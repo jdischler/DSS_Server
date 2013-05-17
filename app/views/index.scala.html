@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>GLBRC DSS v0.01</title>
+    <script src="http://extjs.cachefly.net/ext-4.1.1-gpl/ext-all-debug.js"></script>
+    <script src="http://maps.google.com/maps/api/js?v=3.7&amp;sensor=false"></script>
+	<link rel="stylesheet" href="http://extjs.cachefly.net/ext-4.1.1-gpl/resources/css/ext-all.css">
+    <script src="http://openlayers.org/api/2.12-rc3/OpenLayers.js"></script>
+    <script src="http://svn.osgeo.org/metacrs/proj4js/trunk/lib/proj4js-compressed.js"></script>
+    <script type="text/javascript">OpenLayers.ImgPath = "./app/images/";</script>
+    <script type="text/javascript">
+    	Proj4js.defs["EPSG:3857"] = "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378137 +b=6378137 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs";
+    </script>
+    
+<style type="text/css">
+
+div.olLayerGoogleCopyright, div.olLayerGooglePoweredBy
+{
+	display: none !important;
+}
+
+.x-accordion-hd .x-panel-header-text {
+  color: #022048;
+  text-shadow: 0px -1px 1px #ffffff;
+  filter: dropshadow(color=#ffffff, offx=0, offy=-1);
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.x-panel-header-text-default {
+  color: #022048;
+  text-shadow: 0px -1px 1px #ffffff;
+  filter: dropshadow(color=#ffffff, offx=0, offy=-1);
+  font-weight: bold;
+  font-size: 12px;
+}
+.my-header .x-accordion-hd {
+  background-image: none;
+  background: #95b0db !important;
+  color: #ffffff;
+}
+
+.olControlPanPanel div {
+    background-image: url('app/images/pan-panel.png');
+    height: 18px;
+    width: 18px;
+    cursor: pointer;
+    position: absolute;
+}
+.olControlPanPanel .olControlPanNorthItemInactive {
+    top: 0;
+    left: 9px;
+    background-position: 0 0;
+}
+.olControlPanPanel .olControlPanSouthItemInactive {
+    top: 36px;
+    left: 9px;
+    background-position: 18px 0;
+}
+.olControlPanPanel .olControlPanWestItemInactive {
+    position: absolute;
+    top: 18px;
+    left: 0;
+    background-position: 0 18px;
+}
+.olControlPanPanel .olControlPanEastItemInactive {
+    top: 18px;
+    left: 18px;
+    background-position: 18px 18px;
+}
+.olControlScaleLineBottom {
+   border: solid 2px black;
+   background-color: #668;
+   opacity: 0.75;
+   border-bottom: none;
+   margin-top:-2px;
+   text-align: center;
+   box-shadow: 0px 0px 0px 1px #334;
+}
+.olControlScaleLineTop {
+   border: solid 2px black;
+   background-color: #686;
+   opacity: 0.75;
+   border-top: none;
+   text-align: center;
+   box-shadow: 0px 0px 0px 1px #343;
+}
+
+.olControlScaleLine {
+   display: block;
+   position: absolute;
+   left: 10px;
+   bottom: 15px;
+   font-size: xx-small;
+   color: #fff;
+   text-shadow: 0px 1px 2px #000
+}
+</style>
+    <script type="text/javascript" src="./app/app.js?_dc=1354642241337"></script>
+</head>
+<body></body>
+</html>

@@ -4,6 +4,9 @@ import play.*;
 import java.util.*;
 import java.io.*;
 
+import org.codehaus.jackson.*;
+import org.codehaus.jackson.node.*;
+
 
 //------------------------------------------------------------------------------
 public class Global extends GlobalSettings
@@ -180,10 +183,6 @@ public class Global extends GlobalSettings
 		try {
 			cacheByteLayerLow("cdl");
 			cacheFloatLayerLow("slope", 0.0f, 90.0f, 0, 360);
-//			cacheLayerLow("rivers");
-//			cacheLayerLow("roads");
-//			cacheLayerLow("slope");
-//			cacheLayerLow("watersheds");
 		}
 		catch (Exception e) {
 			Logger.info(e.toString());
@@ -197,6 +196,38 @@ public class Global extends GlobalSettings
 		
 		return mLayers.get(name);
 	}
+	
+	//--------------------------------------------------------------------------
+	public static void queryLayerIndexed(JsonNode layerName, JsonNode matchValuesArray) {
+		String name = layerName.getTextValue();
+		int[][] data = Global.getLayer(name);
+		
+		//Todo: extract array values out of matchValuesArray
+		int test_val = 1;
+
+/*		for (y = 0; y < imgInfo.rows; y++) {
+			for (x = 0; x < imgInfo.cols; x++) {
+				mImgArray[y][x] &= (data[y][x] == test_val ? 1 : 0);
+			}
+		}*/
+	}
+	
+	//--------------------------------------------------------------------------
+	public static void queryLayer(JsonNode queryNode) {
+
+		JsonNode typeNode = queryNode.get("type");
+		if (typeNode != null) {
+			String type = typeNode.getTextValue();
+			if (type.compareToIgnoreCase("indexed") == 0) {
+				
+				JsonNode queryValues = queryNode.get("matchValues");
+				JsonNode queryLayer = queryNode.get("name");
+				if (queryValues != null && queryLayer != null) {
+					queryLayerIndexed(queryLayer, queryValues);
+				}
+			}
+		}
+	}	
 }
 	
 

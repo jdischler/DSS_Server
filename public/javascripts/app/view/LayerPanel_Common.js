@@ -1,24 +1,21 @@
-Ext.define('MyApp.view.Slope_Panel', {
-    extend: 'Ext.panel.Panel',
-    alias: 'widget.slope_panel',
 
-    height: 90,
+//------------------------------------------------------------------------------
+Ext.define('MyApp.view.LayerPanel_Common', {
+    extend: 'Ext.panel.Panel',
+
     layout: {
         type: 'absolute'
     },
-    collapsible: true,
-    manageHeight: false,
-	icon: 'app/images/layers_icon.png',
-//    title: '<input type="checkbox" /> Slope',
-    title: 'Slope',
-    titleCollapse: false,
-    bodyStyle: {"background-color": "#f8faff"},
     
-    //--------------------------------------------------------------------------
+	icon: 'app/images/layers_icon.png',
+    titleCollapse: false,
+    floatable: false,
+    bodyStyle: {"background-color": "#f8faff"},
+
+	//--------------------------------------------------------------------------    
 	listeners: {
 		afterrender: function(c) { 
 			
-			console.log('After render Slope!');
 			var chk = Ext.create('Ext.form.field.Checkbox',
 			{
 				padding: '0 5 0 2',
@@ -79,90 +76,62 @@ Ext.define('MyApp.view.Slope_Panel', {
 		
     	this.DSS_Layer.setOpacity(value);
     },
-	
+    
     //--------------------------------------------------------------------------
     initComponent: function() {
+    	
         var me = this;
-
-        Ext.applyIf(me, {
-            items: [{
-				xtype: 'label',
-				x: 0,
-				y: 14,
-				html: '<p style="text-align:right">Slope</p>',
-				width: 60
-			},
-			{
-				xtype: 'button',
-				x: 70,
-				y: 10,
-				width: 30,
-				text: '>=',
-				tooltip: 'Greater than',
-				handler: function(me,evt) {
-					if (me.text == '>=') {
-						me.setText('>');
-					}
-					else {
-						me.setText('>=');
-					}
-				}
-			},
-			{
-				xtype: 'numberfield',
-				x: 100,
-				y: 10,
-				width: 70,
-				hideEmptyLabel: false,
-				hideLabel: true,
-				decimalPrecision: 1,
-				step: 0.5,
-				value: 10
-			},
-			{
-				xtype: 'button',
-				x: 190,
-				y: 10,
-				width: 30,
-				text: '<=',
-				tooltip: 'Less than',
-				handler: function(me,evt) {
-					if (me.text == '<=') {
-						me.setText('<');
-					}
-					else {
-						me.setText('<=');
-					}
-				}
-			},
-			{
-				xtype: 'numberfield',
-				x: 220,
-				y: 10,
-				width: 70,
-				hideEmptyLabel: false,
-				hideLabel: true,
-				decimalPrecision: 1,
-				step: 0.5
-			},
-			{
-				xtype: 'button',
-				x: 300,
-				y: 10,
-				text: 'Set Selection',
-				handler: function(me,evt) {
-				}
-			},
-			{
-				xtype: 'label',
-				x: 70,
-				y: 40,
-				text: 'Range of values: 0.0 to 45.5'
-			}]
-        });
-
-        me.titleCollapes = false;
         me.callParent(arguments);
-    }
+    },
+    
+    //--------------------------------------------------------------------------
+    submitQuery: function(queryJson) {
+    	
+		var obj = Ext.Ajax.request({
+//    		url: 'http://dss.wei.wisc.edu:9000/query',
+			url: 'http://localhost:9000/query',
+			jsonData: queryJson,
+			timeout: 2000,
+			
+			success: function(response, opts) {
+				console.log("success: ");
+				console.log(response);
+				
+				Ext.defer(function(response) {
+					var bounds = new OpenLayers.Bounds(
+						-10035269.3627204, 5259982.9002571,
+						-9882534.26873933, 5386224.15842662
+					);
+					var imgTest = new OpenLayers.Layer.Image(
+						'Test',
+						response.responseText,
+						bounds,
+						new OpenLayers.Size(2113.0,-2113.0),
+						{
+							buffer: 0,
+							opacity: 0.5,
+							isBaseLayer: false,
+							displayInLayerSwitcher: false,
+							transitionEffect: "resize",
+							visibility: true,
+							maxResolution: "auto",
+							projection: globalMap.getProjectionObject(),
+							numZoomLevels: 16
+						}
+					);
+					var layerBrowser = Ext.getCmp('mapLayerPanel');
+					layerBrowser.addLayer(imgTest, 'Geophysical', 'app/images/raster.png',
+							'Test layer of images!!');
+					globalMap.addLayer(imgTest);
+			
+				}, 1000, this, [response]);
+	
+			},
+			
+			failure: function(respose, opts) {
+				alert("Query Failsauce");
+			}
+		});
+	}
 
 });

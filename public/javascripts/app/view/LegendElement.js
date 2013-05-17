@@ -9,6 +9,7 @@ Ext.define('MyApp.view.LegendElement', {
         type: 'absolute'
     },
 
+    //--------------------------------------------------------------------------
     initComponent: function() {
         var me = this;
 
@@ -41,6 +42,7 @@ Ext.define('MyApp.view.LegendElement', {
                 },
                 {
                     xtype: 'checkboxfield',
+                    itemId: 'DSS_queryCheck',
                     x: 180,
                     y: 3,
                     fieldLabel: 'Label',
@@ -50,6 +52,19 @@ Ext.define('MyApp.view.LegendElement', {
         });
 
         me.callParent(arguments);
+    },
+    
+    //--------------------------------------------------------------------------
+    elementIsChecked: function() {
+    	
+    	var comp = this.getComponent('DSS_queryCheck');
+    	return comp.getValue();
+    },
+    
+    //--------------------------------------------------------------------------
+    getElementQueryIndex: function() {
+    	
+    	return this.DSS_Index;
     }
 
 });

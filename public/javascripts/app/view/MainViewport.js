@@ -19,7 +19,6 @@ Ext.define('MyApp.view.MainViewport', {
 	requires: [
 		'MyApp.view.InfoToolbar',
 		'MyApp.view.MainToolbar',
-		'MyApp.view.QueryEditor',
 		'MyApp.view.ViewTools',
 		'MyApp.view.SelectionTools',
 		'MyApp.view.TransformationTools',
@@ -32,8 +31,8 @@ Ext.define('MyApp.view.MainViewport', {
 		'MyApp.view.GlobalScenarioTools',
 		'MyApp.view.QueryPanelTool',
 		'MyApp.view.ReportTools',
-        'MyApp.view.LegendPanel',
-        'MyApp.view.Slope_Panel'
+        'MyApp.view.LayerPanel_Indexed',
+        'MyApp.view.LayerPanel_Continuous'
 	],
 	
 	autoScroll: true,
@@ -109,12 +108,10 @@ Ext.define('MyApp.view.MainViewport', {
 		
 		map.addControl(new OpenLayers.Control.PanZoomBar({zoomWorldIcon: true}));
 		map.addControl(new OpenLayers.Control.ArgParser());
-//		map.addControl(new OpenLayers.Control.Attribution());
 		
 		var layerSwitcher =new OpenLayers.Control.LayerSwitcher(); 
 		map.addControl(layerSwitcher);
-/*		layerSwitcher.maximizeControl();
-*/		
+		
 		var scaleLine = new OpenLayers.Control.ScaleLine({maxWidth: 200,         					
 			lineSymbolizer: {
 				strokeColor: "#bbb",
@@ -130,31 +127,8 @@ Ext.define('MyApp.view.MainViewport', {
 			}
 		}); 
 		map.addControl(scaleLine);
-				
-/*		var lonlatGrid = new OpenLayers.Control.Graticule({
-			displayInLayerSwitcher: false, 
-			visible: false, 
-			targetSize: 500,
-			numPoints: 8,
-			lineSymbolizer: {
-				strokeColor: "#777",
-				strokeWidth: 1,
-				strokeOpacity: 0.8
-			},
-			labelSymbolizer: {
-				fontColor: '#ddd',
-				labelXOffset: "0",
-				labelYOffset: "2",
-				labelOutlineColor: "#222",
-				labelOutlineWidth: 4
-			}
-		})
-		map.addControl(lonlatGrid);
-		lonlatGrid.draw();
-		lonlatGrid.gratLayer.name = 'Lon/Lat Grid';
-		layerBrowser.addLayer(lonlatGrid.gratLayer, 'Tools','app/images/tool.png',
-				'Activate the longitude/latitude grid overlay');
-*/		
+		
+		// FIXME: maybe just use afterRender listener event?			
 		this.wireInDelayedControls(2000);
 	},
 				
@@ -184,25 +158,6 @@ Ext.define('MyApp.view.MainViewport', {
 				visibility: false
 			});
 		
-/*		//----------------
-		var wmsRoads = new OpenLayers.Layer.WMS("Roads", 
-			["http://" + baseUrl + ":" + port + path,
-			"http://" + baseUrl1 + ":" + port + path,
-			"http://" + baseUrl2 + ":" + port + path,
-			"http://" + baseUrl3 + ":" + port + path],
-			{ 
-				layers: 'DSS-Vector:roads',  
-				transparent: "true",
-				format: imgFormat  
-			},
-			{ 
-				displayOutsideMapExtent: false,
-				isBaseLayer: false,
-				opacity: 0.5,
-				transitionEffect: resizeMethod,
-				visibility: false
-			});
-*/		
 		//----------------
 		var wmsRivers = new OpenLayers.Layer.WMS("Rivers", 
 			["http://" + baseUrl + ":" + port + path,
@@ -249,31 +204,6 @@ Ext.define('MyApp.view.MainViewport', {
 			});
 
 		//----------------
-/*		var wmsDEM = new OpenLayers.Layer.WMS("Digital Elevation", 
-			["http://" + baseUrl + ":" + port + "/geoserver/DSS-Raster-UTM/wms",
-			"http://" + baseUrl1 + ":" + port + "/geoserver/DSS-Raster-UTM/wms",
-			"http://" + baseUrl2 + ":" + port + "/geoserver/DSS-Raster-UTM/wms",
-			"http://" + baseUrl3 + ":" + port + "/geoserver/DSS-Raster-UTM/wms"],
-			{
-				layers: 'DSS-Raster:DEM',
-				format: imgFormat,
-				transparent: true,
-				tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
-			},
-			{
-				buffer: bufferSize,
-				displayOutsideMaxExtent: false,
-				isBaseLayer: false,
-				displayInLayerSwitcher: false,
-				transitionEffect: resizeMethod,
-				opacity: 0.5,
-				visibility: false,
-				yx : {
-					projectionType : true
-				}
-			});
-*/		
-		//----------------
 		var wmsCDL = new OpenLayers.Layer.WMS("CDL", 
 			["http://" + baseUrl + ":" + port + "/geoserver/DSS-Raster-UTM/wms",
 			"http://" + baseUrl1 + ":" + port + "/geoserver/DSS-Raster-UTM/wms",
@@ -312,9 +242,6 @@ Ext.define('MyApp.view.MainViewport', {
 		//----------------
 		layerBrowser.addLayer(wmsCDL, 'Land Coverage','app/images/raster.png',
 				'Activate a raster overlay of land usage');
-
-//		layerBrowser.addLayer(wmsDEM, 'Geophysical','app/images/raster.png',
-//				'Activate a raster overlay of elevation');
 		layerBrowser.addLayer(wmsSlope, 'Geophysical','app/images/raster.png',
 				'Activate a raster overlay of calculated terrain slope');
 		layerBrowser.addLayer(wmsRivers, 'Geophysical','app/images/vector.png',
@@ -324,13 +251,12 @@ Ext.define('MyApp.view.MainViewport', {
 	
 		map.addLayers([googTerrain,googHybrid,
 			wmsCDL,
-//			wmsDEM,
 			wmsSlope,
 			wmsWatersheds,
 			wmsRivers
 			]);
 		
-		var lpCDL = Ext.create('MyApp.view.LegendPanel', {
+		var lpCDL = Ext.create('MyApp.view.LayerPanel_Indexed', {
 			DSS_Layer: wmsCDL,
 			title: 'Cropland Data',
 			minHeight: 90,
@@ -339,43 +265,72 @@ Ext.define('MyApp.view.MainViewport', {
 			DSS_LegendElements: [{
 				DSS_LegendElementType: 'Corn',
 				DSS_LegendElementColor: '#ffdd00',
+				DSS_Index: 1
 			},
 			{
 				DSS_LegendElementType: 'Soy',
 				DSS_LegendElementColor: '#009900',
+				DSS_Index: 2
 			},
 			{
 				DSS_LegendElementType: 'Water',
 				DSS_LegendElementColor: '#5599ff',
+				DSS_Index: 141
 			},
 			{
 				DSS_LegendElementType: 'Trees',
 				DSS_LegendElementColor: '#99ffdd',
+				DSS_Index: 181
 			},
 			{
 				DSS_LegendElementType: 'Urban',
 				DSS_LegendElementColor: '#cccccc',
+				DSS_Index: 196
 			},
 			{
 				DSS_LegendElementType: 'Area 51',
 				DSS_LegendElementColor: '#cc0000',
+				DSS_Index: 6
 			},
 			{
 				DSS_LegendElementType: 'Cancer Research',
 				DSS_LegendElementColor: '#ffaaff',
+				DSS_Index: 10
 			},
 			{
 				DSS_LegendElementType: 'Taters',
 				DSS_LegendElementColor: '#774400',
-			}]
+				DSS_Index: 11
+			}],
+			
+			DSS_QueryTable: 'cdl'
 		});
 		
-		var lpSlope = Ext.create('MyApp.view.Slope_Panel', {
-			DSS_Layer: wmsSlope
+		var lpSlope = Ext.create('MyApp.view.LayerPanel_Continuous', {
+			title: 'Slope',
+			DSS_Layer: wmsSlope,
+			DSS_LayerUnit: '\xb0',
+			DSS_LayerRangeMin: 0,
+			DSS_LayerRangeMax: 45.5,
+			DSS_ValueDefaultGreater: 10,
+			DSS_QueryTable: 'slope'
+		});
+
+		var lpRiver = Ext.create('MyApp.view.LayerPanel_Continuous', {
+			title: 'River',
+			DSS_Layer: wmsRivers,
+			DSS_LayerUnit: 'm',
+			DSS_LayerRangeMin: 0,
+			DSS_LayerRangeMax: 915.5,
+			DSS_ValueDefaultLess: 120,
+			DSS_QueryTable: 'river'
 		});
 		
 		Ext.getCmp('DSS_LeftPanel').insert(0,lpSlope);
+		Ext.getCmp('DSS_LeftPanel').insert(0,lpRiver);
 		Ext.getCmp('DSS_LeftPanel').insert(0,lpCDL);
+		
+		
 	},
 	
 	//--------------------------------------------------------------------------
@@ -422,11 +377,6 @@ Ext.define('MyApp.view.MainViewport', {
 						src: 'app/images/dss_logo.png'
 					}]
 				},
-/*				{
-					xtype: 'queryEditor',
-					dock: 'top',
-					collapsed: true
-				},*/
 				{
 					xtype: 'infotoolbar',
 					dock: 'bottom'

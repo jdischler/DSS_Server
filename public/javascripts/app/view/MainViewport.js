@@ -21,8 +21,6 @@ Ext.define('MyApp.view.MainViewport', {
 	extend: 'Ext.container.Viewport',
 	requires: [
 		'MyApp.view.InfoToolbar',
-		'MyApp.view.MainToolbar',
-		'MyApp.view.ViewTools',
 		'MyApp.view.SelectionTools',
 		'MyApp.view.TransformationTools',
 		'MyApp.view.ManagementTools',
@@ -32,7 +30,6 @@ Ext.define('MyApp.view.MainViewport', {
 		'MyApp.view.LayerPanel',
 		'MyApp.view.ScenarioTools',
 		'MyApp.view.GlobalScenarioTools',
-		'MyApp.view.QueryPanelTool',
 		'MyApp.view.ReportTools',
         'MyApp.view.LayerPanel_Indexed',
         'MyApp.view.LayerPanel_Continuous'

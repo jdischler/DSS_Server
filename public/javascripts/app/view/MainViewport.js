@@ -11,6 +11,9 @@ var path = "/geoserver/DSS-Vector-UTM/wms";
 var port = '8080';
 var resizeMethod = null; // "resize";
 
+// boo
+var DSS_globalQueryableLayers = [];
+
 //------------------------------------------------------------------------------
 Ext.define('MyApp.view.MainViewport', {
 //------------------------------------------------------------------------------
@@ -239,7 +242,7 @@ Ext.define('MyApp.view.MainViewport', {
 				type: google.maps.MapTypeId.HYBRID, maxZoomLevel: 20, minZoomLevel: 9
 			});
 		
-		//----------------
+/*		//----------------
 		layerBrowser.addLayer(wmsCDL, 'Land Coverage','app/images/raster.png',
 				'Activate a raster overlay of land usage');
 		layerBrowser.addLayer(wmsSlope, 'Geophysical','app/images/raster.png',
@@ -248,7 +251,7 @@ Ext.define('MyApp.view.MainViewport', {
 				'Activate a vector overlay of all rivers');
 		layerBrowser.addLayer(wmsWatersheds, 'Geophysical','app/images/vector.png',
 				'Activate a vector overlay of the watersheds');
-	
+*/	
 		map.addLayers([googTerrain,googHybrid,
 			wmsCDL,
 			wmsSlope,
@@ -263,44 +266,53 @@ Ext.define('MyApp.view.MainViewport', {
 			maxHeight: 400,
 			icon: 'app/images/layers_icon.png',
 			DSS_LegendElements: [{
-				DSS_LegendElementType: 'Corn',
-				DSS_LegendElementColor: '#ffdd00',
+				DSS_LegendElementType: 'Corn and Beans', // 1,255,85,0,Corn and beans
+				DSS_LegendElementColor: '#ff5500',
 				DSS_Index: 1
-			},
-			{
-				DSS_LegendElementType: 'Soy',
-				DSS_LegendElementColor: '#009900',
+			},{
+				DSS_LegendElementType: 'Small Grains', //2,255,102,0,Small grains
+				DSS_LegendElementColor: '#ff6600',
 				DSS_Index: 2
-			},
-			{
-				DSS_LegendElementType: 'Water',
-				DSS_LegendElementColor: '#5599ff',
-				DSS_Index: 141
-			},
-			{
-				DSS_LegendElementType: 'Trees',
-				DSS_LegendElementColor: '#99ffdd',
-				DSS_Index: 181
-			},
-			{
-				DSS_LegendElementType: 'Urban',
-				DSS_LegendElementColor: '#cccccc',
-				DSS_Index: 196
-			},
-			{
-				DSS_LegendElementType: 'Area 51',
-				DSS_LegendElementColor: '#cc0000',
+			},{
+				DSS_LegendElementType: 'Vegetables', //3,255,132,0,255,Vegetables
+				DSS_LegendElementColor: '#ff8400',
+				DSS_Index: 3
+			},{
+				DSS_LegendElementType: 'Tree Crops', //4,255,204,0,255,Tree crops
+				DSS_LegendElementColor: '#ffcc00',
+				DSS_Index: 4
+			},{
+				DSS_LegendElementType: 'Other Crops', //5,255,255,0,255,Other crops
+				DSS_LegendElementColor: '#ffff00',
+				DSS_Index: 5
+			},{
+				DSS_LegendElementType: 'Grass and forage', //6,0,85,0,255,Grass and forage
+				DSS_LegendElementColor: '#005500',
 				DSS_Index: 6
-			},
-			{
-				DSS_LegendElementType: 'Cancer Research',
-				DSS_LegendElementColor: '#ffaaff',
+			},{
+				DSS_LegendElementType: 'Woodlands', //7,85,0,0,255,Woodland
+				DSS_LegendElementColor: '#550000',
+				DSS_Index: 7
+			},{
+				DSS_LegendElementType: 'Wetland', //8,0,0,104,255,Wetland
+				DSS_LegendElementColor: '#000068',
+				DSS_Index: 8
+			},{
+				DSS_LegendElementType: 'Open Water', //9,0,128,255,255,Open water
+				DSS_LegendElementColor: '#0080ff',
+				DSS_Index: 9
+			},{
+				DSS_LegendElementType: 'Suburbs', //10,104,104,104,255,Suburbs
+				DSS_LegendElementColor: '#686868',
 				DSS_Index: 10
-			},
-			{
-				DSS_LegendElementType: 'Taters',
-				DSS_LegendElementColor: '#774400',
+			},{
+				DSS_LegendElementType: 'Urban', //11,49,49,49,255,Urban
+				DSS_LegendElementColor: '#313131',
 				DSS_Index: 11
+			},{
+				DSS_LegendElementType: 'Barren', //12,0,0,0,255,Barren
+				DSS_LegendElementColor: '#000000',
+				DSS_Index: 12
 			}],
 			
 			DSS_QueryTable: 'cdl'
@@ -323,14 +335,18 @@ Ext.define('MyApp.view.MainViewport', {
 			DSS_LayerRangeMin: 0,
 			DSS_LayerRangeMax: 915.5,
 			DSS_ValueDefaultLess: 120,
-			DSS_QueryTable: 'river'
+			DSS_QueryTable: 'river',
+			collapsed: true
 		});
 		
 		Ext.getCmp('DSS_LeftPanel').insert(0,lpSlope);
 		Ext.getCmp('DSS_LeftPanel').insert(0,lpRiver);
 		Ext.getCmp('DSS_LeftPanel').insert(0,lpCDL);
 		
-		
+		// BOO
+		DSS_globalQueryableLayers.push(lpCDL);
+		DSS_globalQueryableLayers.push(lpSlope);
+		console.log(DSS_globalQueryableLayers);
 	},
 	
 	//--------------------------------------------------------------------------
@@ -461,3 +477,4 @@ Ext.define('MyApp.view.MainViewport', {
     }
 
 });
+

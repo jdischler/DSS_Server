@@ -62,6 +62,14 @@ Ext.define('MyApp.view.LegendElement', {
     },
     
     //--------------------------------------------------------------------------
+    clearCheck: function() {
+    	
+    	var comp = this.getComponent('DSS_queryCheck');
+    	comp.setValue(false);
+    },
+
+    
+    //--------------------------------------------------------------------------
     getElementQueryIndex: function() {
     	
     	return this.DSS_Index;

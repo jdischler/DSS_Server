@@ -49,7 +49,16 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
 				y: 35,
 				text: 'Set Selection',
 				handler: function() {
-					this.up().setSelection();
+					this.up().buildQuery();
+				}
+			},
+			{
+				xtype: 'button',
+				x: 300,
+				y: 60,
+				text: 'Clear Checks',
+				handler: function() {
+					this.up().clearChecks();
 				}
 			}]
         });
@@ -69,27 +78,37 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
     //--------------------------------------------------------------------------
     setSelection: function() {
     	
-    	var requestData = {
-    		clientID: 12345, //temp
-    		queryLayers: []
-    	};
-		
 		var queryLayer = { 
 			name: this.DSS_QueryTable,
 			type: 'indexed',
 			matchValues: []
 		};
 		
+		var addedElement = false;
         var cont = this.getComponent('legendcontainer');
         for (var i = 0; i < cont.items.length; i++) {
         	var item = cont.items.items[i];
         	if (item.elementIsChecked()) {
+        		addedElement = true;
         		var queryIdx = item.getElementQueryIndex();
         		queryLayer.matchValues.push(queryIdx);
         	}
         }
-        requestData.queryLayers.push(queryLayer);
-        console.log(requestData);
-        this.submitQuery(requestData);
+        
+        if (!addedElement) {
+        	return;
+        }
+        return queryLayer;
+    },
+    
+    //--------------------------------------------------------------------------
+    clearChecks: function() {
+    
+        var cont = this.getComponent('legendcontainer');
+        for (var i = 0; i < cont.items.length; i++) {
+        	var item = cont.items.items[i];
+        	item.clearCheck();
+        }
     }
+    
 });

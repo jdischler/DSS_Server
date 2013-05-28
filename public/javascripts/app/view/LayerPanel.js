@@ -109,7 +109,7 @@ Ext.define('MyApp.view.LayerPanel', {
     alias: 'widget.layerPanel',
 
     id: 'mapLayerPanel',
-    title: 'View Landscape',
+    title: 'View Selections',
 	icon: 'app/images/layers_icon.png',
 
     store: store,

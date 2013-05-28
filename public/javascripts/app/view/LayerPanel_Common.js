@@ -85,6 +85,34 @@ Ext.define('MyApp.view.LayerPanel_Common', {
     },
     
     //--------------------------------------------------------------------------
+    buildQuery: function() {
+    	
+       	var requestData = {
+    		clientID: 12345, //temp
+    		queryLayers: []
+    	};
+
+    	var query = false;
+    	for (var i = 0; i < DSS_globalQueryableLayers.length; i++) {
+    		
+    		if (!DSS_globalQueryableLayers[i].collapsed) {
+    			var queryComp = DSS_globalQueryableLayers[i].setSelection();
+    			console.log(queryComp);
+    			requestData.queryLayers.push(queryComp);
+    			query = true;
+    		}
+    	}
+    	
+		console.log(requestData);
+		if (query) {
+			this.submitQuery(requestData);
+		}
+		else {
+			alert("No query built - nothing to query");
+		}
+    },
+    
+    //--------------------------------------------------------------------------
     submitQuery: function(queryJson) {
     	
 		var obj = Ext.Ajax.request({
@@ -99,37 +127,40 @@ Ext.define('MyApp.view.LayerPanel_Common', {
 				
 				Ext.defer(function(response) {
 					var bounds = new OpenLayers.Bounds(
-						-10035269.3627204, 5259982.9002571,
-						-9882534.26873933, 5386224.15842662
+						-10067785.16592, 5246156.162177,
+						-10067785.16592 + (4709 * 40.261055644652),
+						5246156.162177 + (3868 * 40.261055644652)
+//						-10035269.3627204, 5259982.9002571,
+//						-9882534.26873933, 5386224.15842662
 					);
 					var imgTest = new OpenLayers.Layer.Image(
-						'Test',
+						'Selection',
 						response.responseText,
 						bounds,
 						new OpenLayers.Size(2113.0,-2113.0),
 						{
 							buffer: 0,
-							opacity: 0.5,
+							opacity: 1.0,
 							isBaseLayer: false,
 							displayInLayerSwitcher: false,
 							transitionEffect: "resize",
 							visibility: true,
 							maxResolution: "auto",
 							projection: globalMap.getProjectionObject(),
-							numZoomLevels: 16
+							numZoomLevels: 17
 						}
 					);
 					var layerBrowser = Ext.getCmp('mapLayerPanel');
-					layerBrowser.addLayer(imgTest, 'Geophysical', 'app/images/raster.png',
-							'Test layer of images!!');
+					layerBrowser.addLayer(imgTest, 'Selection', 'app/images/raster.png',
+							'Selection');
 					globalMap.addLayer(imgTest);
 			
-				}, 1000, this, [response]);
+				}, 2000, this, [response]);
 	
 			},
 			
 			failure: function(respose, opts) {
-				alert("Query Failsauce");
+				alert("Query failed, request timed out?");
 			}
 		});
 	}

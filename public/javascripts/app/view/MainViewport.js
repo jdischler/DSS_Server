@@ -21,7 +21,6 @@ Ext.define('MyApp.view.MainViewport', {
 	extend: 'Ext.container.Viewport',
 	requires: [
 		'MyApp.view.InfoToolbar',
-		'MyApp.view.SelectionTools',
 		'MyApp.view.TransformationTools',
 		'MyApp.view.ManagementTools',
 		'MyApp.view.EvaluationTools',
@@ -138,27 +137,6 @@ Ext.define('MyApp.view.MainViewport', {
 		var layerBrowser = Ext.getCmp('mapLayerPanel');
 		
 		//----------------
-		var wmsWatersheds = new OpenLayers.Layer.WMS("Watersheds", 
-			["http://" + baseUrl + ":" + port + path,
-			"http://" + baseUrl1 + ":" + port + path,
-			"http://" + baseUrl2 + ":" + port + path,
-			"http://" + baseUrl3 + ":" + port + path],
-			{
-				layers: 'DSS-Vector:watersheds',
-				transparent: true,
-				format: imgFormat
-			},
-			{ 
-				displayOutsideMapExtent: false,
-				opacity: 0.5,
-				isBaseLayer: false,
-				displayInLayerSwitcher: false,
-				transitionEffect: resizeMethod,
-				buffer: bufferSize,
-				visibility: false
-			});
-		
-		//----------------
 		var wmsRivers = new OpenLayers.Layer.WMS("Rivers", 
 			["http://" + baseUrl + ":" + port + path,
 			"http://" + baseUrl1 + ":" + port + path,
@@ -239,20 +217,9 @@ Ext.define('MyApp.view.MainViewport', {
 				type: google.maps.MapTypeId.HYBRID, maxZoomLevel: 20, minZoomLevel: 9
 			});
 		
-/*		//----------------
-		layerBrowser.addLayer(wmsCDL, 'Land Coverage','app/images/raster.png',
-				'Activate a raster overlay of land usage');
-		layerBrowser.addLayer(wmsSlope, 'Geophysical','app/images/raster.png',
-				'Activate a raster overlay of calculated terrain slope');
-		layerBrowser.addLayer(wmsRivers, 'Geophysical','app/images/vector.png',
-				'Activate a vector overlay of all rivers');
-		layerBrowser.addLayer(wmsWatersheds, 'Geophysical','app/images/vector.png',
-				'Activate a vector overlay of the watersheds');
-*/	
 		map.addLayers([googTerrain,googHybrid,
 			wmsCDL,
 			wmsSlope,
-			wmsWatersheds,
 			wmsRivers
 			]);
 		
@@ -374,8 +341,6 @@ Ext.define('MyApp.view.MainViewport', {
 					layout: {
 						type: 'absolute'
 					},
-//					title: 'GLBRC Decision Support Tool v0.1',
-//					titleAlign: 'center',
 					header: false,
 					dock: 'top',
 					collapsible: true,
@@ -421,18 +386,10 @@ Ext.define('MyApp.view.MainViewport', {
 							p.setTitle('');
 						},
 					},
-					items: [/*{
-						xtype: 'legendpanel'
-					},
-					{
-						xtype: 'slope_panel'
-					},*/
+					items: [
 					{
 						xtype: 'layerPanel'
 					},
-/*					{
-						xtype: 'querypanel'
-					},*/
 					{
 						xtype: 'scenariotools',
 						collapsed: true

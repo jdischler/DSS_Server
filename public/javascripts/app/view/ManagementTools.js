@@ -28,24 +28,20 @@ Ext.define('MyApp.view.ManagementTools', {
         var me = this;
 
         Ext.applyIf(me, {
-            items: [
-                {
-                    xtype: 'panel',
-                    bodyPadding: 10,
-                    title: 'Management',
-                    items: [
-                        {
-                            xtype: 'combobox',
-                            store: 'store1'
-                        }
-                    ]
-                },
-                {
-                    xtype: 'panel',
-                    bodyPadding: 10,
-                    title: 'Properties'
-                }
-            ]
+            items: [{
+				xtype: 'panel',
+				bodyPadding: 10,
+				title: 'Management',
+				items: [{
+					xtype: 'combobox',
+					store: 'store1'
+				}]
+			},
+			{
+				xtype: 'panel',
+				bodyPadding: 10,
+				title: 'Properties'
+			}]
         });
 
         me.callParent(arguments);

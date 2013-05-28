@@ -31,7 +31,6 @@ Ext.application({
     views: [
         'InfoToolbar',
         'MainViewport',
-        'SelectionTools',
         'TransformationTools',
         'ManagementTools',
         'EvaluationTools',

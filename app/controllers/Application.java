@@ -19,11 +19,6 @@ import javax.xml.bind.DatatypeConverter;
 //------------------------------------------------------------------------------
 public class Application extends Controller {
 	
-	static int counter;
-	// FIXME: not thread safe in the sense that multiple incoming queries will 'fight' with each other
-	static int[][] mImgArray;
-	static int mWidth, mHeight;
-	
 	//--------------------------------------------------------------------------
 	public static Result index() {
 		
@@ -35,8 +30,6 @@ public class Application extends Controller {
 		
 		Query query = new Query();
 		String urlPath = query.exec(request().body().asJson());
-		
-//		return ok("http://dss.wei.wisc.edu:9000/app" + partialPath);
-		return ok("http://localhost:9000" + urlPath);
+		return ok(urlPath);
 	}
 }

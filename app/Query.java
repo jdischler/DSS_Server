@@ -53,19 +53,21 @@ public class Query {
 		Logger.info("Called into query");
 		Logger.info(requestBody.toString());
 		
-//		String fullPath = Play.application().path().getPath() + "/public/file/test" + String.valueOf(counter) + ".png";
-//		Logger.info(fullPath);
-		
 		String partialPath = "/public/file/test" + String.valueOf(mCounter) + ".png";
+		// FIXME: not sure why play doesn't hand me back the expected directory path in production?
+		if (Play.isProd()) {
+			// FIXME: blugh, like this won't be totally fragile? :)
+			partialPath = "/target/scala-2.10/classes" + partialPath;
+		}
 		String urlPath = "/app/file/test" + String.valueOf(mCounter) + ".png";
-		Logger.info(partialPath);
+		Logger.info("File write path: " + partialPath);
 		mCounter++;
 		
 		// create image at 8 bit per pixel, indexed
 		ImageInfo imgInfo = new ImageInfo(mWidth, mHeight, 8, false, false, true);
 		OutputStream outputStream = new FileOutputStream("." + partialPath);
 		PngWriter pngW = new PngWriter(outputStream, imgInfo);
-//		pngW.setCompLevel(9);
+//		pngW.setCompLevel(9); // compression level not working?
 		pngW.getMetadata().setDpi(306.98);
 		PngChunkPLTE palette = pngW.getMetadata().createPLTEChunk();
 		palette.setNentries(2);

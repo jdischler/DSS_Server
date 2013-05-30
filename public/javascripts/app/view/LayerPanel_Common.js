@@ -115,16 +115,25 @@ Ext.define('MyApp.view.LayerPanel_Common', {
     //--------------------------------------------------------------------------
     submitQuery: function(queryJson) {
     	
+    	
+		var button = this.getComponent('selectionbutton');
+		button.setIcon('app/images/spinner_16a.gif');
+		button.setDisabled(true);
+
 		var obj = Ext.Ajax.request({
-//    		url: 'http://dss.wei.wisc.edu:9000/query',
-			url: 'http://localhost:9000/query',
+			url: location.href + 'query',
 			jsonData: queryJson,
-			timeout: 2000,
+			timeout: 15000, // in milliseconds
 			
 			success: function(response, opts) {
 				console.log("success: ");
 				console.log(response);
 				
+				// TODO: not 100% sure a delay is needed here? Was added to give server
+				//	time to finish writing out file...but if the OK response comes back from the server
+				//	...that is AFTER the file write process so the file should be ready?
+				// Still, sometimes the file fails to be found if we request the image too fast...
+				//	as if the server is still finishing writing it out?
 				Ext.defer(function(response) {
 					var bounds = new OpenLayers.Bounds(
 						-10067785.16592, 5246156.162177,
@@ -147,7 +156,7 @@ Ext.define('MyApp.view.LayerPanel_Common', {
 							visibility: true,
 							maxResolution: "auto",
 							projection: globalMap.getProjectionObject(),
-							numZoomLevels: 17
+							numZoomLevels: 19
 						}
 					);
 					var layerBrowser = Ext.getCmp('mapLayerPanel');
@@ -155,11 +164,16 @@ Ext.define('MyApp.view.LayerPanel_Common', {
 							'Selection');
 					globalMap.addLayer(imgTest);
 			
-				}, 2000, this, [response]);
+					button.setIcon(null);
+					button.setDisabled(false);
+					
+				}, 1000, this, [response]);
 	
 			},
 			
 			failure: function(respose, opts) {
+				button.setIcon(null);
+				button.setDisabled(false);
 				alert("Query failed, request timed out?");
 			}
 		});

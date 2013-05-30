@@ -45,7 +45,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 				itemId: 'DSS_GreaterThanValue',
 				x: 100,
 				y: 10,
-				width: 60,
+				width: 54,
 				hideEmptyLabel: false,
 				hideLabel: true,
 				decimalPrecision: 1,
@@ -53,19 +53,27 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 				value: me.DSS_ValueDefaultGreater
 			},{
 				xtype: 'label',
-				x: 163,
+				x: 157,
 				y: 14,
 				html: me.DSS_LayerUnit,
 				width: 60
-			},/*{
+			},{
 				xtype: 'button',
 				icon: 'app/images/switch_icon.png',
+				tooltip: 'Swap values',
 				x: 170,
-				y: 10
-			},*/{
+				y: 10,
+				handler: function(me,evt) {
+					var gtrValue = me.up().getComponent('DSS_GreaterThanValue');
+					var lessValue = me.up().getComponent('DSS_LessThanValue');
+					var temp = gtrValue.getValue();
+					gtrValue.setValue(lessValue.getValue());
+					lessValue.setValue(temp);
+				}
+			},{
 				xtype: 'button',
 				itemId: 'DSS_LessThanTest',
-				x: 190,
+				x: 195,
 				y: 10,
 				width: 30,
 				text: '<=',
@@ -81,9 +89,9 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 			},{
 				xtype: 'numberfield',
 				itemId: 'DSS_LessThanValue',
-				x: 220,
+				x: 225,
 				y: 10,
-				width: 60,
+				width: 54,
 				hideEmptyLabel: false,
 				hideLabel: true,
 				decimalPrecision: 1,
@@ -91,12 +99,14 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 				value: me.DSS_ValueDefaultLess
 			},{
 				xtype: 'label',
-				x: 283,
+				x: 282,
 				y: 14,
 				html: me.DSS_LayerUnit,
 				width: 60
 			},{
 				xtype: 'button',
+				itemId: 'selectionbutton',
+				iconAlign: 'right',
 				x: 300,
 				y: 10,
 				text: 'Set Selection',

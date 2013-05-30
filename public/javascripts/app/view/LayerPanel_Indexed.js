@@ -45,6 +45,8 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
 			},
 			{
 				xtype: 'button',
+				itemId: 'selectionbutton',
+				iconAlign: 'right',
 				x: 300,
 				y: 35,
 				text: 'Set Selection',

@@ -83,7 +83,13 @@ public class Layer_Continuous extends Layer_Base
 	}
 
 	//--------------------------------------------------------------------------
-	public int[][] query(JsonNode queryNode, int[][] workArray) {
+	protected void onLoadEnd() {
+		Logger.info("Value range is: " + Float.toString(mLayerMin) + 
+						" to " + Float.toString(mLayerMax));
+	}
+	
+	//--------------------------------------------------------------------------
+	protected int[][] query(JsonNode queryNode, int[][] workArray) {
 
 		Logger.info("Running continuous query");
 
@@ -188,23 +194,23 @@ public class Layer_Continuous extends Layer_Base
 			}
 		}
 		else if (isLessThan) {
-			// <=
-			Logger.info("<=");
-			for (y = 0; y < mHeight; y++) {
-				for (x = 0; x < mWidth; x++) {
-					workArray[y][x] &= 
-						(mData[y][x] <= maxVal 
-						? 1 : 0);
-				}
-			}
-		}
-		else if (isLessThanEqual) {
 			// <
 			Logger.info("<");
 			for (y = 0; y < mHeight; y++) {
 				for (x = 0; x < mWidth; x++) {
 					workArray[y][x] &= 
 						(mData[y][x] < maxVal 
+						? 1 : 0);
+				}
+			}
+		}
+		else if (isLessThanEqual) {
+			// <=
+			Logger.info("<=");
+			for (y = 0; y < mHeight; y++) {
+				for (x = 0; x < mWidth; x++) {
+					workArray[y][x] &= 
+						(mData[y][x] <= maxVal 
 						? 1 : 0);
 				}
 			}

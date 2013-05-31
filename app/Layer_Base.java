@@ -8,7 +8,7 @@ import org.codehaus.jackson.*;
 import org.codehaus.jackson.node.*;
 
 //------------------------------------------------------------------------------
-public abstract class Layer_Base// implements Layer
+public abstract class Layer_Base
 {
 	private static Map<String, Layer_Base>	mLayers;
 	
@@ -110,6 +110,8 @@ public abstract class Layer_Base// implements Layer
 		finally {
 			br.close();
 		}
+		
+		onLoadEnd();
 	}
 	
 	//--------------------------------------------------------------------------
@@ -119,7 +121,8 @@ public abstract class Layer_Base// implements Layer
 	}
 	
 	//--------------------------------------------------------------------------
-	abstract public int[][] query(JsonNode queryNode, int[][] workArray);
+	abstract protected void onLoadEnd();
+	abstract protected int[][] query(JsonNode queryNode, int[][] workArray);
 	abstract protected void processASC_Line(int y, String lineElementsArray[]);
 		
 	//--------------------------------------------------------------------------

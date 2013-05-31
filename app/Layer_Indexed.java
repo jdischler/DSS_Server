@@ -48,6 +48,9 @@ public class Layer_Indexed extends Layer_Base
 	}
 
 	//--------------------------------------------------------------------------
+	protected void onLoadEnd() {}
+		
+	//--------------------------------------------------------------------------
 	private int getCompareBitMask(JsonNode matchValuesArray) {
 		
 		int queryMask = 0;
@@ -79,7 +82,7 @@ public class Layer_Indexed extends Layer_Base
 	}
 	
 	//--------------------------------------------------------------------------
-	public int[][] query(JsonNode queryNode, int[][] workArray) {
+	protected int[][] query(JsonNode queryNode, int[][] workArray) {
 
 		Logger.info("Running indexed query");
 		JsonNode queryValues = queryNode.get("matchValues");

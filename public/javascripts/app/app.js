@@ -23,10 +23,7 @@ Ext.Loader.setConfig({
 
 Ext.application({
     stores: [
-        'store1',
-        'landCoverTypes',
-        'selectionModification',
-        'selectionTool'
+        'store1'
     ],
     views: [
         'InfoToolbar',

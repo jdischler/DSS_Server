@@ -26,6 +26,16 @@ public class Layer_Continuous extends Layer_Base
 */
 	
 	//--------------------------------------------------------------------------
+	public float getLayerMin() {
+		return mLayerMin;
+	}
+	
+	//--------------------------------------------------------------------------
+	public float getLayerMax() {
+		return mLayerMax;
+	}
+	
+	//--------------------------------------------------------------------------
 	public Layer_Continuous(String name, float fMin, float fMax, int iMin, int iMax) {
 
 		super(name);

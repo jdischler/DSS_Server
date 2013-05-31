@@ -122,36 +122,42 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 			}]
         });
 
+        me.requestLayerRange(me);
+        
         me.callParent(arguments);
     },
 
-    // TODO: finish!
 	//--------------------------------------------------------------------------
-    requestLayerRange: function() {
+    requestLayerRange: function(container) {
 
 		var queryLayerRequest = { 
-			name: this.DSS_QueryTable,
+			name: container.DSS_QueryTable,
 			type: 'layerRange',
 		};
     	
 		var obj = Ext.Ajax.request({
-			url: 'http://localhost:9000/layerRequest',
+			url: 'http://localhost:9000/layerParmRequest',
 			jsonData: queryLayerRequest,
 			timeout: 2000,
 			
 			success: function(response, opts) {
-				console.log("success: ");
-				console.log(response);
 				
-				var label = this.up().getComponent('DSS_ValueRange');
+				var label = container.getComponent('DSS_ValueRange');
 				
-				this.DSS_LayerRangeMin = response.layerMin;
-				this.DSS_LayerRangeMax = response.layerMax;
+				// Note: old versions of IE may not support Json.parse...
+				var obj = JSON.parse(response.responseText);
+				
+				if (obj.length == 0 || obj.layerMin == null || obj.layerMax == null) {
+					console.log("layer request object return was null?");
+					return;
+				}
+				container.DSS_LayerRangeMin = obj.layerMin;
+				container.DSS_LayerRangeMax = obj.layerMax;
 				
 				var rangeLabel = 'Range of values: ' + 
-        					this.DSS_LayerRangeMin.toFixed(1) + this.DSS_LayerUnit +
+        					obj.layerMin.toFixed(1) + container.DSS_LayerUnit +
         					' to ' + 
-        					this.DSS_LayerRangeMax.toFixed(1) + methisDSS_LayerUnit;
+        					obj.layerMax.toFixed(1) + container.DSS_LayerUnit;
 
 				label.setText(rangeLabel);
 			},

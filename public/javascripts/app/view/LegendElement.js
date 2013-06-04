@@ -3,7 +3,7 @@ Ext.define('MyApp.view.LegendElement', {
     extend: 'Ext.container.Container',
     alias: 'widget.legendelement',
 
-    height: 27,
+    height: 24,
     width: 220,
     layout: {
         type: 'absolute'
@@ -23,28 +23,28 @@ Ext.define('MyApp.view.LegendElement', {
             items: [
                 {
                     xtype: 'container',
-                    x: 20,
+                    x: 18,
                     y: 1,
                     frame: false,
-                    height: 22,
+                    height: 19,
+                    width: 28,
                     html: '',
                     style: {
                         'background-color': me.DSS_LegendElementColor,
                         border: '1px dotted #BBBBBB'
-                    },
-                    width: 25
+                    }
                 },
                 {
                     xtype: 'label',
                     x: 55,
-                    y: 5,
+                    y: 2,
                     text: me.DSS_LegendElementType
                 },
                 {
                     xtype: 'checkboxfield',
                     itemId: 'DSS_queryCheck',
                     x: 180,
-                    y: 3,
+                    y: -1,
                     fieldLabel: 'Label',
                     hideLabel: true
                 }

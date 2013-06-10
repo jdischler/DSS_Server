@@ -16,3 +16,7 @@ dist
 *.txt#
 
 *.asc#
+
+*.java#
+
+*.js#

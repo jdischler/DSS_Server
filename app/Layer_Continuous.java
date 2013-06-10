@@ -19,12 +19,6 @@ public class Layer_Continuous extends Layer_Base
 	boolean mbInitedMinMaxCache;
 	float	mLayerMin, mLayerMax;
 	
-/*	// from Layer_Base
-	private Integer mWidth, mHeight;
-	private Integer mNoDataValue;
-	private int[][] mData;
-*/
-	
 	//--------------------------------------------------------------------------
 	public float getLayerMin() {
 		return mLayerMin;
@@ -94,6 +88,7 @@ public class Layer_Continuous extends Layer_Base
 
 	//--------------------------------------------------------------------------
 	protected void onLoadEnd() {
+		
 		Logger.info("Value range is: " + Float.toString(mLayerMin) + 
 						" to " + Float.toString(mLayerMax));
 	}

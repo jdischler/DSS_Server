@@ -10,6 +10,7 @@ var baseUrl3 = 'pgis3.wei.wisc.edu';
 var path = "/geoserver/DSS-Vector-UTM/wms";
 var port = '8080';
 var resizeMethod = null; // "resize";
+var DSS_LogoPanelHeight = 64;
 
 // boo
 var DSS_globalQueryableLayers = [];
@@ -26,12 +27,13 @@ Ext.define('MyApp.view.MainViewport', {
 		'MyApp.view.EvaluationTools',
 		'MyApp.view.GraphTools',
 		'GeoExt.panel.Map',
-		'MyApp.view.LayerPanel',
 		'MyApp.view.ScenarioTools',
 		'MyApp.view.GlobalScenarioTools',
 		'MyApp.view.ReportTools',
+		'MyApp.view.LayerPanel_Google',
         'MyApp.view.LayerPanel_Indexed',
-        'MyApp.view.LayerPanel_Continuous'
+        'MyApp.view.LayerPanel_Continuous',
+        'MyApp.view.LayerPanel_CurrentSelection'
 	],
 	
 	autoScroll: true,
@@ -107,9 +109,6 @@ Ext.define('MyApp.view.MainViewport', {
 		
 		map.addControl(new OpenLayers.Control.PanZoomBar({zoomWorldIcon: true}));
 		map.addControl(new OpenLayers.Control.ArgParser());
-		
-		var layerSwitcher =new OpenLayers.Control.LayerSwitcher(); 
-		map.addControl(layerSwitcher);
 		
 		var scaleLine = new OpenLayers.Control.ScaleLine({maxWidth: 200,         					
 			lineSymbolizer: {
@@ -228,7 +227,7 @@ Ext.define('MyApp.view.MainViewport', {
 			title: 'Cropland Data',
 			minHeight: 90,
 			maxHeight: 400,
-			icon: 'app/images/layers_icon.png',
+//			icon: 'app/images/layers_icon.png',
 			DSS_LegendElements: [{
 				DSS_LegendElementType: 'Corn and Beans', // 1,255,85,0,Corn and beans
 				DSS_LegendElementColor: '#ff5500',
@@ -279,7 +278,8 @@ Ext.define('MyApp.view.MainViewport', {
 				DSS_Index: 12
 			}],
 			
-			DSS_QueryTable: 'cdl'
+			DSS_QueryTable: 'cdl',
+			collapsed: true
 		});
 		
 		var lpSlope = Ext.create('MyApp.view.LayerPanel_Continuous', {
@@ -289,7 +289,8 @@ Ext.define('MyApp.view.MainViewport', {
 			DSS_LayerRangeMin: 0,
 			DSS_LayerRangeMax: 45.5,
 			DSS_ValueDefaultGreater: 10,
-			DSS_QueryTable: 'slope'
+			DSS_QueryTable: 'slope',
+			collapsed: true
 		});
 
 		var lpRiver = Ext.create('MyApp.view.LayerPanel_Continuous', {
@@ -303,6 +304,12 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 		
+		var lpGoog = Ext.create('MyApp.view.LayerPanel_Google', {
+			DSS_LayerSatellite: googTerrain,
+			DSS_LayerHybrid: googHybrid
+		});
+		
+		Ext.getCmp('DSS_LeftPanel').insert(0,lpGoog);
 		Ext.getCmp('DSS_LeftPanel').insert(0,lpSlope);
 		Ext.getCmp('DSS_LeftPanel').insert(0,lpRiver);
 		Ext.getCmp('DSS_LeftPanel').insert(0,lpCDL);
@@ -310,7 +317,12 @@ Ext.define('MyApp.view.MainViewport', {
 		// BOO
 		DSS_globalQueryableLayers.push(lpCDL);
 		DSS_globalQueryableLayers.push(lpSlope);
-		console.log(DSS_globalQueryableLayers);
+		
+		var lpSel = Ext.create('MyApp.view.LayerPanel_CurrentSelection', {
+			hidden: true,
+			DSS_Layer: wmsSlope // NOTE: dummy layer
+		});
+		Ext.getCmp('DSS_LeftPanel').insert(0,lpSel);
 	},
 	
 	//--------------------------------------------------------------------------
@@ -334,25 +346,80 @@ Ext.define('MyApp.view.MainViewport', {
 					center: '12,51',
 					zoom: 6,
 					stateId: 'mappanel',
+					tools: [{
+						type: 'up',
+						tooltip: 'Show/Hide Logo',
+						handler: function() {
+							var panel = Ext.getCmp('DSS_LogoPanel');
+							if (this.type == 'up') {
+								panel.setSize(undefined, 0);
+/*								panel.animate({
+										to: { height: 0
+										},
+										duration: 100
+								});*/
+								this.setType('down');
+							}
+							else {
+								panel.setSize(undefined, DSS_LogoPanelHeight);
+/*								panel.animate({
+										to: { height: DSS_LogoPanelHeight
+										},
+										duration: 100
+								});
+								*/
+								this.setType('up');
+							}
+							panel = Ext.getCmp('DSS_ScenarioPanel');
+							panel.setSize(undefined,300);//doComponentLayout();
+							
+						}
+					}]
 				}],
 				dockedItems: [{
 					xtype: 'panel',
+					id: 'DSS_LogoPanel',
 					frame: false,
 					layout: {
-						type: 'absolute'
+						type: 'hbox',
+						pack: 'center',
+						align: 'stretch'
 					},
 					header: false,
 					dock: 'top',
 					collapsible: true,
 					animCollapse: false,
 					collapsed: false,
-					height: 64,
+					height: DSS_LogoPanelHeight,
 					bodyStyle: 'background-color:rgb(220,230,240)',
 					items: [{
 						xtype: 'image',
-						x: 0,
-						y: 0,
-						src: 'app/images/dss_logo.png'
+//						x: 0,
+//						y: 0,
+						width: 356,
+						src: 'app/images/dss_logo.png',
+						autoEl: {
+							tag: 'a',
+							href: 'http://www.glbrc.org'
+						}
+					},
+					{
+						xtype: 'image',
+						flex: 1,
+						src: 'app/images/globe_icon.png',
+						autoEl: {
+							tag: 'a',
+							href: 'http://www.glbrc.org'
+						}
+					},
+					{
+						xtype: 'image',
+						flex: 1,
+						src: 'app/images/globe_icon.png',
+						autoEl: {
+							tag: 'a',
+							href: 'http://www.glbrc.org'
+						}
 					}]
 				},
 				{
@@ -361,46 +428,90 @@ Ext.define('MyApp.view.MainViewport', {
 				},
 				{
 					xtype: 'panel',
-					id: 'DSS_LeftPanel',
 					dock: 'left',
 					width: 400,
 					autoScroll: true,
-					layout: {
-						fill: false,
-						autoWidth: false,
-						type: 'accordion',
-						animate: false,
-						multi: true
-					},
 					collapseDirection: 'left',
+//					animCollapse: false,
 					collapsible: true,
-					frameHeader: false,
+					header: {
+						style: {
+							'background-color': '#95b0db !important'
+						},
+						icon: 'app/images/magnify_icon.png',
+					},
 					manageHeight: false,
-					title: '',
+					title: 'View / Select',
 
 					listeners: {
 						collapse: function(p, eOpts) { 
-							p.setTitle('Query / Scenario Tools');
+							p.setTitle('View / Select / Scenario Tools');
 						},
 						beforeexpand: function(p, animated, eOpts) {
-							p.setTitle('');
+							p.setTitle('View / Select');
 						},
 					},
-					items: [
-					{
-						xtype: 'layerPanel'
+				
+					layout: {
+						fill: false,
+						autoWidth: false
 					},
-					{
-						xtype: 'scenariotools',
-						collapsed: true
-					},
-					{
-						xtype: 'transformationtools',
-						collapsed: true
-					},
-					{
-						xtype: 'globalscenariotools',
-						collapsed: true
+					
+					items: [{
+						xtype: 'container',
+						id: 'DSS_LeftPanel',
+						layout: {
+							type: 'accordion',
+							animate: false,
+							multi: true,
+							titleCollapse: false
+						},
+						items: [{
+						// NOTE: Hidden Panel to allow all visible items to collapse.
+							xtype: 'panel',
+							hidden: true,
+							collapsed: false
+						}]
+					}]
+					,
+					dockedItems: [{
+						xtype: 'panel',
+						id: 'DSS_ScenarioPanel',
+						frameHeader: false,
+						border: false,
+						autoScroll: true,
+
+						dock: 'bottom',
+						height: 300,
+						layout: {
+							type: 'accordion',
+							animate: false,
+							multi: true
+						},
+						dockedItems: [{
+							xtype: 'panel',
+							dock: 'top',
+							title: 'Scenario Setup / Tools',
+							icon: 'app/images/magnify_icon.png'
+						}],
+						items: [{
+						// NOTE: Hidden Panel to allow all visible items to collapse.
+							xtype: 'panel',
+							hidden: true,
+							collapsed: false
+						},
+						{
+							xtype: 'transformationtools',
+							collapsed: true
+						},
+						{
+							xtype: 'globalscenariotools',
+							collapsed: true
+						},
+						{
+							xtype: 'scenariotools',
+							collapsed: true
+						}]
 					}]
 				},
 				{
@@ -418,6 +529,7 @@ Ext.define('MyApp.view.MainViewport', {
 					collapseDirection: 'right',
 					collapsible: true,
 					collapsed: true,
+//					animCollapse: false,
 					items: [{
 						xtype: 'evaluationtools'
 					},

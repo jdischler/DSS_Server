@@ -10,7 +10,7 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
     ],
 
     width: 400,
-    bodyPadding: 10,
+    bodyPadding: 8,
     
     //--------------------------------------------------------------------------
     initComponent: function() {

@@ -11,10 +11,33 @@ Ext.define('MyApp.view.GlobalScenarioTools', {
     ],
     
     height: 200,
+    minHeight: 200,
     width: 300,
     title: 'Set Global Assumptions',
-	icon: 'app/images/globe_icon.png',
-    activeTab: 0,
+    
+    bodyStyle: {'background-color': '#fafcff'},
+    header: {
+    	style: {
+    		'background-image': 'none',
+    		'background-color': '#ebf2ff !important',
+			border: '1px dotted #d0d8e7'
+    	},
+    	icon: 'app/images/globe_icon.png'
+    },
+/*    tabBar: {
+    	padding: '0 0 0 20',
+    	items: [{
+    			xtype: 'tbspacer',
+    			width: 40
+    	}],
+    	style: {
+    		'background-image': 'none',
+    		'background-color': '#fff !important',
+			border: '1px dotted #fff'
+    	},
+    	plain: true
+    },*/
+    activeTab: 1,
 
 	tools:[{
 		type: 'help',
@@ -24,14 +47,36 @@ Ext.define('MyApp.view.GlobalScenarioTools', {
 		}
     }],
 
+	//--------------------------------------------------------------------------    
+	listeners: {
+		afterrender: function(c) { 
+			
+			var spc = Ext.create('Ext.toolbar.Spacer',
+			{
+				width: 20
+			});
+			el = c.header.insert(0,spc);
+		}
+	},
+	
+   	//--------------------------------------------------------------------------    
     initComponent: function() {
         var me = this;
 
         Ext.applyIf(me, {
             items: [{
+            	xtype: 'panel',
+            	hidden: false,
+            	disabled: true
+            },
+            {
 				xtype: 'panel',
 				title: 'Economic',
 				icon: 'app/images/economic_icon.png',
+				bodyStyle: {
+					'background-image': 'none',
+					'background-color': '#fff !important',
+				},
 				items: [{
 					xtype: 'economicassumptions',
 				}],
@@ -39,6 +84,10 @@ Ext.define('MyApp.view.GlobalScenarioTools', {
 					xtype: 'toolbar',
 					dock: 'bottom',
 					items: [{
+						xtype: 'tbspacer', 
+						width: 20
+					},
+					{
 						xtype: 'button',
 						icon: 'app/images/new_icon.png',
 						scale: 'medium',

@@ -31,7 +31,10 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 				y: 10,
 				width: 30,
 				text: '>=',
-				tooltip: 'Greater than',
+				tooltip: {
+					text: 'Toggle greater than/equal',
+					showDelay: 100
+				},
 				handler: function(me,evt) {
 					if (me.text == '>=') {
 						me.setText('>');
@@ -60,7 +63,10 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 			},{
 				xtype: 'button',
 				icon: 'app/images/switch_icon.png',
-				tooltip: 'Swap values',
+				tooltip: {
+					text: 'Swap values',
+					showDelay: 100
+				},
 				x: 170,
 				y: 10,
 				handler: function(me,evt) {
@@ -77,7 +83,10 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 				y: 10,
 				width: 30,
 				text: '<=',
-				tooltip: 'Less than',
+				tooltip: {
+					text: 'Toggle less than/equal',
+					showDelay: 100
+				},
 				handler: function(me,evt) {
 					if (me.text == '<=') {
 						me.setText('<');
@@ -122,7 +131,8 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 			}]
         });
 
-        me.requestLayerRange(me);
+        this.DSS_RequestTryCount = 0;
+        this.requestLayerRange(this);
         
         me.callParent(arguments);
     },
@@ -138,7 +148,8 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 		var obj = Ext.Ajax.request({
 			url: 'http://localhost:9000/layerParmRequest',
 			jsonData: queryLayerRequest,
-			timeout: 2000,
+			timeout: 10000,
+			scope: container,
 			
 			success: function(response, opts) {
 				
@@ -163,7 +174,15 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 			},
 			
 			failure: function(respose, opts) {
-				alert("Request Failsauce");
+				console.log('layer request failed');
+				if (this.DSS_RequestTryCount < 5) {
+					console.log('trying again');
+					this.DSS_RequestTryCount++;
+					this.requestLayerRange(this);
+				}
+				else {
+					console.log('giving up');
+				}
 			}
 		});
 	},

@@ -7,21 +7,63 @@ Ext.define('MyApp.view.LayerPanel_Common', {
         type: 'absolute'
     },
     
-	icon: 'app/images/layers_icon.png',
-    titleCollapse: false,
-    floatable: false,
-    bodyStyle: {"background-color": "#f8faff"},
+    hideCollapseTool: true,
+    bodyStyle: {
+    	'background-color': '#fafcff'
+    },
+    header: {
+    	style: {
+    		'background-image': 'none',
+    		'background-color': '#ebf2ff !important',
+			border: '1px dotted #d0d8e7'
+    	}
+    },
 
 	//--------------------------------------------------------------------------    
 	listeners: {
 		afterrender: function(c) { 
 			
-			var chk = Ext.create('Ext.form.field.Checkbox',
-			{
-				padding: '0 5 0 2',
-				checked: c.DSS_Layer.getVisibility()
+			// Place the collapse/expand tool at the front if needed, else space it...
+			if (0 && c.DSS_noCollapseTool) {
+				var spc = Ext.create('Ext.toolbar.Spacer',
+				{
+					width: 17
+				});
+				c.header.insert(0,spc);
+			}
+			else {
+				var tool = Ext.create('Ext.panel.Tool', {
+					type: (this.collapsed ? 'plus' : 'minus'),
+					tooltip: {
+						text: 'Show/Hide Query Options',
+						showDelay: 100
+					},
+					toolOwner: c,
+					handler: function(evt, toolEl, owner, tool) {
+						console.log('Clicked panel tool');
+						if (tool.type == 'plus') {
+							owner.expand();
+							tool.setType('minus');
+						} else {
+							owner.collapse();
+							tool.setType('plus');
+						}
+					}
+				});
+				c.header.insert(0,tool);
+			}
+			if (c.DSS_noCollapseTool) {
+				tool.setDisabled(true);
+			}
+
+			// Layer visiblity check box...		
+			var chk = Ext.create('Ext.form.field.Checkbox', {
+				itemId: 'DSS_visibilityToggle',
+				padding: '0 5 0 4',
+				checked: c.DSS_Layer.getVisibility(),
+				fieldStyle: 'position: relative; top: -2px;'
 			});
-			var el = c.header.insert(1,chk);
+			
 			chk.on({
 				'dirtychange': function(me) {
 					if (me.getValue() == true) {
@@ -35,17 +77,13 @@ Ext.define('MyApp.view.LayerPanel_Common', {
 				},
 				scope: c
 			});
+			c.header.insert(1,chk);
 			
-			var spc = Ext.create('Ext.toolbar.Spacer',
-			{
-				width: 20
-			});
-			el = c.header.insert(3,spc);
-			
-			var slider = Ext.create('Ext.slider.Single',
-			{
-				width: 190,
-				padding: '0 20 0 10',
+			// opacity slider...
+			var slider = Ext.create('Ext.slider.Single', {
+				itemId: 'DSS_opacitySlider',
+				width: 140,
+				padding: '0 10 0 10',
 				value: 50,
 				minValue: 1,
 				maxValue: 100,
@@ -60,9 +98,37 @@ Ext.define('MyApp.view.LayerPanel_Common', {
 					scope: c
 				}
 			});
-			
-			el = c.header.insert(4, slider);
 			chk.DSS_associatedOpacitySlider = slider;
+			c.header.insert(3, slider);
+			
+			// Query button if needed, else space it out...
+			if (c.DSS_noQueryTool) {
+				var spc = Ext.create('Ext.toolbar.Spacer',
+				{
+					width: 42
+				});
+				c.header.add(spc);
+			}
+			else {
+				var queryButton = Ext.create('Ext.button.Button', {
+					text: 'Query',
+					width: 42,
+					height: 20,
+					tooltip: {
+						text: 'Include in Query?',
+						showDelay: 100
+					},
+					enableToggle: true
+				});
+				c.header.add(queryButton);
+			}
+
+			// and one at the end to give space for the scroll bar?
+			var spc = Ext.create('Ext.toolbar.Spacer',
+			{
+				width: 20
+			});
+			c.header.add(spc);
 		}
 	},
 
@@ -159,11 +225,13 @@ Ext.define('MyApp.view.LayerPanel_Common', {
 							numZoomLevels: 19
 						}
 					);
-					var layerBrowser = Ext.getCmp('mapLayerPanel');
-					layerBrowser.addLayer(imgTest, 'Selection', 'app/images/raster.png',
-							'Selection');
-					globalMap.addLayer(imgTest);
+					
+					var selectionPanel = Ext.getCmp('CurrentSelectionLayer');
+					selectionPanel.setSelectionLayer(imgTest)
 			
+					var summaryPanel = Ext.getCmp('DSS_ScenarioSummary');
+					summaryPanel.expand(true);
+					
 					button.setIcon(null);
 					button.setDisabled(false);
 					

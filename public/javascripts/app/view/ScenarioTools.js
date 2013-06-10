@@ -6,8 +6,8 @@
     fields : ['active', 'query', 'transforms'],
     data   : {
         items : [
-            { active: true, query: 'Prairie near Rivers In Watershed', transforms: 'To Corn / Soy'  },
-            { active: true, query: 'Corn on slopes > 30 near Rivers', transforms: 'To Miscanthus'  },
+            { active: true, query: 'Corn and Beans', transforms: 'To grass'  }//,
+//            { active: true, query: 'Corn on slopes > 30 near Rivers', transforms: 'To Miscanthus'  },
         ]
     },
     proxy  : {
@@ -19,19 +19,20 @@
     }
 });
  
+// Scenario Summary....
 Ext.define('MyApp.view.ScenarioTools', {
     extend: 'Ext.grid.Panel',
     alias: 'widget.scenariotools',
 
-    height: 200,
+    id: 'DSS_ScenarioSummary',
+    height: 150,
+    minHeight: 150,
+    maxHeight: 150,
     width: 300,
-    title: 'Create / Manage Scenario',
-	icon: 'app/images/scenario_icon.png',
-	cls: 'my-header',
+    title: 'Scenario Summary',
 	viewConfig: {
 		stripeRows: true
 	},
-
     tools:[{
 		type: 'help',
 		qtip: 'Scenario Help',
@@ -44,11 +45,37 @@ Ext.define('MyApp.view.ScenarioTools', {
     enableColumnMove: false,
 
     store: testGridStore,
-    
+ 
+    bodyStyle: {'background-color': '#fafcff'},
+    header: {
+    	style: {
+    		'background-image': 'none',
+    		'background-color': '#ebf2ff !important',
+			border: '1px dotted #d0d8e7'
+    	},
+    	icon: 'app/images/scenario_icon.png'
+    },
+
+	//--------------------------------------------------------------------------    
+	listeners: {
+		afterrender: function(c) { 
+			
+			var spc = Ext.create('Ext.toolbar.Spacer',
+			{
+				width: 20
+			});
+			el = c.header.insert(0,spc);
+		}
+	},
+
 	dockedItems: [{
 		xtype: 'toolbar',
 		dock: 'bottom',
 		items: [{
+			xtype: 'tbspacer', 
+			width: 20
+		},
+		{
 			xtype: 'button',
 			icon: 'app/images/new_icon.png',
 			scale: 'medium',
@@ -74,22 +101,33 @@ Ext.define('MyApp.view.ScenarioTools', {
 		}]
 	}],
 	
-	columns: [{
-		dataIndex: 'query',
-		text: 'Query',
-		width: 225
+	columns: {
+		items:[{
+			dataIndex: null,
+			width: 30,
+			sortable: false,
+			resizable: false
+		},
+		{
+			dataIndex: 'query',
+			text: 'Query',
+			width: 200,
+			resizable: false
+		},
+		{
+			dataIndex: 'transforms',
+			text: 'Transforms',
+			width: 120,
+			resizable: false
+		},
+		{
+			dataIndex: 'active',
+			text: 'x',
+		//	xtype: 'checkcolumn',
+			width: 40,
+			resizable: false
+		}]
 	},
-	{
-		dataIndex: 'transforms',
-		text: 'Transforms',
-		width: 200
-	},
-	{
-		dataIndex: 'active',
-		text: 'x',
-	//	xtype: 'checkcolumn',
-		width: 40
-	}],
 
     initComponent: function() {
         var me = this;

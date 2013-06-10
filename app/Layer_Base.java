@@ -21,10 +21,11 @@ public abstract class Layer_Base
 	public Layer_Base(String name) {
 		
 		mName = name.toLowerCase();
+		Logger.info("mName ");
 		if (mLayers == null) {
 			mLayers = new HashMap<String, Layer_Base>();
 		}
-		mLayers.put(name, this);
+		mLayers.put(mName, this);
 	}
 
 	//--------------------------------------------------------------------------
@@ -118,6 +119,11 @@ public abstract class Layer_Base
 	public static Layer_Base getLayer(String name) {
 		
 		return mLayers.get(name);
+	}
+	
+	//--------------------------------------------------------------------------
+	public int[][] getLayerRaster() {
+		return mData;
 	}
 	
 	//--------------------------------------------------------------------------

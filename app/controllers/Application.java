@@ -17,16 +17,19 @@ import org.codehaus.jackson.node.*;
 import javax.xml.bind.DatatypeConverter;
 
 //------------------------------------------------------------------------------
-public class Application extends Controller {
+public class Application extends Controller 
+	{
 	
 	//--------------------------------------------------------------------------
-	public static Result index() {
+	public static Result index() 
+	{
 		
 		return ok(index.render());
 	}
 	
 	//--------------------------------------------------------------------------
-	public static Result query() throws Exception {
+	public static Result query() throws Exception 
+	{
 		
 		Query query = new Query();
 		String urlPath = query.exec(request().body().asJson());
@@ -34,7 +37,8 @@ public class Application extends Controller {
 	}
 
 	//--------------------------------------------------------------------------
-	public static Result layerParmRequest() throws Exception {
+	public static Result layerParmRequest() throws Exception 
+	{
 		
 		JsonNode request = request().body().asJson();
 		
@@ -56,5 +60,16 @@ public class Application extends Controller {
 		}
 
 		return ok(ret);
+	}
+	
+	
+	//----------------------------------------------------------------------
+	public static Result model() throws Exception 
+	{
+		
+		Logger.info("Server got models request:");
+			
+//		return ok("http://dss.wei.wisc.edu:9000/app" + partialPath);
+		return ok("http://localhost:9000");
 	}
 }

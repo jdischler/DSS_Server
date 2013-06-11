@@ -37,9 +37,12 @@ public class Query {
 			blue = 255;
 		}
 		
-		// FIXME: can't use hardcoded image sizes...
-		mWidth = 4710;//3791;
-		mHeight = 3869;//3133;
+		// FIXME: can't base size off of a hardcoded layer? The expectation is that
+		//	all layers are of the same size....
+		Layer_Base tmp = Layer_Base.getLayer("slope");
+		mWidth = tmp.getWidth();//4710;//3791;
+		mHeight = tmp.getHeight();//3869;//3133;
+		
 		int[][] imgArray = new int[mHeight][mWidth];
 		
 		// BOOO, prep the array for & logic

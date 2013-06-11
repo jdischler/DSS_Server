@@ -13,21 +13,61 @@ public abstract class Layer_Base
 	private static Map<String, Layer_Base>	mLayers;
 	
 	protected String mName;
-	protected Integer mWidth, mHeight;
-	protected Integer mNoDataValue;
-	protected int[][] mData;
+	protected int mWidth, mHeight;
+	protected int mNoDataValue;
+	protected int[][] mIntData;
 
+	// Return the Layer_Base object when asked for it by name
+	//--------------------------------------------------------------------------
+	public static Layer_Base getLayer(String name) {
+		
+		name = name.toLowerCase();
+		return mLayers.get(name);
+	}
+
+	// Use carefully...e.g., only if you are temporarily loading data for a process that rarely runs...
+	//--------------------------------------------------------------------------
+	public static void removeLayer(String name) {
+
+		Logger.info("A call was made to remove layer: " + name + " from memory");
+		name = name.toLowerCase();
+		mLayers.remove(name);
+	}
+	
+	// Use even more carefully...currently only be used when the server shuts down.
+	//--------------------------------------------------------------------------
+	public static void removeAllLayers() {
+
+		Logger.info("A call was made to clear all Layers!");
+		mLayers.clear();
+	}
+	
+	// Base constructor
 	//--------------------------------------------------------------------------
 	public Layer_Base(String name) {
 		
 		mName = name.toLowerCase();
-		Logger.info("mName ");
 		if (mLayers == null) {
 			mLayers = new HashMap<String, Layer_Base>();
 		}
 		mLayers.put(mName, this);
 	}
+	
+	//--------------------------------------------------------------------------
+	public int getWidth() {
+		return mWidth;
+	}
 
+	//--------------------------------------------------------------------------
+	public int getHeight() {
+		return mHeight;
+	}
+	
+	//--------------------------------------------------------------------------
+	public int[][] getIntData() {
+		return mIntData;
+	}
+	
 	//--------------------------------------------------------------------------
 	public void init() {
 		
@@ -85,9 +125,7 @@ public abstract class Layer_Base
 		BufferedReader br = new BufferedReader(new FileReader("./layerData/" + mName + ".asc"));
 		try {
 			readASC_Header(br);
-			
-			Logger.info("Allocating new work array");
-			mData = new int[mHeight][mWidth];
+			allocMemory(mWidth, mHeight);
 			
 			Logger.info("Attempting to read the array data");
 			
@@ -116,20 +154,17 @@ public abstract class Layer_Base
 	}
 	
 	//--------------------------------------------------------------------------
-	public static Layer_Base getLayer(String name) {
+	protected void allocMemory(int width, int height) {
 		
-		return mLayers.get(name);
+		Logger.info("Allocating new work array");
+		mIntData = new int[mHeight][mWidth];
 	}
 	
-	//--------------------------------------------------------------------------
-	public int[][] getLayerRaster() {
-		return mData;
-	}
-	
+	// Functions that must be in the subclass. 
 	//--------------------------------------------------------------------------
 	abstract protected void onLoadEnd();
-	abstract protected int[][] query(JsonNode queryNode, int[][] workArray);
 	abstract protected void processASC_Line(int y, String lineElementsArray[]);
+	abstract protected int[][] query(JsonNode queryNode, int[][] workArray);
 		
 	//--------------------------------------------------------------------------
 	public static void execQuery(JsonNode layerList, int[][] workArray) {

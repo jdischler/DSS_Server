@@ -10,10 +10,6 @@ import org.codehaus.jackson.node.*;
 //------------------------------------------------------------------------------
 public class Layer_Indexed extends Layer_Base
 {
-/*	private Integer mWidth, mHeight;
-	private Integer mNoDataValue;
-	private int[][] mData;
-*/
 	// TODO: hold data for index, colors, names, etc...
 	
 	//--------------------------------------------------------------------------
@@ -43,12 +39,12 @@ public class Layer_Indexed extends Layer_Base
 						+ Integer.toString(val));
 				}
 			}
-			mData[y][x] = val;
+			mIntData[y][x] = val;
 		}
 	}
 
 	//--------------------------------------------------------------------------
-	protected void onLoadEnd() {}
+	protected void onLoadEnd() { /*does nothing at this point*/ }
 		
 	//--------------------------------------------------------------------------
 	private int getCompareBitMask(JsonNode matchValuesArray) {
@@ -90,11 +86,10 @@ public class Layer_Indexed extends Layer_Base
 
 		for (int y = 0; y < mHeight; y++) {
 			for (int x = 0; x < mWidth; x++) {
-				workArray[y][x] &= ((mData[y][x] & test_mask) > 0 ? 1 : 0);
+				workArray[y][x] &= ((mIntData[y][x] & test_mask) > 0 ? 1 : 0);
 			}
 		}
 		return workArray;
 	}
 }
-	
 

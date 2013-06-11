@@ -32,25 +32,24 @@ public class Layer_Raw extends Layer_Base
 	protected void allocMemory(int width, int height) {
 		
 		super.allocMemory(width, height);
-		mFloatData = new int[mHeight][mWidth];
+		mFloatData = new float[mHeight][mWidth];
 	}
 	
 	//--------------------------------------------------------------------------
 	protected void processASC_Line(int y, String lineElementsArray[]) {
 		
-		boolean erred = false;
 		for (int x = 0; x < lineElementsArray.length; x++) {
 			// save data as both Int and Float
 			int iVal = Integer.parseInt(lineElementsArray[x]);
-			mData[y][x] = iVal;
+			mIntData[y][x] = iVal;
 			
 			float fVal = Float.parseFloat(lineElementsArray[x]);
-			mFloatData = fVal;
+			mFloatData[y][x] = fVal;
 		}
 	}
 
 	//--------------------------------------------------------------------------
-	protected void onLoadEnd() {}
+	protected void onLoadEnd() { /*does nothing at this point*/ }
 	
 	//--------------------------------------------------------------------------
 	protected int[][] query(JsonNode queryNode, int[][] workArray) {

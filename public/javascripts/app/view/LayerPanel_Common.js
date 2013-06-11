@@ -201,12 +201,11 @@ Ext.define('MyApp.view.LayerPanel_Common', {
 				// Still, sometimes the file fails to be found if we request the image too fast...
 				//	as if the server is still finishing writing it out?
 				Ext.defer(function(response) {
+					// FIXME: bounds should probably be computed by the server and passed back!!!
 					var bounds = new OpenLayers.Bounds(
-						-10067785.16592, 5246156.162177,
-						-10067785.16592 + (4709 * 40.261055644652),
-						5246156.162177 + (3868 * 40.261055644652)
-//						-10035269.3627204, 5259982.9002571,
-//						-9882534.26873933, 5386224.15842662
+						-10062652.65061, 5249032.6922889,
+						-10062652.65061 + (6150 * 30),
+						5249032.6922889 + (4557 * 30)
 					);
 					var imgTest = new OpenLayers.Layer.Image(
 						'Selection',

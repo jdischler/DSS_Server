@@ -82,7 +82,7 @@ public class Layer_Continuous extends Layer_Base
 			
 			float val = Float.parseFloat(lineElementsArray[x]);
 			cacheMinMax(val);
-			mData[y][x] = projectFloatToInt(val);
+			mIntData[y][x] = projectFloatToInt(val);
 		}
 	}
 
@@ -135,7 +135,7 @@ public class Layer_Continuous extends Layer_Base
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
 						workArray[y][x] &= 
-							((mData[y][x] > minVal && mData[y][x] < maxVal) 
+							((mIntData[y][x] > minVal && mIntData[y][x] < maxVal) 
 							? 1 : 0);
 					}
 				}
@@ -146,7 +146,7 @@ public class Layer_Continuous extends Layer_Base
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
 						workArray[y][x] &= 
-							((mData[y][x] > minVal && mData[y][x] <= maxVal) 
+							((mIntData[y][x] > minVal && mIntData[y][x] <= maxVal) 
 							? 1 : 0);
 					}
 				}
@@ -157,7 +157,7 @@ public class Layer_Continuous extends Layer_Base
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
 						workArray[y][x] &= 
-							(mData[y][x] > minVal 
+							(mIntData[y][x] > minVal 
 							? 1 : 0);
 					}
 				}
@@ -170,7 +170,7 @@ public class Layer_Continuous extends Layer_Base
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
 						workArray[y][x] &= 
-							((mData[y][x] >= minVal && mData[y][x] < maxVal) 
+							((mIntData[y][x] >= minVal && mIntData[y][x] < maxVal) 
 							? 1 : 0);
 					}
 				}
@@ -181,7 +181,7 @@ public class Layer_Continuous extends Layer_Base
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
 						workArray[y][x] &= 
-							((mData[y][x] >= minVal && mData[y][x] <= maxVal) 
+							((mIntData[y][x] >= minVal && mIntData[y][x] <= maxVal) 
 							? 1 : 0);
 					}
 				}
@@ -192,7 +192,7 @@ public class Layer_Continuous extends Layer_Base
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
 						workArray[y][x] &= 
-							(mData[y][x] >= minVal 
+							(mIntData[y][x] >= minVal 
 							? 1 : 0);
 					}
 				}
@@ -204,7 +204,7 @@ public class Layer_Continuous extends Layer_Base
 			for (y = 0; y < mHeight; y++) {
 				for (x = 0; x < mWidth; x++) {
 					workArray[y][x] &= 
-						(mData[y][x] < maxVal 
+						(mIntData[y][x] < maxVal 
 						? 1 : 0);
 				}
 			}
@@ -215,7 +215,7 @@ public class Layer_Continuous extends Layer_Base
 			for (y = 0; y < mHeight; y++) {
 				for (x = 0; x < mWidth; x++) {
 					workArray[y][x] &= 
-						(mData[y][x] <= maxVal 
+						(mIntData[y][x] <= maxVal 
 						? 1 : 0);
 				}
 			}
@@ -225,5 +225,4 @@ public class Layer_Continuous extends Layer_Base
 		return workArray;
 	}
 }
-	
 

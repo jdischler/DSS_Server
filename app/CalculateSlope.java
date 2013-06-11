@@ -274,7 +274,8 @@ public class CalculateSlope
 			return -1;
 		}
 
-		// Capture the max slope for the neighborhood
+		// Capture the max slope for the neighborhood, ie, get the worst-case
+		//	erodible slope
 		float max = 0;
 		for (int i = 0; i < floatArray.size(); i++) {
 			if (floatArray.get(i) > max) {

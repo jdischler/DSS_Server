@@ -144,9 +144,11 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 				Ext.defer(function(response) {
 					// FIXME: bounds should probably be computed by the server and passed back!!!
 					var bounds = new OpenLayers.Bounds(
-						-10062652.65061, 5249032.6922889,
-						-10062652.65061 + (6150 * 30),
-						5249032.6922889 + (4557 * 30)
+						-10062652.65061, 5278060.469521415,// 5249032.6922889,
+						-9878152.65061, 5415259.640662575// 5385742.6922889
+//						-10062652.65061, 5249032.6922889,
+//						-10062652.65061 + (6150 * 30),
+//						5249032.6922889 + (4557 * 30)
 					);
 					var imgTest = new OpenLayers.Layer.Image(
 						'Selection',

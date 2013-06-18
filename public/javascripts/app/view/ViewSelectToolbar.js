@@ -104,7 +104,6 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
     		
     		if (DSS_globalQueryableLayers[i].includeInQuery()) {
     			var queryComp = DSS_globalQueryableLayers[i].setSelectionCriteria();
-    			console.log(queryComp);
     			requestData.queryLayers.push(queryComp);
     			query = true;
     		}

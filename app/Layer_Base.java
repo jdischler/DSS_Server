@@ -160,6 +160,36 @@ public abstract class Layer_Base
 		mIntData = new int[mHeight][mWidth];
 	}
 	
+	// Generally comes from a client request for data about this layer...
+	//	this could be layer width/height, maybe cell size (30m), maybe the layer
+	//	ranges, in the case of indexed layers...the key/legend for the layer
+	//--------------------------------------------------------------------------
+	public static JsonNode getParameter(JsonNode clientRequest) throws Exception {
+		
+		JsonNode ret = null;
+		String layername = clientRequest.get("name").getTextValue();
+		
+		Layer_Base layer = Layer_Base.getLayer(layername);
+		if (layer != null) {
+			ret = layer.getParameterInternal(clientRequest);
+		}
+
+		return ret;
+	}
+	
+	// ordering expects subclasses to call the super (this) first...
+	//--------------------------------------------------------------------------
+	protected JsonNode getParameterInternal(JsonNode clientRequest) throws Exception {
+		
+		// Set this as a default
+		JsonNode ret = null;
+		
+		// Do any processing here if the base layer class needs to...
+		//	e.g., if we ever need to pass back layer dimensions, cell size, etc...
+		
+		return ret;
+	}
+	
 	// Functions that must be in the subclass. 
 	//--------------------------------------------------------------------------
 	abstract protected void onLoadEnd();

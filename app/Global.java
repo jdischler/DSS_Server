@@ -40,9 +40,10 @@ public class Global extends GlobalSettings
 	//--------------------------------------------------------------------------
 	private void cacheLayers() {
 
-		// Uncomment if need to recalculate and output slope
+		/* // Uncomment if need to recalculate and output slope
 		CalculateSlope cs = new CalculateSlope();
 		cs.computeSlope();
+		*/
 
 		/* // Uncomment if need to recalculate and output crop rotation
 		CropRotation cr = new CropRotation();
@@ -51,16 +52,26 @@ public class Global extends GlobalSettings
 		
 		Layer_Base layer;
 		try {
-//			layer = new Layer_Indexed("cdl"); layer.init();
+			layer = new Layer_Indexed("rotation"); layer.init();
+			
 			// data range is 0-90 but expand it up to 0-1000 internally since we are converting to int
 			//	and losing some precision
 			layer = new Layer_Continuous("slope", 0.0f, 90.0f, 0, 1000); layer.init();
 			
+			// distance to river can get clamped to the nearest int value without losing much...
+			layer = new Layer_Continuous("rivers"); layer.init();
+			
+			// distance to road can get clamped to the nearest int value without losing much...
+			layer = new Layer_Continuous("roads"); layer.init();
+			
+			// SOC can get clamped to the nearest int value without losing much...
+			layer = new Layer_Continuous("soc"); layer.init();
+			
 			// NOTE: if we have more than 32 watersheds, we can't use Layer_Indexed
-//			layer = new Layer_Indexed("watersheds"); layer.init();
-//			layer = new Layer_Indexed("lcc"); layer.init();
-//			layer = new Layer_Indexed("lcs"); layer.init();
-//			layer = new Layer_Continuous("slope_new", 0.0f, 90.0f, 0, 1000); layer.init();
+			layer = new Layer_Indexed("watersheds"); layer.init();
+			
+			layer = new Layer_Indexed("lcc"); layer.init();
+			layer = new Layer_Indexed("lcs"); layer.init();
 		}
 		catch (Exception e) {
 			Logger.info(e.toString());

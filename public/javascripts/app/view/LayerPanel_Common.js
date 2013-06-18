@@ -8,6 +8,7 @@ Ext.define('MyApp.view.LayerPanel_Common', {
     },
     
     hideCollapseTool: true,
+    DSS_noCollapseTool: false,  
     bodyStyle: {
     	'background-color': '#fafcff'
     },
@@ -24,6 +25,7 @@ Ext.define('MyApp.view.LayerPanel_Common', {
 		afterrender: function(c) { 
 			
 			// Place the collapse/expand tool at the front if needed, else space it...
+/*			// NOTE: always adding a collapse tool for now and disabling if it can't be toggled
 			if (0 && c.DSS_noCollapseTool) {
 				var spc = Ext.create('Ext.toolbar.Spacer',
 				{
@@ -31,7 +33,7 @@ Ext.define('MyApp.view.LayerPanel_Common', {
 				});
 				c.header.insert(0,spc);
 			}
-			else {
+			else*/ {
 				var tool = Ext.create('Ext.panel.Tool', {
 					type: (this.collapsed ? 'plus' : 'minus'),
 					tooltip: {
@@ -43,35 +45,51 @@ Ext.define('MyApp.view.LayerPanel_Common', {
 						console.log('Clicked panel tool');
 						if (tool.type == 'plus') {
 							owner.expand();
-							tool.setType('minus');
 						} else {
 							owner.collapse();
-							tool.setType('plus');
 						}
 					}
 				});
 				c.header.insert(0,tool);
+				c.DSS_collapseTool = tool;
 			}
 			if (c.DSS_noCollapseTool) {
 				tool.setDisabled(true);
 			}
 
+			// if no layer is bound, don't enable the check options, etc.
+			var checkStyle = 'position: relative; top: -2px;';
+			var checkDisabled = false;
+			var makeChecked = c.DSS_Layer ? c.DSS_Layer.getVisibility() : false;
+			if (!c.DSS_Layer) {
+				checkStyle += 'filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=15);' + 
+					'opacity: 0.15;';
+				checkDisabled = true;
+			}
+			
 			// Layer visiblity check box...		
 			var chk = Ext.create('Ext.form.field.Checkbox', {
 				itemId: 'DSS_visibilityToggle',
-				padding: '0 5 0 4',
-				checked: c.DSS_Layer.getVisibility(),
-				fieldStyle: 'position: relative; top: -2px;'
+				padding: '0 4 0 4',
+				checked: makeChecked,
+				disabled: checkDisabled,
+				fieldStyle: checkStyle
 			});
 			
 			chk.on({
 				'dirtychange': function(me) {
 					if (me.getValue() == true) {
 						me.DSS_associatedOpacitySlider.show();
+						if (c.DSS_ShortTitle && c.DSS_AutoSwapTitles) {
+							c.setTitle(c.DSS_ShortTitle);
+						}
 					}
 					else
 					{
 						me.DSS_associatedOpacitySlider.hide();
+						if (c.DSS_LongTitle && c.DSS_AutoSwapTitles) {
+							c.setTitle(c.DSS_LongTitle);
+						}
 					}
 					c.DSS_Layer.setVisibility(me.getValue());
 				},
@@ -80,6 +98,7 @@ Ext.define('MyApp.view.LayerPanel_Common', {
 			c.header.insert(1,chk);
 			
 			// opacity slider...
+			var hideSlider = (c.DSS_Layer ? !c.DSS_Layer.getVisibility() : true);
 			var slider = Ext.create('Ext.slider.Single', {
 				itemId: 'DSS_opacitySlider',
 				width: 140,
@@ -90,7 +109,7 @@ Ext.define('MyApp.view.LayerPanel_Common', {
 				increment: 1,
 				fieldLabel: 'Opacity',
 				labelWidth: 45,
-				hidden: !c.DSS_Layer.getVisibility(),
+				hidden: hideSlider,
 				listeners: {
 					change: function(slider, newvalue) {
 						c.adjustOpacity(slider);
@@ -100,6 +119,12 @@ Ext.define('MyApp.view.LayerPanel_Common', {
 			});
 			chk.DSS_associatedOpacitySlider = slider;
 			c.header.insert(3, slider);
+			if (c.DSS_ShortTitle) {
+				c.DSS_LongTitle = c.title;
+				if (hideSlider == false && c.DSS_AutoSwapTitles) {
+					c.setTitle(c.DSS_ShortTitle);
+				}
+			}
 			
 			// Query button if needed, else space it out...
 			if (c.DSS_noQueryTool) {
@@ -110,12 +135,45 @@ Ext.define('MyApp.view.LayerPanel_Common', {
 				c.header.add(spc);
 			}
 			else {
+/*				var drop = Ext.create('Ext.button.Button', {
+					width: 15,
+					arrowAlign: 'left',
+					tooltip: {
+						text: 'Layer Options',
+						showDelay: 100
+					},
+					menu: {
+						// to remove icon 'tray' on left...
+						//	though it just removes the bar but still uses all of the space, booo..
+						plain: true, 
+						items: [{
+							xtype: 'slider',
+							fieldLabel: 'Layer Opacity',
+							indent: false,
+							labelWidth: 75,
+							labelSeparator: '',
+							labelCls: 'x-menu-item-slider-text',
+							padding: '3 4 -4 5',
+							width: 200
+						}]
+					}
+				});
+				c.header.add(drop);
+	
+				console.log(drop);
+				var spc = Ext.create('Ext.toolbar.Spacer',
+				{
+					width: 4
+				});
+				c.header.add(spc);
+*/				
 				var queryButton = Ext.create('Ext.button.Button', {
+					itemId: 'DSS_ShouldQuery',
 					text: 'Query',
 					width: 42,
 					height: 20,
 					tooltip: {
-						text: 'Include in Query?',
+						text: 'Include this layer in your query?',
 						showDelay: 100
 					},
 					enableToggle: true
@@ -129,6 +187,12 @@ Ext.define('MyApp.view.LayerPanel_Common', {
 				width: 20
 			});
 			c.header.add(spc);
+		},
+		expand: function(panel, eOpts) {
+			panel.DSS_collapseTool.setType('minus');
+		},
+		collapse: function(panel, eOpts) {
+			panel.DSS_collapseTool.setType('plus');
 		}
 	},
 
@@ -151,99 +215,10 @@ Ext.define('MyApp.view.LayerPanel_Common', {
     },
     
     //--------------------------------------------------------------------------
-    buildQuery: function() {
-    	
-       	var requestData = {
-    		clientID: 12345, //temp
-    		queryLayers: []
-    	};
-
-    	var query = false;
-    	for (var i = 0; i < DSS_globalQueryableLayers.length; i++) {
-    		
-    		if (!DSS_globalQueryableLayers[i].collapsed) {
-    			var queryComp = DSS_globalQueryableLayers[i].setSelection();
-    			console.log(queryComp);
-    			requestData.queryLayers.push(queryComp);
-    			query = true;
-    		}
-    	}
-    	
-		console.log(requestData);
-		if (query) {
-			this.submitQuery(requestData);
-		}
-		else {
-			alert("No query built - nothing to query");
-		}
-    },
+    includeInQuery: function() {
     
-    //--------------------------------------------------------------------------
-    submitQuery: function(queryJson) {
-    	
-    	
-		var button = this.getComponent('selectionbutton');
-		button.setIcon('app/images/spinner_16a.gif');
-		button.setDisabled(true);
-
-		var obj = Ext.Ajax.request({
-			url: location.href + 'query',
-			jsonData: queryJson,
-			timeout: 15000, // in milliseconds
-			
-			success: function(response, opts) {
-				console.log("success: ");
-				console.log(response);
-				
-				// TODO: not 100% sure a delay is needed here? Was added to give server
-				//	time to finish writing out file...but if the OK response comes back from the server
-				//	...that is AFTER the file write process so the file should be ready?
-				// Still, sometimes the file fails to be found if we request the image too fast...
-				//	as if the server is still finishing writing it out?
-				Ext.defer(function(response) {
-					// FIXME: bounds should probably be computed by the server and passed back!!!
-					var bounds = new OpenLayers.Bounds(
-						-10062652.65061, 5249032.6922889,
-						-10062652.65061 + (6150 * 30),
-						5249032.6922889 + (4557 * 30)
-					);
-					var imgTest = new OpenLayers.Layer.Image(
-						'Selection',
-						response.responseText,
-						bounds,
-						new OpenLayers.Size(2113.0,-2113.0),
-						{
-							buffer: 0,
-							opacity: 1.0,
-							isBaseLayer: false,
-							displayInLayerSwitcher: false,
-							transitionEffect: "resize",
-							visibility: true,
-							maxResolution: "auto",
-							projection: globalMap.getProjectionObject(),
-							numZoomLevels: 19
-						}
-					);
-					
-					var selectionPanel = Ext.getCmp('CurrentSelectionLayer');
-					selectionPanel.setSelectionLayer(imgTest)
-			
-					var summaryPanel = Ext.getCmp('DSS_ScenarioSummary');
-					summaryPanel.expand(true);
-					
-					button.setIcon(null);
-					button.setDisabled(false);
-					
-				}, 1000, this, [response]);
+    	var queryToggleButton = this.header.getComponent('DSS_ShouldQuery');
+    	return queryToggleButton.pressed;
+    }
 	
-			},
-			
-			failure: function(respose, opts) {
-				button.setIcon(null);
-				button.setDisabled(false);
-				alert("Query failed, request timed out?");
-			}
-		});
-	}
-
 });

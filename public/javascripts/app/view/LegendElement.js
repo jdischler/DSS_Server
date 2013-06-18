@@ -4,7 +4,7 @@ Ext.define('MyApp.view.LegendElement', {
     alias: 'widget.legendelement',
 
     height: 24,
-    width: 220,
+    width: 178,
     layout: {
         type: 'absolute'
     },
@@ -13,7 +13,12 @@ Ext.define('MyApp.view.LegendElement', {
     initComponent: function() {
         var me = this;
 
-        var BGcolor = (me.DSS_LegendElementIndex & 0x1) ? '#ffffff' : '#f0f7ff';
+        console.log(me);
+        
+//        var pattern = (me.DSS_LegendElementIndex & 0x3);
+        var pattern = (me.index & 0x3);
+        var BGcolor = (pattern == 0 || pattern == 1) ? '#ffffff' : '#f7faff';
+//        var BGcolor = '#ffffff';
         
         Ext.applyIf(me, {
             style: {
@@ -23,27 +28,27 @@ Ext.define('MyApp.view.LegendElement', {
             items: [
                 {
                     xtype: 'container',
-                    x: 18,
+                    x: 5,
                     y: 1,
                     frame: false,
                     height: 19,
-                    width: 28,
+                    width: 20,
                     html: '',
                     style: {
-                        'background-color': me.DSS_LegendElementColor,
+                        'background-color': me.color,//DSS_LegendElementColor,
                         border: '1px dotted #BBBBBB'
                     }
                 },
                 {
                     xtype: 'label',
-                    x: 55,
+                    x: 30,
                     y: 2,
-                    text: me.DSS_LegendElementType
+                    text: me.label,//DSS_LegendElementType
                 },
                 {
                     xtype: 'checkboxfield',
                     itemId: 'DSS_queryCheck',
-                    x: 180,
+                    x: 145,
                     y: -1,
                     fieldLabel: 'Label',
                     hideLabel: true
@@ -72,7 +77,8 @@ Ext.define('MyApp.view.LegendElement', {
     //--------------------------------------------------------------------------
     getElementQueryIndex: function() {
     	
-    	return this.DSS_Index;
+//    	return this.DSS_Index;
+    	return this.index;
     }
 
 });

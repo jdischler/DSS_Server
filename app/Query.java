@@ -17,15 +17,17 @@ public class Query {
 	static int mWidth, mHeight;
 	
 	//------------------------------------------------------------------------------
-	public String exec(JsonNode requestBody) throws Exception
+	public JsonNode exec(JsonNode requestBody) throws Exception
 	{
+		ObjectNode ret = JsonNodeFactory.instance.objectNode();
+		
 		int x, y;
 		// blah, selection color
 		int red = 255;
 		int green = 0;
 		int blue = 96;
 		
-		// TEMP: just rotate the color to get a different selection color
+/*		// TEMP: just rotate the color to get a different selection color
 		if ((mCounter & 0x3) == 1) {
 			red = 0;
 			green = 128;
@@ -36,10 +38,10 @@ public class Query {
 			green = 0;
 			blue = 255;
 		}
-		
+*/		
 		// FIXME: can't base size off of a hardcoded layer? The expectation is that
 		//	all layers are of the same size....
-		Layer_Base tmp = Layer_Base.getLayer("slope");
+		Layer_Base tmp = Layer_Base.getLayer("rotation");
 		mWidth = tmp.getWidth();//4710;//3791;
 		mHeight = tmp.getHeight();//3869;//3133;
 		
@@ -88,7 +90,24 @@ public class Query {
 		pngW.writeRowsInt(imgArray);
 		pngW.end();
 		
+		int count = 0;	
+		for (y = 0; y < mHeight; y++) {
+			for (x = 0; x < mWidth; x++) {
+				count += imgArray[y][x];
+			}
+		}
+
+		Logger.info("Query Statistics");
+		Logger.info("-----------------------");
+		Logger.info("Total selected pixels: " + Integer.toString(count));
+		Logger.info("Square km: " + Float.toString(count * 0.03f * 0.03f));
+		
+		ret.put("url", urlPath);
+		ret.put("selectedPixels", count);
+		ret.put("totalPixels", mHeight * mWidth);
+
 //		return ok("http://dss.wei.wisc.edu:9000/app" + partialPath);
-		return urlPath;
+//		return urlPath;
+		return ret;
 	}
 }

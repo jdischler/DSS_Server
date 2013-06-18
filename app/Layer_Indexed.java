@@ -10,14 +10,38 @@ import org.codehaus.jackson.node.*;
 //------------------------------------------------------------------------------
 public class Layer_Indexed extends Layer_Base
 {
-	// TODO: hold data for index, colors, names, etc...
+	// Internal helper class to store color key information...
+	//--------------------------------------------------------------------------
+	protected class Layer_Key {
+		
+		private int mIndex;
+		private String mLabel, mHexColor;
+		
+		public Layer_Key(int index, String label, String hexColor) {
+			mIndex = index;
+			mLabel = label;
+			mHexColor = hexColor;
+		}
+
+		public JsonNode getAsJson() {
+			ObjectNode ret = JsonNodeFactory.instance.objectNode();
+			
+			ret.put("index", mIndex);
+			ret.put("label", mLabel);
+			ret.put("color", mHexColor);
+			
+			return ret;
+		}
+	}
+	
+	private ArrayList<Layer_Key> mLayerKey;
 	
 	//--------------------------------------------------------------------------
 	public Layer_Indexed(String name) {
 		super(name);
+		
+		mLayerKey = new ArrayList<Layer_Key>();
 	}
-	
-	// TODO: Read in indexed file for colors, names, etc.
 	
 	//--------------------------------------------------------------------------
 	protected void processASC_Line(int y, String lineElementsArray[]) {
@@ -43,9 +67,77 @@ public class Layer_Indexed extends Layer_Base
 		}
 	}
 
+	// Loads a color key if there is one....
 	//--------------------------------------------------------------------------
-	protected void onLoadEnd() { /*does nothing at this point*/ }
+	protected void onLoadEnd() {
 		
+		Logger.info("Attempting to read color and name key file.");
+		BufferedReader br = null;
+		try {
+			br = new BufferedReader(new FileReader("./layerData/" + mName + ".key"));
+
+			// now read the array data
+			while (br.ready()) {
+				String line = br.readLine();
+				String split[] = line.split(",");
+			
+				if (split.length != 3) {
+					Logger.info("Parse error reading /layerData/" + mName + ".key");
+					Logger.info("Error: <read>" + line);
+					throw new Exception();
+				}
+				else {
+					int index = Integer.parseInt(split[0].trim());
+					String label = split[1].trim();
+					String color = split[2].trim();
+							
+					Layer_Key keyItem = new Layer_Key(index, label, color);
+					mLayerKey.add(keyItem);
+				}
+			}
+		}
+		catch (Exception e) {
+			Logger.info(e.toString());
+		}
+		finally {
+			if (br != null) {
+				try {
+					br.close();
+				}
+				catch (Exception e) {
+					Logger.info(e.toString());
+				}
+			}
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	protected JsonNode getParameterInternal(JsonNode clientRequest) throws Exception {
+
+		// Set this as a default - call super first so subclass can override a return result
+		//	for the same parameter request type. Unsure we need that functionality but...
+		JsonNode ret = super.getParameterInternal(clientRequest);
+
+		String type = clientRequest.get("type").getTextValue();
+		if (type.equals("colorKey")) {
+			ret = getColorKeyAsJson();
+		}
+		
+		return ret;
+	}
+	
+	//--------------------------------------------------------------------------
+	public JsonNode getColorKeyAsJson() {
+		
+		ArrayNode ret = JsonNodeFactory.instance.arrayNode();
+		
+		for (int i = 0; i < mLayerKey.size(); i++) {
+			ret.add(mLayerKey.get(i).getAsJson());
+		}
+		
+		return ret;
+	}
+	
 	//--------------------------------------------------------------------------
 	private int getCompareBitMask(JsonNode matchValuesArray) {
 		

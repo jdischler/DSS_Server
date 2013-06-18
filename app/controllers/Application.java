@@ -18,50 +18,34 @@ import javax.xml.bind.DatatypeConverter;
 
 //------------------------------------------------------------------------------
 public class Application extends Controller 
-	{
+{
 	
 	//--------------------------------------------------------------------------
-	public static Result index() 
-	{
+	public static Result index() {
 		
 		return ok(index.render());
 	}
 	
 	//--------------------------------------------------------------------------
-	public static Result query() throws Exception 
-	{
+	public static Result query() throws Exception {
 		
 		Query query = new Query();
-		String urlPath = query.exec(request().body().asJson());
-		return ok(urlPath);
+		JsonNode result = query.exec(request().body().asJson());
+		return ok(result);
 	}
 
 	//--------------------------------------------------------------------------
-	public static Result layerParmRequest() throws Exception 
-	{
+	public static Result layerParmRequest() throws Exception {
 		
 		JsonNode request = request().body().asJson();
-		
-		ObjectNode ret = JsonNodeFactory.instance.objectNode();
-		
-		String layername = request.get("name").getTextValue();
-		String type = request.get("type").getTextValue();
 
-		Layer_Base layer = Layer_Base.getLayer(layername);
-		if (layer != null && type != null) {
-			if (type.equals("layerRange")) {
-				Layer_Continuous layerCont = (Layer_Continuous)layer;
-				if (layerCont == null) {
-					throw new Exception();
-				}
-				ret.put("layerMin", layerCont.getLayerMin());
-				ret.put("layerMax", layerCont.getLayerMax());
-			}
+		JsonNode ret = Layer_Base.getParameter(request);
+		if (ret != null) {
+			return ok(ret);
 		}
-
-		return ok(ret);
+		
+		return ok(); // derp, not really OK if gets here...or??
 	}
-	
 	
 	//----------------------------------------------------------------------
 	public static Result model() throws Exception 

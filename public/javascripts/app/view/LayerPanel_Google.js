@@ -11,6 +11,7 @@ Ext.define('MyApp.view.LayerPanel_Google', {
     title: 'Base Map',
 
     hideCollapseTool: true,
+    DSS_noCollapseTool: false,
     bodyStyle: {'background-color': '#fafcff'},
     header: {
     	style: {
@@ -36,22 +37,24 @@ Ext.define('MyApp.view.LayerPanel_Google', {
 					console.log('Clicked panel tool');
 					if (tool.type == 'plus') {
 						owner.expand();
-						tool.setType('minus');
 					} else {
 						owner.collapse();
-						tool.setType('plus');
 					}
 				}
 			});
 			c.header.insert(0,tool);
+			c.DSS_collapseTool = tool;
 
 			// Added to space it out and match the other checks...never used?
 			var chk = Ext.create('Ext.form.field.Checkbox',
 			{
 				padding: '0 5 0 4',
 				checked: false,
-				fieldStyle: 'position: relative; top: -3px;',
-				disabled: true
+				// wanted it to be barely visible...
+				fieldStyle: 'position: relative; top: -3px;' + 
+					'filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=15);' + 
+					'opacity: 0.15;',
+				disabled: true,
 			});
 			var el = c.header.insert(1,chk);
 			
@@ -61,6 +64,12 @@ Ext.define('MyApp.view.LayerPanel_Google', {
 				width: 10
 			});
 			c.header.add(spc);
+		},
+		expand: function(panel, eOpts) {
+			panel.DSS_collapseTool.setType('minus');
+		},
+		collapse: function(panel, eOpts) {
+			panel.DSS_collapseTool.setType('plus');
 		}
 	},
     
@@ -91,7 +100,6 @@ Ext.define('MyApp.view.LayerPanel_Google', {
 					if (!checked) {
 						globalMap.setBaseLayer(this.DSS_LayerValue);
 					}
-					
 				}
 			},
 			{

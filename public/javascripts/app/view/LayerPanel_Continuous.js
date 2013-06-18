@@ -10,8 +10,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
     initComponent: function() {
         var me = this;
 
-        var label = '<p style="text-align:right">' + me.title + '</p>';
-        
+        var label = '<p style="text-align:right">' + (me.DSS_ShortTitle ? me.DSS_ShortTitle : me.title) + '</p>';
         var rangeLabel = 'Range of values: ' + 
         					me.DSS_LayerRangeMin.toFixed(1) + me.DSS_LayerUnit +
         					' to ' + 
@@ -55,8 +54,21 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 				step: 0.5,
 				value: me.DSS_ValueDefaultGreater
 			},{
+				xtype: 'button',
+				x: 154,
+				y: 10,
+				width: 18,
+				text: 'c',
+				tooltip: {
+					text: 'Clear this text field',
+					showDelay: 100
+				},
+				handler: function(me,evt) {
+					me.up().getComponent('DSS_GreaterThanValue').setValue('');
+				}
+			},{
 				xtype: 'label',
-				x: 157,
+				x: 177,
 				y: 14,
 				html: me.DSS_LayerUnit,
 				width: 60
@@ -67,7 +79,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 					text: 'Swap values',
 					showDelay: 100
 				},
-				x: 170,
+				x: 197,
 				y: 10,
 				handler: function(me,evt) {
 					var gtrValue = me.up().getComponent('DSS_GreaterThanValue');
@@ -79,7 +91,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 			},{
 				xtype: 'button',
 				itemId: 'DSS_LessThanTest',
-				x: 195,
+				x: 235,
 				y: 10,
 				width: 30,
 				text: '<=',
@@ -98,7 +110,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 			},{
 				xtype: 'numberfield',
 				itemId: 'DSS_LessThanValue',
-				x: 225,
+				x: 265,
 				y: 10,
 				width: 54,
 				hideEmptyLabel: false,
@@ -107,12 +119,25 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 				step: 0.5,
 				value: me.DSS_ValueDefaultLess
 			},{
+				xtype: 'button',
+				x: 319,
+				y: 10,
+				width: 18,
+				text: 'c',
+				tooltip: {
+					text: 'Clear this text field',
+					showDelay: 100
+				},
+				handler: function(me,evt) {
+					me.up().getComponent('DSS_LessThanValue').setValue('');
+				}
+			},{
 				xtype: 'label',
-				x: 282,
+				x: 343,
 				y: 14,
 				html: me.DSS_LayerUnit,
 				width: 60
-			},{
+			},/*{
 				xtype: 'button',
 				itemId: 'selectionbutton',
 				iconAlign: 'right',
@@ -122,12 +147,15 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 				handler: function(me,evt) {
 					this.up().buildQuery();
 				}
-			},{
+			},*/{
 				xtype: 'label',
 				itemId: 'DSS_ValueRange',
 				x: 70,
 				y: 40,
-				text: rangeLabel
+				text: rangeLabel,
+				style: {
+					color: '#888'
+				}
 			}]
         });
 
@@ -188,7 +216,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 	},
 
     //--------------------------------------------------------------------------
-    setSelection: function() {
+    setSelectionCriteria: function() {
     	
 		var queryLayer = { 
 			name: this.DSS_QueryTable,

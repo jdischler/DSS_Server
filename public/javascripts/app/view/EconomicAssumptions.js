@@ -1,4 +1,7 @@
+
+//------------------------------------------------------------------------------
 Ext.define('MyApp.view.EconomicAssumptions', {
+		
     extend: 'Ext.container.Container',
     alias: 'widget.economicassumptions',
 
@@ -6,6 +9,7 @@ Ext.define('MyApp.view.EconomicAssumptions', {
         type: 'absolute'
     },
 
+    //--------------------------------------------------------------------------
     initComponent: function() {
         var me = this;
 

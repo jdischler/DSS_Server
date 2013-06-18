@@ -105,7 +105,7 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
 				var cont = this.getComponent('legendcontainer');
 				for (var i = 0; i < obj.length; i++) {
 					// add index for every other colouring
-					var element = Ext.create('MyApp.view.LegendElement_New', 
+					var element = Ext.create('MyApp.view.LegendElement', 
 						obj[i]);
 					cont.insert(i, element);
 				}

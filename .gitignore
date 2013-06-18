@@ -2,7 +2,6 @@ logs
 project/project
 project/target
 target
-layerData
 tmp
 .history
 dist
@@ -15,9 +14,10 @@ dist
 /RUNNING_PID
 /public/file
 *.txt#
-*.asc#
-*.java#
-*.js#
+*.txt~
 *.asc
+*.asc#
+*.js#
 *.js~
+*.java#
 *.java~

@@ -15,7 +15,7 @@ public class Query {
 	
 	static int mCounter;
 	static int mWidth, mHeight;
-	
+
 	//------------------------------------------------------------------------------
 	public JsonNode exec(JsonNode requestBody) throws Exception
 	{
@@ -26,19 +26,8 @@ public class Query {
 		int red = 255;
 		int green = 0;
 		int blue = 96;
+		int resampleFactor = 5;
 		
-/*		// TEMP: just rotate the color to get a different selection color
-		if ((mCounter & 0x3) == 1) {
-			red = 0;
-			green = 128;
-			blue = 255;
-		}
-		else if ((mCounter & 0x3) == 2) {
-			red = 255;
-			green = 0;
-			blue = 255;
-		}
-*/		
 		// FIXME: can't base size off of a hardcoded layer? The expectation is that
 		//	all layers are of the same size....
 		Layer_Base tmp = Layer_Base.getLayer("rotation");
@@ -68,27 +57,23 @@ public class Query {
 		Logger.info("File write path: " + partialPath);
 		mCounter++;
 		
-		// create image at 8 bit per pixel, indexed
-		ImageInfo imgInfo = new ImageInfo(mWidth, mHeight, 8, false, false, true);
-		OutputStream outputStream = new FileOutputStream("." + partialPath);
-		PngWriter pngW = new PngWriter(outputStream, imgInfo);
-//		pngW.setCompLevel(9); // compression level not working?
-		pngW.getMetadata().setDpi(306.98);
-		PngChunkPLTE palette = pngW.getMetadata().createPLTEChunk();
-		palette.setNentries(2);
+		// 8 bits per pixel, one channel (indexed);
+		Png png = new Png(mWidth / resampleFactor, mHeight / resampleFactor, 
+				8, 1, 
+				"." + partialPath);
+		
+		PngChunkPLTE palette = png.createPalette(2);
 		palette.setEntry(0, 0,0,0); // black
 		palette.setEntry(1, red, green, blue);
 		
 		// set index 0 (black) as transparent
-		PngChunkTRNS trans = pngW.getMetadata().createTRNSChunk();
-		trans.setIndexEntryAsTransparent(0);
+		png.setTransparentIndex(0);
 
 		// Actually run the query...
 		JsonNode layerList = requestBody.get("queryLayers");
 		Layer_Base.execQuery(layerList, imgArray);
 		
-		pngW.writeRowsInt(imgArray);
-		pngW.end();
+		png.writeResampledArray(mWidth, mHeight, imgArray);
 		
 		int count = 0;	
 		for (y = 0; y < mHeight; y++) {
@@ -106,8 +91,6 @@ public class Query {
 		ret.put("selectedPixels", count);
 		ret.put("totalPixels", mHeight * mWidth);
 
-//		return ok("http://dss.wei.wisc.edu:9000/app" + partialPath);
-//		return urlPath;
 		return ret;
 	}
 }

@@ -17,6 +17,9 @@ var DSS_LogoPanelHeight = 64;
 var DSS_globalQueryableLayers = [];
 var DSS_globalCollapsibleLayers = [];
 
+var DSS_hiliteLayer = null;
+var DSS_waterShedTest = null;
+
 //------------------------------------------------------------------------------
 Ext.define('MyApp.view.MainViewport', {
 //------------------------------------------------------------------------------
@@ -57,14 +60,14 @@ Ext.define('MyApp.view.MainViewport', {
 		var me = this;
 		var projectionType = "EPSG:3857";
 		var bounds = new OpenLayers.Bounds(
-			-10062652.65061, 5249032.6922889,
-			-9878152.65061, 5385742.6922889
+			-10062652.65061, 5278060.469521415,// 5249032.6922889,
+			-9878152.65061, 5415259.640662575// 5385742.6922889
 		);
 		var options = {
 			controls: [],
 			maxExtent: bounds,
 			restrictedExtent: bounds.scale(1.25),
-			maxResolution: 720.703125,
+			maxResolution: 720.703124999,
 			projection: projectionType,
 			units: 'm'
 		};
@@ -190,30 +193,30 @@ Ext.define('MyApp.view.MainViewport', {
 		var wmsRivers = new OpenLayers.Layer.WMS("Rivers", 
 			this.getGeoserverURL('vector'),
 			{ 
-				layers: 'Vector:rivers',  
+				layers: 'Vector:Rivers-B',  
 				transparent: true,
 				format: imgFormat,
 				tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom  
 			},
-			this.getWMS_Settings(false, 0.3)
+			this.getWMS_Settings(false, 1)
 		);
 		//------------------------------------------------
 		var wmsWatershed = new OpenLayers.Layer.WMS("Watersheds", 
 			this.getGeoserverURL('vector'),
 			{ 
-				layers: 'Vector:watersheds',  
+				layers: 'Vector:Watersheds-C',  
 				transparent: true,
 				format: imgFormat,
 				tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
 			},
-			this.getWMS_Settings(false, 0.3)
+			this.getWMS_Settings(false, 1)
 		);
 		
 		//------------------------------------------------
 		var wmsSlope = new OpenLayers.Layer.WMS("Slope", 
 			this.getGeoserverURL('raster'),
 			{
-				layers: 'Raster:Slope',
+				layers: 'Raster:Slope-b',
 				format: imgFormat,
 				transparent: true,
 				tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
@@ -225,7 +228,7 @@ Ext.define('MyApp.view.MainViewport', {
 		var wmsLCC = new OpenLayers.Layer.WMS("lcc", 
 			this.getGeoserverURL('raster'),
 			{
-				layers: 'Raster:lcc',
+				layers: 'Raster:LCC',
 				format: imgFormat,
 				transparent: true,
 				tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
@@ -237,7 +240,7 @@ Ext.define('MyApp.view.MainViewport', {
 		var wmsLCS = new OpenLayers.Layer.WMS("lcs",
 			this.getGeoserverURL('raster'),
 			{
-				layers: 'Raster:lcs',
+				layers: 'Raster:LCS',
 				format: imgFormat,
 				transparent: true,
 				tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
@@ -249,7 +252,7 @@ Ext.define('MyApp.view.MainViewport', {
 		var wmsSOC = new OpenLayers.Layer.WMS("SOC", 
 			this.getGeoserverURL('raster'),
 			{
-				layers: 'Raster:soc',
+				layers: 'Raster:SOC_I',
 				format: imgFormat,
 				transparent: true,
 				tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
@@ -392,8 +395,8 @@ Ext.define('MyApp.view.MainViewport', {
 		var dssLeftPanel = Ext.getCmp('DSS_LeftPanel');
 		dssLeftPanel.insert(0,lpGoog);
 		dssLeftPanel.insert(0,lpSOC);
-		dssLeftPanel.insert(0,lpLCC);
 		dssLeftPanel.insert(0,lpLCS);
+		dssLeftPanel.insert(0,lpLCC);
 		dssLeftPanel.insert(0,lpSlope);
 		dssLeftPanel.insert(0,lpWatershed);
 		dssLeftPanel.insert(0,lpRoad);
@@ -420,12 +423,55 @@ Ext.define('MyApp.view.MainViewport', {
 		DSS_globalCollapsibleLayers.push(lpCDL);
 		
 		var lpSel = Ext.create('MyApp.view.LayerPanel_CurrentSelection', {
-			hidden: true,
-			DSS_Layer: wmsSlope // NOTE: dummy layer
+			hidden: true//,
+//			DSS_Layer: wmsSlope // NOTE: dummy layer
 		});
 		dssLeftPanel.insert(0,lpSel);
+//		DSS_globalCollapsibleLayers.push(lpSel);
+		
+		// TEST TEST
+		this.testAddFeatureClick(map, wmsWatershed);
 	},
 	
+	//--------------------------------------------------------------------------
+	testAddFeatureClick: function(map, watershed) {
+		
+		// Allow cross url requests....IMPORTANT
+		OpenLayers.ProxyHost = "proxy.cgi?url=";
+		
+		DSS_waterShedTest = watershed;
+		DSS_hiliteLayer = new OpenLayers.Layer.Vector("Highlighted Features", {
+				displayInLayerSwitcher: false, 
+				isBaseLayer: false 
+		});
+		
+		map.addLayer(DSS_hiliteLayer);
+	
+		var url = 'http://' + baseUrl + ':' + port + vectorPath;
+		var click = new OpenLayers.Control.WMSGetFeatureInfo({
+			url: url, 
+			title: 'Identify features by clicking',
+			layers: [DSS_waterShedTest],
+			queryVisible: true
+		})
+		
+		click.events.register("getfeatureinfo", this, this.featureShowInfo);
+		map.addControl(click); 
+		click.activate();
+	},
+	
+	//--------------------------------------------------------------------------
+	featureShowInfo: function(evt) {
+		
+		console.log('entered feature show info!');
+		
+		if (evt.features && evt.features.length) {
+			DSS_hiliteLayer.destroyFeatures();
+			DSS_hiliteLayer.addFeatures(evt.features);
+			DSS_hiliteLayer.redraw();
+		} 
+	},
+
 	//--------------------------------------------------------------------------
     doApplyIf: function(me, map) {
     	

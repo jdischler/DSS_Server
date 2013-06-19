@@ -19,13 +19,11 @@ public class Query {
 	//------------------------------------------------------------------------------
 	public JsonNode exec(JsonNode requestBody) throws Exception
 	{
-		ObjectNode ret = JsonNodeFactory.instance.objectNode();
-		
-		int x, y;
-		// blah, selection color
+		// selection color
 		int red = 255;
 		int green = 0;
 		int blue = 96;
+		int x, y;
 		int resampleFactor = 5;
 		
 		// FIXME: can't base size off of a hardcoded layer? The expectation is that
@@ -34,16 +32,6 @@ public class Query {
 		mWidth = tmp.getWidth();//4710;//3791;
 		mHeight = tmp.getHeight();//3869;//3133;
 		
-		int[][] imgArray = new int[mHeight][mWidth];
-		
-		// BOOO, prep the array for & logic
-		// FIXME: don't use hardcoded image sizes, either 		
-		for (y = 0; y < mHeight; y++) {
-			for (x = 0; x < mWidth; x++) {
-				imgArray[y][x] = 1;
-			}
-		}
-
 		Logger.info("Called into query");
 		Logger.info(requestBody.toString());
 		
@@ -57,7 +45,9 @@ public class Query {
 		Logger.info("File write path: " + partialPath);
 		mCounter++;
 		
-		// 8 bits per pixel, one channel (indexed);
+		// 8 bits per pixel, one channel (indexed), file path where the png is saved
+		// Since this is the file we are saving, it will be smaller than the actual
+		//	width/height by the sample factor.
 		Png png = new Png(mWidth / resampleFactor, mHeight / resampleFactor, 
 				8, 1, 
 				"." + partialPath);
@@ -69,12 +59,25 @@ public class Query {
 		// set index 0 (black) as transparent
 		png.setTransparentIndex(0);
 
+		// Set up to run the query...allocate memory...
+		int[][] imgArray = new int[mHeight][mWidth];
+		
+		// ...and initialize everything to 1 to prep for & (and) logic
+		for (y = 0; y < mHeight; y++) {
+			for (x = 0; x < mWidth; x++) {
+				imgArray[y][x] = 1;
+			}
+		}
+		
 		// Actually run the query...
 		JsonNode layerList = requestBody.get("queryLayers");
 		Layer_Base.execQuery(layerList, imgArray);
 		
+		// Pass the whole array at the full size...and let the writer do the resample
+		//	to convert this to the size the png will be written at
 		png.writeResampledArray(mWidth, mHeight, imgArray);
 		
+		// Get query statistics (number of selected pixels)
 		int count = 0;	
 		for (y = 0; y < mHeight; y++) {
 			for (x = 0; x < mWidth; x++) {
@@ -86,6 +89,9 @@ public class Query {
 		Logger.info("-----------------------");
 		Logger.info("Total selected pixels: " + Integer.toString(count));
 		Logger.info("Square km: " + Float.toString(count * 0.03f * 0.03f));
+
+		// Data to return to the client		
+		ObjectNode ret = JsonNodeFactory.instance.objectNode();
 		
 		ret.put("url", urlPath);
 		ret.put("selectedPixels", count);

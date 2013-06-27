@@ -67,14 +67,17 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
 
         me.callParent(arguments);
         
-/*        var cont = me.getComponent('legendcontainer');
-        for (var i = 0; i < me.DSS_LegendElements.length; i++) {
-        	// add index for every other colouring
-        	me.DSS_LegendElements[i].DSS_LegendElementIndex = i-1;
-        	var element = Ext.create('MyApp.view.LegendElement_New', 
-        		me.DSS_LegendElements[i]);
-        	cont.insert(i, element);
-        }*/
+        // TODO: Code path should be deprecated...
+        if (me.DSS_LegendElements) {
+			var cont = me.getComponent('legendcontainer');
+			for (var i = 0; i < me.DSS_LegendElements.length; i++) {
+				// add index for every other colouring
+//				me.DSS_LegendElements[i].DSS_LegendElementIndex = i-1;
+				var element = Ext.create('MyApp.view.LegendElement', 
+					me.DSS_LegendElements[i]);
+				cont.insert(i, element);
+			}
+		}
         this.DSS_RequestTryCount = 0;
         this.requestLayerRange(this);
     },
@@ -88,7 +91,7 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
 		};
     	
 		var obj = Ext.Ajax.request({
-			url: 'http://localhost:9000/layerParmRequest',
+			url: location.href + 'layerParmRequest',
 			jsonData: queryLayerRequest,
 			timeout: 10000,
 			scope: container,

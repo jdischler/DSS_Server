@@ -174,7 +174,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 		};
     	
 		var obj = Ext.Ajax.request({
-			url: 'http://localhost:9000/layerParmRequest',
+			url: location.href + 'layerParmRequest',
 			jsonData: queryLayerRequest,
 			timeout: 10000,
 			scope: container,

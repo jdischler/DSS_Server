@@ -7,7 +7,7 @@ GET     /                           controllers.Application.index()
 POST	/query						controllers.Application.query()
 POST	/layerParmRequest			controllers.Application.layerParmRequest()
 POST	/wmsRequest					controllers.Application.wmsRequest()
-GET		/model						controllers.Application.model()
+POST	/models						controllers.Application.Models()
 
 # Map static resources from the /public folder to the /assets URL path
 GET		/app/file/*file			controllers.Assets.at(path="/public/file", file)

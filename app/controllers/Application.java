@@ -31,7 +31,7 @@ public class Application extends Controller
 	public static Result query() throws Exception {
 		
 		Query query = new Query();
-		JsonNode result = query.exec(request().body().asJson());
+		JsonNode result = query.selection(request().body().asJson());
 		return ok(result);
 	}
 
@@ -50,8 +50,6 @@ public class Application extends Controller
 	
 	//----------------------------------------------------------------------
 	public static Result wmsRequest() {
-		
-		Logger.info("Entering wmsRequest!");
 		
 		// Open up request from client...
 		JsonNode request = request().body().asJson();
@@ -105,18 +103,17 @@ public class Application extends Controller
 			Logger.info(e.toString());
 		}
 		
-		Logger.info("Failed");
-		return ok();//redirect("http://pgis.glbrc.org:8080/geoserver/Vector/wms?LAYERS=Vector:Watersheds-C&QUERY_LAYERS=Vector:Watersheds-C&STYLES=&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&BBOX=-10066101.81001,5298351.853223,-9874703.49121,5394968.256962&FEATURE_COUNT=10&HEIGHT=632&WIDTH=1252&FORMAT=image/png&INFO_FORMAT=text/html&SRS=EPSG:900913&X=585&Y=273");
-//		return ok();
+		Logger.info("WMS request failed");
+		// TODO: return NOT ok?
+		return ok();
 	}
 	
 	//----------------------------------------------------------------------
-	public static Result model() throws Exception 
+	public static Result Models() throws Exception 
 	{
-		
-		Logger.info("Server got models request:");
-			
-//		return ok("http://dss.wei.wisc.edu:9000/app" + partialPath);
-		return ok("http://localhost:9000");
+		Logger.info("Server Run The Models Request:");
+		Models model = new Models();
+		JsonNode SendBack = model.modeloutcome(request().body().asJson());
+		return ok(SendBack);
 	}
 }

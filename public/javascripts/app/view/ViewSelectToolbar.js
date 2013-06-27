@@ -252,14 +252,9 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 				console.log("success: ");
 				console.log(obj);
 				
-			//for (var i = 0; i < obj.length; i++) {
-			//	var value = obj[i];
-			//	console.log(value);
-			//}
-			
-			//Ext.getCmp('Habitat_Index').SetChartData(obj); 
-			Ext.getCmp('Model_Graph').SetData(obj);
-			
+				Ext.getCmp('Model_Graph').SetData(obj);
+				button.setIcon(null);
+				button.setDisabled(false);
 			},
 			
 			failure: function(respose, opts) {

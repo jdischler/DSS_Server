@@ -59,7 +59,7 @@ public class Layer_Indexed extends Layer_Base
 				}
 				else if (!erred) {
 					erred = true;
-					Logger.error("BAD value - indexed values can only be 1-31. Was: " 
+					Logger.error("  BAD value - indexed values can only be 1-31. Was: " 
 						+ Integer.toString(val));
 				}
 			}
@@ -71,7 +71,7 @@ public class Layer_Indexed extends Layer_Base
 	//--------------------------------------------------------------------------
 	protected void onLoadEnd() {
 		
-		Logger.info("Attempting to read color and name key file.");
+		Logger.info("  Attempting to read color and name key file.");
 		BufferedReader br = null;
 		try {
 			br = new BufferedReader(new FileReader("./layerData/" + mName + ".key"));
@@ -82,8 +82,8 @@ public class Layer_Indexed extends Layer_Base
 				String split[] = line.split(",");
 			
 				if (split.length != 3) {
-					Logger.info("Parse error reading /layerData/" + mName + ".key");
-					Logger.info("Error: <read>" + line);
+					Logger.info("  Parse error reading /layerData/" + mName + ".key");
+					Logger.info("  Error: <read>" + line);
 					throw new Exception();
 				}
 				else {
@@ -97,7 +97,7 @@ public class Layer_Indexed extends Layer_Base
 			}
 		}
 		catch (Exception e) {
-			Logger.info(e.toString());
+			Logger.info("  " + e.toString());
 		}
 		finally {
 			if (br != null) {
@@ -105,7 +105,7 @@ public class Layer_Indexed extends Layer_Base
 					br.close();
 				}
 				catch (Exception e) {
-					Logger.info(e.toString());
+					Logger.info("  " + e.toString());
 				}
 			}
 		}

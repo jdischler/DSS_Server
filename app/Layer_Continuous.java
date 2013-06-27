@@ -130,7 +130,7 @@ public class Layer_Continuous extends Layer_Base
 	//--------------------------------------------------------------------------
 	protected void onLoadEnd() {
 		
-		Logger.info("Value range is: " + Float.toString(mLayerMin) + 
+		Logger.info("  Value range is: " + Float.toString(mLayerMin) + 
 						" to " + Float.toString(mLayerMax));
 	}
 	

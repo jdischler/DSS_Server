@@ -30,7 +30,7 @@ public class Application extends Controller
 	public static Result query() throws Exception {
 		
 		Query query = new Query();
-		JsonNode result = query.exec(request().body().asJson());
+		JsonNode result = query.selection(request().body().asJson());
 		return ok(result);
 	}
 
@@ -48,12 +48,11 @@ public class Application extends Controller
 	}
 	
 	//----------------------------------------------------------------------
-	public static Result model() throws Exception 
+	public static Result Models() throws Exception 
 	{
-		
-		Logger.info("Server got models request:");
-			
-//		return ok("http://dss.wei.wisc.edu:9000/app" + partialPath);
-		return ok("http://localhost:9000");
+		Logger.info("Server Run The Models Request:");
+		Models model = new Models();
+		JsonNode SendBack = model.modeloutcome(request().body().asJson());
+		return ok(SendBack);
 	}
 }

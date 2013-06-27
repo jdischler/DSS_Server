@@ -85,6 +85,25 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 				handler: function(button, evt, toolEl, owner, tool) {
 					button.up().buildQuery();
 				}
+			},
+			{
+				xtype: 'button',
+				itemId: 'DSS_modelButton',
+				scale: 'small',
+				text: 'Run Model',
+				iconAlign: 'right',
+				tooltip: {
+					text: 'Run the Model using the current query',
+					showDelay: 100
+				},
+				border: 1,
+				style: {
+					borderColor: '#eff',
+					borderStyle: 'dotted'
+				},
+				handler: function(button, evt, toolEl, owner, tool) {
+					button.up().buildModel();
+				}
 			}]
         });
 
@@ -189,19 +208,67 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 			}
 		});
 	},
-	
 	//--------------------------------------------------------------------------
-	tryExpandAll: function() {
+	buildModel: function() {
+	
+		var requestData = {
+			clientID: 12345, //temp
+			queryLayers: []
+		};
 		
-    	for (var i = 0; i < DSS_globalCollapsibleLayers.length; i++) {
-    		
-    		var layer = DSS_globalCollapsibleLayers[i];
-    		if (layer.DSS_noCollapseTool == false) {
-    			layer.expand();
-    		}
+		var query = false;
+		for (var i = 0; i < DSS_globalQueryableLayers.length; i++) {
+			
+			if (DSS_globalQueryableLayers[i].includeInQuery()) {
+				var queryComp = DSS_globalQueryableLayers[i].setSelectionCriteria();
+				requestData.queryLayers.push(queryComp);
+				query = true;
+			}
+		}
+	
+		console.log(requestData);
+		if (query) {
+			this.submitModel(requestData);
+		}
+		else {
+			alert("No query built - nothing to query");
 		}
 	},
-	
+    //--------------------------------------------------------------------------
+    submitModel: function(queryJson) {
+    	
+		var button = this.getComponent('DSS_modelButton');
+		button.setIcon('app/images/spinner_16a.gif');
+		button.setDisabled(true);
+
+		var obj = Ext.Ajax.request({
+			url: location.href + 'models',
+			jsonData: queryJson,
+			timeout: 15000000, // in milliseconds
+			
+			success: function(response, opts) {
+				
+				var obj = JSON.parse(response.responseText);
+				console.log("success: ");
+				console.log(obj);
+				
+			//for (var i = 0; i < obj.length; i++) {
+			//	var value = obj[i];
+			//	console.log(value);
+			//}
+			
+			//Ext.getCmp('Habitat_Index').SetChartData(obj); 
+			Ext.getCmp('Model_Graph').SetData(obj);
+			
+			},
+			
+			failure: function(respose, opts) {
+				button.setIcon(null);
+				button.setDisabled(false);
+				alert("Model run failed, request timed out?");
+			}
+		});
+	},
 	//--------------------------------------------------------------------------
 	tryExpandQueried: function() {
 		

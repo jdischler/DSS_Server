@@ -5,10 +5,14 @@ Ext.define('MyApp.view.ReportMasterLayout', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.report_master_layout',
 
+        requires: [
+		'MyApp.view.ModelGraph',       
+	],
+	
 	dock: 'right',
 	title: 'Simulation Results / Reports',
 	icon: 'app/images/magnify_icon.png',
-	width: 400,
+	width: 500,
 	autoScroll: true,
 	layout: {
 		fill: false,
@@ -35,7 +39,7 @@ Ext.define('MyApp.view.ReportMasterLayout', {
 				collapsed: false
 			},
 			{
-				xtype: 'evaluationtools'
+				xtype: 'ModelGraph'
 			},
 			{
 				xtype: 'reporttools',

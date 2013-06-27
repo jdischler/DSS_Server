@@ -29,7 +29,7 @@ Ext.define('MyApp.view.MainViewport', {
 		'MyApp.view.InfoToolbar',
 		'MyApp.view.TransformationTools',
 		'MyApp.view.ManagementTools',
-		'MyApp.view.EvaluationTools',
+		//'MyApp.view.EvaluationTools',
 		'MyApp.view.GraphTools',
 		'GeoExt.panel.Map',
 		'MyApp.view.ScenarioTools',

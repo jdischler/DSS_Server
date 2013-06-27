@@ -17,9 +17,6 @@ var DSS_LogoPanelHeight = 64;
 var DSS_globalQueryableLayers = [];
 var DSS_globalCollapsibleLayers = [];
 
-var DSS_hiliteLayer = null;
-var DSS_waterShedTest = null;
-
 //------------------------------------------------------------------------------
 Ext.define('MyApp.view.MainViewport', {
 //------------------------------------------------------------------------------
@@ -39,6 +36,7 @@ Ext.define('MyApp.view.MainViewport', {
         'MyApp.view.LayerPanel_Indexed',
         'MyApp.view.LayerPanel_Continuous',
         'MyApp.view.LayerPanel_CurrentSelection',
+        'MyApp.view.LayerPanel_Watershed',
         'MyApp.view.LogoPanel',
         'MyApp.view.ViewSelectToolbar',
         'MyApp.view.ScenarioMasterLayout',        
@@ -49,11 +47,20 @@ Ext.define('MyApp.view.MainViewport', {
 	layout: {
 		type: 'fit'
 	},
+	id: 'DSS_MainViewport',
+	
+	listeners: {
+		// Some controls need the layout to be done before being wired in...
+		afterrender: function(c) {
+			this.addControlsNeedingLayout();
 
+		}
+	},
+	
 	//--------------------------------------------------------------------------
 	initComponent: function() {
 		
-		OpenLayers.IMAGE_RELOAD_ATTEMPTS = 0;//5;
+		OpenLayers.IMAGE_RELOAD_ATTEMPTS = 5;
 		// make OL compute scale according to WMS spec
 		OpenLayers.DOTS_PER_INCH = 25.4 / 0.28;
 		
@@ -67,7 +74,7 @@ Ext.define('MyApp.view.MainViewport', {
 			controls: [],
 			maxExtent: bounds,
 			restrictedExtent: bounds.scale(1.25),
-			maxResolution: 720.703124999,
+			maxResolution: 305.74811309814453,
 			projection: projectionType,
 			units: 'm'
 		};
@@ -80,20 +87,18 @@ Ext.define('MyApp.view.MainViewport', {
 		me.callParent(arguments);
 		this.addMapLayers(map);
 		this.addMapControls(map);		
-		map.zoomTo(1);
 	},
 
 	// Controls wired up to DOM elements need some manner of delay other control
 	//	INIT will attempt to find the element which will not exist yet    
 	//--------------------------------------------------------------------------
-	wireInDelayedControls: function(delay) {
+	addControlsNeedingLayout: function() {
 		
-		Ext.defer(function() {
-			globalMap.addControl(new OpenLayers.Control.Scale($('DSS_scale_tag')));
-			
-			Ext.getCmp('DSS_scale_tag').updateLayout();
-			
-		}, delay, this);
+		globalMap.addControl(new OpenLayers.Control.Scale($('DSS_scale_tag')));
+		Ext.getCmp('DSS_scale_tag').updateLayout();
+		
+		globalMap.zoomTo(1);
+		globalMap.pan(1,1); // FIXME: lame workaround for google map zoom level not starting out correctly?
 	},
 	
 	//--------------------------------------------------------------------------
@@ -138,9 +143,6 @@ Ext.define('MyApp.view.MainViewport', {
 			}
 		}); 
 		map.addControl(scaleLine);
-		
-		// FIXME: maybe just use afterRender listener event?			
-		this.wireInDelayedControls(2000);
 	},
 
 	// Type is 'raster' or 'vector'	
@@ -276,12 +278,12 @@ Ext.define('MyApp.view.MainViewport', {
 		var googTerrain = new OpenLayers.Layer.Google(
 			"Google Terrain",
 			{
-				type: google.maps.MapTypeId.TERRAIN, maxZoomLevel: 20, minZoomLevel: 9
+				type: google.maps.MapTypeId.TERRAIN, minZoomLevel: 9, maxZoomLevel: 15
 			});
 		var googHybrid = new OpenLayers.Layer.Google(
 			"Google Hybrid",
 			{
-				type: google.maps.MapTypeId.HYBRID, maxZoomLevel: 20, minZoomLevel: 9
+				type: google.maps.MapTypeId.HYBRID, minZoomLevel: 9, maxZoomLevel: 15
 			});
 		
 		map.addLayers([googTerrain,googHybrid,
@@ -336,14 +338,10 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 
-		var lpWatershed = Ext.create('MyApp.view.LayerPanel_Continuous', {
+		var lpWatershed = Ext.create('MyApp.view.LayerPanel_Watershed', {
 			title: 'Watershed',
 			DSS_Layer: wmsWatershed,
-			DSS_LayerUnit: '\xb0',
-			DSS_LayerRangeMin: 0,
-			DSS_LayerRangeMax: 45.5,
-			DSS_ValueDefaultGreater: 10,
-			DSS_QueryTable: 'slope',
+			DSS_QueryTable: 'watersheds',
 			collapsed: true
 		});
 
@@ -408,6 +406,7 @@ Ext.define('MyApp.view.MainViewport', {
 		DSS_globalQueryableLayers.push(lpSlope);
 		DSS_globalQueryableLayers.push(lpLCC);
 		DSS_globalQueryableLayers.push(lpLCS);
+		DSS_globalQueryableLayers.push(lpWatershed);
 		DSS_globalQueryableLayers.push(lpRoad);
 		DSS_globalQueryableLayers.push(lpRiver);
 		DSS_globalQueryableLayers.push(lpSOC);
@@ -429,49 +428,76 @@ Ext.define('MyApp.view.MainViewport', {
 		dssLeftPanel.insert(0,lpSel);
 //		DSS_globalCollapsibleLayers.push(lpSel);
 		
-		// TEST TEST
-		this.testAddFeatureClick(map, wmsWatershed);
+		this.addFeatureClickControl(map);
+	},
+	
+	// Used by vector selection layers (e.g., Watershed)
+	//--------------------------------------------------------------------------
+	activateClickControlWithHandler: function(handler, scope) {
+		
+		this.DSS_clickFeatureHandler = {
+			handler: handler,
+			scope: scope
+		};
+		this.DSS_clickControl.activate();
+		OpenLayers.Element.addClass(globalMap.viewPortDiv, "olCursorHand");
 	},
 	
 	//--------------------------------------------------------------------------
-	testAddFeatureClick: function(map, watershed) {
+	deactivateClickControl: function() {
 		
-		// Allow cross url requests....IMPORTANT
-		OpenLayers.ProxyHost = "proxy.cgi?url=";
+		this.DSS_clickControl.deactivate();
+		OpenLayers.Element.removeClass(globalMap.viewPortDiv, "olCursorHand");
+	},
+	
+	// Bah, the OpenLayers click handler doesn't seem terribly configurable with
+	//	switching out a handler call back with a different scope, etc...
+	//	Prefer to just have the given Layer Panel manage it...so define the
+	//	click callback handler to go here for consistency sake...then route to 
+	//	the correct Layer Panel handler that was configured in: this.activateClickControlWithHandler()
+	//--------------------------------------------------------------------------
+	onClick: function(evt) {
 		
-		DSS_waterShedTest = watershed;
-		DSS_hiliteLayer = new OpenLayers.Layer.Vector("Highlighted Features", {
-				displayInLayerSwitcher: false, 
-				isBaseLayer: false 
+		this.DSS_clickFeatureHandler.handler.call(
+			this.DSS_clickFeatureHandler.scope,
+			evt);
+	},
+	
+	//--------------------------------------------------------------------------
+	addFeatureClickControl: function(map) {
+		
+		var me = this;
+		
+		// NOTE: found this in OL code samples. I guess it just creates a click control
+		//	class from the OpenLayer.Control class? ie, it adds a custom click handler?
+		OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {                
+			defaultHandlerOptions: {
+				'single': true,
+				'double': false,
+				'pixelTolerance': 0,
+				'stopSingle': false,
+				'stopDouble': false
+			},
+
+			initialize: function(options) {
+				this.handlerOptions = OpenLayers.Util.extend(
+					{}, this.defaultHandlerOptions
+				);
+				OpenLayers.Control.prototype.initialize.apply(
+					this, arguments
+				); 
+				this.handler = new OpenLayers.Handler.Click(
+					me, {
+						'click': me.onClick
+					}, this.handlerOptions
+				);
+			}
 		});
 		
-		map.addLayer(DSS_hiliteLayer);
-	
-		var url = 'http://' + baseUrl + ':' + port + vectorPath;
-		var click = new OpenLayers.Control.WMSGetFeatureInfo({
-			url: url, 
-			title: 'Identify features by clicking',
-			layers: [DSS_waterShedTest],
-			queryVisible: true
-		})
-		
-		click.events.register("getfeatureinfo", this, this.featureShowInfo);
-		map.addControl(click); 
-		click.activate();
+		this.DSS_clickControl = new OpenLayers.Control.Click();
+		map.addControl(this.DSS_clickControl);
 	},
 	
-	//--------------------------------------------------------------------------
-	featureShowInfo: function(evt) {
-		
-		console.log('entered feature show info!');
-		
-		if (evt.features && evt.features.length) {
-			DSS_hiliteLayer.destroyFeatures();
-			DSS_hiliteLayer.addFeatures(evt.features);
-			DSS_hiliteLayer.redraw();
-		} 
-	},
-
 	//--------------------------------------------------------------------------
     doApplyIf: function(me, map) {
     	
@@ -486,6 +512,7 @@ Ext.define('MyApp.view.MainViewport', {
 				},
 				items: [{
 					xtype: 'gx_mappanel',
+					id: 'DSS_map_panel',
 					title: 'Landscape Viewer',
 					icon: 'app/images/globe_icon.png',
 					map: map,

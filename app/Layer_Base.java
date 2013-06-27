@@ -21,8 +21,16 @@ public abstract class Layer_Base
 	//--------------------------------------------------------------------------
 	public static Layer_Base getLayer(String name) {
 		
-		name = name.toLowerCase();
-		return mLayers.get(name);
+		if (mLayers == null) {
+			Logger.info("Info: getLayer called with no mLayers. Allocating one.");
+			mLayers = new HashMap<String, Layer_Base>();
+		}
+		String name_low = name.toLowerCase();
+		if (!mLayers.containsKey(name_low)) {
+			Logger.info("getLayer called looking for: " + name_low + "  but layer doesn't exist");
+			return null;
+		}
+		return mLayers.get(name_low);
 	}
 
 	// Use carefully...e.g., only if you are temporarily loading data for a process that rarely runs...
@@ -46,10 +54,10 @@ public abstract class Layer_Base
 	//--------------------------------------------------------------------------
 	public Layer_Base(String name) {
 		
-		mName = name.toLowerCase();
 		if (mLayers == null) {
 			mLayers = new HashMap<String, Layer_Base>();
 		}
+		mName = name.toLowerCase();
 		mLayers.put(mName, this);
 	}
 	
@@ -97,14 +105,14 @@ public abstract class Layer_Base
 			String width = reader.readLine(); // ncols
 			String height = reader.readLine(); // nrows
 			
-			String tmp = reader.readLine(); /* xll corner */ Logger.info(tmp);
-			tmp = reader.readLine(); /* yll corner */ Logger.info(tmp);
-			tmp = reader.readLine(); /* cellsize */ Logger.info(tmp);
+			String tmp = reader.readLine(); /* xll corner */ Logger.info("  " + tmp);
+			tmp = reader.readLine(); /* yll corner */ Logger.info("  " + tmp);
+			tmp = reader.readLine(); /* cellsize */ Logger.info("  " + tmp);
 			String noData = reader.readLine(); // nodata value
 			
-			Logger.info(width);
-			Logger.info(height);
-			Logger.info(noData);
+			Logger.info("  " + width);
+			Logger.info("  " + height);
+			Logger.info("  " + noData);
 			
 			mWidth = Integer.parseInt(getASC_HeaderValue(width));
 			mHeight = Integer.parseInt(getASC_HeaderValue(height));
@@ -118,16 +126,16 @@ public abstract class Layer_Base
 	//--------------------------------------------------------------------------
 	private void loadASC() throws Exception {
 		
-		Logger.info("---------------------");
-		Logger.info(mName);
-		Logger.info("---------------------");
+		Logger.info("+-------------------------------------------------------+");
+		Logger.info("| " + mName);
+		Logger.info("+-------------------------------------------------------+");
 		
 		BufferedReader br = new BufferedReader(new FileReader("./layerData/" + mName + ".asc"));
 		try {
 			readASC_Header(br);
 			allocMemory(mWidth, mHeight);
 			
-			Logger.info("Attempting to read the array data");
+			Logger.info("  Attempting to read the array data");
 			
 			int x = 0, y = 0;
 			
@@ -156,7 +164,7 @@ public abstract class Layer_Base
 	//--------------------------------------------------------------------------
 	protected void allocMemory(int width, int height) {
 		
-		Logger.info("Allocating new work array");
+		Logger.info("  Allocating new work array");
 		mIntData = new int[mHeight][mWidth];
 	}
 	
@@ -218,4 +226,3 @@ public abstract class Layer_Base
 	}
 }
 	
-

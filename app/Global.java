@@ -11,19 +11,26 @@ import org.codehaus.jackson.node.*;
 //------------------------------------------------------------------------------
 public class Global extends GlobalSettings
 {
+	// If the play server is started in DEV mode, should we skip loading certain layers
+	//	to get a faster server startup time and use less memory?
+	private static final boolean LOAD_ALL_LAYERS_FOR_DEV = true;
+	
 	//--------------------------------------------------------------------------
 	@Override
 	public void onStart(play.Application app) {
-		Logger.info("Application has started");
+		
+		systemReport("Application has started");
 		cacheLayers();
-		Logger.info("--data layers cached");
+		systemReport("Data Layers Cached");
 	}
 	
 	//--------------------------------------------------------------------------
 	@Override
 	public void onStop(play.Application app) {
-		Logger.info("Application is stopping");
+		
 		Layer_Base.removeAllLayers();
+		System.gc();
+		systemReport("Application stopped, Garbage Collection call made");
 	}
 	
 	//--------------------------------------------------------------------------
@@ -36,7 +43,34 @@ public class Global extends GlobalSettings
 		
 		return null;
 	}
+
+	//--------------------------------------------------------------------------
+	private void systemReport(String customMessage) {
+		
+		float unitConversion = (1024.0f * 1024.0f); // bytes -> MB
+		String unitName = "MB";
+		
+		Logger.info("+-------------------------------------------------------+");
+		Logger.info("| " + customMessage);
+		Logger.info("+-------------------------------------------------------+");
+		Logger.info("  Available Processors: " + 
+			Integer.toString(Runtime.getRuntime().availableProcessors()));
+		Logger.info("  Total Free Memory: " + 
+			String.format("%.2f", 
+				(float)(Runtime.getRuntime().freeMemory() / unitConversion)) +
+				unitName);
+		Logger.info("  Current Total Memory in Use: " + 
+			String.format("%.2f", 
+				(float)(Runtime.getRuntime().totalMemory() / unitConversion)) +
+				unitName);
+		Logger.info("  Maximum Memory for Use: " + 
+			String.format("%.2f", 
+				(float)(Runtime.getRuntime().maxMemory() / unitConversion)) +
+				unitName);
+		Logger.info("+-------------------------------------------------------+");
+	}
 	
+	// Only tries to load a layer if it isn't in memory already
 	//--------------------------------------------------------------------------
 	private void cacheLayers() {
 
@@ -61,17 +95,25 @@ public class Global extends GlobalSettings
 			// distance to river can get clamped to the nearest int value without losing much...
 			layer = new Layer_Continuous("rivers"); layer.init();
 			
-			// distance to road can get clamped to the nearest int value without losing much...
-			layer = new Layer_Continuous("roads"); layer.init();
-			
-			// SOC can get clamped to the nearest int value without losing much...
-			layer = new Layer_Continuous("soc"); layer.init();
-			
-			// NOTE: if we have more than 32 watersheds, we can't use Layer_Indexed
+			// NOTE: if we have more than 32 watersheds, we CAN'T use Layer_Indexed
 			layer = new Layer_Indexed("watersheds"); layer.init();
 			
-			layer = new Layer_Indexed("lcc"); layer.init();
-			layer = new Layer_Indexed("lcs"); layer.init();
+			// NOTE: can put low-priority (rarely used) data layers here so that
+			//	we can have them skip loading in DEVELOPMENT mode. Ie, it gives us
+			//	some ways that we can get the server up as quickly as possible for
+			//	testing and development
+			if (Play.isProd() || LOAD_ALL_LAYERS_FOR_DEV == true) {
+				
+				Logger.info("Loading all layers");
+				// SOC can get clamped to the nearest int value without losing much...
+				layer = new Layer_Continuous("soc"); layer.init();
+			
+				// distance to road can get clamped to the nearest int value without losing much...
+				layer = new Layer_Continuous("roads"); layer.init();
+				
+				layer = new Layer_Indexed("lcc"); layer.init();
+				layer = new Layer_Indexed("lcs"); layer.init();
+			}
 		}
 		catch (Exception e) {
 			Logger.info(e.toString());
@@ -80,5 +122,4 @@ public class Global extends GlobalSettings
 		}
 	}	
 }
-	
 

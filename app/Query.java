@@ -29,8 +29,8 @@ public class Query {
 		// FIXME: can't base size off of a hardcoded layer? The expectation is that
 		//	all layers are of the same size....
 		Layer_Base tmp = Layer_Base.getLayer("rotation");
-		mWidth = tmp.getWidth();//4710;//3791;
-		mHeight = tmp.getHeight();//3869;//3133;
+		mWidth = tmp.getWidth();
+		mHeight = tmp.getHeight();
 		
 		Logger.info("Called into query");
 		Logger.info(requestBody.toString());

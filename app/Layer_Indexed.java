@@ -170,7 +170,7 @@ public class Layer_Indexed extends Layer_Base
 	}
 	
 	//--------------------------------------------------------------------------
-	protected int[][] query(JsonNode queryNode, int[][] workArray) {
+	protected Selection query(JsonNode queryNode, Selection selection) {
 
 		Logger.info("Running indexed query");
 		JsonNode queryValues = queryNode.get("matchValues");
@@ -178,10 +178,10 @@ public class Layer_Indexed extends Layer_Base
 
 		for (int y = 0; y < mHeight; y++) {
 			for (int x = 0; x < mWidth; x++) {
-				workArray[y][x] &= ((mIntData[y][x] & test_mask) > 0 ? 1 : 0);
+				selection.mSelection[y][x] &= ((mIntData[y][x] & test_mask) > 0 ? 1 : 0);
 			}
 		}
-		return workArray;
+		return selection;
 	}
 }
 

@@ -13,7 +13,8 @@ public class Global extends GlobalSettings
 {
 	// If the play server is started in DEV mode, should we skip loading certain layers
 	//	to get a faster server startup time and use less memory?
-	private static final boolean LOAD_ALL_LAYERS_FOR_DEV = true;
+	private static final boolean LOAD_ALL_LAYERS_FOR_DEV = false;
+	private static JsonNode mSendBack; 
 	
 	//--------------------------------------------------------------------------
 	@Override
@@ -22,6 +23,26 @@ public class Global extends GlobalSettings
 		systemReport("Application has started");
 		cacheLayers();
 		systemReport("Data Layers Cached");
+				
+		Layer_Base tmp = Layer_Base.getLayer("rotation");
+		int w = tmp.getWidth();
+		int h = tmp.getHeight();
+		
+		Selection selection = new Selection(w, h);
+		
+		Logger.info("Server Run The Models Request:");
+		Models model = new Models();
+		File Output = new File("./layerData/Default");
+		if(Output.exists())
+		{
+			Logger.info("This folder is already exist");
+		}
+		else
+		{
+			Output.mkdir();
+			mSendBack = model.modeloutcome(null, selection, "Default", tmp.getIntData());
+		}
+
 	}
 	
 	//--------------------------------------------------------------------------
@@ -120,6 +141,11 @@ public class Global extends GlobalSettings
 		}
 		finally {
 		}
-	}	
+	}
+
+	public static JsonNode GetDefaultSendBack()
+	{
+		return mSendBack;
+	}
 }
 

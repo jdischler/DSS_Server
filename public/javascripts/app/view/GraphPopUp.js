@@ -1,7 +1,7 @@
 Ext.define('MyApp.view.GraphPopUp', {
     extend: 'Ext.window.Window',
 
-    height: 250,
+    height: 320,
     width: 400,
     title: 'My Window',
     layout: 'fit',
@@ -11,7 +11,7 @@ Ext.define('MyApp.view.GraphPopUp', {
 
         	Ext.define('Habitat_Index', {
 	    extend: 'Ext.data.Model',
-	    fields: ['Frequency', 'Bin']
+	    fields: ['Freq_Default', 'Freq_Transform', 'Bin']
 	});
 	
         this.graphstore = Ext.create('Ext.data.Store', {
@@ -29,12 +29,25 @@ Ext.define('MyApp.view.GraphPopUp', {
                     animate: true,
                     store: this.graphstore,
                     insetPadding: 20,
+                        legend: {
+				position: 'top'
+			    },
+			    tips:
+			    {
+			    	    trackMouse: true,
+			    	    width: 80,
+			    	    height:50,
+			    	    renderer: function(store, item)
+			    	    {
+			    	    	    this.setTitle(store.get('Bin') + '<br />' + store.get('Freq_Default'))
+			    	    }
+			    },
                     axes: [
                         {
                             title: 'Frequency',
                             type: 'Numeric',
                             position: 'left',
-                            fields: ['Frequency']
+                            fields: ['Freq_Default', 'Freq_Transform']
                         },
                         {
 			    title: 'Bin',
@@ -47,7 +60,13 @@ Ext.define('MyApp.view.GraphPopUp', {
                         {
 			    type: 'line',
 			    xField: 'Bin',
-			    yField: 'Frequency',
+			    yField: 'Freq_Default',
+                            smooth: 3
+                        },
+                        {
+			    type: 'line',
+			    xField: 'Bin',
+			    yField: 'Freq_Transform',
                             smooth: 3
                         }
                     ]
@@ -58,18 +77,19 @@ Ext.define('MyApp.view.GraphPopUp', {
         me.callParent(arguments);
     },
     
-    SetChartData: function(obj)
+    SetChartData: function(objD, objT)
     {
 
-    	var data1 = obj.Default;
+    	var data1 = objD.Result;
+    	var data2 = objT.Result;
     	//var data2 = obj.Habitat_Index.Transform;
-    	var Min = obj.Min;
-    	var Max = obj.Max;
+    	var Min = objD.Min;
+    	var Max = objD.Max;
     	
 	var array = [];
-	for (var i = 0; i < data1.length; i++){
-		array.push({ Frequency: data1[i], Bin: (Max-Min)/(data1.length) * i + Min });
-		//array.push({ Frequency: data2[i], Bin: (Max-Min)/(data.length) * i + Min });
+	for (var i = 0; i < data1.length; i++)
+	{
+		array.push({ Freq_Default: data1[i]*900/1000000, Freq_Transform: data2[i]*900/1000000, Bin: (Max-Min)/(data1.length) * i + Min });
 	}
 	
 	this.graphstore.loadData(array);

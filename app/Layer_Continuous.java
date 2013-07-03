@@ -153,7 +153,7 @@ public class Layer_Continuous extends Layer_Base
 	}
 	
 	//--------------------------------------------------------------------------
-	protected int[][] query(JsonNode queryNode, int[][] workArray) {
+	protected Selection query(JsonNode queryNode, Selection selection) {
 
 		Logger.info("Running continuous query");
 
@@ -196,7 +196,7 @@ public class Layer_Continuous extends Layer_Base
 				Logger.info("> <");
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
-						workArray[y][x] &= 
+						selection.mSelection[y][x] &= 
 							((mIntData[y][x] > minVal && mIntData[y][x] < maxVal) 
 							? 1 : 0);
 					}
@@ -207,7 +207,7 @@ public class Layer_Continuous extends Layer_Base
 				Logger.info("> <=");
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
-						workArray[y][x] &= 
+						selection.mSelection[y][x] &= 
 							((mIntData[y][x] > minVal && mIntData[y][x] <= maxVal) 
 							? 1 : 0);
 					}
@@ -218,7 +218,7 @@ public class Layer_Continuous extends Layer_Base
 				Logger.info(">");
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
-						workArray[y][x] &= 
+						selection.mSelection[y][x] &= 
 							(mIntData[y][x] > minVal 
 							? 1 : 0);
 					}
@@ -231,7 +231,7 @@ public class Layer_Continuous extends Layer_Base
 				Logger.info(">= <");
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
-						workArray[y][x] &= 
+						selection.mSelection[y][x] &= 
 							((mIntData[y][x] >= minVal && mIntData[y][x] < maxVal) 
 							? 1 : 0);
 					}
@@ -242,7 +242,7 @@ public class Layer_Continuous extends Layer_Base
 				Logger.info(">= <=");
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
-						workArray[y][x] &= 
+						selection.mSelection[y][x] &= 
 							((mIntData[y][x] >= minVal && mIntData[y][x] <= maxVal) 
 							? 1 : 0);
 					}
@@ -253,7 +253,7 @@ public class Layer_Continuous extends Layer_Base
 				Logger.info(">=");
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
-						workArray[y][x] &= 
+						selection.mSelection[y][x] &= 
 							(mIntData[y][x] >= minVal 
 							? 1 : 0);
 					}
@@ -265,7 +265,7 @@ public class Layer_Continuous extends Layer_Base
 			Logger.info("<");
 			for (y = 0; y < mHeight; y++) {
 				for (x = 0; x < mWidth; x++) {
-					workArray[y][x] &= 
+					selection.mSelection[y][x] &= 
 						(mIntData[y][x] < maxVal 
 						? 1 : 0);
 				}
@@ -276,7 +276,7 @@ public class Layer_Continuous extends Layer_Base
 			Logger.info("<=");
 			for (y = 0; y < mHeight; y++) {
 				for (x = 0; x < mWidth; x++) {
-					workArray[y][x] &= 
+					selection.mSelection[y][x] &= 
 						(mIntData[y][x] <= maxVal 
 						? 1 : 0);
 				}
@@ -284,7 +284,7 @@ public class Layer_Continuous extends Layer_Base
 		}
 
 		Logger.info("Continuous query done!");
-		return workArray;
+		return selection;
 	}
 }
 

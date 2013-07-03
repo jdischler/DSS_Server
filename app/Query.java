@@ -60,17 +60,17 @@ public class Query {
 		png.setTransparentIndex(0);
 
 		// Set up to run the query...allocate memory...
-		int[][] imgArray = execute(requestBody);
+		Selection selection = execute(requestBody);
 		
 		// Pass the whole array at the full size...and let the writer do the resample
 		//	to convert this to the size the png will be written at
-		png.writeResampledArray(mWidth, mHeight, imgArray);
+		png.writeResampledArray(mWidth, mHeight, selection.mSelection);
 		
 		// Get query statistics (number of selected pixels)
 		int count = 0;	
 		for (y = 0; y < mHeight; y++) {
 			for (x = 0; x < mWidth; x++) {
-				count += imgArray[y][x];
+				count += selection.mSelection[y][x];
 			}
 		}
 
@@ -89,28 +89,21 @@ public class Query {
 		return ret;
 	}
 	
-	public int[][] execute(JsonNode requestBody) throws Exception
+	public Selection execute(JsonNode requestBody) throws Exception
 	{
 		
 		// FIXME: can't base size off of a hardcoded layer? The expectation is that
-		//	all layers are of the same size....
+		// all layers are of the same size....
 		Layer_Base tmp = Layer_Base.getLayer("rotation");
 		mWidth = tmp.getWidth();//4710;//3791;
 		mHeight = tmp.getHeight();//3869;//3133;
 		
-		// Set up to run the query...allocate memory...
-		int[][] imgArray = new int[mHeight][mWidth];
-		int x, y;
-		// ...and initialize everything to 1 to prep for & (and) logic
-		for (y = 0; y < mHeight; y++) {
-			for (x = 0; x < mWidth; x++) {
-				imgArray[y][x] = 1;
-			}
-		}
-		
+		Selection selection = new Selection(mWidth, mHeight);
+
 		// Actually run the query...
 		JsonNode layerList = requestBody.get("queryLayers");
-		Layer_Base.execQuery(layerList, imgArray);
-		return imgArray;
+		Layer_Base.execQuery(layerList, selection);
+		return selection;
 	}
+	
 }

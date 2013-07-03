@@ -115,7 +115,7 @@ Ext.define('MyApp.view.ModelGraph', {
 			    	    var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Habitat Index'});
 			    	
 			    	    mypopup.show();
-			    	    mypopup.SetChartData(self.graphdata);
+			    	    mypopup.SetChartData(self.graphdataD, self.graphdataT);
 			    }
 			},
 			{
@@ -128,7 +128,7 @@ Ext.define('MyApp.view.ModelGraph', {
 			    {
 			    	    var mypopup = Ext.create("MyApp.view.GraphPopUp");
 			    	    mypopup.show();
-			    	    mypopup.SetChartData(self.graphdata);
+			    	    mypopup.SetChartData(self.graphdataD, self.graphdataT);
 			    }
 			},
 			{
@@ -141,7 +141,7 @@ Ext.define('MyApp.view.ModelGraph', {
 			    {
 			    	    var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Nitrogen'});
 			    	    mypopup.show();
-			    	    mypopup.SetChartData(self.graphdata);
+			    	    mypopup.SetChartData(self.graphdataD, self.graphdataT);
 			    }
 			},
 			{
@@ -154,7 +154,7 @@ Ext.define('MyApp.view.ModelGraph', {
 			    {
 			    	    var mypopup = Ext.create("MyApp.view.GraphPopUp");
 			    	    mypopup.show();
-			    	    mypopup.SetChartData(self.graphdata);
+			    	    mypopup.SetChartData(self.graphdataD, self.graphdataT);
 			    }
 			},
 			{
@@ -167,7 +167,7 @@ Ext.define('MyApp.view.ModelGraph', {
 			    {
 			    	    var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Phosphorus'});
 			    	    mypopup.show();
-			    	    mypopup.SetChartData(self.graphdata);
+			    	    mypopup.SetChartData(self.graphdataD, self.graphdataT);
 			    }
 			},
 			{
@@ -180,7 +180,7 @@ Ext.define('MyApp.view.ModelGraph', {
 			    {
 			    	    var mypopup = Ext.create("MyApp.view.GraphPopUp");
 			    	    mypopup.show();
-			    	    mypopup.SetChartData(self.graphdata);
+			    	    mypopup.SetChartData(self.graphdataD, self.graphdataT);
 			    }
 			},
 			{
@@ -193,7 +193,7 @@ Ext.define('MyApp.view.ModelGraph', {
 			    {
 			    	    var mypopup = Ext.create("MyApp.view.GraphPopUp");
 			    	    mypopup.show();
-			    	    mypopup.SetChartData(self.graphdata);
+			    	    mypopup.SetChartData(self.graphdataD, self.graphdataT);
 			    }
 			},
 			{
@@ -206,7 +206,7 @@ Ext.define('MyApp.view.ModelGraph', {
 			    {
 			    	    var mypopup = Ext.create("MyApp.view.GraphPopUp");
 			    	    mypopup.show();
-			    	    mypopup.SetChartData(self.graphdata);
+			    	    mypopup.SetChartData(self.graphdataD, self.graphdataT);
 			    }
 			},
                 //}
@@ -219,26 +219,32 @@ Ext.define('MyApp.view.ModelGraph', {
         SetData: function(obj)
     {
     	// Habitat Index
-    	var val1 = obj.Habitat_Index.Average_HI;
+    	var val1 = obj.Default.Habitat_Index.Average_HI;
+    	var val2 = obj.Transform.Habitat_Index.Average_HI;
     	var Habitat_Text = this.getComponent('Habitat_Index');
-    	Habitat_Text.setValue(val1);
+    	Habitat_Text.setValue(val1-val2);
     	
-    	var val2 = obj.Nitrogen.Nitrogen_T;
+    	var val3 = obj.Default.Nitrogen.Nitrogen;
+    	var val4 = obj.Transform.Nitrogen.Nitrogen;
     	var Nitrogen_Text = this.getComponent('Nitrogen');
-    	Nitrogen_Text.setValue(val2);
+    	Nitrogen_Text.setValue(val3-val4);
     	
-    	var val3 = obj.Phosphorus.Phosphorus_T;
+    	var val5 = obj.Default.Phosphorus.Phosphorus;
+    	var val6 = obj.Transform.Phosphorus.Phosphorus;
     	var Phosphorus_Text = this.getComponent('Phosphorus');
-    	Phosphorus_Text.setValue(val3);
+    	Phosphorus_Text.setValue(val5-val6);
     	
     	var Habitat_Button = this.getComponent('Graph_Habitat_Index');
-    	Habitat_Button.graphdata = obj.Habitat_Index;
+    	Habitat_Button.graphdataD = obj.Default.Habitat_Index;
+    	Habitat_Button.graphdataT = obj.Transform.Habitat_Index;
     	
     	var Nitrogen_Button = this.getComponent('Graph_Nitrogen');
-    	Nitrogen_Button.graphdata = obj.Nitrogen;
+    	Nitrogen_Button.graphdataD = obj.Default.Nitrogen;
+    	Nitrogen_Button.graphdataT = obj.Transform.Nitrogen;
     	
     	var Phosphorus_Button = this.getComponent('Graph_Phosphorus');
-    	Phosphorus_Button.graphdata = obj.Phosphorus;
+    	Phosphorus_Button.graphdataD = obj.Default.Phosphorus;
+    	Phosphorus_Button.graphdataT = obj.Transform.Phosphorus;
     }
 
 });

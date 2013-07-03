@@ -202,10 +202,10 @@ public abstract class Layer_Base
 	//--------------------------------------------------------------------------
 	abstract protected void onLoadEnd();
 	abstract protected void processASC_Line(int y, String lineElementsArray[]);
-	abstract protected int[][] query(JsonNode queryNode, int[][] workArray);
+	abstract protected Selection query(JsonNode queryNode, Selection selection);
 		
 	//--------------------------------------------------------------------------
-	public static void execQuery(JsonNode layerList, int[][] workArray) {
+	public static void execQuery(JsonNode layerList, Selection selection) {
 
 		if (layerList.isArray()) {
 	
@@ -218,7 +218,7 @@ public abstract class Layer_Base
 				if (arElem != null && layerName != null) {
 					Layer_Base layer = Layer_Base.getLayer(layerName.getValueAsText());
 					if (layer != null) {
-						layer.query(arElem, workArray);
+						layer.query(arElem, selection);
 					}
 				}
 			}

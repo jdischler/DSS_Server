@@ -111,9 +111,158 @@ public class Application extends Controller
 	//----------------------------------------------------------------------
 	public static Result Models() throws Exception 
 	{
+		File Output = new File("./layerData/Client_ID");
+		if(Output.exists())
+		{
+			Logger.info("This folder is already exist");
+		}
+		else
+		{
+			Output.mkdir();
+		}
+		
+		Query query = new Query();
+		Selection selection = null;
+		
+		try {
+			selection = query.execute(request().body().asJson());
+		} catch (Exception e) {
+			Logger.info(e.toString());
+		}
+		
 		Logger.info("Server Run The Models Request:");
 		Models model = new Models();
-		JsonNode SendBack = model.modeloutcome(request().body().asJson());
+		
+		// Code for Transformation
+		int I_Code = 1; // 1
+		int S_Code = 256; // 9
+		
+		// Rotation
+		int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
+		Layer_Base layer = Layer_Base.getLayer("Rotation");
+		int width = layer.getWidth();
+		int height = layer.getHeight();
+		int[][] RotationT = new int [height][width];
+		
+		// Chnage Rotation to Rotation_T
+		for (int y = 0; y < height; y++) 
+		{
+			for (int x = 0; x < width; x++) 
+			{
+				RotationT[y][x] = Rotation[y][x];
+				if (RotationT[y][x] == I_Code)
+				{
+					RotationT[y][x] = S_Code;
+				}
+			}
+		}
+			
+		JsonNode SendBackT = model.modeloutcome(request().body().asJson(), selection, "Client_ID", RotationT);
+		
+		JsonNode SendBackD = model.modeloutcome(request().body().asJson(), selection, "Default", Rotation);
+		
+		//JsonNode SendBackD = Global.GetDefaultSendBack();
+		
+		ObjectNode SendBack = JsonNodeFactory.instance.objectNode();
+		
+		SendBack.put("Default", SendBackD);
+		SendBack.put("Transform", SendBackT);
+		// Open a file to write Delta for HI
+		int w = selection.mWidth;
+		//Logger.info(integer.toString(w));
+		int h = selection.mHeight;
+		//Logger.info(integer.toString(h));
+		int NO_DATA = -9999;
+		float Habitat_Index_Delta = 0;
+		float Nitrogen_Delta = 0;
+		float Phosphorus_Delta = 0;
+		
+		// Buffer reader
+		BufferedReader br1 = model.HeaderRead("Bird_Index", w, h, "Default");
+		BufferedReader br2 = model.HeaderRead("Bird_Index", w, h, "Client_ID");
+		BufferedReader br3 = model.HeaderRead("Nitrogen", w, h, "Default");
+		BufferedReader br4 = model.HeaderRead("Nitrogen", w, h, "Client_ID");
+		BufferedReader br5 = model.HeaderRead("Phosphorus", w, h, "Default");
+		BufferedReader br6 = model.HeaderRead("Phosphorus", w, h, "Client_ID");
+		
+		// Buffer writer
+		PrintWriter out1 = model.HeaderWrite("Delta_Bird_Index", w, h, "Client_ID/Delta");
+		PrintWriter out2 = model.HeaderWrite("Delta_Nitrogen", w, h, "Client_ID/Delta");
+		PrintWriter out3 = model.HeaderWrite("Delta_Phosphorus", w, h, "Client_ID/Delta");
+		
+		int y = 0;
+		
+		while (br1.ready() && br2.ready() && br3.ready() && br4.ready() && br5.ready() && br6.ready()) 
+		{
+			StringBuffer sb1 = new StringBuffer();
+			StringBuffer sb2 = new StringBuffer();
+			StringBuffer sb3 = new StringBuffer();
+			
+			if (y >= h) 
+			{
+				Logger.error("BAD READ - more lines than expected!");
+				break;
+			}
+			
+			String line1 = br1.readLine();
+			String split1[] = line1.split("\\s+");
+			String line2 = br2.readLine();
+			String split2[] = line2.split("\\s+");
+			String line3 = br3.readLine();
+			String split3[] = line3.split("\\s+");
+			String line4 = br4.readLine();
+			String split4[] = line4.split("\\s+");
+			String line5 = br5.readLine();
+			String split5[] = line5.split("\\s+");
+			String line6 = br6.readLine();
+			String split6[] = line6.split("\\s+");
+			
+			for (int x = 0; x < split1.length; x++) 
+			{	
+				//if (Integer.valueOf(split1[x]) == (int)NO_DATA) 
+				if (selection.mSelection[y][x] == 0)
+				{
+					sb1.append(Integer.toString(NO_DATA));
+					sb2.append(Integer.toString(NO_DATA));
+					sb3.append(Integer.toString(NO_DATA));
+				}
+				else
+				{
+					// Compare Default with After Transformation
+					Habitat_Index_Delta = Float.parseFloat(split1[x]) - Float.parseFloat(split2[x]);
+					Nitrogen_Delta = Float.parseFloat(split3[x]) - Float.parseFloat(split4[x]);
+					Phosphorus_Delta = Float.parseFloat(split5[x]) - Float.parseFloat(split6[x]);
+					
+					sb1.append(String.format("%.4f", Habitat_Index_Delta));
+					sb2.append(String.format("%.4f", Nitrogen_Delta));
+					sb3.append(String.format("%.4f", Phosphorus_Delta));
+				}
+				if (x != w - 1) 
+				{
+					sb1.append(" ");
+					sb2.append(" ");
+					sb3.append(" ");
+				}
+				
+			}
+			
+			out1.println(sb1.toString());
+			out2.println(sb2.toString());
+			out3.println(sb3.toString());
+			
+			y++;
+		}
+		br1.close();
+		br2.close();
+		br3.close();
+		br4.close();
+		br5.close();
+		br6.close();
+		
+		out1.close();
+		out2.close();
+		out3.close();
+		
 		return ok(SendBack);
 	}
 }

@@ -208,6 +208,7 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 			}
 		});
 	},
+	
 	//--------------------------------------------------------------------------
 	buildModel: function() {
 	
@@ -234,6 +235,7 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 			alert("No query built - nothing to query");
 		}
 	},
+	
     //--------------------------------------------------------------------------
     submitModel: function(queryJson) {
     	
@@ -264,6 +266,17 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 			}
 		});
 	},
+
+	//--------------------------------------------------------------------------
+	tryExpandAll: function() {
+		
+    	for (var i = 0; i < DSS_globalQueryableLayers.length; i++) {
+    		
+    		var layer = DSS_globalQueryableLayers[i];
+			layer.expand();
+		}
+	},
+	
 	//--------------------------------------------------------------------------
 	tryExpandQueried: function() {
 		

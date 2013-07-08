@@ -4,7 +4,7 @@ Ext.define('MyApp.view.ModelGraph', {
     
     id: "Model_Graph",
     
-    height: 300,
+    height: 200,
     width: 500,
         layout: {
         type: 'absolute'
@@ -37,85 +37,93 @@ Ext.define('MyApp.view.ModelGraph', {
 			    xtype: 'textfield',
 			    x: 10,
 			    y: 10,
-			    width: 150,
+			    width: 160,
 			    fieldLabel: 'Habitat',
-			    labelWidth: 80
+			    labelWidth: 80,
+			    labelAlign: 'right'
 			},
 			{
 			    itemId: 'Carbon',
 			    xtype: 'textfield',
 			    x: 260,
 			    y: 10,
-			    width: 150,
+			    width: 160,
 			    fieldLabel: 'Carbon',
-			    labelWidth: 80
+			    labelWidth: 80,
+			    labelAlign: 'right'
 			},
 			{
 			    itemId: 'Nitrogen',
 			    xtype: 'textfield',
 			    x: 10,
 			    y: 50,
-			    width: 150,
+			    width: 160,
 			    fieldLabel: 'Nitrogen',
-			    labelWidth: 80
+			    labelWidth: 80,
+			    labelAlign: 'right'
 			},
 			{
 			    itemId: 'Pollinator',
 			    xtype: 'textfield',
 			    x: 260,
 			    y: 50,
-			    width: 150,
+			    width: 160,
 			    fieldLabel: 'Pollinator',
-			    labelWidth: 80
+			    labelWidth: 80,
+			    labelAlign: 'right'
 			},
 			{
 			    itemId: 'Phosphorus',
 			    xtype: 'textfield',
 			    x: 10,
-			    y: 100,
-			    width: 150,
+			    y: 90,
+			    width: 160,
 			    fieldLabel: 'Phosphorus',
-			    labelWidth: 80
+			    labelWidth: 80,
+			    labelAlign: 'right'
 			},
 			{
 			    itemId: 'Net_Energy',
 			    xtype: 'textfield',
 			    x: 260,
-			    y: 100,
-			    width: 150,
+			    y: 90,
+			    width: 160,
 			    fieldLabel: 'Net Energy',
-			    labelWidth: 80
+			    labelWidth: 80,
+			    labelAlign: 'right'
 			},
 			{
-		            itemId: 'Crop_Pest',
+				itemId: 'Crop_Pest',
 			    xtype: 'textfield',
 			    x: 10,
-			    y: 150,
-			    width: 150,
+			    y: 130,
+			    width: 160,
 			    fieldLabel: 'Crop Pest',
-			    labelWidth: 80
+			    labelWidth: 80,
+			    labelAlign: 'right'
 			},
 			{
 			    itemId: 'Net_Income',
 			    xtype: 'textfield',
 			    x: 260,
-			    y: 150,
-			    width: 150,
+			    y: 130,
+			    width: 160,
 			    fieldLabel: 'Net Income',
-			    labelWidth: 80
+			    labelWidth: 80,
+			    labelAlign: 'right'
 			},
 			{
 			    itemId: 'Graph_Habitat_Index',
 			    xtype: 'button',
-			    x: 170,
+			    x: 180,
 			    y: 10,
 			    text: 'Graph',
 			    handler: function (self)
 			    {
-			    	    var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Habitat Index'});
-			    	
-			    	    mypopup.show();
-			    	    mypopup.SetChartData(self.graphdataD, self.graphdataT);
+					var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Habitat Index'});
+				
+					mypopup.show();
+					mypopup.SetChartData(self.graphdataD, self.graphdataT);
 			    }
 			},
 			{
@@ -126,22 +134,22 @@ Ext.define('MyApp.view.ModelGraph', {
 			    text: 'Graph',
 			    handler: function (self)
 			    {
-			    	    var mypopup = Ext.create("MyApp.view.GraphPopUp");
-			    	    mypopup.show();
-			    	    mypopup.SetChartData(self.graphdataD, self.graphdataT);
+					var mypopup = Ext.create("MyApp.view.GraphPopUp");
+					mypopup.show();
+					mypopup.SetChartData(self.graphdataD, self.graphdataT);
 			    }
 			},
 			{
 			    itemId: 'Graph_Nitrogen',
 			    xtype: 'button',
-			    x: 170,
+			    x: 180,
 			    y: 50,
 			    text: 'Graph',
 			    handler: function (self)
 			    {
-			    	    var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Nitrogen'});
-			    	    mypopup.show();
-			    	    mypopup.SetChartData(self.graphdataD, self.graphdataT);
+					var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Nitrogen'});
+					mypopup.show();
+					mypopup.SetChartData(self.graphdataD, self.graphdataT);
 			    }
 			},
 			{
@@ -152,71 +160,69 @@ Ext.define('MyApp.view.ModelGraph', {
 			    text: 'Graph',
 			    handler: function (self)
 			    {
-			    	    var mypopup = Ext.create("MyApp.view.GraphPopUp");
-			    	    mypopup.show();
-			    	    mypopup.SetChartData(self.graphdataD, self.graphdataT);
+					var mypopup = Ext.create("MyApp.view.GraphPopUp");
+					mypopup.show();
+					mypopup.SetChartData(self.graphdataD, self.graphdataT);
 			    }
 			},
 			{
 			    itemId: 'Graph_Phosphorus',
 			    xtype: 'button',
-			    x: 170,
-			    y: 100,
+			    x: 180,
+			    y: 90,
 			    text: 'Graph',
 			    handler: function (self)
 			    {
-			    	    var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Phosphorus'});
-			    	    mypopup.show();
-			    	    mypopup.SetChartData(self.graphdataD, self.graphdataT);
+					var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Phosphorus'});
+					mypopup.show();
+					mypopup.SetChartData(self.graphdataD, self.graphdataT);
 			    }
 			},
 			{
 			    itemId: 'Graph_Net_Energy',
 			    xtype: 'button',
 			    x: 430,
-			    y: 100,
+			    y: 90,
 			    text: 'Graph',
 			    handler: function (self)
 			    {
-			    	    var mypopup = Ext.create("MyApp.view.GraphPopUp");
-			    	    mypopup.show();
-			    	    mypopup.SetChartData(self.graphdataD, self.graphdataT);
+					var mypopup = Ext.create("MyApp.view.GraphPopUp");
+					mypopup.show();
+					mypopup.SetChartData(self.graphdataD, self.graphdataT);
 			    }
 			},
 			{
 			    itemId: 'Graph_Crop_Pest',
 			    xtype: 'button',
-			    x: 170,
-			    y: 150,
+			    x: 180,
+			    y: 130,
 			    text: 'Graph',
 			    handler: function (self)
 			    {
-			    	    var mypopup = Ext.create("MyApp.view.GraphPopUp");
-			    	    mypopup.show();
-			    	    mypopup.SetChartData(self.graphdataD, self.graphdataT);
+					var mypopup = Ext.create("MyApp.view.GraphPopUp");
+					mypopup.show();
+					mypopup.SetChartData(self.graphdataD, self.graphdataT);
 			    }
 			},
 			{
 			    itemId: 'Graph_Net_Income',
 			    xtype: 'button',
 			    x: 430,
-			    y: 150,
+			    y: 130,
 			    text: 'Graph',
 			    handler: function (self)
 			    {
-			    	    var mypopup = Ext.create("MyApp.view.GraphPopUp");
-			    	    mypopup.show();
-			    	    mypopup.SetChartData(self.graphdataD, self.graphdataT);
+					var mypopup = Ext.create("MyApp.view.GraphPopUp");
+					mypopup.show();
+					mypopup.SetChartData(self.graphdataD, self.graphdataT);
 			    }
-			},
-                //}
-            ]
+			}]
         });
         	
         me.callParent(arguments);
     },
     
-        SetData: function(obj)
+	SetData: function(obj)
     {
     	// Habitat Index
     	var val1 = obj.Default.Habitat_Index.Average_HI;

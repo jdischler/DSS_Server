@@ -544,6 +544,7 @@ Ext.define('MyApp.view.MainViewport', {
 				},
 				{
 					xtype: 'infotoolbar' // docked bottom
+					, hidden: true
 				},
 				{
 					xtype: 'panel',

@@ -4,7 +4,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
     extend: 'MyApp.view.LayerPanel_Common',
     alias: 'widget.layer_continuous',
 
-    height: 90,
+    height: 86,
     
     //--------------------------------------------------------------------------
     initComponent: function() {
@@ -20,14 +20,14 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
             items: [{
 				xtype: 'label',
 				x: 0,
-				y: 14,
+				y: 10,
 				html: label,
 				width: 60
 			},{
 				xtype: 'button',
 				itemId: 'DSS_GreaterThanTest',
 				x: 70,
-				y: 10,
+				y: 6,
 				width: 30,
 				text: '>=',
 				tooltip: {
@@ -46,7 +46,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 				xtype: 'numberfield',
 				itemId: 'DSS_GreaterThanValue',
 				x: 100,
-				y: 10,
+				y: 6,
 				width: 54,
 				hideEmptyLabel: false,
 				hideLabel: true,
@@ -56,7 +56,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 			},{
 				xtype: 'button',
 				x: 154,
-				y: 10,
+				y: 6,
 				width: 18,
 				text: 'c',
 				tooltip: {
@@ -69,7 +69,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 			},{
 				xtype: 'label',
 				x: 177,
-				y: 14,
+				y: 10,
 				html: me.DSS_LayerUnit,
 				width: 60
 			},{
@@ -80,7 +80,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 					showDelay: 100
 				},
 				x: 197,
-				y: 10,
+				y: 6,
 				handler: function(me,evt) {
 					var gtrValue = me.up().getComponent('DSS_GreaterThanValue');
 					var lessValue = me.up().getComponent('DSS_LessThanValue');
@@ -92,7 +92,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 				xtype: 'button',
 				itemId: 'DSS_LessThanTest',
 				x: 235,
-				y: 10,
+				y: 6,
 				width: 30,
 				text: '<=',
 				tooltip: {
@@ -111,7 +111,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 				xtype: 'numberfield',
 				itemId: 'DSS_LessThanValue',
 				x: 265,
-				y: 10,
+				y: 6,
 				width: 54,
 				hideEmptyLabel: false,
 				hideLabel: true,
@@ -121,7 +121,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 			},{
 				xtype: 'button',
 				x: 319,
-				y: 10,
+				y: 6,
 				width: 18,
 				text: 'c',
 				tooltip: {
@@ -134,7 +134,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 			},{
 				xtype: 'label',
 				x: 343,
-				y: 14,
+				y: 10,
 				html: me.DSS_LayerUnit,
 				width: 60
 			},/*{
@@ -151,7 +151,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 				xtype: 'label',
 				itemId: 'DSS_ValueRange',
 				x: 70,
-				y: 40,
+				y: 36,
 				text: rangeLabel,
 				style: {
 					color: '#888'

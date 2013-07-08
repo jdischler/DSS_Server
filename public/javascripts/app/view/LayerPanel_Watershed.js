@@ -8,7 +8,7 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
     alias: 'widget.layer_watershed',
 
     width: 400,
-    height: 75,
+    height: 66,
 //    bodyPadding: '0 0 3 0', // just really need to pad bottom to maintain spacing there
 	DSS_unpressedText: 'Activate Click Selection Tool',
 	DSS_pressedText: 'Deactivate Selection Tool',
@@ -32,7 +32,7 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 				xtype: 'button', 
 				text: 'Activate Click Selection Tool',
 				x: 35,
-				y: 10,
+				y: 6,
 				height: 20,
 				tooltip: {
 					text: 'Click on a watershed to include it in your query',
@@ -55,7 +55,7 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 				xtype: 'button', 
 				text: 'Clear Selection',
 				x: 190,
-				y: 10,
+				y: 6,
 				height: 20,
 				tooltip: {
 					text: 'Clear all selected watersehds',

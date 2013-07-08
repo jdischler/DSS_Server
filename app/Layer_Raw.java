@@ -52,11 +52,11 @@ public class Layer_Raw extends Layer_Base
 	protected void onLoadEnd() { /*does nothing at this point*/ }
 	
 	//--------------------------------------------------------------------------
-	protected int[][] query(JsonNode queryNode, int[][] workArray) {
+	protected Selection query(JsonNode queryNode, Selection selection) {
 
 		// not sure if we need to implement queries on this type of data?
-		//	At this point, just return workArray
-		return workArray;
+		//	At this point, just return the passed in selection
+		return selection;
 	}
 }
 	

@@ -111,14 +111,14 @@ public class Application extends Controller
 	//----------------------------------------------------------------------
 	public static Result Models() throws Exception 
 	{
-		File Output = new File("./layerData/Client_ID");
-		if(Output.exists())
+		File output = new File("./layerData/Client_ID");
+		if(output.exists())
 		{
-			Logger.info("This folder is already exist");
+			Logger.info("This folder already exists");
 		}
 		else
 		{
-			Output.mkdir();
+			output.mkdir();
 		}
 		
 		Query query = new Query();
@@ -184,7 +184,15 @@ public class Application extends Controller
 		BufferedReader br4 = model.HeaderRead("Nitrogen", w, h, "Client_ID");
 		BufferedReader br5 = model.HeaderRead("Phosphorus", w, h, "Default");
 		BufferedReader br6 = model.HeaderRead("Phosphorus", w, h, "Client_ID");
-		
+	
+		output = new File("./layerData/Client_ID/Delta");
+		if(output.exists()) {
+			Logger.info("The Delta folder is already exist");
+		}
+		else {
+			output.mkdir();
+		}
+
 		// Buffer writer
 		PrintWriter out1 = model.HeaderWrite("Delta_Bird_Index", w, h, "Client_ID/Delta");
 		PrintWriter out2 = model.HeaderWrite("Delta_Nitrogen", w, h, "Client_ID/Delta");

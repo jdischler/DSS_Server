@@ -54,12 +54,12 @@ public class Layer_Indexed extends Layer_Base
 			}
 			else {
 				// convert to a bit style value for fast/simultaneous compares
-				if (val <= 31) {
-					val = (1 << (val-1));
+				if (val <= 32) {
+					val = convertIndexToMask(val);
 				}
 				else if (!erred) {
 					erred = true;
-					Logger.error("  BAD value - indexed values can only be 1-31. Was: " 
+					Logger.error("  BAD value - indexed values can only be 1-32. Was: " 
 						+ Integer.toString(val));
 				}
 			}
@@ -137,6 +137,19 @@ public class Layer_Indexed extends Layer_Base
 		
 		return ret;
 	}
+
+	// Takes an index on an indexed raster and converts it to the appropriate
+	//	bit position. Index must be 1 based and not more than 32 (ie, 1-32)
+	//--------------------------------------------------------------------------
+	public static int convertIndexToMask(int index) {
+		
+		if (index <= 0 || index > 32) {
+			Logger.info("Bad index in convertIndexToMask: " + Integer.toString(index));
+			return 1;
+		}
+		
+		return (1 << (index-1));
+	}
 	
 	//--------------------------------------------------------------------------
 	private int getCompareBitMask(JsonNode matchValuesArray) {
@@ -159,7 +172,7 @@ public class Layer_Indexed extends Layer_Base
 				
 				int val = node.getValueAsInt(1); // FIXME: default value?
 				Logger.info(Integer.toString(val));
-				queryMask |= (1 << (val-1));
+				queryMask |= convertIndexToMask(val);
 			}
 			
 			Logger.info(Integer.toString(queryMask));

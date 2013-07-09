@@ -176,6 +176,8 @@ public class Application extends Controller
 		float Habitat_Index_Delta = 0;
 		float Nitrogen_Delta = 0;
 		float Phosphorus_Delta = 0;
+		float Pest_Delta = 0;
+		float Pollinator_Delta = 0;
 		
 		// Buffer reader
 		BufferedReader br1 = model.HeaderRead("Bird_Index", w, h, "Default");
@@ -184,7 +186,11 @@ public class Application extends Controller
 		BufferedReader br4 = model.HeaderRead("Nitrogen", w, h, "Client_ID");
 		BufferedReader br5 = model.HeaderRead("Phosphorus", w, h, "Default");
 		BufferedReader br6 = model.HeaderRead("Phosphorus", w, h, "Client_ID");
-	
+		BufferedReader br7 = model.HeaderRead("Pest", w, h, "Default");
+		BufferedReader br8 = model.HeaderRead("Pest", w, h, "Client_ID");
+		BufferedReader br9 = model.HeaderRead("Pollinator", w, h, "Default");
+		BufferedReader br10 = model.HeaderRead("Pollinator", w, h, "Client_ID");
+		
 		output = new File("./layerData/Client_ID/Delta");
 		if(output.exists()) {
 			Logger.info("The Delta folder is already exist");
@@ -197,14 +203,18 @@ public class Application extends Controller
 		PrintWriter out1 = model.HeaderWrite("Delta_Bird_Index", w, h, "Client_ID/Delta");
 		PrintWriter out2 = model.HeaderWrite("Delta_Nitrogen", w, h, "Client_ID/Delta");
 		PrintWriter out3 = model.HeaderWrite("Delta_Phosphorus", w, h, "Client_ID/Delta");
+		PrintWriter out4 = model.HeaderWrite("Delta_Pest", w, h, "Client_ID/Delta");
+		PrintWriter out5 = model.HeaderWrite("Delta_Pollinator", w, h, "Client_ID/Delta");
 		
 		int y = 0;
 		
-		while (br1.ready() && br2.ready() && br3.ready() && br4.ready() && br5.ready() && br6.ready()) 
+		while (br1.ready() && br2.ready() && br3.ready() && br4.ready() && br5.ready() && br6.ready() && br7.ready() && br8.ready() && br9.ready() && br10.ready()) 
 		{
 			StringBuffer sb1 = new StringBuffer();
 			StringBuffer sb2 = new StringBuffer();
 			StringBuffer sb3 = new StringBuffer();
+			StringBuffer sb4 = new StringBuffer();
+			StringBuffer sb5 = new StringBuffer();
 			
 			if (y >= h) 
 			{
@@ -224,6 +234,14 @@ public class Application extends Controller
 			String split5[] = line5.split("\\s+");
 			String line6 = br6.readLine();
 			String split6[] = line6.split("\\s+");
+			String line7 = br7.readLine();
+			String split7[] = line7.split("\\s+");
+			String line8 = br8.readLine();
+			String split8[] = line8.split("\\s+");
+			String line9 = br9.readLine();
+			String split9[] = line9.split("\\s+");
+			String line10 = br10.readLine();
+			String split10[] = line10.split("\\s+");
 			
 			for (int x = 0; x < split1.length; x++) 
 			{	
@@ -233,6 +251,8 @@ public class Application extends Controller
 					sb1.append(Integer.toString(NO_DATA));
 					sb2.append(Integer.toString(NO_DATA));
 					sb3.append(Integer.toString(NO_DATA));
+					sb4.append(Integer.toString(NO_DATA));
+					sb5.append(Integer.toString(NO_DATA));
 				}
 				else
 				{
@@ -240,16 +260,22 @@ public class Application extends Controller
 					Habitat_Index_Delta = Float.parseFloat(split1[x]) - Float.parseFloat(split2[x]);
 					Nitrogen_Delta = Float.parseFloat(split3[x]) - Float.parseFloat(split4[x]);
 					Phosphorus_Delta = Float.parseFloat(split5[x]) - Float.parseFloat(split6[x]);
+					Pest_Delta = Float.parseFloat(split7[x]) - Float.parseFloat(split8[x]);
+					Pollinator_Delta = Float.parseFloat(split9[x]) - Float.parseFloat(split10[x]);
 					
 					sb1.append(String.format("%.4f", Habitat_Index_Delta));
 					sb2.append(String.format("%.4f", Nitrogen_Delta));
 					sb3.append(String.format("%.4f", Phosphorus_Delta));
+					sb4.append(String.format("%.4f", Nitrogen_Delta));
+					sb5.append(String.format("%.4f", Phosphorus_Delta));
 				}
 				if (x != w - 1) 
 				{
 					sb1.append(" ");
 					sb2.append(" ");
 					sb3.append(" ");
+					sb4.append(" ");
+					sb5.append(" ");
 				}
 				
 			}
@@ -257,6 +283,8 @@ public class Application extends Controller
 			out1.println(sb1.toString());
 			out2.println(sb2.toString());
 			out3.println(sb3.toString());
+			out4.println(sb2.toString());
+			out5.println(sb3.toString());
 			
 			y++;
 		}
@@ -266,10 +294,16 @@ public class Application extends Controller
 		br4.close();
 		br5.close();
 		br6.close();
+		br7.close();
+		br8.close();
+		br9.close();
+		br10.close();
 		
 		out1.close();
 		out2.close();
 		out3.close();
+		out4.close();
+		out5.close();
 		
 		return ok(SendBack);
 	}

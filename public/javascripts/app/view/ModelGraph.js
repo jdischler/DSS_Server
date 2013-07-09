@@ -93,7 +93,7 @@ Ext.define('MyApp.view.ModelGraph', {
 			    labelAlign: 'right'
 			},
 			{
-				itemId: 'Crop_Pest',
+			    itemId: 'Crop_Pest',
 			    xtype: 'textfield',
 			    x: 10,
 			    y: 130,
@@ -134,7 +134,7 @@ Ext.define('MyApp.view.ModelGraph', {
 			    text: 'Graph',
 			    handler: function (self)
 			    {
-					var mypopup = Ext.create("MyApp.view.GraphPopUp");
+					var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Carbon'});
 					mypopup.show();
 					mypopup.SetChartData(self.graphdataD, self.graphdataT);
 			    }
@@ -160,7 +160,7 @@ Ext.define('MyApp.view.ModelGraph', {
 			    text: 'Graph',
 			    handler: function (self)
 			    {
-					var mypopup = Ext.create("MyApp.view.GraphPopUp");
+					var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Pollinator'});
 					mypopup.show();
 					mypopup.SetChartData(self.graphdataD, self.graphdataT);
 			    }
@@ -186,7 +186,7 @@ Ext.define('MyApp.view.ModelGraph', {
 			    text: 'Graph',
 			    handler: function (self)
 			    {
-					var mypopup = Ext.create("MyApp.view.GraphPopUp");
+					var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Net Energy'});
 					mypopup.show();
 					mypopup.SetChartData(self.graphdataD, self.graphdataT);
 			    }
@@ -199,7 +199,7 @@ Ext.define('MyApp.view.ModelGraph', {
 			    text: 'Graph',
 			    handler: function (self)
 			    {
-					var mypopup = Ext.create("MyApp.view.GraphPopUp");
+					var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Crop Pest'});
 					mypopup.show();
 					mypopup.SetChartData(self.graphdataD, self.graphdataT);
 			    }
@@ -212,7 +212,7 @@ Ext.define('MyApp.view.ModelGraph', {
 			    text: 'Graph',
 			    handler: function (self)
 			    {
-					var mypopup = Ext.create("MyApp.view.GraphPopUp");
+					var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Net Income'});
 					mypopup.show();
 					mypopup.SetChartData(self.graphdataD, self.graphdataT);
 			    }
@@ -240,6 +240,16 @@ Ext.define('MyApp.view.ModelGraph', {
     	var Phosphorus_Text = this.getComponent('Phosphorus');
     	Phosphorus_Text.setValue(val5-val6);
     	
+    	var val7 = obj.Default.Pest.Pest;
+    	var val8 = obj.Transform.Pest.Pest;
+    	var Pest_Text = this.getComponent('Crop_Pest');
+    	Pest_Text.setValue(val7-val8);
+    	
+    	var val9 = obj.Default.Pollinator.Pollinator;
+    	var val10 = obj.Transform.Pollinator.Pollinator;
+    	var Pollinator_Text = this.getComponent('Pollinator');
+    	Pollinator_Text.setValue(val9-val10);
+    	
     	var Habitat_Button = this.getComponent('Graph_Habitat_Index');
     	Habitat_Button.graphdataD = obj.Default.Habitat_Index;
     	Habitat_Button.graphdataT = obj.Transform.Habitat_Index;
@@ -251,6 +261,14 @@ Ext.define('MyApp.view.ModelGraph', {
     	var Phosphorus_Button = this.getComponent('Graph_Phosphorus');
     	Phosphorus_Button.graphdataD = obj.Default.Phosphorus;
     	Phosphorus_Button.graphdataT = obj.Transform.Phosphorus;
+    	
+    	var Pest_Button = this.getComponent('Graph_Crop_Pest');
+    	Pest_Button.graphdataD = obj.Default.Pest;
+    	Pest_Button.graphdataT = obj.Transform.Pest;
+    	
+    	var Pollinator_Button = this.getComponent('Graph_Pollinator');
+    	Pollinator_Button.graphdataD = obj.Default.Pollinator;
+    	Pollinator_Button.graphdataT = obj.Transform.Pollinator;
     }
 
 });

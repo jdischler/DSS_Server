@@ -19,9 +19,11 @@ public class Models
 	static int Window_Size;
 	static int mWidth, mHeight;
 	static int Bin;
+	static float Habitat_Index_T;
 	static float Phosphorus_T;
 	static float Nitrogen_T;
-	static float Habitat_Index_T;
+	static float Pest_T;
+	static float Pollinator_T;
 	
 	//--------------------------------------------------------------------------
 	public JsonNode modeloutcome(JsonNode requestBody, Selection selection, String Output_Folder, int[][] RotationT)
@@ -39,12 +41,19 @@ public class Models
 		float Min_N = 0;
 		float Max_P = 0;
 		float Min_P = 0;
+		float Max_Pest = 0;
+		float Min_Pest = 0;
+		float Max_Poll = 0;
+		float Min_Poll = 0;
 		int Bin = 10;
+		
 		// Before Transformation
 		int[] CountBin_H = new int [Bin];
 		int[] CountBin_N = new int [Bin];
 		int[] CountBin_P = new int [Bin];
-		
+		int[] CountBin_Pest = new int [Bin];
+		int[] CountBin_Poll = new int [Bin];
+
 		// Rotation
 		int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
 		if (Rotation == null){
@@ -123,27 +132,39 @@ public class Models
 		Logger.info("About to output the model outcomes");
 		try {
 			Logger.info("Opening the files to write");
-			// Generate output file to write the model outcome in
+			// Generate output file to write the model outcome
+			
 			// Ethanol Production
 			//PrintWriter out1 = HeaderWrite("Ethanol", width, height);
 			// PrintWriter out1 = new PrintWriter(new BufferedWriter(new FileWriter("./layerData/Ethanol.asc")));
+			
 			// Net Income
 			//PrintWriter out2 = HeaderWrite("Net_Income", width, height);
 			//PrintWriter out2 = new PrintWriter(new BufferedWriter(new FileWriter("./layerData/Net_Income.asc")));
+			
 			// Soil Carbon
 			//PrintWriter out3 = HeaderWrite("Soil_Carbon", width, height);
 			//PrintWriter out3 = new PrintWriter(new BufferedWriter(new FileWriter("./layerData/Soil_Carbon.asc")));
+			
 			// Bird Index
 			PrintWriter out4 = HeaderWrite("Bird_Index", width, height, Output_Folder);
 			//PrintWriter out4 = new PrintWriter(new BufferedWriter(new FileWriter("./layerData/Bird_Index.asc")));
+			
 			// Nitrogen
 			PrintWriter out5 = HeaderWrite("Nitrogen", width, height, Output_Folder);
 			//PrintWriter out5 = new PrintWriter(new BufferedWriter(new FileWriter("./layerData/Nitrogen.asc")));
+			
 			// Phosphorus
 			PrintWriter out6 = HeaderWrite("Phosphorus", width, height, Output_Folder);
 			//PrintWriter out6 = new PrintWriter(new BufferedWriter(new FileWriter("./layerData/Phosphorus.asc")));
 			
-			Logger.info("Outputting header");
+			// Pest
+			PrintWriter out7 = HeaderWrite("Pest", width, height, Output_Folder);
+			//PrintWriter out7 = new PrintWriter(new BufferedWriter(new FileWriter("./layerData/Pest.asc")));
+			
+			// Pollinator 
+			PrintWriter out8 = HeaderWrite("Pollinator", width, height, Output_Folder);
+			//PrintWriter out8 = new PrintWriter(new BufferedWriter(new FileWriter("./layerData/Pollinator.asc")));
 			
 			Logger.info("Writing array to the file");
 			
@@ -157,6 +178,9 @@ public class Models
 				StringBuffer sb4 = new StringBuffer();
 				StringBuffer sb5 = new StringBuffer();
 				StringBuffer sb6 = new StringBuffer();
+				StringBuffer sb7 = new StringBuffer();
+				StringBuffer sb8 = new StringBuffer();
+				
 				for (int x = 0; x < width; x++) {
 					if (RotationT[y][x] == 0 || selection.mSelection[y][x] == 0) 
 					{
@@ -167,10 +191,31 @@ public class Models
 						sb4.append(Integer.toString(NO_DATA));
 						sb5.append(Integer.toString(NO_DATA));
 						sb6.append(Integer.toString(NO_DATA));
+						sb7.append(Integer.toString(NO_DATA));
+						sb8.append(Integer.toString(NO_DATA));
 					}
 					else if (selection.mSelection[y][x] == 1)
 					{
 						// Formula to Compute Model Outcome
+						// Initial Settings
+						// The Sie of Moving Window Size to Calculate Bird Habitat
+						int Buffer = 390; // In Meter
+						Window_Size = Buffer/30; // Number of Cells in Raster Map
+						float Prop_Ag = 0;
+						int Count_Ag = 0;
+						int Ag_Mask = 1 + 2 + 4 + 8 + 16 + 32 + 64 + 512; // 1, 2, 3, 4, 5, 6, 7, 10
+						float Prop_Forest = 0;
+						int Count_Forest = 0;
+						int Forest_Mask = 1024; // 11
+						float Prop_Grass = 0;
+						int Count_Grass = 0;
+						int Grass_Mask = 128 + 256; // 8 and 9
+						// Calculate number of cells inside Bins
+						int Value_H = 0;
+						int Value_N = 0;
+						int Value_P = 0;
+						int Value_Pest = 0;
+						int Value_Poll = 0;
 						
 						
 						
@@ -193,28 +238,11 @@ public class Models
 						// Write Soil Carbon to The File
 						//sb3.append(Float.toString(NO_DATA));
 						
-						
-						
-						// Bird Habitat
-						
-						// The Sie of Moving Window Size to Calculate Bird Habitat
-						int Buffer = 390; // In Meter
-						Window_Size = Buffer/30; // Number of Cells in Raster Map
-						float Prop_Ag = 0;
-						float Prop_Forest = 0;
-						int Count_Ag = 0;
-						int Ag_Mask = 1 + 2 + 4 + 8 + 16 + 32 + 64; // 1, 2, 3, 4, 5, 6, 7
-						int Count_Forest = 0;
-						int Forest_Mask = 128 + 256; //8 9
-						float Lambda = 0;
-						float Habitat_Index = 0;
-						// Calculate number of cells inside Bins
-						int Value_H = 0;
-						int Value_N = 0;
-						int Value_P = 0;
+
 						
 						// Calculate the Boundary for Moving Window
 						Moving_Window mWin = new Moving_Window(x, y, Window_Size, width, height);
+						
 						// I to Width and J to Height
 						for (int i = mWin.ULX; i <= mWin.LRX; i++) {
 						for (int j = mWin.ULY; j <= mWin.LRY; j++) {
@@ -229,14 +257,29 @@ public class Models
 							{
 								Count_Forest = Count_Forest + 1;
 							}
+							else if ((RotationT[j][i] & Grass_Mask) > 0 )
+							{
+								Count_Grass = Count_Grass + 1;
+							}
 						}
 						}
 						}
 						
+						
+						
+						// Compute Ag, forest and grass proportion
 						// Agriculture Proportion
 						Prop_Ag = (float)Count_Ag / mWin.Total;
 						// Forest Proportion
 						Prop_Forest = (float)Count_Forest / mWin.Total;
+						// Grass Proportion
+						Prop_Grass = (float)Count_Grass / mWin.Total;
+						
+						
+						
+						// Bird Habitat
+						float Lambda = 0;
+						float Habitat_Index = 0;
 						// Lambda
 						Lambda = -4.47f + 2.95f * Prop_Ag + 5.17f * Prop_Forest; 
 						// Habitat Index
@@ -252,6 +295,8 @@ public class Models
 						// Summary of Habitat Index
 						// Write Habitat Index to The File
 						sb4.append(String.format("%.4f", Habitat_Index));
+						
+						
 						
 						// Nitrogen
 						if (Prop_Ag < 0 || Prop_Ag > 1 || Prop_Forest < 0 || Prop_Forest > 1)
@@ -288,6 +333,52 @@ public class Models
 						CountBin_P[Value_P]++;
 						// Write Phosphorus to The File
 						sb6.append(String.format("%.3f", Phosphorus));
+						
+						
+						
+						// Pest 
+						int Crop_Type = 0;
+						if ((RotationT[y][x] & Ag_Mask) > 0)
+						{
+							Crop_Type = 0;	
+						}
+						else if ((RotationT[y][x] & Grass_Mask) > 0 )
+						{
+							Crop_Type = 1;
+						}
+						// Maximum is not really 1
+						Max_Pest = (float)(0.25 + 0.19f * 1 + 0.62f * 1);
+						Min_Pest = (float)(0.25 + 0.19f * 0 + 0.62f * 0);
+						// Normalize using Max
+						float Pest = (float)(0.25 + 0.19f * Crop_Type + 0.62f * Prop_Forest) / Max_Pest;
+						Pest_T = Pest + Pest_T;
+						// Summary of Pest
+						Value_Pest = (int)((Pest - Min_Pest)/(Max_Pest - Min_Pest)*(Bin-1));
+						if (Value_Pest < 0 || Value_Pest >= Bin)
+						{
+							Logger.info("Out of range:" + Float.toString(Pest) + " " + Integer.toString(Value_Pest));
+						}
+						CountBin_Pest[Value_Pest]++;
+						// Write Pest to The File
+						sb7.append(String.format("%.3f", Pest));
+						
+						
+						
+						// Pollinator
+						Max_Poll = (float)Math.pow(0.6617f + 2.98 * 1 + 1.83 * 1, 2);
+						Min_Poll = (float)Math.pow(0.6617f + 2.98 * 0 + 1.83 * 0, 2);
+						// Normalize using Max
+						float Poll = (float)Math.pow(0.6617f + 2.98 * Prop_Forest + 1.83 * Prop_Grass, 2) / Max_Poll;
+						Pollinator_T = Poll + Pollinator_T;
+						// Summary of Pollinator
+						Value_Poll = (int)((Poll - Min_Poll)/(Max_Poll - Min_Poll)*(Bin-1));
+						if (Value_Poll < 0 || Value_Poll >= Bin)
+						{
+							Logger.info("Out of range:" + Float.toString(Poll) + " " + Integer.toString(Value_Poll));
+						}
+						CountBin_Poll[Value_Poll]++;
+						// Write Pollinator to The File
+						sb8.append(String.format("%.3f", Poll));
 					}
 					if (x != width - 1) 
 					{
@@ -297,6 +388,8 @@ public class Models
 						sb4.append(" ");
 						sb5.append(" ");
 						sb6.append(" ");
+						sb7.append(" ");
+						sb8.append(" ");
 					}
 				}
 				// out1.println(sb1.toString());
@@ -305,6 +398,8 @@ public class Models
 				out4.println(sb4.toString());
 				out5.println(sb5.toString());
 				out6.println(sb6.toString());
+				out7.println(sb5.toString());
+				out8.println(sb6.toString());
 			}
 			Logger.info("Closing the Files");
 			// out1.close();
@@ -313,6 +408,8 @@ public class Models
 			out4.close();
 			out5.close();
 			out6.close();
+			out7.close();
+			out8.close();
 			Logger.info("Writting to the Files has finished");
 		}
 		catch(Exception err) {
@@ -325,17 +422,19 @@ public class Models
 		ObjectNode H_I = JsonNodeFactory.instance.objectNode();
 		ObjectNode Nitr = JsonNodeFactory.instance.objectNode();
 		ObjectNode Phos = JsonNodeFactory.instance.objectNode();
+		ObjectNode Pest = JsonNodeFactory.instance.objectNode();
+		ObjectNode Poll = JsonNodeFactory.instance.objectNode();
 		
 		// Habitat Index
 		ArrayNode HI = JsonNodeFactory.instance.arrayNode();
 		float Total_Cells = 0;
-		float HI_Average_Per_Cell = 0;
+		float HI_Per_Cell = 0;
 		for (int i = 0; i < CountBin_H.length; i++) {
 			Total_Cells = CountBin_H[i] + Total_Cells;
 			HI.add(CountBin_H[i]);
 		}
 		// Average of Habitat_Index per pixel
-		HI_Average_Per_Cell = Habitat_Index_T / Total_Cells;
+		HI_Per_Cell = Habitat_Index_T / Total_Cells;
 		
 		// Nitrogen
 		ArrayNode N = JsonNodeFactory.instance.arrayNode();
@@ -349,11 +448,29 @@ public class Models
 			P.add(CountBin_P[i]);
 		}
 		
+		// Pest
+		float Pest_Per_Cell = 0;
+		ArrayNode PestS = JsonNodeFactory.instance.arrayNode();
+		for (int i = 0; i < CountBin_Pest.length; i++) {
+			PestS.add(CountBin_Pest[i]);
+		}
+		// Average of Pest per pixel
+		Pest_Per_Cell = Pest_T / Total_Cells;
+		
+		// Pollinator
+		float Pollinator_Per_Cell = 0;
+		ArrayNode Pollin = JsonNodeFactory.instance.arrayNode();
+		for (int i = 0; i < CountBin_Poll.length; i++) {
+			Pollin.add(CountBin_Poll[i]);
+		}
+		// Average of Pollinator per pixel
+		Pollinator_Per_Cell = Pollinator_T / Total_Cells;
+		
 		// Habitat_Index
 		H_I.put("Result", HI);
 		H_I.put("Min", Min_H);
 		H_I.put("Max", Max_H);
-		H_I.put("Average_HI", HI_Average_Per_Cell);
+		H_I.put("Average_HI", HI_Per_Cell);
 		
 		// Nitrogen
 		Nitr.put("Result", N);
@@ -367,10 +484,24 @@ public class Models
 		Phos.put("Max", Max_P);
 		Phos.put("Phosphorus", Phosphorus_T * 900 / 1000000);
 		
+		// Pest
+		Pest.put("Result", PestS);
+		Pest.put("Min", Min_Pest);
+		Pest.put("Max", Max_Pest);
+		Pest.put("Pest", Pest_Per_Cell);
+		
+		// Pollinator
+		Poll.put("Result", Pollin);
+		Poll.put("Min", Min_Poll);
+		Poll.put("Max", Max_Poll);
+		Poll.put("Pollinator", Pollinator_Per_Cell);
+		
 		// Add branches to JSON Node 
 		obj.put("Habitat_Index", H_I);
 		obj.put("Nitrogen", Nitr);
 		obj.put("Phosphorus", Phos);
+		obj.put("Pest", Pest);
+		obj.put("Pollinator", Poll);
 		
                 Logger.info(obj.toString());
 		return obj;

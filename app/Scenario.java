@@ -10,54 +10,7 @@ import org.codehaus.jackson.node.*;
 //------------------------------------------------------------------------------
 public class Scenario 
 {
-	public class Sel {
-		public int[][] mSelection;
-		public int mHeight, mWidth;
-		
-		//----------------------------------------------------------------------
-		public boolean isSelected(int atX, int atY) {
-			return (mSelection[atY][atX] > 0);
-		}
-		
-		// Takes the selected pixels in otherSel and adds them into this selection
-		//----------------------------------------------------------------------
-		public void combineSelection(Sel otherSel) {
-			int x, y;
-			for (y = 0; y < mHeight; y++) {
-				for (x = 0; x < mWidth; x++) {
-					// flip the 1st bit
-					mSelection[y][x] |= otherSel.mSelection[y][x];
-				}
-			}
-		}
-		
-		// Takes the selected pixels in otherSel and removes them from this selection
-		//----------------------------------------------------------------------
-		public void removeSelection(Sel otherSel) {
-			int x, y;
-			for (y = 0; y < mHeight; y++) {
-				for (x = 0; x < mWidth; x++) {
-					// Flip/invert the first bit...
-					mSelection[y][x] &= (otherSel.mSelection[y][x] ^ 1);
-//					mSelection[y][x] &= (!otherSel.mSelection[y][x]);
-				}
-			}
-		}
-		
-		
-		//----------------------------------------------------------------------
-		public void invertSelection() {
-			int x, y;
-			for (y = 0; y < mHeight; y++) {
-				for (x = 0; x < mWidth; x++) {
-					// flip the 1st bit
-					mSelection[y][x] ^= 1;
-				}
-			}
-		}
-	}
-	
-	private Sel mSelection; 
+	private Selection mSelection; 
 	private String mOutputDir;
 	private JsonNode mConfiguration;
 	private int[][] mNewRotation; // copy of Rotation layer, but selection transformed
@@ -70,53 +23,81 @@ public class Scenario
 	}
 	
 	//--------------------------------------------------------------------------
-	public void run() {
-		
-		// FIXME: get from client
-		int newCrop = 1;
+	public JsonNode run() {
 		
 		mNewRotation = duplicateRotation();
-		transformRotation(mNewRotation, newCrop);
+		transformRotation(mNewRotation);
 		
 		Models model = new Models();
-//		JsonNode SendBack = model.modeloutcome(request().body().asJson(), mSelection, mOutputDir);
-//		return ok(SendBack);
+		JsonNode SendBack = model.modeloutcome(null, mSelection, mOutputDir, mNewRotation);
+		return SendBack;
 	}
 	
 	//--------------------------------------------------------------------------
 	private int[][] duplicateRotation() {
-		
-		int[][] rotation = Layer_Base.getLayer("Rotation").getIntData();
-	 	int[][] newRotation = new int[mSelection.mHeight][mSelection.mWidth];
-		
-		int x, y;
-		for (y = 0; y < mSelection.mHeight; y++) {
-			for (x = 0; x < mSelection.mWidth; x++) {
-				newRotation[y][x] = rotation[y][x];
-			}
-		}
-		
-		return newRotation;
+	
+		// uses clone to duplicate the data array
+		return Layer_Base.getLayer("Rotation").getIntData().clone();
 	}
 
 	//--------------------------------------------------------------------------
-	private void transformRotation(int[][] rotationToTransform, int newCrop) {
+	private void transformRotation(int[][] rotationToTransform) {
 	
-/*		Query query = new Query();
-		try {
-			mSelection = query.execute(mConfiguration);
-		} catch (Exception e) {
-			Logger.info(e.toString());
-		}
+		Query query = new Query();
 		
-		int x, y;
-		for (y = 0; y < mSelection.mHeight; y++) {
-			for (x = 0; x < mSelection.mWidth; x++) {
-				if (mSelection.isSelected(atX, atY)) {
-					rotationToTransform[y][x] = newCrop;			
+		JsonNode transformQueries = mConfiguration.get("transforms");
+		if (transformQueries != null && transformQueries.isArray()) {
+	
+			Selection currentSelection = null, oldSelection = null;
+			ArrayNode transformArray = (ArrayNode)transformQueries;
+			int count = transformArray.size();
+			
+			for (int i = 0; i < count; i++) {
+				Logger.info("Processing one array element in the transform list");
+				JsonNode transformElement = transformArray.get(i);
+				
+				// get the new landuse...but remember that it needs to be in the
+				//	format of a bit mask "position" that corresponds to the index
+				//	.vs the index value itself.
+				int newLanduse = transformElement.get("newLanduse").getValueAsInt();
+				newLanduse = Layer_Indexed.convertIndexToMask(newLanduse);
+				
+				try {
+					currentSelection = query.execute(transformElement);
+				} catch (Exception e) {
+					Logger.info(e.toString());
 				}
+				
+				if (oldSelection != null) {
+					// remove the old selection from the current/new selection
+					//	this prevents us from running a transform on land that is
+					//	already transformed....
+					currentSelection.removeSelection(oldSelection);
+				}
+				
+				// Run the transform on a (possibly) reduced selection
+				//	e.g., if this is the second or later query in a series,
+				//	the first (highest priority) transform will trump any subsequent transforms
+				int x, y;
+				for (y = 0; y < currentSelection.mHeight; y++) {
+					for (x = 0; x < currentSelection.mWidth; x++) {
+						if (currentSelection.isSelected(x, y)) {
+							rotationToTransform[y][x] = newLanduse;			
+						}
+					}
+				}
+				
+				if (oldSelection != null) {
+					// Now grow the selection up to be the sum of both selections
+					//	...thereby potentially growing the selection up to include
+					//	more pixels...which will then be candidates for being excluded
+					//	from subsequent transform passes...
+					currentSelection.combineSelection(oldSelection);
+				}
+				
+				oldSelection = currentSelection;
 			}
-		}*/
+		}
 	}
 }
 

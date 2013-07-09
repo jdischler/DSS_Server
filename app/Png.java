@@ -91,26 +91,42 @@ public class Png {
 	
 	// FIXME: probably need to rethink this...?	probably only works for indexed?
 	//--------------------------------------------------------------------------
-	public void writeResampledArray(int sourceWidth, int sourceHeight, int[][] imagePixels) {
+	public void writeResampledSelection(int sourceWidth, int sourceHeight, Selection selection) {
 		
 		float stepX = (float)mImageInfo.cols / sourceWidth;
 		float stepY = (float)mImageInfo.rows / sourceHeight;
 		
-		int[][] temp = new int[mImageInfo.rows][mImageInfo.cols];
+		byte[][] temp = new byte[mImageInfo.rows][mImageInfo.cols];
 		
 		float fy = 0;
 		
 		for (int y = 0; y < sourceHeight; y++) {
 			float fx = 0;
 			for (int x = 0; x < sourceWidth; x++) {
-				temp[((int)fy)][((int)fx)] |= imagePixels[y][x];
+				temp[((int)fy)][((int)fx)] |= selection.mSelection[y][x];
 				fx += stepX;
 			}
 			fy += stepY;
 		}
 		
-		mPngWriter.writeRowsInt(temp);
+		mPngWriter.writeRowsByte(temp);
 		mPngWriter.end();
+	}
+
+	//--------------------------------------------------------------------------
+	public static void createHeatmapFromDelta(String deltaFile, String outputPng) {
+	
+		// TODO: open deltaFile (ASC) and get width/height
+		int width = 1;
+		int height = 1;
+		
+		// 8 bits per pixel, 4 channels (RGBA)
+		Png newImage = new Png(width, height, 8, 4, outputPng);
+		
+		// TODO: finish me
+		
+//		newImage.mPngWriter.writeRowsInt(temp);
+		newImage.mPngWriter.end();
 	}
 }
 

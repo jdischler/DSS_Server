@@ -14,7 +14,7 @@ import org.codehaus.jackson.node.*;
 public class Query {
 	
 	static int mCounter;
-	static int mWidth, mHeight;
+	static int mWidth, mHeight; // FIXME: why static?
 
 	//------------------------------------------------------------------------------
 	public JsonNode selection(JsonNode requestBody) throws Exception
@@ -64,15 +64,10 @@ public class Query {
 		
 		// Pass the whole array at the full size...and let the writer do the resample
 		//	to convert this to the size the png will be written at
-		png.writeResampledArray(mWidth, mHeight, selection.mSelection);
+		png.writeResampledSelection(mWidth, mHeight, selection);
 		
 		// Get query statistics (number of selected pixels)
-		int count = 0;	
-		for (y = 0; y < mHeight; y++) {
-			for (x = 0; x < mWidth; x++) {
-				count += selection.mSelection[y][x];
-			}
-		}
+		int count = selection.countSelectedPixels();	
 
 		Logger.info("Query Statistics");
 		Logger.info("-----------------------");
@@ -89,14 +84,14 @@ public class Query {
 		return ret;
 	}
 	
-	public Selection execute(JsonNode requestBody) throws Exception
-	{
+	//--------------------------------------------------------------------------
+	public Selection execute(JsonNode requestBody) throws Exception {
 		
 		// FIXME: can't base size off of a hardcoded layer? The expectation is that
 		// all layers are of the same size....
 		Layer_Base tmp = Layer_Base.getLayer("rotation");
-		mWidth = tmp.getWidth();//4710;//3791;
-		mHeight = tmp.getHeight();//3869;//3133;
+		mWidth = tmp.getWidth();
+		mHeight = tmp.getHeight();
 		
 		Selection selection = new Selection(mWidth, mHeight);
 

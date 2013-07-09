@@ -151,6 +151,20 @@ public class Layer_Indexed extends Layer_Base
 		return (1 << (index-1));
 	}
 	
+	// Takes a variable number of integer arguments...can be called like these: 
+	//	int mask1 = Layer_Indexed.convertIndicesToMask(1,5,8,11,15);
+	//	int mask2 = Layer_Indexed.convertIndicesToMask(2,3,7);
+	//--------------------------------------------------------------------------
+	public static int convertIndicesToMask(int... indicesList) {
+		
+		int result = 0;
+		for (int i=0; i < indicesList.length; i++) {
+			result |= convertIndexToMask(indicesList[i]);
+		}
+		
+		return result;
+	}
+	
 	//--------------------------------------------------------------------------
 	private int getCompareBitMask(JsonNode matchValuesArray) {
 		

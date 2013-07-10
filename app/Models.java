@@ -45,11 +45,11 @@ public class Models
 		float Max_P = 0;
 		float Min_P = 0;
 		// Pest
-		float Max_Pest = 0;
-		float Min_Pest = 0;
+		float Max_Pest = (float)(0.25 + 0.19f * 1 + 0.62f * 1);
+		float Min_Pest = (float)(0.25 + 0.19f * 0 + 0.62f * 0);
 		// Pollinator
-		float Max_Poll = 0;
-		float Min_Poll = 0;
+		float Max_Poll = (float)Math.pow(0.6617f + 2.98 * 1 + 1.83 * 1, 2);
+		float Min_Poll = (float)Math.pow(0.6617f + 2.98 * 0 + 1.83 * 0, 2);
 		int Bin = 10;
 		
 		// Before Transformation
@@ -251,7 +251,7 @@ public class Models
 						// I to Width and J to Height
 						for (int i = mWin.ULX; i <= mWin.LRX; i++) {
 						for (int j = mWin.ULY; j <= mWin.LRY; j++) {
-							if (RotationT[y][x] != NO_DATA)
+							if (RotationT[j][i] != 0)
 							{
 								mWin.Total++;
 							if ((RotationT[j][i] & Ag_Mask) > 0)
@@ -352,13 +352,13 @@ public class Models
 							Crop_Type = 1;
 						}
 						// Maximum is not really 1
-						Max_Pest = (float)(0.25 + 0.19f * 1 + 0.62f * 1);
-						Min_Pest = (float)(0.25 + 0.19f * 0 + 0.62f * 0);
+						//Max_Pest = (float)(0.25 + 0.19f * 1 + 0.62f * 1);
+						//Min_Pest = (float)(0.25 + 0.19f * 0 + 0.62f * 0);
 						// Normalize using Max
 						float Pest = (float)(0.25 + 0.19f * Crop_Type + 0.62f * Prop_Forest) / Max_Pest;
 						Pest_T = Pest + Pest_T;
 						// Summary of Pest
-						Value_Pest = (int)((Pest - Min_Pest)/(Max_Pest - Min_Pest)*(Bin-1));
+						Value_Pest = (int)(Pest*(Bin-1));
 						if (Value_Pest < 0 || Value_Pest >= Bin)
 						{
 							Logger.info("Out of range:" + Float.toString(Pest) + " " + Integer.toString(Value_Pest));
@@ -370,13 +370,13 @@ public class Models
 						
 						
 						// Pollinator
-						Max_Poll = (float)Math.pow(0.6617f + 2.98 * 1 + 1.83 * 1, 2);
-						Min_Poll = (float)Math.pow(0.6617f + 2.98 * 0 + 1.83 * 0, 2);
+						//Max_Poll = (float)Math.pow(0.6617f + 2.98 * 1 + 1.83 * 1, 2);
+						//Min_Poll = (float)Math.pow(0.6617f + 2.98 * 0 + 1.83 * 0, 2);
 						// Normalize using Max
 						float Poll = (float)Math.pow(0.6617f + 2.98 * Prop_Forest + 1.83 * Prop_Grass, 2) / Max_Poll;
-						Pollinator_T = Poll + Pollinator_T;
+						Pollinator_T = Poll / Max_Poll + Pollinator_T;
 						// Summary of Pollinator
-						Value_Poll = (int)((Poll - Min_Poll)/(Max_Poll - Min_Poll)*(Bin-1));
+						Value_Poll = (int)(Poll * (Bin-1));
 						if (Value_Poll < 0 || Value_Poll >= Bin)
 						{
 							Logger.info("Out of range:" + Float.toString(Poll) + " " + Integer.toString(Value_Poll));
@@ -491,14 +491,14 @@ public class Models
 		
 		// Pest
 		Pest.put("Result", PestS);
-		Pest.put("Min", Min_Pest);
-		Pest.put("Max", Max_Pest);
+		Pest.put("Min", 0);
+		Pest.put("Max", 1);
 		Pest.put("Pest", Pest_Per_Cell);
 		
 		// Pollinator
 		Poll.put("Result", Pollin);
-		Poll.put("Min", Min_Poll);
-		Poll.put("Max", Max_Poll);
+		Poll.put("Min", 0);
+		Poll.put("Max", 1);
 		Poll.put("Pollinator", Pollinator_Per_Cell);
 		
 		// Add branches to JSON Node 

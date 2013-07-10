@@ -35,14 +35,19 @@ public class Models
 		Layer_Base layer;
 		int width, height;
 		
+		// HI
 		float Max_H = 1;
 		float Min_H = 0;
+		// Nitrogen
 		float Max_N = 0;
 		float Min_N = 0;
+		// Phosphrous
 		float Max_P = 0;
 		float Min_P = 0;
+		// Pest
 		float Max_Pest = 0;
 		float Min_Pest = 0;
+		// Pollinator
 		float Max_Poll = 0;
 		float Min_Poll = 0;
 		int Bin = 10;
@@ -274,6 +279,10 @@ public class Models
 						Prop_Forest = (float)Count_Forest / mWin.Total;
 						// Grass Proportion
 						Prop_Grass = (float)Count_Grass / mWin.Total;
+						if (Prop_Ag < 0 || Prop_Ag > 1 || Prop_Forest < 0 || Prop_Forest > 1 || Prop_Grass < 0 || Prop_Grass > 1)
+						{
+							Logger.info("Out of range:" + Float.toString(Prop_Ag) + " " + Float.toString(Prop_Forest) + " " + Float.toString(Prop_Grass));
+						}
 						
 						
 						
@@ -287,7 +296,7 @@ public class Models
 						
 						Habitat_Index_T = Habitat_Index + Habitat_Index_T;
 						Value_H = (int)((Habitat_Index - Min_H)/(Max_H - Min_H)*(Bin-1));
-						if (Value_H < 0 || Value_H > Bin)
+						if (Value_H < 0 || Value_H >= Bin)
 						{
 							Logger.info("Out of range:" + Float.toString(Habitat_Index) + " " + Integer.toString(Value_H));
 						}
@@ -299,10 +308,6 @@ public class Models
 						
 						
 						// Nitrogen
-						if (Prop_Ag < 0 || Prop_Ag > 1 || Prop_Forest < 0 || Prop_Forest > 1)
-						{
-							Logger.info("Out of range:" + Float.toString(Prop_Ag) + " " + Float.toString(Prop_Forest));
-						}
 						float Nitrogen = (float)Math.pow(10, 1.13f * Prop_Ag - 0.23f);
 						Min_N = (float)Math.pow(10, 1.13f * 0 - 0.23f);
 						Max_N = (float)Math.pow(10, 1.13f * 1 - 0.23f);

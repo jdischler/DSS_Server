@@ -24,6 +24,7 @@ Ext.define('MyApp.view.GraphPopUp', {
             items: [
                 {
                     xtype: 'chart',
+                    itemId: 'MyGraph',
                     //height: 250,
                     //width: 400,
                     animate: true,
@@ -86,6 +87,10 @@ Ext.define('MyApp.view.GraphPopUp', {
     	var Min = objD.Min;
     	var Max = objD.Max;
     	
+    	var chart = this.getComponent("MyGraph");
+    	chart.axes.items[1].maximum = Max;
+	chart.axes.items[1].minimum = Min;
+	
 	var array = [];
 	for (var i = 0; i < data1.length; i++)
 	{
@@ -93,6 +98,8 @@ Ext.define('MyApp.view.GraphPopUp', {
 	}
 	
 	this.graphstore.loadData(array);
+
+
     }
 
 });

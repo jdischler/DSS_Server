@@ -79,7 +79,7 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 	},
 
     //--------------------------------------------------------------------------
-    setSelectionCriteria: function() {
+    getSelectionCriteria: function() {
     	
 		var queryLayer = { 
 			name: this.DSS_QueryTable,

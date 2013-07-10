@@ -25,7 +25,7 @@ Ext.define('MyApp.view.LayerPanel_CurrentSelection', {
     // Print text standardizing
     DSS_areaText: 'Area Selected: ',
     DSS_areaUnits: ' km\xb2',
-    DSS_percText: '% of area: ',
+    DSS_percText: '% of study area: ',
     
     //--------------------------------------------------------------------------
     initComponent: function() {

@@ -389,7 +389,10 @@ Ext.define('MyApp.view.MainViewport', {
 			DSS_LayerSatellite: googTerrain,
 			DSS_LayerHybrid: googHybrid
 		});
-		
+
+		// Speed up the insertion process a bit by suspending the layout engine until the new
+		// 	elements are added...		
+		Ext.suspendLayouts();
 		var dssLeftPanel = Ext.getCmp('DSS_LeftPanel');
 		dssLeftPanel.insert(0,lpGoog);
 		dssLeftPanel.insert(0,lpSOC);
@@ -400,6 +403,7 @@ Ext.define('MyApp.view.MainViewport', {
 		dssLeftPanel.insert(0,lpRoad);
 		dssLeftPanel.insert(0,lpRiver);
 		dssLeftPanel.insert(0,lpCDL);
+		Ext.resumeLayouts(true);
 		
 		// BOO - FIXME
 		DSS_globalQueryableLayers.push(lpCDL);

@@ -105,6 +105,10 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
 					console.log("layer request object return was null?");
 					return;
 				}
+				
+				// adding multiple elements causes a layout calc each time...
+				//	disable that for performance
+				Ext.suspendLayouts();
 				var cont = this.getComponent('legendcontainer');
 				for (var i = 0; i < obj.length; i++) {
 					// add index for every other colouring
@@ -112,6 +116,8 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
 						obj[i]);
 					cont.insert(i, element);
 				}
+				// Layouts were disabled...must turn them back on!!
+				Ext.resumeLayouts(true);
 			},
 			
 			failure: function(respose, opts) {

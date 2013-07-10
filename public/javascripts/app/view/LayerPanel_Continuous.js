@@ -236,5 +236,5 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 		return queryLayer;		
     }
 
-
 });
+

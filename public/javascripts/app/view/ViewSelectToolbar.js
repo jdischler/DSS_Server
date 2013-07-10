@@ -214,21 +214,28 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 	
 		var requestData = {
 			clientID: 12345, //temp
-			queryLayers: []
+			transforms: []
 		};
 		
-		var query = false;
+		var transform = {
+			queryLayers: [],
+			newLandUse: 1
+		};
+		
+		var haveQuery = false;
 		for (var i = 0; i < DSS_globalQueryableLayers.length; i++) {
 			
 			if (DSS_globalQueryableLayers[i].includeInQuery()) {
 				var queryComp = DSS_globalQueryableLayers[i].setSelectionCriteria();
-				requestData.queryLayers.push(queryComp);
-				query = true;
+				transform.queryLayers.push(queryComp);
+				haveQuery = true;
 			}
 		}
 	
+		requestData.transforms.push(transform);
+		
 		console.log(requestData);
-		if (query) {
+		if (haveQuery) {
 			this.submitModel(requestData);
 		}
 		else {
@@ -270,16 +277,23 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 	//--------------------------------------------------------------------------
 	tryExpandAll: function() {
 		
+		// NOTE: Each layer expand causes a layout calculation...much more efficient
+		//	to disable the layout engine, make all of the changes, then do the final layout...
+		Ext.suspendLayouts();
     	for (var i = 0; i < DSS_globalQueryableLayers.length; i++) {
     		
     		var layer = DSS_globalQueryableLayers[i];
 			layer.expand();
 		}
+		Ext.resumeLayouts(true);
 	},
 	
 	//--------------------------------------------------------------------------
 	tryExpandQueried: function() {
 		
+		// NOTE: Each layer expand causes a layout calculation...much more efficient
+		//	to disable the layout engine, make all of the changes, then do the final layout...
+		Ext.suspendLayouts();
     	for (var i = 0; i < DSS_globalQueryableLayers.length; i++) {
     		
     		var layer = DSS_globalQueryableLayers[i];
@@ -290,11 +304,15 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
     			layer.collapse();
     		}
 		}
+		Ext.resumeLayouts(true);
 	},
 	
 	//--------------------------------------------------------------------------
 	tryCollapseAll: function() {
 		
+		// NOTE: Each layer expand causes a layout calculation...much more efficient
+		//	to disable the layout engine, make all of the changes, then do the final layout...
+		Ext.suspendLayouts();
     	for (var i = 0; i < DSS_globalCollapsibleLayers.length; i++) {
     		
     		var layer = DSS_globalCollapsibleLayers[i];
@@ -302,6 +320,7 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
     			layer.collapse();
     		}
 		}
+		Ext.resumeLayouts(true);
 	}
 
 });

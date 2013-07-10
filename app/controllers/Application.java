@@ -120,53 +120,31 @@ public class Application extends Controller
 		{
 			output.mkdir();
 		}
-		
-		Query query = new Query();
-		Selection selection = null;
-		
-		try {
-			selection = query.execute(request().body().asJson());
-		} catch (Exception e) {
-			Logger.info(e.toString());
-		}
-		
+	
+		// Create a new scenario and get a transformed crop rotation layer from it...
+		Scenario scenario = new Scenario();
+		scenario.getTransformedRotation(request().body().asJson());
+
+		Selection selection = scenario.mSelection;
 		Logger.info("Server Run The Models Request:");
 		Models model = new Models();
 		
-		// Code for Transformation
-		int I_Code = 1; // 1
-		int S_Code = 256; // 9
-		
 		// Rotation
 		int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
-		Layer_Base layer = Layer_Base.getLayer("Rotation");
-		int width = layer.getWidth();
-		int height = layer.getHeight();
-		int[][] RotationT = new int [height][width];
 		
-		// Chnage Rotation to Rotation_T
-		for (int y = 0; y < height; y++) 
-		{
-			for (int x = 0; x < width; x++) 
-			{
-				RotationT[y][x] = Rotation[y][x];
-				if (RotationT[y][x] == I_Code)
-				{
-					RotationT[y][x] = S_Code;
-				}
-			}
-		}
-			
-		JsonNode SendBackT = model.modeloutcome(request().body().asJson(), selection, "Client_ID", RotationT);
+		// Run the model with the new transformed rotation...
+		JsonNode SendBackT = model.modeloutcome(request().body().asJson(), // << parm no longer used? 
+			selection, "Client_ID", scenario.mNewRotation);
+		// Run the model with the old rotation....
+		JsonNode SendBackD = model.modeloutcome(request().body().asJson(), // << parm no longer used? 
+			selection, "Default", Rotation);
 		
-		JsonNode SendBackD = model.modeloutcome(request().body().asJson(), selection, "Default", Rotation);
-		
-		//JsonNode SendBackD = Global.GetDefaultSendBack();
-		
+		// Get some data to send back...
 		ObjectNode SendBack = JsonNodeFactory.instance.objectNode();
 		
 		SendBack.put("Default", SendBackD);
 		SendBack.put("Transform", SendBackT);
+		
 		// Open a file to write Delta for HI
 		int w = selection.mWidth;
 		//Logger.info(integer.toString(w));
@@ -193,7 +171,7 @@ public class Application extends Controller
 		
 		output = new File("./layerData/Client_ID/Delta");
 		if(output.exists()) {
-			Logger.info("The Delta folder is already exist");
+			Logger.info("The Delta folder already exists");
 		}
 		else {
 			output.mkdir();

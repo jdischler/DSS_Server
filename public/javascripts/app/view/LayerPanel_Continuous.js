@@ -234,7 +234,35 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 		queryLayer.greaterThanValue = gtrValue.getValue();
 		
 		return queryLayer;		
-    }
+    },
 
+    //--------------------------------------------------------------------------
+    setSelectionCriteria: function(jsonQuery) {
+
+		for (var i = 0; i < jsonQuery.queryLayers.length; i++) {
+		
+			var queryElement = jsonQuery.queryLayers[i];
+			
+			// in query?
+			if (queryElement.name == this.DSS_QueryTable) {
+				// yup
+				this.header.getComponent('DSS_ShouldQuery').toggle(true);
+				var gtrTest = this.getComponent('DSS_GreaterThanTest');
+				var gtrValue = this.getComponent('DSS_GreaterThanValue');
+				var lessTest = this.getComponent('DSS_LessThanTest');
+				var lessValue = this.getComponent('DSS_LessThanValue');
+		
+				lessTest.setText(queryElement.lessThanTest);
+				gtrTest.setText(queryElement.greaterThanTest);
+				lessValue.setValue(queryElement.lessThanValue);
+				gtrValue.setValue(queryElement.greaterThanValue);
+				return;
+			}
+		}
+		
+		// Nope, mark as not queried
+		this.header.getComponent('DSS_ShouldQuery').toggle(false);
+    }
+    
 });
 

@@ -1,4 +1,5 @@
 
+//------------------------------------------------------------------------------
 Ext.define('MyApp.view.LegendElement', {
     extend: 'Ext.container.Container',
     alias: 'widget.legendelement',
@@ -11,8 +12,8 @@ Ext.define('MyApp.view.LegendElement', {
 
     //--------------------------------------------------------------------------
     initComponent: function() {
+    	
         var me = this;
-
 //        var pattern = (me.DSS_LegendElementIndex & 0x3);
         var pattern = (me.index & 0x3);
         var BGcolor = (pattern == 0 || pattern == 1) ? '#ffffff' : '#f7faff';
@@ -23,35 +24,33 @@ Ext.define('MyApp.view.LegendElement', {
                 'background-color': BGcolor,
                 border: '1px solid #f7f7f7'
             },
-            items: [
-                {
-                    xtype: 'container',
-                    x: 5,
-                    y: 1,
-                    frame: false,
-                    height: 19,
-                    width: 20,
-                    html: '',
-                    style: {
-                        'background-color': me.color,//DSS_LegendElementColor,
-                        border: '1px dotted #BBBBBB'
-                    }
-                },
-                {
-                    xtype: 'label',
-                    x: 30,
-                    y: 2,
-                    text: me.label,//DSS_LegendElementType
-                },
-                {
-                    xtype: 'checkboxfield',
-                    itemId: 'DSS_queryCheck',
-                    x: 145,
-                    y: -1,
-                    fieldLabel: 'Label',
-                    hideLabel: true
-                }
-            ]
+            items: [{
+				xtype: 'container',
+				x: 5,
+				y: 1,
+				frame: false,
+				height: 19,
+				width: 20,
+				html: '',
+				style: {
+					'background-color': me.color,//DSS_LegendElementColor,
+					border: '1px dotted #BBBBBB'
+				}
+			},
+			{
+				xtype: 'label',
+				x: 30,
+				y: 2,
+				text: me.label,//DSS_LegendElementType
+			},
+			{
+				xtype: 'checkboxfield',
+				itemId: 'DSS_queryCheck',
+				x: 145,
+				y: -1,
+				fieldLabel: 'Label',
+				hideLabel: true
+			}]
         });
 
         me.callParent(arguments);
@@ -65,13 +64,12 @@ Ext.define('MyApp.view.LegendElement', {
     },
     
     //--------------------------------------------------------------------------
-    clearCheck: function() {
+    setChecked: function(shouldBeChecked) {
     	
     	var comp = this.getComponent('DSS_queryCheck');
-    	comp.setValue(false);
+    	comp.setValue(shouldBeChecked);
     },
 
-    
     //--------------------------------------------------------------------------
     getElementQueryIndex: function() {
     	

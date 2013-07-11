@@ -135,6 +135,16 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
 	},
 
     //--------------------------------------------------------------------------
+	clearChecks: function() {
+		
+        var cont = this.getComponent('legendcontainer');
+        for (var i = 0; i < cont.items.length; i++) {
+        	var item = cont.items.items[i];
+        	item.setChecked(false);
+        }
+    },
+	
+    //--------------------------------------------------------------------------
     getSelectionCriteria: function() {
     	
 		var queryLayer = { 
@@ -158,6 +168,43 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
         	return;
         }
         return queryLayer;
+    },
+
+    //--------------------------------------------------------------------------
+    setSelectionCriteria: function(jsonQuery) {
+
+		for (var i = 0; i < jsonQuery.queryLayers.length; i++) {
+		
+			var queryElement = jsonQuery.queryLayers[i];
+			
+			// in query?
+			if (queryElement.name == this.DSS_QueryTable) {
+				// yup
+				this.header.getComponent('DSS_ShouldQuery').toggle(true);
+				
+				// start with a clean slate, then check only the ones that need it
+				this.clearChecks();
+				var cont = this.getComponent('legendcontainer');
+				// get each match value in the query...
+				for (var j = 0; j < queryElement.matchValues.length; j++) {
+					// hopefully find the right checkbox that corresponds to it...
+					for (var k = 0; k < cont.items.items.length; k++) {
+						var item = cont.items.items[k];
+						// and make that checkbox checked...
+						if (item.getElementQueryIndex() == queryElement.matchValues[j]) {
+							item.setChecked(true);
+							// don't check any more items for this match value
+							break;
+						}
+					}
+				}
+				return;
+        	}
+        }
+				
+		// Nope, mark as not queried
+		this.header.getComponent('DSS_ShouldQuery').toggle(false);
     }
     
 });
+

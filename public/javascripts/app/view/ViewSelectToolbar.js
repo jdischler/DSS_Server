@@ -104,6 +104,24 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 				handler: function(button, evt, toolEl, owner, tool) {
 					button.up().buildModel();
 				}
+			},
+			{
+				xtype: 'button',
+				scale: 'small',
+				text: '!!',
+				iconAlign: 'right',
+				tooltip: {
+					text: 'Test resetting query elements',
+					showDelay: 100
+				},
+				border: 1,
+				style: {
+					borderColor: '#eff',
+					borderStyle: 'dotted'
+				},
+				handler: function(button, evt, toolEl, owner, tool) {
+					button.up().resetQuery();
+				}
 			}]
         });
 
@@ -131,6 +149,7 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 		console.log(requestData);
 		if (query) {
 			this.submitQuery(requestData);
+			this.testStoreQuery = requestData;
 		}
 		else {
 			alert("No query built - nothing to query");
@@ -321,6 +340,16 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
     		}
 		}
 		Ext.resumeLayouts(true);
-	}
+	},
+
+	//--------------------------------------------------------------------------
+	resetQuery: function() {
+		
+    	for (var i = 0; i < DSS_globalQueryableLayers.length; i++) {
+    		
+    		DSS_globalQueryableLayers[i].setSelectionCriteria(this.testStoreQuery);
+    	}
+    }
 
 });
+

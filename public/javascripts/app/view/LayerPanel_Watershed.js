@@ -97,7 +97,35 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
         }
         return queryLayer;
     },
-    
+
+    //--------------------------------------------------------------------------
+    setSelectionCriteria: function(jsonQuery) {
+
+		for (var i = 0; i < jsonQuery.queryLayers.length; i++) {
+		
+			var queryElement = jsonQuery.queryLayers[i];
+			
+			// in query?
+			if (queryElement.name == this.DSS_QueryTable) {
+				// yup
+				this.header.getComponent('DSS_ShouldQuery').toggle(true);
+				
+				// start with a clean slate, then select only the ones that need it
+				this.clearSelection();
+				// get each match value in the query...
+				for (var j = 0; j < queryElement.matchValues.length; j++) {
+					this.DSS_watershedSelections.push(queryElement.matchValues[j]);
+					
+					// FIXME: TODO: Need to somehow get the relevant feature vectors!!!??
+				}
+				return;
+        	}
+        }
+				
+		// Nope, mark as not queried
+		this.header.getComponent('DSS_ShouldQuery').toggle(false);
+    },
+
 	//--------------------------------------------------------------------------
 	clickSelection: function(event) {
 
@@ -153,17 +181,19 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 	enableClickSelection: function() {
 		
 		var viewport = Ext.getCmp('DSS_MainViewport');
-		console.log(viewport);
 		viewport.activateClickControlWithHandler(this.clickSelection, this);
 		// FIXME: probably want to tie this to the watershed layer visibility?
 		this.DSS_selectionLayer.setVisibility(true);
+		
+		// When click selection is on, show the layer...Make sense?
+		var layerVisToggle = this.header.getComponent('DSS_visibilityToggle');
+		layerVisToggle.setValue(true);
 	},
 
 	//--------------------------------------------------------------------------
 	disableClickSelection: function() {
 		
 		var viewport = Ext.getCmp('DSS_MainViewport');
-		console.log(viewport);
 		
 		viewport.deactivateClickControl();
 		// FIXME: probably want to tie this to the watershed layer visibility?

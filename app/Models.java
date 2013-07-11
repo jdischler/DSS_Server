@@ -39,11 +39,11 @@ public class Models
 		float Max_H = 1;
 		float Min_H = 0;
 		// Nitrogen
-		float Max_N = 0;
-		float Min_N = 0;
+		float Min_N = (float)Math.pow(10, 1.13f * 0 - 0.23f);
+		float Max_N = (float)Math.pow(10, 1.13f * 1 - 0.23f);
 		// Phosphrous
-		float Max_P = 0;
-		float Min_P = 0;
+		float Min_P = (float)Math.pow(10, 0.79f * 0 - 1.44f);
+		float Max_P = (float)Math.pow(10, 0.79f * 1 - 1.44f);
 		// Pest
 		float Max_Pest = (float)(0.25 + 0.19f * 1 + 0.62f * 1);
 		float Min_Pest = (float)(0.25 + 0.19f * 0 + 0.62f * 0);
@@ -175,6 +175,8 @@ public class Models
 			
 			// Size of Window
 			int Window_Size = 0;
+			// Precompute this so we don't do it on every cell
+			String stringNoData = Integer.toString(NO_DATA);
 			
 			for (int y = 0; y < height; y++) {
 				// StringBuffer sb1 = new StringBuffer();
@@ -190,14 +192,14 @@ public class Models
 					if (RotationT[y][x] == 0 || selection.mSelection[y][x] == 0) 
 					{
 						// Check for No-Data Value
-						// sb1.append(Integer.toString(NO_DATA));
-						// sb2.append(Integer.toString(NO_DATA));
-						// sb3.append(Integer.toString(NO_DATA));
-						sb4.append(Integer.toString(NO_DATA));
-						sb5.append(Integer.toString(NO_DATA));
-						sb6.append(Integer.toString(NO_DATA));
-						sb7.append(Integer.toString(NO_DATA));
-						sb8.append(Integer.toString(NO_DATA));
+						// sb1.append(stringNoData);
+						// sb2.append(stringNoData);
+						// sb3.append(stringNoData);
+						sb4.append(stringNoData);
+						sb5.append(stringNoData);
+						sb6.append(stringNoData);
+						sb7.append(stringNoData);
+						sb8.append(stringNoData);
 					}
 					else if (selection.mSelection[y][x] == 1)
 					{
@@ -249,25 +251,25 @@ public class Models
 						Moving_Window mWin = new Moving_Window(x, y, Window_Size, width, height);
 						
 						// I to Width and J to Height
-						for (int i = mWin.ULX; i <= mWin.LRX; i++) {
 						for (int j = mWin.ULY; j <= mWin.LRY; j++) {
-							if (RotationT[j][i] != 0)
-							{
-								mWin.Total++;
-							if ((RotationT[j][i] & Ag_Mask) > 0)
-							{
-								Count_Ag = Count_Ag + 1;	
+							for (int i = mWin.ULX; i <= mWin.LRX; i++) {
+								if (RotationT[j][i] != 0)
+								{
+									mWin.Total++;
+									if ((RotationT[j][i] & Ag_Mask) > 0)
+									{
+										Count_Ag = Count_Ag + 1;	
+									}
+									else if ((RotationT[j][i] & Forest_Mask) > 0 )
+									{
+										Count_Forest = Count_Forest + 1;
+									}
+									else if ((RotationT[j][i] & Grass_Mask) > 0 )
+									{
+										Count_Grass = Count_Grass + 1;
+									}
+								}
 							}
-							else if ((RotationT[j][i] & Forest_Mask) > 0 )
-							{
-								Count_Forest = Count_Forest + 1;
-							}
-							else if ((RotationT[j][i] & Grass_Mask) > 0 )
-							{
-								Count_Grass = Count_Grass + 1;
-							}
-						}
-						}
 						}
 						
 						
@@ -309,8 +311,6 @@ public class Models
 						
 						// Nitrogen
 						float Nitrogen = (float)Math.pow(10, 1.13f * Prop_Ag - 0.23f);
-						Min_N = (float)Math.pow(10, 1.13f * 0 - 0.23f);
-						Max_N = (float)Math.pow(10, 1.13f * 1 - 0.23f);
 						Nitrogen_T = Nitrogen + Nitrogen_T;
 						// Summary of Nitrogen
 						Value_N = (int)((Nitrogen - Min_N)/(Max_N - Min_N)*(Bin-1));
@@ -327,8 +327,6 @@ public class Models
 						// Phosphorus 
 						float Phosphorus = (float)Math.pow(10, 0.79f * Prop_Ag - 1.44f);
 						Phosphorus_T = Phosphorus + Phosphorus_T;
-						Min_P = (float)Math.pow(10, 0.79f * 0 - 1.44f);
-						Max_P = (float)Math.pow(10, 0.79f * 1 - 1.44f);
 						// Summary of Phosphorus
 						Value_P = (int)((Phosphorus - Min_P)/(Max_P - Min_P)*(Bin-1));
 						if (Value_P < 0 || Value_P >= Bin)
@@ -508,13 +506,8 @@ public class Models
 		obj.put("Pest", Pest);
 		obj.put("Pollinator", Poll);
 		
-                Logger.info(obj.toString());
+		Logger.info(obj.toString());
 		return obj;
-		
-		// GetIt.put("URL", urlPath);
-		// GetIt.put("Pixels", count);
-		// GetIt.put("Total", mHeight * mWidth);
-		// return GetIt;
 	}	
 
 	// Moving Window Function

@@ -111,6 +111,9 @@ public class Application extends Controller
 	//----------------------------------------------------------------------
 	public static Result Models() throws Exception 
 	{
+		Logger.info("Called into Model:");
+		Logger.info(request().body().asJson().toString());
+
 		File output = new File("./layerData/Client_ID");
 		if(output.exists())
 		{

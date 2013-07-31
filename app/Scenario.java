@@ -98,6 +98,7 @@ public class Scenario
 				//	format of a bit mask "position" that corresponds to the index
 				//	.vs the index value itself.
 				int newLanduse = transformElement.get("newLandUse").getValueAsInt();
+				Logger.info("+New land use code: " + Integer.toString(newLanduse));
 				newLanduse = Layer_Indexed.convertIndexToMask(newLanduse);
 				
 				try {

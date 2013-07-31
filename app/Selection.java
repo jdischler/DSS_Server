@@ -44,9 +44,9 @@ public class Selection
 		for (y = 0; y < mHeight; y++) {
 			for (x = 0; x < mWidth; x++) {
 				// NOTE: relies on mSelection containing 1's and 0's...
-				count += mSelection[y][x];
+				//count += mSelection[y][x];
 				// Otherwise do something like...
-//				count += (mSelection[y][x] > 0 ? 1 : 0);
+				count += (mSelection[y][x] > 0 ? 1 : 0);
 			}
 		}
 		return count;

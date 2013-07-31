@@ -38,6 +38,7 @@ public class Models
 		Layer_Base layer;
 		int width, height;
 		int NO_DATA = -9999;
+		float Total_Cells = selection.countSelectedPixels();
 		
 		// Ton/ha
 		//float Min_Corn_Y = 3.08f - 0.11f * 70;
@@ -777,11 +778,10 @@ public class Models
 		
 		
 		
-		float Total_Cells = 0;
 		// Ethonal
 		ArrayNode E = JsonNodeFactory.instance.arrayNode();
 		for (int i = 0; i < CountBin_E.length; i++) {
-			Total_Cells = CountBin_E[i] + Total_Cells;
+			//Total_Cells = CountBin_E[i] + Total_Cells;
 			E.add(CountBin_E[i]);
 		}
 		// Average of Ethanol per pixel
@@ -789,11 +789,11 @@ public class Models
 		
 		
 		
-		Total_Cells = 0;
+		//Total_Cells = 0;
 		// Habitat Index
 		ArrayNode HI = JsonNodeFactory.instance.arrayNode();
 		for (int i = 0; i < CountBin_H.length; i++) {
-			Total_Cells = CountBin_H[i] + Total_Cells;
+			//Total_Cells = CountBin_H[i] + Total_Cells;
 			HI.add(CountBin_H[i]);
 		}
 		// Average of Habitat_Index per pixel
@@ -801,11 +801,11 @@ public class Models
 		
 		
 		
-		Total_Cells = 0;
+		//Total_Cells = 0;
 		// Nitrogen
 		ArrayNode N = JsonNodeFactory.instance.arrayNode();
 		for (int i = 0; i < CountBin_N.length; i++) {
-			Total_Cells = CountBin_N[i] + Total_Cells;
+			//Total_Cells = CountBin_N[i] + Total_Cells;
 			N.add(CountBin_N[i]);
 		}
 		// Average of Nitrogen per pixel
@@ -813,11 +813,11 @@ public class Models
 		
 		
 		
-		Total_Cells = 0;
+		//Total_Cells = 0;
 		// Phosphorus
 		ArrayNode P = JsonNodeFactory.instance.arrayNode();
 		for (int i = 0; i < CountBin_P.length; i++) {
-			Total_Cells = CountBin_P[i] + Total_Cells;
+			//Total_Cells = CountBin_P[i] + Total_Cells;
 			P.add(CountBin_P[i]);
 		}
 		// Average of Phosphorus per pixel
@@ -825,11 +825,11 @@ public class Models
 		
 		
 		
-		Total_Cells = 0;
+		//Total_Cells = 0;
 		// Pest
 		ArrayNode PestS = JsonNodeFactory.instance.arrayNode();
 		for (int i = 0; i < CountBin_Pest.length; i++) {
-			Total_Cells = CountBin_Pest[i] + Total_Cells;
+			//Total_Cells = CountBin_Pest[i] + Total_Cells;
 			PestS.add(CountBin_Pest[i]);
 		}
 		// Average of Pest per pixel
@@ -837,11 +837,11 @@ public class Models
 		
 		
 		
-		Total_Cells = 0;
+		//Total_Cells = 0;
 		// Pollinator
 		ArrayNode Pollin = JsonNodeFactory.instance.arrayNode();
 		for (int i = 0; i < CountBin_Poll.length; i++) {
-			Total_Cells = CountBin_Poll[i] + Total_Cells;
+			//Total_Cells = CountBin_Poll[i] + Total_Cells;
 			Pollin.add(CountBin_Poll[i]);
 		}
 		// Average of Pollinator per pixel
@@ -849,11 +849,11 @@ public class Models
 		
 		
 		
-		Total_Cells = 0;
+		//Total_Cells = 0;
 		// Net_Income
 		ArrayNode NI = JsonNodeFactory.instance.arrayNode();
 		for (int i = 0; i < CountBin_NI.length; i++) {
-			Total_Cells = CountBin_NI[i] + Total_Cells;
+			//Total_Cells = CountBin_NI[i] + Total_Cells;
 			NI.add(CountBin_NI[i]);
 		}
 		// Average of Net_Income per pixel
@@ -861,11 +861,11 @@ public class Models
 		
 		
 		
-		Total_Cells = 0;
+		//Total_Cells = 0;
 		// Net Energy
 		ArrayNode NE = JsonNodeFactory.instance.arrayNode();
 		for (int i = 0; i < CountBin_NE.length; i++) {
-			Total_Cells = CountBin_NE[i] + Total_Cells;
+			//Total_Cells = CountBin_NE[i] + Total_Cells;
 			NE.add(CountBin_NE[i]);
 		}
 		// Average of Net_Energy per pixel

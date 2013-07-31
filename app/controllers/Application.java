@@ -135,12 +135,13 @@ public class Application extends Controller
 		// Rotation
 		int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
 		
-		// Run the model with the new transformed rotation...
-		JsonNode SendBackT = model.modeloutcome(request().body().asJson(), // << parm no longer used? 
-			selection, "Client_ID", scenario.mNewRotation);
 		// Run the model with the old rotation....
 		JsonNode SendBackD = model.modeloutcome(request().body().asJson(), // << parm no longer used? 
 			selection, "Default", Rotation);
+		
+		// Run the model with the new transformed rotation...
+		JsonNode SendBackT = model.modeloutcome(request().body().asJson(), // << parm no longer used? 
+			selection, "Client_ID", scenario.mNewRotation);
 		
 		// Get some data to send back...
 		ObjectNode SendBack = JsonNodeFactory.instance.objectNode();

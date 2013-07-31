@@ -3,6 +3,8 @@ package util;
 import play.*;
 import java.util.*;
 import java.io.*;
+import java.nio.*;
+import java.nio.channels.*;
 
 import org.codehaus.jackson.*;
 import org.codehaus.jackson.node.*;
@@ -11,6 +13,8 @@ import org.codehaus.jackson.node.*;
 public abstract class Layer_Base
 {
 	private static Map<String, Layer_Base>	mLayers;
+	
+	protected final boolean mbUseBinaryFormat = false;
 	
 	protected String mName;
 	protected int mWidth, mHeight;
@@ -79,8 +83,23 @@ public abstract class Layer_Base
 	//--------------------------------------------------------------------------
 	public void init() {
 		
-		try{
-			loadASC();
+		try {
+			// TODO: FIXME: binary format reading or writing has an issue, not sure which
+			if (mbUseBinaryFormat) {
+				File input = new File("./layerData/" + mName + ".bin");
+				if(input.exists()) {
+					readBinary();
+				}
+				else {
+					// wanting to use binary format but file doesn't exist...
+					// 	load ASC, save as Binary
+					loadASC();
+					writeBinary();
+				}
+			}
+			else {
+				loadASC();
+			}
 		}
 		catch(Exception e) {
 			Logger.error(e.toString());
@@ -224,5 +243,98 @@ public abstract class Layer_Base
 			}
 		}
 	}
-}
+
+	//--------------------------------------------------------------------------
+	// BINARY format reading/writing
+	//	~3-5x faster 
+	//	FIXME: TODO: (but doesn't current work right yet) unsure exactly why. 
+	//	Needs diagnosing and fixing...
+	//--------------------------------------------------------------------------
+	private void writeBinary() throws Exception {
+		
+		Logger.info("Writing Binary");
+		File output = new File("./layerData/" + mName + ".bin");
+
+		FileOutputStream fos = new FileOutputStream(output);
+		try {
+			WritableByteChannel channel = fos.getChannel();
+			ByteBuffer buf = ByteBuffer.allocateDirect(3 * 4); // FIXME: size of int * header?
+			
+			// FIXME: TODO: Continuous layers need min/max range property read
+			//	else...could scan the data layer later worst case
+			buf.putInt(mWidth);
+			buf.putInt(mHeight);
+			buf.putInt(mNoDataValue);
+			buf.flip();
+			channel.write(buf);
+			
+			buf = ByteBuffer.allocateDirect(mWidth * 4); // FIXME: size of int?
+			
+			for (int y = 0; y < mHeight; y++) {
+				buf.clear();
+				for (int x = 0; x < mWidth; x++) {
+					buf.putInt(mIntData[y][x]);
+				}
+				buf.flip();
+				channel.write(buf);
+			}
+			channel.close();
+		}
+		catch (Exception e) {
+			Logger.info(e.toString());
+		}
+		finally {
+			fos.close();
+		}
+	}
 	
+	//--------------------------------------------------------------------------
+	private void readBinary() throws Exception {
+		
+		Logger.info("+-------------------------------------------------------+");
+		Logger.info("| Binary Read: " + mName);
+		Logger.info("+-------------------------------------------------------+");
+		File input = new File("./layerData/" + mName + ".bin");
+
+		FileInputStream fis = new FileInputStream(input);
+		
+		try {
+			ReadableByteChannel channel = fis.getChannel();
+			
+			Logger.info("  Reading header...");
+			ByteBuffer buf = ByteBuffer.allocateDirect(3 * 4); // FIXME: size of header * size of int?
+			channel.read(buf); 
+			buf.rewind();
+			Logger.info("  Extracting header...");
+			// FIXME: TODO: Continuous layers need min/max range property read
+			//	else...could scan the data layer later worst case
+			mWidth = buf.getInt();
+			mHeight = buf.getInt();
+			mNoDataValue = buf.getInt();
+			
+			Logger.info("  Width: " + Integer.toString(mWidth) 
+							+ "  Height: " + Integer.toString(mHeight));
+			allocMemory(mWidth, mHeight);
+			
+			buf = ByteBuffer.allocateDirect(mWidth * 4); // FIXME: size of int?
+			Logger.info("  Reading file with ByteBuffer and NIO...");
+			
+			for (int y = 0; y < mHeight; y++) {
+				buf.rewind();
+				channel.read(buf);
+				for (int x = 0; x < mWidth; x++) {
+					mIntData[y][x] = buf.getInt(x);
+				}
+			}
+			channel.close();
+		}
+		catch (Exception e) {
+			Logger.info(e.toString());
+		}
+		finally {
+			fis.close();
+		}
+		
+		onLoadEnd();
+	}
+}

@@ -5,8 +5,9 @@ Ext.define('MyApp.view.ReportMasterLayout', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.report_master_layout',
 
-        requires: [
-		'MyApp.view.ModelGraph',       
+	requires: [
+		'MyApp.view.ModelGraph',
+		'MyApp.view.ReportTools'
 	],
 	
 	dock: 'right',
@@ -25,6 +26,18 @@ Ext.define('MyApp.view.ReportMasterLayout', {
 	collapsible: true,
 	collapsed: true,
 	animCollapse: false,
+	bodystyle: 'border-color:#000; border-width:2px',
+	
+	//--------------------------------------------------------------------------    
+	listeners: {
+		afterrender: function(c) {
+			// NOTE: didn't like the expander tool appearing at the BOTTOM
+			//	of the rightmost collapsible panel. It is not very visible.
+			//	So, I move it from the last position to the first position...
+			var tool = c.reExpander.remove(c.reExpander.items.getAt(2), false);
+			c.reExpander.insert(0, tool);
+		},
+	},
 	
     //--------------------------------------------------------------------------
     initComponent: function() {

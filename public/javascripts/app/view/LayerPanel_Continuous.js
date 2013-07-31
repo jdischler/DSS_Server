@@ -137,17 +137,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 				y: 10,
 				html: me.DSS_LayerUnit,
 				width: 60
-			},/*{
-				xtype: 'button',
-				itemId: 'selectionbutton',
-				iconAlign: 'right',
-				x: 300,
-				y: 10,
-				text: 'Set Selection',
-				handler: function(me,evt) {
-					this.up().buildQuery();
-				}
-			},*/{
+			},{
 				xtype: 'label',
 				itemId: 'DSS_ValueRange',
 				x: 70,
@@ -181,27 +171,30 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 			
 			success: function(response, opts) {
 				
-				var label = container.getComponent('DSS_ValueRange');
-				
-				// Note: old versions of IE may not support Json.parse...
-				var obj = JSON.parse(response.responseText);
-				
-				if (obj.length == 0 || obj.layerMin == null || obj.layerMax == null) {
-					console.log("layer request object return was null?");
-					return;
+				// TODO: keep this check? Or should the server be sending a fail message?		
+				if (response.responseText != '') {
+					// Note: old versions of IE may not support Json.parse...
+					var obj = JSON.parse(response.responseText);
+	
+					var label = container.getComponent('DSS_ValueRange');
+					
+					if (obj.length == 0 || obj.layerMin == null || obj.layerMax == null) {
+						console.log("layer request object return was null?");
+						return;
+					}
+					container.DSS_LayerRangeMin = obj.layerMin;
+					container.DSS_LayerRangeMax = obj.layerMax;
+					
+					var rangeLabel = 'Range of values: ' + 
+								obj.layerMin.toFixed(1) + container.DSS_LayerUnit +
+								' to ' + 
+								obj.layerMax.toFixed(1) + container.DSS_LayerUnit;
+	
+					label.setText(rangeLabel);
 				}
-				container.DSS_LayerRangeMin = obj.layerMin;
-				container.DSS_LayerRangeMax = obj.layerMax;
-				
-				var rangeLabel = 'Range of values: ' + 
-        					obj.layerMin.toFixed(1) + container.DSS_LayerUnit +
-        					' to ' + 
-        					obj.layerMax.toFixed(1) + container.DSS_LayerUnit;
-
-				label.setText(rangeLabel);
 			},
 			
-			failure: function(respose, opts) {
+			failure: function(response, opts) {
 				console.log('layer request failed');
 				if (this.DSS_RequestTryCount < 5) {
 					console.log('trying again');

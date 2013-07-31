@@ -176,7 +176,17 @@ Ext.define('MyApp.view.LayerPanel_Common', {
 						text: 'Include this layer in your query?',
 						showDelay: 100
 					},
-					enableToggle: true
+					enableToggle: true,
+					handler: function(self) {
+						if (DSS_DoExpandQueried) {
+							if (self.pressed) {
+								c.expand();
+							}
+							else {
+								c.collapse();
+							}
+						}
+					}
 				});
 				c.header.add(queryButton);
 			}

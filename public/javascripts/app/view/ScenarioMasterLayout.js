@@ -1,5 +1,5 @@
 
-//------------------------------------------------------------------------------
+/*//------------------------------------------------------------------------------
 Ext.define('MyApp.view.ScenarioMasterLayout', {
 		
     extend: 'Ext.panel.Panel',
@@ -54,3 +54,41 @@ Ext.define('MyApp.view.ScenarioMasterLayout', {
     }
     
 });
+*/
+// TEST of new, simpler layout.
+//------------------------------------------------------------------------------
+Ext.define('MyApp.view.ScenarioMasterLayout', {
+		
+    extend: 'Ext.panel.Panel',
+    alias: 'widget.scenario_master_layout',
+
+	id: 'DSS_ScenarioPanel',
+	frameHeader: false,
+	border: false,
+	autoScroll: true,
+
+	dock: 'bottom',
+	height: 300,
+	dockedItems: [{
+		xtype: 'panel',
+		dock: 'top',
+		title: 'Scenario Setup / Tools',
+		icon: 'app/images/magnify_icon.png'
+	}],
+	
+    //--------------------------------------------------------------------------
+    initComponent: function() {
+    	
+        var me = this;
+        
+        Ext.applyIf(me, {
+			items: [{
+				xtype: 'scenariotools'
+			}]
+        });
+        
+        me.callParent(arguments);
+    }
+    
+});
+

@@ -17,21 +17,15 @@ Ext.Loader.setConfig({
     enabled: true,
 		paths: {
 			GeoExt: "http://geoext.github.com/geoext2/src/GeoExt",
-			Ext: "http://cdn.sencha.io/ext-4.1.1-gpl/src"
+			Ext: "http://cdn.sencha.io/ext-4.2.1-gpl/src"
 		}
 });
 
 Ext.application({
     stores: [
-        'store1'
     ],
     views: [
-        'InfoToolbar',
-        'MainViewport',
-        'TransformationTools',
-        'ManagementTools',
-        'EvaluationTools',
-        'GraphTools'
+        'MainViewport'
     ],
     autoCreateViewport: true,
     name: 'MyApp'

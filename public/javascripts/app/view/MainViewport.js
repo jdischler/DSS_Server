@@ -24,14 +24,8 @@ Ext.define('MyApp.view.MainViewport', {
 	extend: 'Ext.container.Viewport',
 	requires: [
 		'MyApp.view.InfoToolbar',
-		'MyApp.view.TransformationTools',
-		'MyApp.view.ManagementTools',
-		//'MyApp.view.EvaluationTools',
-		'MyApp.view.GraphTools',
 		'GeoExt.panel.Map',
 		'MyApp.view.ScenarioTools',
-		'MyApp.view.GlobalScenarioTools',
-		'MyApp.view.ReportTools',
 		'MyApp.view.LayerPanel_Google',
         'MyApp.view.LayerPanel_Indexed',
         'MyApp.view.LayerPanel_Continuous',
@@ -67,8 +61,8 @@ Ext.define('MyApp.view.MainViewport', {
 		var me = this;
 		var projectionType = "EPSG:3857";
 		var bounds = new OpenLayers.Bounds(
-			-10062652.65061, 5278060.469521415,// 5249032.6922889,
-			-9878152.65061, 5415259.640662575// 5385742.6922889
+			-10062652.65061, 5278060.469521415,
+			-9878152.65061, 5415259.640662575
 		);
 		var options = {
 			controls: [],
@@ -117,7 +111,7 @@ Ext.define('MyApp.view.MainViewport', {
 		var overviewMap = new OpenLayers.Control.OverviewMap({minRatio: 32, maxRatio:64, 
 			autoPan:true,
 			size: {w: 270, h: 120},
-			maximized: true
+			maximized: false
 		}); 
 		map.addControl(overviewMap);
 		var tip = Ext.create('Ext.tip.ToolTip', {
@@ -327,6 +321,7 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 		
+		// Slope is greater than or equal to 10.2 degrees and less than or equal to 20.3 degrees
 		var lpSlope = Ext.create('MyApp.view.LayerPanel_Continuous', {
 			title: 'Slope',
 			DSS_Layer: wmsSlope,
@@ -601,11 +596,12 @@ Ext.define('MyApp.view.MainViewport', {
 						xtype: 'view_select_toolbar' // docked top left
 					},
 					{
-						xtype: 'scenario_master_layout' // docked bottom left
+						xtype: 'scenariotools'//'scenario_master_layout' // docked bottom left
 					}]
 				},
 				{
-					xtype: 'report_master_layout' // docked right
+					xtype: 'report_master_layout', // docked right
+					id: 'DSS_report_panel',
 				}]
 			}]
         });

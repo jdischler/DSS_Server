@@ -32,7 +32,8 @@ Ext.define('MyApp.view.LogoPanel', {
 				src: 'app/images/dss_logo.png',
 				autoEl: {
 					tag: 'a',
-					href: 'http://www.glbrc.org'
+					href: 'http://www.glbrc.org',
+					onclick: "javascript:window.open(this.href,'_blank');return false;"	
 				}
 			},
 			{
@@ -41,7 +42,8 @@ Ext.define('MyApp.view.LogoPanel', {
 				src: 'app/images/globe_icon.png',
 				autoEl: {
 					tag: 'a',
-					href: 'http://www.glbrc.org'
+					href: 'http://www.glbrc.org',
+					onclick: "javascript:window.open(this.href,'_blank');return false;"	
 				}
 			},
 			{
@@ -50,7 +52,8 @@ Ext.define('MyApp.view.LogoPanel', {
 				src: 'app/images/globe_icon.png',
 				autoEl: {
 					tag: 'a',
-					href: 'http://www.glbrc.org'
+					href: 'http://www.glbrc.org',
+					onclick: "javascript:window.open(this.href,'_blank');return false;"	
 				}
 			}]
         });

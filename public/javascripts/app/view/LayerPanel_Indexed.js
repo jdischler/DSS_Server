@@ -42,27 +42,7 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
 //					type: 'vbox'
 					type: 'column'
 				}
-			}/*,
-			{
-				xtype: 'button',
-				itemId: 'selectionbutton',
-				iconAlign: 'right',
-				x: 300,
-				y: 35,
-				text: 'Set Selection',
-				handler: function() {
-					this.up().buildQuery();
-				}
-			},
-			{
-				xtype: 'button',
-				x: 300,
-				y: 60,
-				text: 'Clear Checks',
-				handler: function() {
-					this.up().clearChecks();
-				}
-			}*/]
+			}]
         });
 
         me.callParent(arguments);
@@ -97,30 +77,33 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
 			scope: container,
 			
 			success: function(response, opts) {
-				
-				// Note: old versions of IE may not support Json.parse...
-				var obj = JSON.parse(response.responseText);
-				
-				if (obj.length == 0) {
-					console.log("layer request object return was null?");
-					return;
+
+				// TODO: keep this check? Or should the server be sending a fail message?		
+				if (response.responseText != '') {				
+					// Note: old versions of IE may not support Json.parse...
+					var obj = JSON.parse(response.responseText);
+					
+					if (obj.length == 0) {
+						console.log("layer request object return was null?");
+						return;
+					}
+					
+					// adding multiple elements causes a layout calc each time...
+					//	disable that for performance
+					Ext.suspendLayouts();
+					var cont = this.getComponent('legendcontainer');
+					for (var i = 0; i < obj.length; i++) {
+						// add index for every other colouring
+						var element = Ext.create('MyApp.view.LegendElement', 
+							obj[i]);
+						cont.insert(i, element);
+					}
+					// Layouts were disabled...must turn them back on!!
+					Ext.resumeLayouts(true);
 				}
-				
-				// adding multiple elements causes a layout calc each time...
-				//	disable that for performance
-				Ext.suspendLayouts();
-				var cont = this.getComponent('legendcontainer');
-				for (var i = 0; i < obj.length; i++) {
-					// add index for every other colouring
-					var element = Ext.create('MyApp.view.LegendElement', 
-						obj[i]);
-					cont.insert(i, element);
-				}
-				// Layouts were disabled...must turn them back on!!
-				Ext.resumeLayouts(true);
 			},
 			
-			failure: function(respose, opts) {
+			failure: function(response, opts) {
 				console.log('layer request failed');
 				if (this.DSS_RequestTryCount < 5) {
 					console.log('trying again');

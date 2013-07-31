@@ -1,53 +1,53 @@
 
 // Toolbar for View / Selection panel
 
+var DSS_DoExpandQueried = true;
+
 //------------------------------------------------------------------------------
 Ext.define('MyApp.view.ViewSelectToolbar', {
 		
     extend: 'Ext.toolbar.Toolbar',
     alias: 'widget.view_select_toolbar',
 
+	style: {
+    	'background-color': '#ADC5B5'
+    },
+
     //--------------------------------------------------------------------------
     initComponent: function() {
         var me = this;
 
         Ext.applyIf(me, {
-			items: [{
-				xtype: 'tbspacer', 
-				width: 8
-			},
-			{	
-				xtype: 'button',
-				scale: 'small',
-				text: 'Expand',
-				tooltip: {
-					text: 'Expand all query groups',
-					showDelay: 100
-				},
-				border: 1,
-				style: {
-					borderColor: '#eff',
-					borderStyle: 'dotted'
-				},
-				handler: function(button) {
-					button.up().tryExpandAll();
-				}
-			},
+			items: [
 			{	
 				xtype: 'button',
 				scale: 'small',
 				text: 'Expand Queried',
+				enableToggle: true,
+				pressed: DSS_DoExpandQueried,
 				tooltip: {
 					text: 'Expand only queried layers',
 					showDelay: 100
 				},
 				border: 1,
-				style: {
-					borderColor: '#eff',
-					borderStyle: 'dotted'
-				},
 				handler: function(button) {
-					button.up().tryExpandQueried();
+					DSS_DoExpandQueried = button.pressed;
+					if (DSS_DoExpandQueried) {
+						button.up().tryExpandQueried();
+					}
+				}
+			},
+			{	
+				xtype: 'button',
+				scale: 'small',
+				text: 'Expand All',
+				tooltip: {
+					text: 'Expand all query groups',
+					showDelay: 100
+				},
+				border: 1,
+				handler: function(button) {
+					button.up().tryExpandAll();
 				}
 			},
 			{	
@@ -59,33 +59,29 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 					showDelay: 100
 				},
 				border: 1,
-				style: {
-					borderColor: '#eff',
-					borderStyle: 'dotted'
-				},
 				handler: function(button) {
 					button.up().tryCollapseAll();
 				}
+			},
+			{
+				xtype: 'tbspacer', 
+				width: 84
 			},
 			{
 				xtype: 'button',
 				itemId: 'DSS_queryButton',
 				scale: 'small',
 				text: 'Run Query',
-				iconAlign: 'right',
+				icon: 'app/images/go_icon_small.png',
 				tooltip: {
 					text: 'Run the current query and show selection results',
 					showDelay: 100
 				},
 				border: 1,
-				style: {
-					borderColor: '#eff',
-					borderStyle: 'dotted'
-				},
 				handler: function(button, evt, toolEl, owner, tool) {
 					button.up().buildQuery();
 				}
-			},
+			}/*,
 			{
 				xtype: 'button',
 				itemId: 'DSS_modelButton',
@@ -97,10 +93,6 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 					showDelay: 100
 				},
 				border: 1,
-				style: {
-					borderColor: '#eff',
-					borderStyle: 'dotted'
-				},
 				handler: function(button, evt, toolEl, owner, tool) {
 					button.up().buildModel();
 				}
@@ -115,14 +107,10 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 					showDelay: 100
 				},
 				border: 1,
-				style: {
-					borderColor: '#eff',
-					borderStyle: 'dotted'
-				},
 				handler: function(button, evt, toolEl, owner, tool) {
 					button.up().resetQuery();
 				}
-			}]
+			}*/]
         });
 
         me.callParent(arguments);
@@ -182,11 +170,8 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 				Ext.defer(function(response) {
 					// FIXME: bounds should probably be computed by the server and passed back!!!
 					var bounds = new OpenLayers.Bounds(
-						-10062652.65061, 5278060.469521415,// 5249032.6922889,
-						-9878152.65061, 5415259.640662575// 5385742.6922889
-//						-10062652.65061, 5249032.6922889,
-//						-10062652.65061 + (6150 * 30),
-//						5249032.6922889 + (4557 * 30)
+						-10062652.65061, 5278060.469521415,
+						-9878152.65061, 5415259.640662575
 					);
 					var imgTest = new OpenLayers.Layer.Image(
 						'Selection',
@@ -213,7 +198,7 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 					var summaryPanel = Ext.getCmp('DSS_ScenarioSummary');
 					summaryPanel.expand(true);
 					
-					button.setIcon(null);
+					button.setIcon('app/images/go_icon_small.png');
 					button.setDisabled(false);
 					
 				}, 1000, this, [response]);
@@ -221,7 +206,7 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 			},
 			
 			failure: function(respose, opts) {
-				button.setIcon(null);
+				button.setIcon('app/images/go_icon_small.png');
 				button.setDisabled(false);
 				alert("Query failed, request timed out?");
 			}

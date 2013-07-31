@@ -3,12 +3,13 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index()
-POST	/query						controllers.Application.query()
-POST	/layerParmRequest			controllers.Application.layerParmRequest()
-POST	/wmsRequest					controllers.Application.wmsRequest()
-POST	/models						controllers.Application.Models()
+GET     /						controllers.Application.index()
+POST	/query					controllers.Application.query()
+POST	/layerParmRequest		controllers.Application.layerParmRequest()
+POST	/wmsRequest				controllers.Application.wmsRequest()
+POST	/models					controllers.Application.Models()
 
 # Map static resources from the /public folder to the /assets URL path
 GET		/app/file/*file			controllers.Assets.at(path="/public/file", file)
-GET		/app/*file					controllers.Assets.at(path="/public/javascripts/app", file)
+GET		/app/*file				controllers.Assets.at(path="/public/javascripts/app", file)
+GET		/app/stylesheets		controllers.Assets.at(path="/public/stylesheets", file)

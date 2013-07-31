@@ -37,7 +37,7 @@ Ext.define('MyApp.view.MainViewport', {
         'MyApp.view.ReportMasterLayout'        
 	],
 	
-	autoScroll: true,
+	//autoScroll: true,
 	layout: {
 		type: 'fit'
 	},

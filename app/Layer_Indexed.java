@@ -78,21 +78,25 @@ public class Layer_Indexed extends Layer_Base
 
 			// now read the array data
 			while (br.ready()) {
-				String line = br.readLine();
-				String split[] = line.split(",");
-			
-				if (split.length != 3) {
-					Logger.info("  Parse error reading /layerData/" + mName + ".key");
-					Logger.info("  Error: <read>" + line);
-					throw new Exception();
-				}
-				else {
-					int index = Integer.parseInt(split[0].trim());
-					String label = split[1].trim();
-					String color = split[2].trim();
-							
-					Layer_Key keyItem = new Layer_Key(index, label, color);
-					mLayerKey.add(keyItem);
+				String line = br.readLine().trim();
+				
+				if (!line.startsWith(";") && line.length() > 0) {
+					String split[] = line.split(",");
+				
+					if (split.length != 3) {
+						Logger.info("  Parse error reading /layerData/" + mName + ".key");
+						Logger.info("  Error: <read>" + line);
+						Logger.info("    Expected Line Format: Index, Display Name, Display Color (hex)");
+						throw new Exception();
+					}
+					else {
+						int index = Integer.parseInt(split[0].trim());
+						String label = split[1].trim();
+						String color = split[2].trim();
+								
+						Layer_Key keyItem = new Layer_Key(index, label, color);
+						mLayerKey.add(keyItem);
+					}
 				}
 			}
 		}

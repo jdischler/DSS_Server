@@ -1,0 +1,11 @@
+; Category, 		Category Icon,			Unique Variable Name, 	Display Name, 			Default Value
+
+"Economic",			"economic_icon.png",	"p_corn",				"Corn Price",			120
+"Economic",			"economic_icon.png",	"p_grass",				"Grass Price",			100
+"Economic",			"economic_icon.png",	"p_eth",				"Ethanol Price",		300
+"Conversion Rates",	"scenario_icon.png",	"conv_corn",			"Corn Grain", 			1.8
+"Conversion Rates",	"scenario_icon.png",	"conv_stover",			"Stover",				1.4
+"Conversion Rates",	"scenario_icon.png",	"conv_grass",			"Grass", 				1.2
+"Climate",			"climage_icon.png",		"av_temp",				"Average Temperature",	76.1
+"Climate",			"climage_icon.png",		"av_rain",				"Average Rainfall",		19.2
+"Other",			"policy_icon.png",		"temp",					"Dunno",				1

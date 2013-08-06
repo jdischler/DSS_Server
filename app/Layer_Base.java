@@ -18,6 +18,7 @@ public abstract class Layer_Base
 	
 	protected String mName;
 	protected int mWidth, mHeight;
+	protected float mCellSize, mCornerX, mCornerY;
 	protected int mNoDataValue;
 	protected int[][] mIntData;
 
@@ -123,18 +124,25 @@ public abstract class Layer_Base
 		try {
 			String width = reader.readLine(); // ncols
 			String height = reader.readLine(); // nrows
-			
-			String tmp = reader.readLine(); /* xll corner */ Logger.info("  " + tmp);
-			tmp = reader.readLine(); /* yll corner */ Logger.info("  " + tmp);
-			tmp = reader.readLine(); /* cellsize */ Logger.info("  " + tmp);
+			String xllCorner = reader.readLine(); // xll corner
+			String yllCorner = reader.readLine(); // yll corner
+			String cellSize = reader.readLine(); // cellsize
 			String noData = reader.readLine(); // nodata value
 			
+			// Echo string values in ASC header
 			Logger.info("  " + width);
 			Logger.info("  " + height);
+			Logger.info("  " + xllCorner);
+			Logger.info("  " + yllCorner);
+			Logger.info("  " + cellSize);
 			Logger.info("  " + noData);
 			
+			// convert to required data types and save
 			mWidth = Integer.parseInt(getASC_HeaderValue(width));
 			mHeight = Integer.parseInt(getASC_HeaderValue(height));
+			mCornerX = Float.parseFloat(getASC_HeaderValue(xllCorner));
+			mCornerY = Float.parseFloat(getASC_HeaderValue(yllCorner));
+			mCellSize = Float.parseFloat(getASC_HeaderValue(cellSize));
 			mNoDataValue = Integer.parseInt(getASC_HeaderValue(noData));
 		}
 		catch (Exception e) {
@@ -323,7 +331,7 @@ public abstract class Layer_Base
 				buf.rewind();
 				channel.read(buf);
 				for (int x = 0; x < mWidth; x++) {
-					mIntData[y][x] = buf.getInt(x);
+					mIntData[y][x] = buf.getInt(x * 4);
 				}
 			}
 			channel.close();

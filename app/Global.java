@@ -7,14 +7,12 @@ import java.io.*;
 import org.codehaus.jackson.*;
 import org.codehaus.jackson.node.*;
 
-
 //------------------------------------------------------------------------------
 public class Global extends GlobalSettings
 {
 	// If the play server is started in DEV mode, should we skip loading certain layers
 	//	to get a faster server startup time and use less memory?
 	private static final boolean LOAD_ALL_LAYERS_FOR_DEV = false;
-	private static JsonNode mSendBack; 
 	
 	//--------------------------------------------------------------------------
 	@Override
@@ -24,25 +22,11 @@ public class Global extends GlobalSettings
 		cacheLayers();
 		systemReport("Data Layers Cached");
 				
-		Layer_Base tmp = Layer_Base.getLayer("rotation");
-		int w = tmp.getWidth();
-		int h = tmp.getHeight();
-		
-		Selection selection = new Selection(w, h);
-		
-		Logger.info("Server Run The Models Request:");
-		Models model = new Models();
 		File Output = new File("./layerData/Default");
-		if(Output.exists())
-		{
-			Logger.info("This folder is already exist");
-		}
-		else
+		if(!Output.exists())
 		{
 			Output.mkdir();
-			mSendBack = model.modeloutcome(null, selection, "Default", tmp.getIntData());
 		}
-
 	}
 	
 	//--------------------------------------------------------------------------
@@ -54,17 +38,6 @@ public class Global extends GlobalSettings
 		systemReport("Application stopped, Garbage Collection call made");
 	}
 	
-	//--------------------------------------------------------------------------
-	private String getValue(String line) {
-		
-		String split[] = line.split("\\s+");
-		if (split.length == 2) {
-			return split[1];
-		}
-		
-		return null;
-	}
-
 	//--------------------------------------------------------------------------
 	private void systemReport(String customMessage) {
 		
@@ -141,11 +114,6 @@ public class Global extends GlobalSettings
 		}
 		finally {
 		}
-	}
-
-	public static JsonNode GetDefaultSendBack()
-	{
-		return mSendBack;
 	}
 }
 

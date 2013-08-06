@@ -21,3 +21,9 @@ dist
 *.js~
 *.java#
 *.java~
+
+*.bin
+
+*.bin
+
+*.marks

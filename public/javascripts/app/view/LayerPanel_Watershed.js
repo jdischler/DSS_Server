@@ -101,6 +101,11 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
     //--------------------------------------------------------------------------
     setSelectionCriteria: function(jsonQuery) {
 
+    	if (!jsonQuery || !jsonQuery.queryLayers) {
+			this.header.getComponent('DSS_ShouldQuery').toggle(false);
+    		return;
+    	}
+    	
 		for (var i = 0; i < jsonQuery.queryLayers.length; i++) {
 		
 			var queryElement = jsonQuery.queryLayers[i];

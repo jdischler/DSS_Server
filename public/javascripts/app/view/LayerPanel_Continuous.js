@@ -15,6 +15,13 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
         					me.DSS_LayerRangeMin.toFixed(1) + me.DSS_LayerUnit +
         					' to ' + 
         					me.DSS_LayerRangeMax.toFixed(1) + me.DSS_LayerUnit;
+        					
+        if (!me.DSS_DefaultLessThanTest) {
+        	me.DSS_DefaultLessThanTest = '<=';
+        }
+        if (!me.DSS_DefaultGreaterThanTest) {
+        	me.DSS_DefaultGreaterThanTest = '>=';
+        }
         				
         Ext.applyIf(me, {
             items: [{
@@ -29,7 +36,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 				x: 70,
 				y: 6,
 				width: 30,
-				text: '>=',
+				text: me.DSS_DefaultGreaterThanTest, //'>=',
 				tooltip: {
 					text: 'Toggle greater than/equal',
 					showDelay: 100
@@ -94,7 +101,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 				x: 235,
 				y: 6,
 				width: 30,
-				text: '<=',
+				text: me.DSS_DefaultLessThanTest, // '<='
 				tooltip: {
 					text: 'Toggle less than/equal',
 					showDelay: 100
@@ -232,6 +239,16 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
     //--------------------------------------------------------------------------
     setSelectionCriteria: function(jsonQuery) {
 
+    	if (!jsonQuery || !jsonQuery.queryLayers) {
+			this.header.getComponent('DSS_ShouldQuery').toggle(false);
+			this.getComponent('DSS_GreaterThanTest').setText(this.DSS_DefaultGreaterThanTest);
+			this.getComponent('DSS_GreaterThanValue').setValue(this.DSS_ValueDefaultGreater);
+			this.getComponent('DSS_LessThanTest').setText(this.DSS_DefaultLessThanTest);
+			this.getComponent('DSS_LessThanValue').setValue(this.DSS_ValueDefaultLess);
+    		
+    		return;
+    	}
+    	
 		for (var i = 0; i < jsonQuery.queryLayers.length; i++) {
 		
 			var queryElement = jsonQuery.queryLayers[i];

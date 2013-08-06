@@ -2,6 +2,7 @@
 // Toolbar for View / Selection panel
 
 var DSS_DoExpandQueried = true;
+var DSS_ViewSelectToolbar = null;
 
 //------------------------------------------------------------------------------
 Ext.define('MyApp.view.ViewSelectToolbar', {
@@ -17,6 +18,8 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
     initComponent: function() {
         var me = this;
 
+        DSS_ViewSelectToolbar = this;
+        
         Ext.applyIf(me, {
 			items: [
 			{	
@@ -79,48 +82,41 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 				},
 				border: 1,
 				handler: function(button, evt, toolEl, owner, tool) {
-					button.up().buildQuery();
+					var panel = button.up();
+					var query = panel.buildQuery();
+					if (query) {
+						console.log(query);
+						panel.submitQuery(query);
+					}
+					else {
+						alert("No query built - nothing to query");
+					}
 				}
-			}/*,
-			{
-				xtype: 'button',
-				itemId: 'DSS_modelButton',
-				scale: 'small',
-				text: 'Run Model',
-				iconAlign: 'right',
-				tooltip: {
-					text: 'Run the Model using the current query',
-					showDelay: 100
-				},
-				border: 1,
-				handler: function(button, evt, toolEl, owner, tool) {
-					button.up().buildModel();
-				}
-			},
-			{
-				xtype: 'button',
-				scale: 'small',
-				text: '!!',
-				iconAlign: 'right',
-				tooltip: {
-					text: 'Test resetting query elements',
-					showDelay: 100
-				},
-				border: 1,
-				handler: function(button, evt, toolEl, owner, tool) {
-					button.up().resetQuery();
-				}
-			}*/]
+			}]
         });
 
         me.callParent(arguments);
     },
 
+	// Takes the json query that goes to the server and sets up each of the query
+	//	layer panels to the settings that match the query
+	//--------------------------------------------------------------------------
+	setUpSelectionFromQuery: function(queryJson) {
+		
+		for (var i = 0; i < DSS_globalQueryableLayers.length; i++) {
+		
+			DSS_globalQueryableLayers[i].setSelectionCriteria(queryJson);
+		}
+		if (DSS_DoExpandQueried) {
+			this.tryExpandQueried();
+		}
+	},
+    
     //--------------------------------------------------------------------------
     buildQuery: function() {
     	
        	var requestData = {
-    		clientID: 12345, //temp
+    		clientID: 12345, // FIXME: temp
     		queryLayers: []
     	};
 
@@ -134,13 +130,11 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
     		}
     	}
     	
-		console.log(requestData);
 		if (query) {
-			this.submitQuery(requestData);
-			this.testStoreQuery = requestData;
+			return requestData;
 		}
 		else {
-			alert("No query built - nothing to query");
+			return null;
 		}
     },
     
@@ -214,71 +208,6 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 	},
 	
 	//--------------------------------------------------------------------------
-	buildModel: function() {
-	
-		var requestData = {
-			clientID: 12345, //temp
-			transforms: []
-		};
-		
-		var transform = {
-			queryLayers: [],
-			newLandUse: 1
-		};
-		
-		var haveQuery = false;
-		for (var i = 0; i < DSS_globalQueryableLayers.length; i++) {
-			
-			if (DSS_globalQueryableLayers[i].includeInQuery()) {
-				var queryComp = DSS_globalQueryableLayers[i].getSelectionCriteria();
-				transform.queryLayers.push(queryComp);
-				haveQuery = true;
-			}
-		}
-	
-		requestData.transforms.push(transform);
-		
-		console.log(requestData);
-		if (haveQuery) {
-			this.submitModel(requestData);
-		}
-		else {
-			alert("No query built - nothing to query");
-		}
-	},
-	
-    //--------------------------------------------------------------------------
-    submitModel: function(queryJson) {
-    	
-		var button = this.getComponent('DSS_modelButton');
-		button.setIcon('app/images/spinner_16a.gif');
-		button.setDisabled(true);
-
-		var obj = Ext.Ajax.request({
-			url: location.href + 'models',
-			jsonData: queryJson,
-			timeout: 15000000, // in milliseconds
-			
-			success: function(response, opts) {
-				
-				var obj = JSON.parse(response.responseText);
-				console.log("success: ");
-				console.log(obj);
-				
-				Ext.getCmp('Model_Graph').SetData(obj);
-				button.setIcon(null);
-				button.setDisabled(false);
-			},
-			
-			failure: function(respose, opts) {
-				button.setIcon(null);
-				button.setDisabled(false);
-				alert("Model run failed, request timed out?");
-			}
-		});
-	},
-
-	//--------------------------------------------------------------------------
 	tryExpandAll: function() {
 		
 		// NOTE: Each layer expand causes a layout calculation...much more efficient
@@ -325,16 +254,7 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
     		}
 		}
 		Ext.resumeLayouts(true);
-	},
-
-	//--------------------------------------------------------------------------
-	resetQuery: function() {
-		
-    	for (var i = 0; i < DSS_globalQueryableLayers.length; i++) {
-    		
-    		DSS_globalQueryableLayers[i].setSelectionCriteria(this.testStoreQuery);
-    	}
-    }
+	}
 
 });
 

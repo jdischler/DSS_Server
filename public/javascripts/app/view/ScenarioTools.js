@@ -9,18 +9,64 @@ var ScenarioGridStore = Ext.create('Ext.data.Store', {
     data: {
         items: [{ 
         	Active: true, 
-            SelectionName: 'Untitled Selection', 
-        	TransformText: 'To Woodland',
+            SelectionName: 'Unstable Crops', 
+        	TransformText: 'To Perennial Grass',
         	ManagementText: '<b><i>Management Options:</i></b></br>None',
-        	Transform: 11,
-        	Query: null
-        }/*, {
+        	Transform: 9,
+        	Query: {
+        		clientID: 0,
+        		queryLayers: [{
+					name: 'rotation',
+					type: 'indexed',
+					matchValues: [1,2,3]
+        		},
+        		{
+        			greaterThanTest: '>=',
+        			greaterThanValue: 5,
+        			lessThanTest: '<=',
+        			lessThanValue: null,
+        			name: 'slope',
+        			type: 'continuous'
+        		},
+        		{
+        			greaterThanTest: '>=',
+        			greaterThanValue: null,
+        			lessThanTest: '<=',
+        			lessThanValue: 250,
+        			name: 'rivers',
+        			type: 'continuous'
+        		}]
+        	}
+        }, {
         	Active: false, 
-            SelectionName: 'Some other', 
-        	TransformText: 'some disabled thing',
-        	Transform: null,
-        	Query: null
-        }*/]
+            SelectionName: 'Stable Grasses', 
+        	TransformText: 'To Continuous Corn',
+        	Transform: 1,
+        	Query:  {
+        		clientID: 0,
+        		queryLayers: [{
+					name: 'rotation',
+					type: 'indexed',
+					matchValues: [8,9]
+        		},
+        		{
+        			greaterThanTest: '>=',
+        			greaterThanValue: null,
+        			lessThanTest: '<=',
+        			lessThanValue: 5,
+        			name: 'slope',
+        			type: 'continuous'
+        		},
+        		{
+        			greaterThanTest: '>=',
+        			greaterThanValue: 250,
+        			lessThanTest: '<=',
+        			lessThanValue: null,
+        			name: 'rivers',
+        			type: 'continuous'
+        		}]
+        	}
+        }]
     },
     proxy: {
         type: 'memory',
@@ -39,7 +85,8 @@ Ext.define('MyApp.view.ScenarioTools', {
     alias: 'widget.scenariotools',
 
     requires: [
-    	'MyApp.view.GlobalScenarioPopup',
+//    	'MyApp.view.GlobalScenarioPopup',
+    	'MyApp.view.Assumptions.PropertyWindow',
     	'MyApp.view.TransformPopup'
     ],
     
@@ -99,7 +146,7 @@ Ext.define('MyApp.view.ScenarioTools', {
 				mouseOffset: [15,-40] // make it pop up at a lower Y value than normal (18)
 			},
 			handler: function(self) {
-				var window = Ext.create('MyApp.view.GlobalScenarioPopup');
+				var window = Ext.create('MyApp.view.Assumptions.PropertyWindow');//'MyApp.view.GlobalScenarioPopup');
 				var pos = [self.getPosition()[0], self.up().getPosition()[1]];
 //				console.log(pos);
 				window.show();
@@ -137,6 +184,8 @@ Ext.define('MyApp.view.ScenarioTools', {
 						// no real need for validation, but if we don't commit the changes,
 						//	changed fields will show a red triangle in the corner...
 						e.record.commit();
+						var dssLeftPanel = Ext.getCmp('DSS_LeftPanel');
+						dssLeftPanel.up().DSS_SetTitle(e.record.get('SelectionName'));
 					}
 				}
 			}
@@ -154,8 +203,33 @@ Ext.define('MyApp.view.ScenarioTools', {
 	listeners: {
 		celldblclick: function(me, td, cellIndex, record, tr, rowIndex, e, eOpts) {
 			
-			if (cellIndex != 1) return;
-			me.up().showTransformPopup(me, rowIndex);
+			if (cellIndex == 3) {
+				record.set('Active', !record.get('Active')); // Toggle active field
+				record.commit();
+			}
+			else if (cellIndex == 1) {
+				me.up().showTransformPopup(me, rowIndex);
+			}
+		},
+		beforeselect: function(me, record, index, eOpts) {
+			
+			if (me.selected.getCount() > 0) {
+				var oldRecord = me.getSelection()[0];
+				if (oldRecord) {
+					var query = DSS_ViewSelectToolbar.buildQuery()
+					oldRecord.set('Query', query);
+					oldRecord.commit();
+				}
+			}
+		},
+		select: function(me, record, index, eOpts) {
+			console.log('Calling into select...setting up a query');
+			var query = record.get('Query');
+			console.log(query);
+			DSS_ViewSelectToolbar.setUpSelectionFromQuery(query);
+			var dssLeftPanel = Ext.getCmp('DSS_LeftPanel');
+			dssLeftPanel.up().DSS_SetTitle(record.get('SelectionName'));
+
 		}
 	},
 	//--------------------------------------------------------------------------
@@ -186,10 +260,15 @@ Ext.define('MyApp.view.ScenarioTools', {
 			xtype: 'actioncolumn',
 			width: 20,
 			resizable: false,
-			icon: 'app/images/switch_icon.png',
-			tooltip: 'Edit Transform & Management Options',
+			icon: 'app/images/eye_icon.png',
+			tooltip: 'View selection for this tranform',
 			handler: function(grid, rowIndex, colIndex) {
-				grid.up().showTransformPopup(grid, rowIndex);
+				var record = grid.getStore().getAt(rowIndex);
+				grid.getSelectionModel().select([record]); // make record selected to make things less confusing IMO
+				var query = record.get('Query');
+				if (query) {
+					DSS_ViewSelectToolbar.submitQuery(query);
+				}
 			}
 		},
 		{
@@ -221,11 +300,11 @@ Ext.define('MyApp.view.ScenarioTools', {
 			DSS_Transform: {Type: transform},
 			listeners: {
 				beforedestroy: {
-					fn: function() {
-						if (window.DSS_Transform) {
-							record.set('Transform', window.DSS_Transform.Type);
-							record.set('TransformText', window.DSS_Transform.Text);
-							record.set('ManagementText', window.DSS_Transform.Management);
+					fn: function(win) {
+						if (win.DSS_Transform) {
+							record.set('Transform', win.DSS_Transform.Type);
+							record.set('TransformText', win.DSS_Transform.Text);
+							record.set('ManagementText', win.DSS_Transform.Management);
 							record.commit();
 						}
 					}

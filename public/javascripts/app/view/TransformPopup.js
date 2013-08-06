@@ -32,6 +32,8 @@ Ext.define('MyApp.view.TransformPopup', {
     },
 	modal: true,
     resizable: false,
+    // should use Ok/Apply or cancel buttons...	OR...fix the bugs with closing via [X] or Esc
+    closable: false,
 	icon: 'app/images/layers_icon.png',
     title: 'Transform and Management Options',
 

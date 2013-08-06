@@ -16,6 +16,7 @@ var DSS_LogoPanelHeight = 64;
 // boo
 var DSS_globalQueryableLayers = [];
 var DSS_globalCollapsibleLayers = [];
+var DSS_AssumptionsDefaults = null;
 
 //------------------------------------------------------------------------------
 Ext.define('MyApp.view.MainViewport', {
@@ -80,7 +81,8 @@ Ext.define('MyApp.view.MainViewport', {
 		
 		me.callParent(arguments);
 		this.addMapLayers(map);
-		this.addMapControls(map);		
+		this.addMapControls(map);	
+		this.getAssumptions();
 	},
 
 	// Controls wired up to DOM elements need some manner of delay other control
@@ -561,16 +563,25 @@ Ext.define('MyApp.view.MainViewport', {
 					},
 					manageHeight: false,
 					title: 'View / Select',
-
+					DSS_NamedQuery: 'Untitled',
 					listeners: {
 						collapse: function(p, eOpts) { 
-							p.setTitle('View / Select / Scenario Tools');
+							p.setTitle('View / Select / Scenario Tools - "' + p.DSS_NamedQuery + '"');
 						},
 						beforeexpand: function(p, animated, eOpts) {
-							p.setTitle('View / Select');
+							p.setTitle('View / Select - "' + p.DSS_NamedQuery + '"');
 						},
 					},
-				
+
+					DSS_SetTitle: function(queryName) {
+						this.DSS_NamedQuery = queryName;
+						if (this.getCollapsed()) {
+							this.setTitle('View / Select / Scenario Tools - "' + this.DSS_NamedQuery + '"');
+						}
+						else {
+							this.setTitle('View / Select - "' + this.DSS_NamedQuery + '"');
+						}
+					},
 					layout: {
 						fill: false,
 						autoWidth: false
@@ -605,7 +616,30 @@ Ext.define('MyApp.view.MainViewport', {
 				}]
 			}]
         });
-    }
-
+    },
+    
+	//--------------------------------------------------------------------------
+    getAssumptions: function() {
+    	
+    	console.log('Trying to get default assumptions from: ' + location.href + 'getAssumptions');
+    	
+		var obj = Ext.Ajax.request({
+			url: location.href + 'getAssumptions',
+			method: 'POST',
+			timeout: 10 * 1000, // seconds * (i.e. converted to) milliseconds
+			
+			success: function(response, opts) {
+				
+				var obj = JSON.parse(response.responseText);
+				console.log("getAssumptions success: ");
+				console.log(obj);
+				DSS_AssumptionsDefaults = obj;
+			},
+			
+			failure: function(respose, opts) {
+				alert("GetAssumptions call failed, request timed out?");
+			}
+		});
+	}
 });
 

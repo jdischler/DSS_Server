@@ -355,7 +355,7 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 
-		var lpRoad = Ext.create('MyApp.view.LayerPanel_Continuous', {
+/*		var lpRoad = Ext.create('MyApp.view.LayerPanel_Continuous', {
 			title: 'Distance to Road',
 			DSS_ShortTitle: 'Road',
 			DSS_AutoSwapTitles: false,
@@ -368,7 +368,7 @@ Ext.define('MyApp.view.MainViewport', {
 			DSS_QueryTable: 'roads',
 			collapsed: true
 		});
-		
+*/		
 		var lpSOC = Ext.create('MyApp.view.LayerPanel_Continuous', {
 			title: 'SOC (Soil Organic Carbon)',
 			DSS_ShortTitle: 'SOC',
@@ -397,7 +397,7 @@ Ext.define('MyApp.view.MainViewport', {
 		dssLeftPanel.insert(0,lpLCC);
 		dssLeftPanel.insert(0,lpSlope);
 		dssLeftPanel.insert(0,lpWatershed);
-		dssLeftPanel.insert(0,lpRoad);
+//		dssLeftPanel.insert(0,lpRoad);
 		dssLeftPanel.insert(0,lpRiver);
 		dssLeftPanel.insert(0,lpCDL);
 		Ext.resumeLayouts(true);
@@ -408,7 +408,7 @@ Ext.define('MyApp.view.MainViewport', {
 		DSS_globalQueryableLayers.push(lpLCC);
 		DSS_globalQueryableLayers.push(lpLCS);
 		DSS_globalQueryableLayers.push(lpWatershed);
-		DSS_globalQueryableLayers.push(lpRoad);
+//		DSS_globalQueryableLayers.push(lpRoad);
 		DSS_globalQueryableLayers.push(lpRiver);
 		DSS_globalQueryableLayers.push(lpSOC);
 		
@@ -418,7 +418,7 @@ Ext.define('MyApp.view.MainViewport', {
 		DSS_globalCollapsibleLayers.push(lpLCS);
 		DSS_globalCollapsibleLayers.push(lpSlope);
 		DSS_globalCollapsibleLayers.push(lpWatershed);
-		DSS_globalCollapsibleLayers.push(lpRoad);
+//		DSS_globalCollapsibleLayers.push(lpRoad);
 		DSS_globalCollapsibleLayers.push(lpRiver);
 		DSS_globalCollapsibleLayers.push(lpCDL);
 		

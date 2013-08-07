@@ -103,7 +103,7 @@ public class Global extends GlobalSettings
 				layer = new Layer_Continuous("soc"); layer.init();
 			
 				// distance to road can get clamped to the nearest int value without losing much...
-				layer = new Layer_Continuous("roads"); layer.init();
+//				layer = new Layer_Continuous("roads"); layer.init();
 				
 				layer = new Layer_Indexed("lcc"); layer.init();
 				layer = new Layer_Indexed("lcs"); layer.init();

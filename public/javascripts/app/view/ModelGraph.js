@@ -304,96 +304,126 @@ Ext.define('MyApp.view.ModelGraph', {
 	SetData: function(obj)
     {
     	// Habitat Index
-    	var val1 = obj.Default.Habitat_Index.Average_HI;
-    	var val2 = obj.Transform.Habitat_Index.Average_HI;
+    	//var val1 = obj.Default.Habitat_Index.Average_HI;
+    	//var val2 = obj.Transform.Habitat_Index.Average_HI;
+    	var val1 = obj.Habitat_Index_D.Average_HI;
+    	var val2 = obj.Habitat_Index_T.Average_HI;
     	var Habitat_Text = this.getComponent('Habitat_Index');
-    	Habitat_Text.setValue(val1-val2);
+    	Habitat_Text.setValue(val2-val1);
     	
     	// Nitrogen
-    	var val3 = obj.Default.Nitrogen.Nitrogen;
-    	var val4 = obj.Transform.Nitrogen.Nitrogen;
+    	//var val3 = obj.Default.Nitrogen.Nitrogen;
+    	//var val4 = obj.Transform.Nitrogen.Nitrogen;
+    	var val3 = obj.Nitrogen_D.Nitrogen;
+    	var val4 = obj.Nitrogen_T.Nitrogen;
     	var Nitrogen_Text = this.getComponent('Nitrogen');
-    	Nitrogen_Text.setValue(val3-val4);
+    	Nitrogen_Text.setValue(val4-val3);
     	
     	// Phosphorus
-    	var val5 = obj.Default.Phosphorus.Phosphorus;
-    	var val6 = obj.Transform.Phosphorus.Phosphorus;
+    	//var val5 = obj.Default.Phosphorus.Phosphorus;
+    	//var val6 = obj.Transform.Phosphorus.Phosphorus;
+    	var val5 = obj.Phosphorus_D.Phosphorus;
+    	var val6 = obj.Phosphorus_T.Phosphorus;
     	var Phosphorus_Text = this.getComponent('Phosphorus');
-    	Phosphorus_Text.setValue(val5-val6);
+    	Phosphorus_Text.setValue(val6-val5);
     	
     	// Crop Pest
-    	var val7 = obj.Default.Pest.Pest;
-    	var val8 = obj.Transform.Pest.Pest;
+    	//var val7 = obj.Default.Pest.Pest;
+    	//var val8 = obj.Transform.Pest.Pest;
+    	var val7 = obj.Pest_Suppression_D.Pest;
+    	var val8 = obj.Pest_Suppression_T.Pest;
     	var Pest_Text = this.getComponent('Crop_Pest');
-    	Pest_Text.setValue(val7-val8);
+    	Pest_Text.setValue(val8-val7);
     	
     	// Pollinator
-    	var val9 = obj.Default.Pollinator.Pollinator;
-    	var val10 = obj.Transform.Pollinator.Pollinator;
+    	//var val9 = obj.Default.Pollinator.Pollinator;
+    	//var val10 = obj.Transform.Pollinator.Pollinator;
+    	var val9  = obj.Pollinator_D.Pollinator;
+    	var val10 = obj.Pollinator_T.Pollinator;
     	var Pollinator_Text = this.getComponent('Pollinator');
-    	Pollinator_Text.setValue(val9-val10);
+    	Pollinator_Text.setValue(val10-val9);
     	
     	// Biomass
-    	var val11 = obj.Default.Ethanol.Ethanol;
-    	var val12 = obj.Transform.Ethanol.Ethanol;
+    	//var val11 = obj.Default.Ethanol.Ethanol;
+    	//var val12 = obj.Transform.Ethanol.Ethanol;
+    	var val11 = obj.Ethanol_D.Ethanol;
+    	var val12 = obj.Ethanol_T.Ethanol;
     	var Biomass_Text = this.getComponent('Biomass');
-    	Biomass_Text.setValue(val11-val12);
+    	Biomass_Text.setValue(val12-val11);
     	
     	// Net_Income
-    	var val13 = obj.Default.Net_Income.Net_Income;
-    	var val14 = obj.Transform.Net_Income.Net_Income;
+    	//var val13 = obj.Default.Net_Income.Net_Income;
+    	//var val14 = obj.Transform.Net_Income.Net_Income;
+    	var val13 = obj.Net_Income_D.Net_Income;
+    	var val14 = obj.Net_Income_T.Net_Income;
     	var Net_Energy_Text = this.getComponent('Net_Income');
-    	Net_Energy_Text.setValue(val13-val14);
+    	Net_Energy_Text.setValue(val14-val13);
     	
     	// Net_Energy
-    	var val15 = obj.Default.Net_Energy.Net_Energy;
-    	var val16 = obj.Transform.Net_Energy.Net_Energy;
+    	//var val15 = obj.Default.Net_Energy.Net_Energy;
+    	//var val16 = obj.Transform.Net_Energy.Net_Energy;
+    	var val15 = obj.Net_Energy_D.Net_Energy;
+    	var val16 = obj.Net_Energy_T.Net_Energy;
     	var Net_Energy_Text = this.getComponent('Net_Energy');
-    	Net_Energy_Text.setValue(val15-val16);
-    	
-    	
+    	Net_Energy_Text.setValue(val16-val15);
     	
     	
     	
     	// Graph_Habitat_Index
     	var Habitat_Button = this.getComponent('Graph_Habitat_Index');
-    	Habitat_Button.graphdataD = obj.Default.Habitat_Index;
-    	Habitat_Button.graphdataT = obj.Transform.Habitat_Index;
+    	//Habitat_Button.graphdataD = obj.Default.Habitat_Index;
+    	//Habitat_Button.graphdataT = obj.Transform.Habitat_Index;
+    	Habitat_Button.graphdataD = obj.Habitat_Index_D;
+    	Habitat_Button.graphdataT = obj.Habitat_Index_T;
     	
     	// Graph_Nitrogen
     	var Nitrogen_Button = this.getComponent('Graph_Nitrogen');
-    	Nitrogen_Button.graphdataD = obj.Default.Nitrogen;
-    	Nitrogen_Button.graphdataT = obj.Transform.Nitrogen;
+    	//Nitrogen_Button.graphdataD = obj.Default.Nitrogen;
+    	//Nitrogen_Button.graphdataT = obj.Transform.Nitrogen;
+    	Nitrogen_Button.graphdataD = obj.Nitrogen_D;
+    	Nitrogen_Button.graphdataT = obj.Nitrogen_T;
     	
     	// Graph_Phosphorus
     	var Phosphorus_Button = this.getComponent('Graph_Phosphorus');
-    	Phosphorus_Button.graphdataD = obj.Default.Phosphorus;
-    	Phosphorus_Button.graphdataT = obj.Transform.Phosphorus;
+    	//Phosphorus_Button.graphdataD = obj.Default.Phosphorus;
+    	//Phosphorus_Button.graphdataT = obj.Transform.Phosphorus;
+    	Phosphorus_Button.graphdataD = obj.Phosphorus_D;
+    	Phosphorus_Button.graphdataT = obj.Phosphorus_T;
     	
     	// Graph_Crop_Pest
     	var Pest_Button = this.getComponent('Graph_Crop_Pest');
-    	Pest_Button.graphdataD = obj.Default.Pest;
-    	Pest_Button.graphdataT = obj.Transform.Pest;
+    	//Pest_Button.graphdataD = obj.Default.Pest;
+    	//Pest_Button.graphdataT = obj.Transform.Pest;
+    	Pest_Button.graphdataD = obj.Pest_Suppression_D;
+    	Pest_Button.graphdataT = obj.Pest_Suppression_T;
     	
     	// Graph_Pollinator
     	var Pollinator_Button = this.getComponent('Graph_Pollinator');
-    	Pollinator_Button.graphdataD = obj.Default.Pollinator;
-    	Pollinator_Button.graphdataT = obj.Transform.Pollinator;
+    	//Pollinator_Button.graphdataD = obj.Default.Pollinator;
+    	//Pollinator_Button.graphdataT = obj.Transform.Pollinator;
+    	Pollinator_Button.graphdataD = obj.Pollinator_D;
+    	Pollinator_Button.graphdataT = obj.Pollinator_T;
     	
     	// Graph_Biomass
     	var Biomass_Button = this.getComponent('Graph_Biomass');
-    	Biomass_Button.graphdataD = obj.Default.Ethanol;
-    	Biomass_Button.graphdataT = obj.Transform.Ethanol;
+    	//Biomass_Button.graphdataD = obj.Default.Ethanol;
+    	//Biomass_Button.graphdataT = obj.Transform.Ethanol;
+    	Biomass_Button.graphdataD = obj.Ethanol_D;
+    	Biomass_Button.graphdataT = obj.Ethanol_T;
     	
     	// Graph_Net_Income
     	var Net_Income_Button = this.getComponent('Graph_Net_Income');
-    	Net_Income_Button.graphdataD = obj.Default.Net_Income;
-    	Net_Income_Button.graphdataT = obj.Transform.Net_Income;
+    	//Net_Income_Button.graphdataD = obj.Default.Net_Income;
+    	//Net_Income_Button.graphdataT = obj.Transform.Net_Income;
+    	Net_Income_Button.graphdataD = obj.Net_Income_D;
+    	Net_Income_Button.graphdataT = obj.Net_Income_T;
     	
     	// Graph_Net_Energy
     	var Net_Energy_Button = this.getComponent('Graph_Net_Energy');
-    	Net_Energy_Button.graphdataD = obj.Default.Net_Energy;
-    	Net_Energy_Button.graphdataT = obj.Transform.Net_Energy;
+    	//Net_Energy_Button.graphdataD = obj.Default.Net_Energy;
+    	//Net_Energy_Button.graphdataT = obj.Transform.Net_Energy;
+    	Net_Energy_Button.graphdataD = obj.Net_Energy_D;
+    	Net_Energy_Button.graphdataT = obj.Net_Energy_T;
     	
     	
     	

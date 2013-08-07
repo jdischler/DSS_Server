@@ -39,6 +39,7 @@ public class Models
 		int width, height;
 		int NO_DATA = -9999;
 		float Total_Cells = selection.countSelectedPixels();
+		Logger.info("Total_Cells:" + Float.toString(Total_Cells));
 		
 		// Ton/ha
 		//float Min_Corn_Y = 3.08f - 0.11f * 70;
@@ -497,6 +498,8 @@ public class Models
 						{
 							Grass_Y = 2.20f - 0.07f * Float.parseFloat(slope[x]) + 0.02f * Float.parseFloat(soil[x]) + 0.07f * Float.parseFloat(silt[x]) + 0.03f * Float.parseFloat(cec[x]);
 							Grass_P = 0.0001f * 900 * Grass_Y;
+							// Ethonal Calculation
+							// Tonnes per pixel
 							Ethanol = Grass_P * 0.38f * 1000;
 							//Ethanol_T = Ethanol_G / G_E_Max;
 							//Ethanol_T = Ethanol_G;

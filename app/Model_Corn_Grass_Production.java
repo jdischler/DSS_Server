@@ -19,7 +19,7 @@ public class Model_Corn_Grass_Production
 	static int mWidth, mHeight;
 	
 	//--------------------------------------------------------------------------
-	public TwoArrays Corn_Grass_P(JsonNode requestBody, Selection selection, String Output_Folder, int[][] RotationT)
+	public TwoArrays Corn_Grass_P(Selection selection, String Output_Folder, int[][] RotationT)
 	{
 		
 		Layer_Base layer;
@@ -39,17 +39,17 @@ public class Model_Corn_Grass_Production
 		float[] Grass_P = new float[Total_Cells];
 		
 		// Ton/ha
-		float Min_Corn_Y = 3.08f - 0.11f * 70;
-		float Max_Corn_Y = 3.08f + 0.02f * 210 + 0.10f * 75 + 0.04f * 200;
+		//float Min_Corn_Y = 3.08f - 0.11f * 70;
+		//float Max_Corn_Y = 3.08f + 0.02f * 210 + 0.10f * 75 + 0.04f * 200;
 		// Tons per pixel
-		float Min_Corn_P = 0.0001f * 900 * Min_Corn_Y;
-		float Max_Corn_P = 0.0001f * 900 * Max_Corn_Y;
+		//float Min_Corn_P = 0.0001f * 900 * Min_Corn_Y;
+		//float Max_Corn_P = 0.0001f * 900 * Max_Corn_Y;
 		// Ton/ha
-		float Min_Grass_Y = 2.20f - 0.07f * 70;
-		float Max_Grass_Y = 2.20f + 0.02f * 210 + 0.07f * 75 + 0.03f * 200;
+		//float Min_Grass_Y = 2.20f - 0.07f * 70;
+		//float Max_Grass_Y = 2.20f + 0.02f * 210 + 0.07f * 75 + 0.03f * 200;
 		// Tons per pixel
-		float Min_Grass_P = 0.0001f * 900 * Min_Grass_Y;
-		float Max_Grass_P = 0.0001f * 900 * Max_Grass_Y;
+		//float Min_Grass_P = 0.0001f * 900 * Min_Grass_Y;
+		//float Max_Grass_P = 0.0001f * 900 * Max_Grass_Y;
 		
 		// Rotation
 		int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
@@ -63,26 +63,18 @@ public class Model_Corn_Grass_Production
 			width = layer.getWidth();
 			height = layer.getHeight();
 		
-		// Slope
-		//int[][] Slope = Layer_Base.getLayer("Slope").getIntData();
-		//if (Slope == null){
-		//	Logger.info("Fail Slope");
-		//	layer = new Layer_Raw("Slope"); layer.init();
-		//	Slope = Layer_Base.getLayer("Slope").getIntData();
-		//}
-		
 		try {
 
 			// Raad Input Files
-			BufferedReader br1 = HeaderRead("slope-soil", width, height, "Inputs");
-			BufferedReader br2 = HeaderRead("depth", width, height, "Inputs");
-			BufferedReader br3 = HeaderRead("silt", width, height, "Inputs");
-			BufferedReader br4 = HeaderRead("cec", width, height, "Inputs");
+			BufferedReader br1 =  new HeaderRead("slope-soil", width, height, "Inputs").getReader();
+			BufferedReader br2 = new HeaderRead("depth", width, height, "Inputs").getReader();
+			BufferedReader br3 = new HeaderRead("silt", width, height, "Inputs").getReader();
+			BufferedReader br4 = new HeaderRead("cec", width, height, "Inputs").getReader();
 			
 			// Cron Production
-			PrintWriter out_C = HeaderWrite("Cron_Production", width, height, Output_Folder);
+			PrintWriter out_C = new HeaderWrite("Cron_Production", width, height, Output_Folder).getWriter();
 			// Grass Production
-			PrintWriter out_G = HeaderWrite("Grass_Production", width, height, Output_Folder);
+			PrintWriter out_G = new HeaderWrite("Grass_Production", width, height, Output_Folder).getWriter();
 			
 			// Precompute this so we don't do it on every cell
 			String stringNoData = Integer.toString(NO_DATA);
@@ -162,64 +154,6 @@ public class Model_Corn_Grass_Production
 		}
 		
 		return new TwoArrays(Corn_P, Grass_P);
-	}
-
-		
-	// public class TwoArrays  
-	// {  
-		  // public float[] a;  
-		  // public float[] b;  
-		  // public TwoArrays(float[] a, float[] b)  
-		  // {  
-		    // this.a = a; this.b = b;  
-		  // }  
-	// }
-
-	// Write Header To The File
-	public PrintWriter HeaderWrite(String name, int W, int H, String Output_Folder) 
-	{
-		PrintWriter out = null;
-		
-		try 
-		{
-			out = new PrintWriter(new BufferedWriter(new FileWriter("./layerData/" + Output_Folder + "/" + name + ".asc")));
-		} 
-		catch (Exception e) 
-		{
-			Logger.info(e.toString());
-		}
-		
-		out.println("ncols         " + Integer.toString(W));
-		out.println("nrows         " + Integer.toString(H));
-		out.println("xllcorner     -10062652.65061");
-		out.println("yllcorner     5249032.6922889");
-		out.println("cellsize      30");
-		out.println("NODATA_value  -9999");
-		
-		return out;
-	}
-	
-	// Read The Header of The File
-	public BufferedReader HeaderRead(String name, int W, int H, String Input_Folder) 
-	{
-		BufferedReader br = null;
-		
-		try 
-		{
-			br = new BufferedReader(new FileReader("./layerData/" + Input_Folder + "/" + name + ".asc"));
-			String line = br.readLine();
-			line = br.readLine();
-			line = br.readLine();
-			line = br.readLine();
-			line = br.readLine();
-			line = br.readLine();
-		} 
-		catch (Exception e) 
-		{
-			Logger.info(e.toString());
-		}
-		
-		return br;
 	}
 	
 }

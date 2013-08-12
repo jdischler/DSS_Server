@@ -16,7 +16,8 @@ public class Global extends GlobalSettings
 	
 	//--------------------------------------------------------------------------
 	@Override
-	public void onStart(play.Application app) {
+	public void onStart(play.Application app) 
+	{
 		
 		systemReport("Application has started");
 		cacheLayers();
@@ -26,7 +27,59 @@ public class Global extends GlobalSettings
 		if(!Output.exists())
 		{
 			Output.mkdir();
+			
+			//Layer_Base layer;
+			//int width, height;
+			// Rotation
+			//int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
+			//layer = Layer_Base.getLayer("Rotation");
+			//width = layer.getWidth();
+			//height = layer.getHeight();
+			
+			//Selection selection = new Selection(width, height);
+		
+			// Corn and Grass Production for D
+			//Model_Corn_Grass_Production Model_CGD = new Model_Corn_Grass_Production();
+			//TwoArrays ArrayD = Model_CGD.Corn_Grass_P(selection, "Default", Rotation);
+			//float ArrayCD[] = ArrayD.a;
+			//float ArrayGD[] = ArrayD.b;
+			
+			// Regular Models
+			//Model_Ethanol ED = new Model_Ethanol();
+			//ED.Ethanol(ArrayCD, ArrayGD, selection, "Default", Rotation);
+			
+			//Model_Net_Energy NE_D = new Model_Net_Energy();
+			//NE_D.Net_Energy(ArrayCD, ArrayGD, selection, "Default", Rotation);
+			
+			//Model_Net_Income NI_D = new Model_Net_Income();
+			//NI_D.Net_Income(ArrayCD, ArrayGD, selection, "Default", Rotation);
+			
+			//Regular_Functions RF = new Regular_Functions();
+			//RF.Regular_Functions(selection, "Default", Rotation);
+			
+			// Moving Window Models
+			//Model_Habitat_Index HI_D = new Model_Habitat_Index();
+			//HI_D.Habitat_Index(selection, "Default", Rotation);
+			
+			//Model_Nitrogen N_D = new Model_Nitrogen();
+			//N_D.Nitrogen(selection, "Default", Rotation);
+			
+			//Model_Phosphorus PH_D = new Model_Phosphorus();
+			//PH_D.Phosphorus(selection, "Default", Rotation);
+			
+			//Model_Pest_Suppression PS_D = new Model_Pest_Suppression();
+			//PS_D.Pest_Suppression(selection, "Default", Rotation);
+			
+			//Model_Pollinator PO_D = new Model_Pollinator();
+			//PO_D.Pollinator(selection, "Default", Rotation);
+			
+			//Moving_Window_Functions MWF = new Moving_Window_Functions();
+			//MWF.Moving_Window_Functions(selection, "Default", Rotation);
 		}
+			
+			// Run Default for Each Model
+			//Models_Default_T MD = new Models_Default_T();
+			//MD.Calculate_T("Default_T");
 	}
 	
 	//--------------------------------------------------------------------------
@@ -66,7 +119,8 @@ public class Global extends GlobalSettings
 	
 	// Only tries to load a layer if it isn't in memory already
 	//--------------------------------------------------------------------------
-	private void cacheLayers() {
+	private void cacheLayers() 
+	{
 
 		/* // Uncomment if need to recalculate and output slope
 		CalculateSlope cs = new CalculateSlope();

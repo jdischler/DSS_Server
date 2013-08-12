@@ -16,12 +16,12 @@ import org.codehaus.jackson.node.*;
 public class Model_Habitat_Index
 {
 		
-	static int Window_Size;
-	static int mWidth, mHeight;
+	//static int Window_Size;
+	//static int mWidth, mHeight;
 	//static float Habitat_Index_T;
 	
 	//--------------------------------------------------------------------------
-	public JsonNode Habitat_Index(JsonNode requestBody, Selection selection, String Output_Folder, int[][] RotationT)
+	public void Habitat_Index(Selection selection, String Output_Folder, int[][] RotationT)
 	{
 		
 		Layer_Base layer;
@@ -29,17 +29,17 @@ public class Model_Habitat_Index
 		int NO_DATA = -9999;
 		int Total_Cells = selection.countSelectedPixels();
 		float Habitat_Index = 0;
-		float Habitat_Index_T = 0;
-		int Value_H;
-		int Bin = 10;
-		int[] CountBin_H = new int [Bin];
+		//float Habitat_Index_T = 0;
+		//int Value_H;
+		//int Bin = 10;
+		//int[] CountBin_H = new int [Bin];
 		// Range of HI
-		float Min_H = 0;
-		float Max_H = 1;
+		//float Min_H = 0;
+		//float Max_H = 1;
 		
 								
 		int Buffer = 390; // In Meter
-		Window_Size = Buffer / 30; // Number of Cells in Raster Map
+		int Window_Size = Buffer / 30; // Number of Cells in Raster Map
 		float Prop_Ag = 0;
 		int Count_Ag = 0;
 		int Ag_Mask = 1 + 2 + 4 + 8 + 16 + 32 + 64 + 512; // 1, 2, 3, 4, 5, 6, 7, 10
@@ -67,7 +67,7 @@ public class Model_Habitat_Index
 		try 
 		{
 			// Bird Index
-			PrintWriter out_HI = HeaderWrite("Bird_Index", width, height, Output_Folder);
+			PrintWriter out_HI = new HeaderWrite("Habitat_Index", width, height, Output_Folder).getWriter();
 			//PrintWriter out4 = new PrintWriter(new BufferedWriter(new FileWriter("./layerData/Bird_Index.asc")));
 
 			// Precompute this so we don't do it on every cell
@@ -90,65 +90,39 @@ public class Model_Habitat_Index
 					{
 						
 						Prop_Ag = 0;
-						Count_Ag = 0;
+						//Count_Ag = 0;
 						Prop_Forest = 0;
-						Count_Forest = 0;
+						//Count_Forest = 0;
 						Prop_Grass = 0;
-						Count_Grass = 0;
+						//Count_Grass = 0;
 						
 						// Calculate the Boundary for Moving Window
 						Moving_Window mWin = new Moving_Window(x, y, Window_Size, width, height);
+						float[] Proportion_AFG = mWin.Window_Operation(RotationT);
 						
-						// I to Width and J to Height
-						for (int j = mWin.ULY; j <= mWin.LRY; j++) 
-						{
-							for (int i = mWin.ULX; i <= mWin.LRX; i++) 
-							{
-								if (RotationT[j][i] != 0)
-								{
-									mWin.Total++;
-									if ((RotationT[j][i] & Ag_Mask) > 0)
-									{
-										Count_Ag = Count_Ag + 1;	
-									}
-									else if ((RotationT[j][i] & Forest_Mask) > 0 )
-									{
-										Count_Forest = Count_Forest + 1;
-									}
-									else if ((RotationT[j][i] & Grass_Mask) > 0 )
-									{
-										Count_Grass = Count_Grass + 1;
-									}
-								}
-							}
-						}
-
-						// Compute Ag, forest and grass proportion
-						// Agriculture Proportion
-						Prop_Ag = (float)Count_Ag / mWin.Total;
-						// Forest Proportion
-						Prop_Forest = (float)Count_Forest / mWin.Total;
-						// Grass Proportion
-						Prop_Grass = (float)Count_Grass / mWin.Total;
-						if (Prop_Ag < 0 || Prop_Ag > 1 || Prop_Forest < 0 || Prop_Forest > 1 || Prop_Grass < 0 || Prop_Grass > 1)
-						{
-							Logger.info("Out of range:" + Float.toString(Prop_Ag) + " " + Float.toString(Prop_Forest) + " " + Float.toString(Prop_Grass));
-						}
+						//if (Prop_Ag < 0 || Prop_Ag > 1 || Prop_Forest < 0 || Prop_Forest > 1 || Prop_Grass < 0 || Prop_Grass > 1)
+						//{
+						//	Logger.info("Out of range:" + Float.toString(Prop_Ag) + " " + Float.toString(Prop_Forest) + " " + Float.toString(Prop_Grass));
+						//}
 						
+						Prop_Ag = Proportion_AFG[0];
+						Prop_Forest = Proportion_AFG[1];
+						Prop_Grass = Proportion_AFG[2];
+		
 						// Bird Habitat
 						// Lambda
 						float Lambda = -4.47f + 2.95f * Prop_Ag + 5.17f * Prop_Forest; 
 						// Habitat Index
 						Habitat_Index = (float)((1 / ( 1 / Math.exp(Lambda) + 1 ) ) / 0.67f);
-						Habitat_Index_T = Habitat_Index + Habitat_Index_T;
+						//Habitat_Index_T = Habitat_Index + Habitat_Index_T;
 						//Value_H = (int)((Habitat_Index - Min_H)/(Max_H - Min_H)*(Bin-1));
-						Value_H = 0;
-						Value_H = (int)(Habitat_Index * (Bin - 1));
-						if (Value_H < 0 || Value_H >= Bin)
-						{
-							Logger.info("Out of range HI:" + Float.toString(Habitat_Index) + " " + Integer.toString(Value_H));
-						}
-						CountBin_H[Value_H]++;
+						//Value_H = 0;
+						//Value_H = (int)(Habitat_Index * (Bin - 1));
+						//if (Value_H < 0 || Value_H >= Bin)
+						//{
+						//	Logger.info("Out of range HI:" + Float.toString(Habitat_Index) + " " + Integer.toString(Value_H));
+						//}
+						//CountBin_H[Value_H]++;
 						// Summary of Habitat Index
 						// Write Habitat Index to The File
 						sb_HI.append(String.format("%.4f", Habitat_Index));
@@ -178,88 +152,29 @@ public class Model_Habitat_Index
 
 		// Data to return to the client		
 		//ObjectNode obj = JsonNodeFactory.instance.objectNode();
-		ObjectNode H_I = JsonNodeFactory.instance.objectNode();
+		//ObjectNode H_I = JsonNodeFactory.instance.objectNode();
 
 		// Habitat Index
-		ArrayNode HI = JsonNodeFactory.instance.arrayNode();
-		for (int i = 0; i < CountBin_H.length; i++) 
-		{
+		//ArrayNode HI = JsonNodeFactory.instance.arrayNode();
+		//for (int i = 0; i < CountBin_H.length; i++) 
+		//{
 			//Total_Cells = CountBin_H[i] + Total_Cells;
-			HI.add(CountBin_H[i]);
-		}
+		//	HI.add(CountBin_H[i]);
+		//}
 		// Average of Habitat_Index per pixel
-		float HI_Per_Cell = Habitat_Index_T / Total_Cells;
+		//float HI_Per_Cell = Habitat_Index_T / Total_Cells;
 		
 		// Habitat_Index
-		H_I.put("Result", HI);
-		H_I.put("Min", String.format("%.4f", Min_H));
-		H_I.put("Max", String.format("%.4f", Max_H));
-		H_I.put("Average_HI", String.format("%.4f", HI_Per_Cell));
+		//H_I.put("Result", HI);
+		//H_I.put("Min", String.format("%.4f", Min_H));
+		//H_I.put("Max", String.format("%.4f", Max_H));
+		//H_I.put("Average_HI", String.format("%.4f", HI_Per_Cell));
 		
 		// Add branches to JSON Node 
 		//obj.put("Habitat_Index", H_I);
 
-		Logger.info(H_I.toString());
-		return H_I;
+		//Logger.info(H_I.toString());
+		//return H_I;
 	}	
-
-	public class Moving_Window
-	{
-		public int ULX, ULY, LRX, LRY, Total;
-		public Moving_Window(int x, int y, int wsz, int w, int h)
-		{
-			ULX = x - wsz/2;
-			ULY = y - wsz/2;
-			LRX = x + wsz/2;
-			LRY = y + wsz/2;
-			
-			// Left
-			if (ULX < 0)
-			{
-				ULX = 0;
-			}
-			// Up
-			if (ULY < 0)
-			{
-				ULY = 0;
-			}
-			// Right
-			if (LRX > w - 1)
-			{
-				LRX = w - 1;
-			}
-			// Low
-			if (LRY > h - 1)
-			{
-				LRY = h - 1;
-			}
-
-			Total = 0;	
-		}
-	}
-	
-	// Write Header To The File
-	public PrintWriter HeaderWrite(String name, int W, int H, String Output_Folder) 
-	{
-		PrintWriter out = null;
-		
-		try 
-		{
-			out = new PrintWriter(new BufferedWriter(new FileWriter("./layerData/" + Output_Folder + "/" + name + ".asc")));
-		} 
-		catch (Exception e) 
-		{
-			Logger.info(e.toString());
-		}
-		
-		out.println("ncols         " + Integer.toString(W));
-		out.println("nrows         " + Integer.toString(H));
-		out.println("xllcorner     -10062652.65061");
-		out.println("yllcorner     5249032.6922889");
-		out.println("cellsize      30");
-		out.println("NODATA_value  -9999");
-		
-		return out;
-	}
 	
 }

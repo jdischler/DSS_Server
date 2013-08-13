@@ -3,12 +3,10 @@ Ext.define('MyApp.view.Report_ScenarioComparison', {
     alias: 'widget.scenariocompare',
 
     height: 60,
-//    width: 500,
     layout: {
         type: 'absolute'
     },
 	dock: 'top',
-//    title: 'Simulation Results Viewer / Comparison',
     header: false,
      bodyStyle: {
     	'background-color': '#f4f8ff'
@@ -28,19 +26,33 @@ Ext.define('MyApp.view.Report_ScenarioComparison', {
 				labelWidth: 80
 			},
 			{
+				itemId: 'DSS_ScenarioCompare',
 				xtype: 'combobox',
 				x: 50,
 				y: 30,
 				width: 300,
 				fieldLabel: 'Scenario 2',
 				labelAlign: 'right',
-				labelWidth: 80
+				labelWidth: 80,
+				value: 'DEFAULT'
 			},
 			{
 				xtype: 'checkboxfield',
 				x: 360,
 				y: 30,
-				boxLabel: 'Compare'
+				boxLabel: 'Compare',
+				checked: true,
+				listeners: {
+					'dirtychange': function(me) {
+						var combo = me.up().getComponent('DSS_ScenarioCompare');
+						if (me.getValue() == true) {
+							combo.enable(true);
+						}
+						else {
+							combo.disable(true);
+						}
+					}
+				}
 			}]
         });
 

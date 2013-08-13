@@ -267,7 +267,7 @@ Ext.define('MyApp.view.MainViewport', {
 				transparent: true,
 				tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
 			},
-			this.getWMS_Settings(true, 0.5)
+			this.getWMS_Settings(false, 0.5)
 		);
 		
 		//----------------
@@ -430,6 +430,34 @@ Ext.define('MyApp.view.MainViewport', {
 //		DSS_globalCollapsibleLayers.push(lpSel);
 		
 		this.addFeatureClickControl(map);
+		
+/*		var lpSel2 = Ext.create('MyApp.view.LayerPanel_CurrentSelection', {
+			hidden: false});//,
+		dssLeftPanel.insert(0,lpSel2);
+		
+		var bounds = new OpenLayers.Bounds(
+			-10062652.65061, 5278060.469521415,
+			-9878152.65061, 5415259.640662575
+		);
+		var imgTest = new OpenLayers.Layer.Image(
+			'Heat',
+			'app/file/heat.png',
+			bounds,
+			new OpenLayers.Size(2113.0,-2113.0),
+			{
+				buffer: 0,
+				opacity: 1.0,
+				isBaseLayer: false,
+				displayInLayerSwitcher: false,
+				transitionEffect: "resize",
+				visibility: true,
+				maxResolution: "auto",
+				projection: globalMap.getProjectionObject(),
+				numZoomLevels: 19
+			}
+		);
+		lpSel2.setSelectionLayer(imgTest);
+*/	
 	},
 	
 	// Used by vector selection layers (e.g., Watershed)

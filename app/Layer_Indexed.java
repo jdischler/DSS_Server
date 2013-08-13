@@ -174,26 +174,27 @@ public class Layer_Indexed extends Layer_Base
 		
 		int queryMask = 0;
 		
-		Logger.info("trying to get Compare Bit Mask");
-		
-		if (matchValuesArray.isArray()) {
-			Logger.info("Ok, matchValuesArray IS an array");
-		}
+		Logger.info("Creating Compare Bit Mask. ");
 		
 		ArrayNode arNode = (ArrayNode)matchValuesArray;
 		if (arNode != null) {
 			int count = arNode.size();
-			Logger.info(Integer.toString(count));
-
+			Logger.info("Query Index Array count: " + Integer.toString(count));
+			StringBuffer debug = new StringBuffer();
+			debug.append("Query Indices: ");
 			for (int i = 0; i < count; i++) {
 				JsonNode node = arNode.get(i);
 				
 				int val = node.getValueAsInt(1); // FIXME: default value?
-				Logger.info(Integer.toString(val));
+				debug.append(Integer.toString(val));
+				if (i < count - 1) {
+					debug.append(", ");
+				}
 				queryMask |= convertIndexToMask(val);
 			}
 			
-			Logger.info(Integer.toString(queryMask));
+			Logger.info(debug.toString());
+			Logger.info("Final Query Mask: " + Integer.toString(queryMask));
 			return queryMask;
 		}
 		

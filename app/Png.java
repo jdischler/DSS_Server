@@ -160,7 +160,7 @@ public class Png {
 			// Blah, find max 
 			//	(would be nice if ASC file could just have the min and max value saved in it?)
 			double max = 0.3;
-/*			while (file1.ready() && file2.ready()) {
+			while (file1.ready() && file2.ready()) {
 				
 				String line1[] = file1.getSplitLine();
 				String line2[] = file2.getSplitLine();
@@ -180,16 +180,12 @@ public class Png {
 			if (max < 0.00001) {
 				max = 1.0;
 			}
-			max = 1.0;
-			// rewind back to just after the header data
-//			file1.rewind();
-//			file2.rewind();
 			file1.close();
 			file2.close();
 
 			file1 = new Asc_Reader(name, folder1);
 			file2 = new Asc_Reader(name, folder2);
-*/		
+		
 			// Make a temp buffer
 			int width = file1.getWidth();
 			int height = file1.getHeight();
@@ -229,7 +225,7 @@ public class Png {
 			
 			Logger.info("Creating png");
 
-			String file = "./public/file/heat.png";
+			String file = "./public/file/heat_2.png";
 //			Png image = new Png(width, height, 8, 4, file);
 			Png png = new Png(width, height, 
 				8, 1, file);
@@ -239,13 +235,23 @@ public class Png {
 			PngChunkPLTE palette = png.createPalette(9);
 			Logger.info("Setting palette entries");
 			// colors from....http://colorbrewer2.org
-			interpolatePaletteEntries(palette, 
+			
+			// MAGENTA to WHITE to LIME GREEN
+/*			interpolatePaletteEntries(palette, 
 				0, 197, 27, 125,	// magenta
 				4, 247, 247, 247);	// white
 			interpolatePaletteEntries(palette, 
 				4, 247, 247, 247,	// white
 				8, 77, 146, 33);	// limey-green
-
+*/
+			// AQUA BLUE to WHITE to BROWN
+			interpolatePaletteEntries(palette, 
+				0, 0, 102, 94,		// aqua blue
+				4, 247, 247, 247);	// white
+			interpolatePaletteEntries(palette, 
+				4, 247, 247, 247,	// white
+				8, 140, 81, 10);	// brown
+			
 			Logger.info("Setting transparent");
 			// set index 4 as transparent
 			int[] alpha = new int[9];

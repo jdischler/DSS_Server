@@ -81,6 +81,14 @@ public class Png {
 		trans.setIndexEntryAsTransparent(paletteIndex);
 	}
 
+	// Only for indexed (palettized) images
+	//--------------------------------------------------------------------------
+	public void setTransparentArray(int[] arrayOfAlphas) {
+		
+		PngChunkTRNS trans = mPngWriter.getMetadata().createTRNSChunk();
+		trans.setPalletteAlpha(arrayOfAlphas);
+	}
+	
 	// FIXME: probably need to rethink this...?	probably only works for indexed?
 	//--------------------------------------------------------------------------
 	public void writeArray(int[][] imagePixels) {
@@ -114,19 +122,162 @@ public class Png {
 	}
 
 	//--------------------------------------------------------------------------
-	public static void createHeatmapFromDelta(String deltaFile, String outputPng) {
+	private static int interpolateElement(int startIdx, int endIdx, int curIdx, int startClrVal, int endClrVal) {
+		
+		float colorVal = ((float)(endClrVal - startClrVal) / (float)(endIdx - startIdx)) 
+				* (curIdx - startIdx) + startClrVal;
+				
+		if (colorVal < 0.0f) colorVal = 0.0f;
+		else if (colorVal > 255.0f) colorVal = 255.0f;
+		
+		return (int)colorVal;
+	}
 	
-		// TODO: open deltaFile (ASC) and get width/height
-		int width = 1;
-		int height = 1;
+	//--------------------------------------------------------------------------
+	private static void interpolatePaletteEntries(PngChunkPLTE palette, 
+			int startIndex, int startR, int startG, int startB,
+			int endIndex, int endR, int endG, int endB) {
+	
+		for (int idx = startIndex; idx <= endIndex; idx++) {
+
+			int r = interpolateElement(startIndex, endIndex, idx, startR, endR);
+			int g = interpolateElement(startIndex, endIndex, idx, startG, endG);
+			int b = interpolateElement(startIndex, endIndex, idx, startB, endB);
+			palette.setEntry(idx, r, g, b);
+		}
+	}
+	
+	// Creates an indexed version of the heatmap...
+	//--------------------------------------------------------------------------
+	public static void createHeatMap_I(String name, String folder1, String folder2) {
 		
-		// 8 bits per pixel, 4 channels (RGBA)
-		Png newImage = new Png(width, height, 8, 4, outputPng);
+		try {
+			Asc_Reader file1 = new Asc_Reader(name, folder1);
+			Asc_Reader file2 = new Asc_Reader(name, folder2);
+	
+			int noDataVal = file1.getNoData() / 2; // FIXME
+			
+			// Blah, find max 
+			//	(would be nice if ASC file could just have the min and max value saved in it?)
+			double max = 0.3;
+/*			while (file1.ready() && file2.ready()) {
+				
+				String line1[] = file1.getSplitLine();
+				String line2[] = file2.getSplitLine();
+				
+				for (int x = 0; x < line1.length; x++) 
+				{	
+					if (Float.valueOf(line1[x]) > noDataVal && Float.valueOf(line2[x]) > noDataVal) { 
+						double delta = Math.abs(Float.parseFloat(line1[x]) - Float.parseFloat(line2[x]));
+						if (delta > max) {
+							max = delta;
+						}
+					}
+				}
+			}
+			
+			Logger.info("Max: " + Double.toString(max));
+			if (max < 0.00001) {
+				max = 1.0;
+			}
+			max = 1.0;
+			// rewind back to just after the header data
+//			file1.rewind();
+//			file2.rewind();
+			file1.close();
+			file2.close();
+
+			file1 = new Asc_Reader(name, folder1);
+			file2 = new Asc_Reader(name, folder2);
+*/		
+			// Make a temp buffer
+			int width = file1.getWidth();
+			int height = file1.getHeight();
+			
+			byte[][] idx = new byte[height][width];
+			
+			int y = 0;
+			
+			Logger.info("Generating IDX array");
+			
+			// Now generate the full resolution heatmap image
+			while (file1.ready() && file2.ready()) {
+				
+				String line1[] = file1.getSplitLine();
+				String line2[] = file2.getSplitLine();
+				
+				for (int x = 0; x < line1.length; x++) 
+				{	
+					if (Float.valueOf(line1[x]) <= noDataVal || Float.valueOf(line2[x]) <= noDataVal) { 
+						idx[y][x] = 4; // trans
+					}
+					else {
+						// Get Normalized Delta (-1.0 to 1.0)
+						double delta = (Float.parseFloat(line1[x]) - Float.parseFloat(line2[x])) / max;
+					
+						delta = delta * 4.0 + 4.5; // round
+						if (delta < 0) delta = 0;
+						else if (delta > 8) delta = 8;
+						idx[y][x] = (byte)delta;
+					}
+				}
+				y++;
+			}
 		
-		// TODO: finish me
+			file1.close();
+			file2.close();
+			
+			Logger.info("Creating png");
+
+			String file = "./public/file/heat.png";
+//			Png image = new Png(width, height, 8, 4, file);
+			Png png = new Png(width, height, 
+				8, 1, file);
 		
-//		newImage.mPngWriter.writeRowsInt(temp);
-		newImage.mPngWriter.end();
+			Logger.info("Creating palette");
+			
+			PngChunkPLTE palette = png.createPalette(9);
+			Logger.info("Setting palette entries");
+			// colors from....http://colorbrewer2.org
+			interpolatePaletteEntries(palette, 
+				0, 197, 27, 125,	// magenta
+				4, 247, 247, 247);	// white
+			interpolatePaletteEntries(palette, 
+				4, 247, 247, 247,	// white
+				8, 77, 146, 33);	// limey-green
+
+			Logger.info("Setting transparent");
+			// set index 4 as transparent
+			int[] alpha = new int[9];
+			alpha[0] = 255; alpha[1] = 255; alpha[2] = 255; alpha[3] = 255;
+			alpha[4] = 0;
+			alpha[5] = 255; alpha[6] = 255; alpha[7] = 255; alpha[8] = 255;
+			
+			png.setTransparentArray(alpha);//TransparentIndex(0);
+	
+			png.mPngWriter.writeRowsByte(idx);
+			/*ImageLineInt imgLine = new ImageLineInt(png.mImageInfo);
+			//ImageLineHelper helper = new ImageLineHelper();
+	
+			Logger.info("Creating scanlines");
+			int[] scanline = imgLine.getScanline();
+			for (y = 0; y < height; y++) {	
+				for (int x = 0; x < width; x++) {
+					if (true) {//red[y][x] > 0 && grn[y][x] > 0) {
+						scanline[x] = idx[y][x];
+					}
+					else {
+					}
+				}
+				png.mPngWriter.writeRow(imgLine);
+			}
+			
+			Logger.info("writing png");*/
+			png.mPngWriter.end();
+		}
+		catch (Exception e) {
+			Logger.info(e.toString());
+		}
 	}
 }
 

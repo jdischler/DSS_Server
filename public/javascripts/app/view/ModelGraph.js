@@ -4,7 +4,7 @@ Ext.define('MyApp.view.ModelGraph', {
     
     id: "Model_Graph",
     
-    height: 270,
+    height: 220,
     width: 500,
         layout: {
         type: 'absolute'
@@ -36,7 +36,7 @@ Ext.define('MyApp.view.ModelGraph', {
 			 {
 			    itemId: 'Habitat_Index',  
 			    xtype: 'textfield',
-			    x: 10,
+			    x: 0,
 			    y: 10,
 			    width: 160,
 			    fieldLabel: 'Habitat',
@@ -46,7 +46,7 @@ Ext.define('MyApp.view.ModelGraph', {
 			{
 			    itemId: 'Carbon',
 			    xtype: 'textfield',
-			    x: 260,
+			    x: 250,
 			    y: 10,
 			    width: 160,
 			    fieldLabel: 'Carbon',
@@ -56,8 +56,8 @@ Ext.define('MyApp.view.ModelGraph', {
 			{
 			    itemId: 'Nitrogen',
 			    xtype: 'textfield',
-			    x: 10,
-			    y: 50,
+			    x: 0,
+			    y: 40,
 			    width: 160,
 			    fieldLabel: 'Nitrogen',
 			    labelWidth: 80,
@@ -66,8 +66,8 @@ Ext.define('MyApp.view.ModelGraph', {
 			{
 			    itemId: 'Pollinator',
 			    xtype: 'textfield',
-			    x: 260,
-			    y: 50,
+			    x: 250,
+			    y: 40,
 			    width: 160,
 			    fieldLabel: 'Pollinator',
 			    labelWidth: 80,
@@ -76,8 +76,8 @@ Ext.define('MyApp.view.ModelGraph', {
 			{
 			    itemId: 'Phosphorus',
 			    xtype: 'textfield',
-			    x: 10,
-			    y: 90,
+			    x: 0,
+			    y: 70,
 			    width: 160,
 			    fieldLabel: 'Phosphorus',
 			    labelWidth: 80,
@@ -86,8 +86,8 @@ Ext.define('MyApp.view.ModelGraph', {
 			{
 			    itemId: 'Net_Energy',
 			    xtype: 'textfield',
-			    x: 260,
-			    y: 90,
+			    x: 250,
+			    y: 70,
 			    width: 160,
 			    fieldLabel: 'Net Energy',
 			    labelWidth: 80,
@@ -96,8 +96,8 @@ Ext.define('MyApp.view.ModelGraph', {
 			{
 			    itemId: 'Crop_Pest',
 			    xtype: 'textfield',
-			    x: 10,
-			    y: 130,
+			    x: 0,
+			    y: 100,
 			    width: 160,
 			    fieldLabel: 'Crop Pest',
 			    labelWidth: 80,
@@ -106,8 +106,8 @@ Ext.define('MyApp.view.ModelGraph', {
 			{
 			    itemId: 'Net_Income',
 			    xtype: 'textfield',
-			    x: 260,
-			    y: 130,
+			    x: 250,
+			    y: 100,
 			    width: 160,
 			    fieldLabel: 'Net Income',
 			    labelWidth: 80,
@@ -116,8 +116,8 @@ Ext.define('MyApp.view.ModelGraph', {
 			{
 			    itemId: 'Biomass',
 			    xtype: 'textfield',
-			    x: 10,
-			    y: 170,
+			    x: 0,
+			    y: 130,
 			    width: 160,
 			    fieldLabel: 'Biomass',
 			    labelWidth: 80,
@@ -126,23 +126,22 @@ Ext.define('MyApp.view.ModelGraph', {
 			{
 			    itemId: 'Drainage',
 			    xtype: 'textfield',
-			    x: 260,
-			    y: 170,
+			    x: 250,
+			    y: 130,
 			    width: 160,
 			    fieldLabel: 'Drainage',
 			    labelWidth: 80,
 			    labelAlign: 'right'
-			},
+			}, //-------------------- End of Text Fields
 			{
 			    itemId: 'Graph_Habitat_Index',
 			    xtype: 'button',
-			    x: 180,
+			    x: 162,
 			    y: 10,
 			    text: 'Graph',
 			    handler: function (self)
 			    {
-					var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Habitat Index'});
-				
+					var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Bird Habitat Index'});
 					mypopup.show();
 					mypopup.SetChartData(self.graphdataD, self.graphdataT);
 			    }
@@ -150,7 +149,7 @@ Ext.define('MyApp.view.ModelGraph', {
 			{
 			    itemId: 'Graph_Carbon',
 			    xtype: 'button',
-			    x: 430,
+			    x: 412,
 			    y: 10,
 			    text: 'Graph',
 			    handler: function (self)
@@ -163,8 +162,8 @@ Ext.define('MyApp.view.ModelGraph', {
 			{
 			    itemId: 'Graph_Nitrogen',
 			    xtype: 'button',
-			    x: 180,
-			    y: 50,
+			    x: 162,
+			    y: 40,
 			    text: 'Graph',
 			    handler: function (self)
 			    {
@@ -176,8 +175,8 @@ Ext.define('MyApp.view.ModelGraph', {
 			{
 			    itemId: 'Graph_Pollinator',
 			    xtype: 'button',
-			    x: 430,
-			    y: 50,
+			    x: 412,
+			    y: 40,
 			    text: 'Graph',
 			    handler: function (self)
 			    {
@@ -189,8 +188,8 @@ Ext.define('MyApp.view.ModelGraph', {
 			{
 			    itemId: 'Graph_Phosphorus',
 			    xtype: 'button',
-			    x: 180,
-			    y: 90,
+			    x: 162,
+			    y: 70,
 			    text: 'Graph',
 			    handler: function (self)
 			    {
@@ -202,8 +201,8 @@ Ext.define('MyApp.view.ModelGraph', {
 			{
 			    itemId: 'Graph_Net_Energy',
 			    xtype: 'button',
-			    x: 430,
-			    y: 90,
+			    x: 412,
+			    y: 70,
 			    text: 'Graph',
 			    handler: function (self)
 			    {
@@ -215,12 +214,12 @@ Ext.define('MyApp.view.ModelGraph', {
 			{
 			    itemId: 'Graph_Crop_Pest',
 			    xtype: 'button',
-			    x: 180,
-			    y: 130,
+			    x: 162,
+			    y: 100,
 			    text: 'Graph',
 			    handler: function (self)
 			    {
-					var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Crop Pest'});
+					var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Crop Pest Supression'});
 					mypopup.show();
 					mypopup.SetChartData(self.graphdataD, self.graphdataT);
 			    }
@@ -228,8 +227,8 @@ Ext.define('MyApp.view.ModelGraph', {
 			{
 			    itemId: 'Graph_Net_Income',
 			    xtype: 'button',
-			    x: 430,
-			    y: 130,
+			    x: 412,
+			    y: 100,
 			    text: 'Graph',
 			    handler: function (self)
 			    {
@@ -241,8 +240,8 @@ Ext.define('MyApp.view.ModelGraph', {
 			{
 			    itemId: 'Graph_Biomass',
 			    xtype: 'button',
-			    x: 180,
-			    y: 170,
+			    x: 162,
+			    y: 130,
 			    text: 'Graph',
 			    handler: function (self)
 			    {
@@ -254,8 +253,8 @@ Ext.define('MyApp.view.ModelGraph', {
 			{
 			    itemId: 'Graph_Drainage',
 			    xtype: 'button',
-			    x: 430,
-			    y: 170,
+			    x: 412,
+			    y: 130,
 			    text: 'Graph',
 			    handler: function (self)
 			    {
@@ -263,25 +262,128 @@ Ext.define('MyApp.view.ModelGraph', {
 					mypopup.show();
 					mypopup.SetChartData(self.graphdataD, self.graphdataT);
 			    }
-			},
-/*	    		{
-			    itemId: 'Spider_Graph',
+			}, //----------------------- End of Graph buttons
+			{
+			    itemId: 'Heat_Habitat_Index',
 			    xtype: 'button',
-			    x: 100,
-			    y: 210,
-			    text: 'Spider Graph',
-			    handler: function (self)
-			    {
-					var myspider = Ext.create("MyApp.view.GraphSpider", {title: 'Spider Graph'});
-					myspider.show();
-					myspider.SetSpiderData(self.graphdataD, self.graphdataT);
+			    x: 207,
+			    y: 10,
+			    text: 'Heat',
+			    tooltip: {
+			    	text: 'View a heatmap overlay',
+			    	showDelay: 100
+			    },
+			    handler: function(self) {
+			    	self.up().showFakeHeatmap(self,'Heat','app/file/heat.png');
 			    }
-			},*/
+			},
+			{
+			    itemId: 'Heat_Carbon',
+			    xtype: 'button',
+			    x: 457,
+			    y: 10,
+			    text: 'Heat',
+			    tooltip: {
+			    	text: 'View a heatmap overlay',
+			    	showDelay: 100
+			    }
+			},
+			{
+			    itemId: 'Heat_Nitrogen',
+			    xtype: 'button',
+			    x: 207,
+			    y: 40,
+			    text: 'Heat',
+			    tooltip: {
+			    	text: 'View a heatmap overlay',
+			    	showDelay: 100
+			    },
+			    handler: function(self) {
+			    	self.up().showFakeHeatmap(self,'Heat2','app/file/heat_2.png');
+			    }
+			},
+			{
+			    itemId: 'Heat_Pollinator',
+			    xtype: 'button',
+			    x: 457,
+			    y: 40,
+			    text: 'Heat',
+			    tooltip: {
+			    	text: 'View a heatmap overlay',
+			    	showDelay: 100
+			    }
+			},
+			{
+			    itemId: 'Heat_Phosphorus',
+			    xtype: 'button',
+			    x: 207,
+			    y: 70,
+			    text: 'Heat',
+			    tooltip: {
+			    	text: 'View a heatmap overlay',
+			    	showDelay: 100
+			    }
+			},
+			{
+			    itemId: 'Heat_Net_Energy',
+			    xtype: 'button',
+			    x: 457,
+			    y: 70,
+			    text: 'Heat',
+			    tooltip: {
+			    	text: 'View a heatmap overlay',
+			    	showDelay: 100
+			    }
+			},
+			{
+			    itemId: 'Heat_Crop_Pest',
+			    xtype: 'button',
+			    x: 207,
+			    y: 100,
+			    text: 'Heat',
+			    tooltip: {
+			    	text: 'View a heatmap overlay',
+			    	showDelay: 100
+			    }
+			},
+			{
+			    itemId: 'Heat_Net_Income',
+			    xtype: 'button',
+			    x: 457,
+			    y: 100,
+			    text: 'Heat',
+			    tooltip: {
+			    	text: 'View a heatmap overlay',
+			    	showDelay: 100
+			    }
+			},
+			{
+			    itemId: 'Heat_Biomass',
+			    xtype: 'button',
+			    x: 207,
+			    y: 130,
+			    text: 'Heat',
+			    tooltip: {
+			    	text: 'View a heatmap overlay',
+			    	showDelay: 100
+			    }
+			},
+			{
+			    itemId: 'Heat_Drainage',
+			    xtype: 'button',
+			    x: 457,
+			    y: 130,
+			    text: 'Heat',
+			    tooltip: {
+			    	text: 'View a heatmap overlay',
+			    	showDelay: 100
+			    }
+			}, // ----------------- End of Heat Buttons
 			{
 			    itemId: 'Clear',
 			    xtype: 'button',
 			    x: 230,
-			    y: 210,
+			    y: 160,
 			    text: 'Clear Fields',
 			    handler: function ()
 			    {
@@ -297,10 +399,6 @@ Ext.define('MyApp.view.ModelGraph', {
 			},
 	    ]
         });
-        
-        //var f1 = 10.4832764;
-        //var f2 = 34.3636464;
-        //console.log((f1-f2).toFixed(4));
         
         me.callParent(arguments);
     },
@@ -429,28 +527,62 @@ Ext.define('MyApp.view.ModelGraph', {
     	//Net_Energy_Button.graphdataD = obj.Net_Energy_D;
     	//Net_Energy_Button.graphdataT = obj.Net_Energy_T;
     	
-    	
-    	
-    	
-    	
     	// Spider_Graph
-    	var Spider_Button = this.getComponent('Spider_Graph');
-    	var array1 = [val1/this.Max(val1, val2), val3/this.Max(val3, val4), val5/this.Max(val5, val6), val7/this.Max(val7, val8),  val9/this.Max(val9, val10), val11/this.Max(val11, val12), val13/this.Max(val13, val14), val15/this.Max(val15, val16)];
-    	var array2 = [val2/this.Max(val1, val2), val4/this.Max(val3, val4), val6/this.Max(val5, val6), val8/this.Max(val7, val8), val10/this.Max(val9, val10), val12/this.Max(val11, val12), val14/this.Max(val13, val14), val16/this.Max(val15, val16)];
-    	Spider_Button.graphdataD = array1;
-    	Spider_Button.graphdataT = array2;
+    	var spiderPanel = Ext.getCmp('DSS_SpiderGraphPanel');
+    	var arrayDef = [val1/this.Max(val1, val2), val3/this.Max(val3, val4), val5/this.Max(val5, val6), val7/this.Max(val7, val8),  val9/this.Max(val9, val10), val11/this.Max(val11, val12), val13/this.Max(val13, val14), val15/this.Max(val15, val16)];
+    	var arrayTrans = [val2/this.Max(val1, val2), val4/this.Max(val3, val4), val6/this.Max(val5, val6), val8/this.Max(val7, val8), val10/this.Max(val9, val10), val12/this.Max(val11, val12), val14/this.Max(val13, val14), val16/this.Max(val15, val16)];
+    	spiderPanel.setSpiderData(arrayDef, arrayTrans);
     },
-    
+
     Max: function (a1, a2)
     {
-    	    if (a1 >= a2)
-    	    {
-    	    	    return a1;
-    	    }
-    	    else 
-    	    {
-    	    	    return a2;
-    	    }
+		if (a1 >= a2)
+		{
+			return a1;
+		}
+		else 
+		{
+			return a2;
+		}
+    },
+    
+    //--------------------------------------------------------------------------
+    showFakeHeatmap: function(button, layerName, imagePath) {
+
+		if (button.DSS_Layer) { 
+			globalMap.removeLayer(button.DSS_Layer);
+			button.DSS_Layer = null;
+		}
+		else {
+			var bounds = new OpenLayers.Bounds(
+				-10062652.65061, 5278060.469521415,
+				-9878152.65061, 5415259.640662575
+			);
+			var imgTest = new OpenLayers.Layer.Image(
+				layerName,
+				imagePath,
+				bounds,
+				new OpenLayers.Size(2113.0,-2113.0),
+				{
+					buffer: 0,
+					opacity: 1.0,
+					isBaseLayer: false,
+					displayInLayerSwitcher: false,
+					transitionEffect: "resize",
+					visibility: true,
+					maxResolution: "auto",
+					projection: globalMap.getProjectionObject(),
+					numZoomLevels: 19
+				}
+			);
+			
+			if (button.DSS_Layer) { 
+				globalMap.removeLayer(button.DSS_Layer);
+			}
+			button.DSS_Layer = imgTest;
+			globalMap.addLayer(button.DSS_Layer);
+			button.DSS_Layer.setOpacity(0.9);
+		}
     }
 
 });

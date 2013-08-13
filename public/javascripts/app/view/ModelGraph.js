@@ -4,14 +4,14 @@ Ext.define('MyApp.view.ModelGraph', {
     
     id: "Model_Graph",
     
-    height: 300,
+    height: 270,
     width: 500,
         layout: {
         type: 'absolute'
     },
     //bodyPadding: 10,
-    title: 'Simulation Results',
-	icon: 'app/images/scenario_icon.png',
+    title: 'Simulation Detail',
+	icon: 'app/images/magnify_icon.png',
     activeTab: 0,
 
     require : [
@@ -264,7 +264,7 @@ Ext.define('MyApp.view.ModelGraph', {
 					mypopup.SetChartData(self.graphdataD, self.graphdataT);
 			    }
 			},
-	    		{
+/*	    		{
 			    itemId: 'Spider_Graph',
 			    xtype: 'button',
 			    x: 100,
@@ -276,13 +276,13 @@ Ext.define('MyApp.view.ModelGraph', {
 					myspider.show();
 					myspider.SetSpiderData(self.graphdataD, self.graphdataT);
 			    }
-			},
+			},*/
 			{
 			    itemId: 'Clear',
 			    xtype: 'button',
-			    x: 350,
+			    x: 230,
 			    y: 210,
-			    text: 'Clear Text',
+			    text: 'Clear Fields',
 			    handler: function ()
 			    {
 			    	    this.up().getComponent('Habitat_Index').setValue(null);

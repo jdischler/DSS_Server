@@ -18,7 +18,9 @@ public class Global extends GlobalSettings
 	@Override
 	public void onStart(play.Application app) 
 	{
-		
+		// Test of heatmapping...
+//		Png.createHeatMap_I("Nitrogen", "Default", "Client_ID"); 
+ 
 		systemReport("Application has started");
 		cacheLayers();
 		systemReport("Data Layers Cached");

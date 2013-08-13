@@ -18,11 +18,11 @@ var ScenarioGridStore = Ext.create('Ext.data.Store', {
         		queryLayers: [{
 					name: 'rotation',
 					type: 'indexed',
-					matchValues: [1,2,3]
+					matchValues: [1,2,3,5]
         		},
         		{
         			greaterThanTest: '>=',
-        			greaterThanValue: 5,
+        			greaterThanValue: 3,
         			lessThanTest: '<=',
         			lessThanValue: null,
         			name: 'slope',
@@ -32,7 +32,7 @@ var ScenarioGridStore = Ext.create('Ext.data.Store', {
         			greaterThanTest: '>=',
         			greaterThanValue: null,
         			lessThanTest: '<=',
-        			lessThanValue: 250,
+        			lessThanValue: 500,
         			name: 'rivers',
         			type: 'continuous'
         		}]
@@ -52,14 +52,14 @@ var ScenarioGridStore = Ext.create('Ext.data.Store', {
         		{
         			greaterThanTest: '>=',
         			greaterThanValue: null,
-        			lessThanTest: '<=',
-        			lessThanValue: 5,
+        			lessThanTest: '<',
+        			lessThanValue: 4,
         			name: 'slope',
         			type: 'continuous'
         		},
         		{
         			greaterThanTest: '>=',
-        			greaterThanValue: 250,
+        			greaterThanValue: 500,
         			lessThanTest: '<=',
         			lessThanValue: null,
         			name: 'rivers',

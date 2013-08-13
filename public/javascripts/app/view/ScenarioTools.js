@@ -358,6 +358,45 @@ Ext.define('MyApp.view.ScenarioTools', {
 		}
 	},
 	
+	// TODO: use this variant instead
+	//--------------------------------------------------------------------------
+	buildModel_NEW: function() {
+	
+		var haveQuery = false;
+		var requestData = {
+			clientID: 12345, //temp
+			transforms: []
+		};
+		
+		var st = this.getStore();
+		for (var idx = 0; idx < st.getCount(); idx++) {
+			var rec = st.getAt(idx);
+			
+			if (rec.get('Active')) {
+				var query = rec.get('Query');		
+				var landUse = rec.get('Transform');
+				if (landUse == null) {
+					landUse = 1; // blurf, set to corn....
+				}
+				
+				var transform = {
+					queryLayers: query.queryLayers,
+					newLandUse: landUse
+				};
+				requestData.transforms.push(transform);
+				haveQuery = true;
+			}
+		}
+		
+		console.log(requestData);
+		if (haveQuery) {
+			this.submitModel(requestData);
+		}
+		else {
+			alert("No query built - nothing to query");
+		}
+	},
+	
     //--------------------------------------------------------------------------
     submitModel: function(queryJson) {
     	

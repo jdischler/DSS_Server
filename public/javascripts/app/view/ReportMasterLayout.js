@@ -7,11 +7,13 @@ Ext.define('MyApp.view.ReportMasterLayout', {
 
 	requires: [
 		'MyApp.view.ModelGraph',
-		'MyApp.view.ReportTools'
+		'MyApp.view.ReportTools',
+		'MyApp.view.Report_SpiderGraph',
+		'MyApp.view.Report_ScenarioComparison'
 	],
 	
 	dock: 'right',
-	title: 'Simulation Results / Reports',
+	title: 'Simulation Results Viewer / Comparison',//Simulation Results / Reports',
 	icon: 'app/images/magnify_icon.png',
 	width: 500,
 	autoScroll: true,
@@ -27,6 +29,9 @@ Ext.define('MyApp.view.ReportMasterLayout', {
 	collapsed: true,
 	animCollapse: false,
 	bodystyle: 'border-color:#000; border-width:2px',
+	dockedItems: [{
+			xtype: 'scenariocompare' // docked top
+	}],
 	
 	//--------------------------------------------------------------------------    
 	listeners: {
@@ -50,6 +55,9 @@ Ext.define('MyApp.view.ReportMasterLayout', {
 				xtype: 'panel',
 				hidden: true,
 				collapsed: false
+			},
+			{
+				xtype: 'spiderpanel'
 			},
 			{
 				xtype: 'ModelGraph'

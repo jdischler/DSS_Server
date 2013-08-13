@@ -4,6 +4,7 @@ Ext.define('MyApp.view.GraphPopUp', {
     height: 320,
     width: 400,
     title: 'My Window',
+	icon: 'app/images/graph_icon.png',
     layout: 'fit',
 
     initComponent: function() {

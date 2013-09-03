@@ -407,7 +407,7 @@ Ext.define('MyApp.view.ScenarioTools', {
 		var obj = Ext.Ajax.request({
 			url: location.href + 'models',
 			jsonData: queryJson,
-			timeout: 5 * 60 * 1000, // minutes * seconds * (i.e. converted to) milliseconds
+			timeout: 10 * 60 * 1000, // minutes * seconds * (i.e. converted to) milliseconds
 			
 			success: function(response, opts) {
 				

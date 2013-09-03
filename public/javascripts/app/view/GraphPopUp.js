@@ -88,8 +88,8 @@ Ext.define('MyApp.view.GraphPopUp', {
     
     SetChartData: function(objD, objT)
     {
-		var data1 = objD.Result;
-		var data2 = objT.Result;
+		var data1 = objD.Bins;
+		var data2 = objT.Bins;
 		var Min = objD.Min;
 		var Max = objD.Max;
 		

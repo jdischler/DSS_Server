@@ -10,64 +10,56 @@ import org.codehaus.jackson.node.*;
 //------------------------------------------------------------------------------
 // Modeling Process
 //
-// This program uses crop rotation layers to assess the impact of crop rotation on other things
+// This program uses landscape proportion and land cover type to calculate pest suppression index (Grass) 
+// using 990m rectangle buffers 
+// Pest suppression index can vary from 0 to 1
+// This model is from unpublished work by Tim Meehan et al., (2012, PLOS one) from University of Wisconsin
+// Inputs are proportion of land cover particularly grass, selected cells in the raster map and crop rotation layer 
+// Output map of pest suppression index
+// Version 08/20/2013
 //
 //------------------------------------------------------------------------------
 public class Model_Pest_Suppression
 {
-	//static int Window_Size;
-	//static int mWidth, mHeight;
 
 	//--------------------------------------------------------------------------
 	public void Pest_Suppression(Selection selection, String Output_Folder, int[][] RotationT)
 	{
-		
+		// This particular block will be removed once we can recycle moving window results
+		 
+		// Define Variables
 		Layer_Base layer;
 		int width, height;
 		int NO_DATA = -9999;
-		float Total_Cells = selection.countSelectedPixels();
-		float Pest = 0;
-		//float Pest_T = 0;
-		//int Bin = 10;
-		//int Value_Pest;
-		//int[] CountBin_Pest = new int [Bin];
-		
-		int Buffer = 390; // In Meter
+		int Total_Cells = selection.countSelectedPixels();
+		int Buffer = 990; // In Meter
 		int Window_Size = Buffer / 30; // Number of Cells in Raster Map
-		float Prop_Ag = 0;
-		int Count_Ag = 0;
-		int Ag_Mask = 1 + 2 + 4 + 8 + 16 + 32 + 64 + 512; // 1, 2, 3, 4, 5, 6, 7, 10
-		float Prop_Forest = 0;
-		int Count_Forest = 0;
-		int Forest_Mask = 1024; // 11
+		
+		//float Prop_Forest = 0;
+		//int Count_Forest = 0;
+		//int Forest_Mask = 1024; // 11
 		float Prop_Grass = 0;
 		int Count_Grass = 0;
 		int Grass_Mask = 128 + 256; // 8 and 9
-		int Corn_Mask = 1; // 1
-						
-		// Pest_Suppression
-		//float Min_Pest = (float)(0.25 + 0.19f * 0 + 0.62f * 0);
-		//float Max_Pest = (float)(0.25 + 0.19f * 1 + 0.62f * 1);
+		int Ag_Mask = 1 + 2 + 4 + 8 + 16 + 32 + 64 + 512; // 1, 2, 3, 4, 5, 6, 7, 10
+		float Pest = 0;
 		
-
-		// Rotation
-		int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
-		if (Rotation == null)
+		// Retrive rotation layer from memory
+		//int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
+		if (RotationT == null)
 		{
 			Logger.info("Fail Rotation");
 			layer = new Layer_Raw("Rotation"); layer.init();
-			Rotation = Layer_Base.getLayer("Rotation").getIntData();
+			RotationT = Layer_Base.getLayer("Rotation").getIntData();
 		}
 			layer = Layer_Base.getLayer("Rotation");
 			width = layer.getWidth();
 			height = layer.getHeight();
 		
-		//Logger.info("About to output the model outcomes");
 		try {
 			
-			// Pest_Suppression
+			// Open a ASCII file to write the output 
 			PrintWriter out_P = new HeaderWrite("Pest_Suppression", width, height, Output_Folder).getWriter();
-			//PrintWriter out7 = new PrintWriter(new BufferedWriter(new FileWriter("./layerData/Pest.asc")));
 
 			// Precompute this so we don't do it on every cell
 			String stringNoData = Integer.toString(NO_DATA);
@@ -86,54 +78,36 @@ public class Model_Pest_Suppression
 					}
 					else if (selection.mSelection[y][x] == 1)
 					{
-
-						Prop_Ag = 0;
-						//Count_Ag = 0;
-						Prop_Forest = 0;
-						//Count_Forest = 0;
-						Prop_Grass = 0;
-						//Count_Grass = 0;
-						
-						// Calculate the Boundary for Moving Window
-						Moving_Window mWin = new Moving_Window(x, y, Window_Size, width, height);
-						float[] Proportion_AFG = mWin.Window_Operation(RotationT);
-						
-						//if (Prop_Ag < 0 || Prop_Ag > 1 || Prop_Forest < 0 || Prop_Forest > 1 || Prop_Grass < 0 || Prop_Grass > 1)
-						//{
-						//	Logger.info("Out of range:" + Float.toString(Prop_Ag) + " " + Float.toString(Prop_Forest) + " " + Float.toString(Prop_Grass));
-						//}
-						
-						Prop_Ag = Proportion_AFG[0];
-						Prop_Forest = Proportion_AFG[1];
-						Prop_Grass = Proportion_AFG[2];
-
-						// Pest_Suppression
-						int Crop_Type = 0;
-						if ((RotationT[y][x] & Ag_Mask) > 0)
+						// Filter out all land cover except grass and ag
+						if ((RotationT[y][x] & Grass_Mask) > 0 || (RotationT[y][x] & Ag_Mask) > 0)
 						{
-							Crop_Type = 0;	
+							
+							// Calculate the Boundary for Moving Window
+							Moving_Window mWin = new Moving_Window(x, y, Window_Size, width, height);
+							float[] Proportion_AFG = mWin.Window_Operation(RotationT);
+							
+							// Split out the proportion
+							//Prop_Forest = Proportion_AFG[1];
+							Prop_Grass = Proportion_AFG[2];
+				
+							// Crop type is zero for Ag
+							int Crop_Type = 0;
+							// Crop type is 1 for grass
+							if ((RotationT[y][x] & Grass_Mask) > 0)
+							{
+								Crop_Type = 1;
+							}
+							
+							// Pest suppression calculation
+							Pest = (float)(0.25 + (0.19f * Crop_Type) + (0.62f * Prop_Grass));
+	
+							// Write Pest to The File
+							sb_P.append(String.format("%.4f", Pest));
 						}
-						else if ((RotationT[y][x] & Grass_Mask) > 0)
+						else 
 						{
-							Crop_Type = 1;
+							sb_P.append(stringNoData);
 						}
-						// Maximum is not really 1
-						//Max_Pest = (float)(0.25 + 0.19f * 1 + 0.62f * 1);
-						//Min_Pest = (float)(0.25 + 0.19f * 0 + 0.62f * 0);
-						// Normalize using Max
-						Pest = (float)(0.25 + 0.19f * Crop_Type + 0.62f * Prop_Forest);
-						//float Pest = (float)(0.25 + 0.19f * Crop_Type + 0.62f * Prop_Forest) / Max_Pest;
-						//Pest_T = Pest + Pest_T;
-						// Summary of Pest
-						//Value_Pest = 0;
-						//Value_Pest = (int)((Pest - Min_Pest)/(Max_Pest - Min_Pest)* (Bin - 1));
-						//if (Value_Pest < 0 || Value_Pest >= Bin)
-						//{
-						//	Logger.info("Out of range Pest:" + Float.toString(Pest) + " " + Integer.toString(Value_Pest));
-						//}
-						//CountBin_Pest[Value_Pest]++;
-						// Write Pest to The File
-						sb_P.append(String.format("%.4f", Pest));
 						
 					}
 					if (x != width - 1) 
@@ -145,10 +119,6 @@ public class Model_Pest_Suppression
 				out_P.println(sb_P.toString());
 			}
 
-			//br1.close();
-			//br2.close();
-			//br3.close();
-			//br4.close();
 			// Close output files
 			out_P.close();
 		}
@@ -157,31 +127,6 @@ public class Model_Pest_Suppression
 			Logger.info(err.toString());
 			Logger.info("Oops, something went wrong with writing to the files!");
 		}
-
-		// Data to return to the client		
-		//ObjectNode obj = JsonNodeFactory.instance.objectNode();
-		//ObjectNode PestObj = JsonNodeFactory.instance.objectNode();
-
-		// Pest
-		//ArrayNode PestS = JsonNodeFactory.instance.arrayNode();
-		//for (int i = 0; i < CountBin_Pest.length; i++) {
-			//Total_Cells = CountBin_Pest[i] + Total_Cells;
-		//	PestS.add(CountBin_Pest[i]);
-		//}
-		// Average of Pest per pixel
-		//float Pest_Per_Cell = Pest_T / Total_Cells;
-		
-		// Pest
-		//PestObj.put("Result", PestS);
-		//PestObj.put("Min", String.format("%.4f", Min_Pest));
-		//PestObj.put("Max", String.format("%.4f", Max_Pest));
-		//PestObj.put("Pest", String.format("%.4f", Pest_Per_Cell));
-
-		// Add branches to JSON Node 
-		//obj.put("Pest", Pest);
-
-		//Logger.info(PestObj.toString());
-		//return PestObj;
 	}	
 	
 }

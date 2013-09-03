@@ -158,9 +158,10 @@ public class Application extends Controller
 	//----------------------------------------------------------------------
 	public static Result Models() throws Exception 
 	{
+		
 		//Logger.info("Called into Model:");
-		Logger.info(request().body().asJson().toString());
-
+		//Logger.info(request().body().asJson().toString());
+		
 		File output = new File("./layerData/Client_ID");
 		if(output.exists())
 		{
@@ -170,15 +171,6 @@ public class Application extends Controller
 		{
 			output.mkdir();
 		}
-
-		// Rotation
-		//int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
-		
-		// Create a new scenario and get a transformed crop rotation layer from it...
-		Scenario scenario = new Scenario();
-		scenario.getTransformedRotation(request().body().asJson());
-		Selection selection = scenario.mSelection;
-		//Logger.info("Server Run The Models Request:");
 		
 		Layer_Base layer;
 		int width, height;
@@ -188,93 +180,188 @@ public class Application extends Controller
 		width = layer.getWidth();
 		height = layer.getHeight();
 		
-		//Selection selection = new Selection(width, height);
+		//int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
+		// Select the entire landscape before transform
+		Selection selectionD = new Selection(width, height);
 
+		// Create a new scenario and get a transformed crop rotation layer from it...
+		Scenario scenario = new Scenario();
+		scenario.getTransformedRotation(request().body().asJson());
+		// Select based on user selection after transform
+		Selection selectionT = scenario.mSelection;
+		//Logger.info("Server Run The Models Request:");
+		
+		
+		
 		// Corn and Grass Production for D
-		//Model_Corn_Grass_Production Model_CGD = new Model_Corn_Grass_Production();
-		//TwoArrays ArrayD = Model_CGD.Corn_Grass_P(request().body().asJson(), selection, "Default", Rotation);
+		//Model_Crop_Yield Model_CGD = new Model_Crop_Yield();
+		//FourArrays ArrayD = Model_CGD.Crop_Y(selectionD, "Default", Rotation);
 		//float ArrayCD[] = ArrayD.a;
 		//float ArrayGD[] = ArrayD.b;
+		//float ArraySD[] = ArrayD.c;
+		//float ArrayAD[] = ArrayD.d;
 		
 		// Corn and Grass Production for T
-		//Model_Corn_Grass_Production Model_CGT = new Model_Corn_Grass_Production();
-		//TwoArrays ArrayT = Model_CGT.Corn_Grass_P(selection, "Client_ID", scenario.mNewRotation);
-		//float ArrayCT[] = ArrayT.a;
-		//float ArrayGT[] = ArrayT.b;
-
+		Model_Crop_Yield Model_CGT = new Model_Crop_Yield();
+		FourArrays ArrayT = Model_CGT.Crop_Y(selectionD, "Client_ID", scenario.mNewRotation);
+		float ArrayCT[] = ArrayT.a;
+		float ArrayGT[] = ArrayT.b;
+		float ArrayST[] = ArrayT.c;
+		float ArrayAT[] = ArrayT.d;
+		
+		
+		
 		// Regular Models
 		// Model_Ethanol
 		//Model_Ethanol ED = new Model_Ethanol();
-		//JsonNode SendBackED = ED.Ethanol(ArrayCD, ArrayGD, request().body().asJson(), selection, "Default", Rotation);
+		//ED.Ethanol(ArrayCD, ArrayGD, ArraySD, ArrayAD, selectionD, "Default", Rotation);
+		Model_Selection EDS = new Model_Selection();
+		JsonNode SendBack_ED = EDS.Selection(selectionT, "Ethanol", "Default");
 		
 		// Model_Ethanol
-		//Model_Ethanol ET = new Model_Ethanol();
-		//JsonNode SendBackET = ET.Ethanol(ArrayCT, ArrayGT, request().body().asJson(), selection, "Client_ID", scenario.mNewRotation);
-		//ET.Ethanol(ArrayCT, ArrayGT, selection, "Client_ID", scenario.mNewRotation);
+		Model_Ethanol ET = new Model_Ethanol();
+		ET.Ethanol(ArrayCT, ArrayGT, ArrayST, ArrayAT, selectionD, "Client_ID", scenario.mNewRotation);
+		Model_Selection ETS = new Model_Selection();
+		JsonNode SendBack_ET = ETS.Selection(selectionT, "Ethanol", "Client_ID");
+		
+		
 		
 		// Model_Net_Energy
-		//Model_Net_Energy NE_D = new Model_Net_Energy();
-		//JsonNode SendBackNED = NE_D.Net_Energy(ArrayCD, ArrayGD, request().body().asJson(), selection, "Default", Rotation);
+		// Default
+		//Model_Net_Energy NED = new Model_Net_Energy();
+		//NED.Net_Energy(ArrayCD, ArrayGD, ArraySD, ArrayAD, selectionD, "Default", Rotation);
+		Model_Selection NEDS = new Model_Selection();
+		JsonNode SendBack_NED = NEDS.Selection(selectionT, "Net_Energy", "Default");
 		
 		// Model_Net_Energy
-		//Model_Net_Energy NE_T = new Model_Net_Energy();
-		//JsonNode SendBackNET = NE_T.Net_Energy(ArrayCT, ArrayGT, request().body().asJson(), selection, "Client_ID", scenario.mNewRotation);
-		//NE_T.Net_Energy(ArrayCT, ArrayGT, selection, "Client_ID", scenario.mNewRotation);
+		// Transform
+		Model_Net_Energy NET = new Model_Net_Energy();
+		NET.Net_Energy(ArrayCT, ArrayGT, ArrayST, ArrayAT, selectionD, "Client_ID", scenario.mNewRotation);
+		Model_Selection NETS = new Model_Selection();
+		JsonNode SendBack_NET = NETS.Selection(selectionT, "Net_Energy", "Client_ID");
+		
+		
 		
 		// Model_Net_Income
-		//Model_Net_Income NI_D = new Model_Net_Income();
-		//JsonNode SendBackNID = NI_D.Net_Income(ArrayCD, ArrayGD, request().body().asJson(), selection, "Default", Rotation);
+		// Default
+		//Model_Net_Income NID = new Model_Net_Income();
+		//NID.Net_Income(ArrayCD, ArrayGD, ArraySD, ArrayAD, selectionD, "Default", Rotation);
+		Model_Selection NIDS = new Model_Selection();
+		JsonNode SendBack_NID = NIDS.Selection(selectionT, "Net_Income", "Default");
 		
 		// Model_Net_Income
-		//Model_Net_Income NI_T = new Model_Net_Income();
-		//JsonNode SendBackNIT = NI_T.Net_Income(ArrayCT, ArrayGT, request().body().asJson(), selection, "Client_ID", scenario.mNewRotation);
-		//NI_T.Net_Income(ArrayCT, ArrayGT, selection, "Client_ID", scenario.mNewRotation);
-
-		//  Models with Moving Window
+		// Transform
+		Model_Net_Income NIT = new Model_Net_Income();
+		NIT.Net_Income(ArrayCT, ArrayGT, ArrayST, ArrayAT, selectionD, "Client_ID", scenario.mNewRotation);
+		Model_Selection NITS = new Model_Selection();
+		JsonNode SendBack_NIT = NITS.Selection(selectionT, "Net_Income", "Client_ID");
+		
+		
+		
+		// Models with Moving Window
 		// Model_Habitat_Index
-		//Model_Habitat_Index HI_D = new Model_Habitat_Index();
-		//JsonNode SendBackHID = HI_D.Habitat_Index(request().body().asJson(), selection, "Default", Rotation);
+		// Default
+		//Model_Habitat_Index HID = new Model_Habitat_Index();
+		//HID.Habitat_Index(selectionD, "Default", Rotation);
+		Model_Selection HIDS = new Model_Selection();
+		JsonNode SendBack_HID = HIDS.Selection(selectionT, "Habitat_Index", "Default");
 		
 		// Model_Habitat_Index
-		//Model_Habitat_Index HI_T = new Model_Habitat_Index();
-		//JsonNode SendBackHIT = HI_T.Habitat_Index(request().body().asJson(), selection, "Client_ID", scenario.mNewRotation);
-		//HI_T.Habitat_Index(selection, "Client_ID", scenario.mNewRotation);
+		// Transform
+		Model_Habitat_Index HIT = new Model_Habitat_Index();
+		HIT.Habitat_Index(selectionD, "Client_ID", scenario.mNewRotation);
+		Model_Selection HITS = new Model_Selection();
+		JsonNode SendBack_HIT = HITS.Selection(selectionT, "Habitat_Index", "Client_ID");
 		
-		// Model_Nitrogen
-		//Model_Nitrogen N_D = new Model_Nitrogen();
-		//JsonNode SendBackND = N_D.Nitrogen(request().body().asJson(), selection, "Default", Rotation);
 		
-		// Model_Nitrogen
-		//Model_Nitrogen N_T = new Model_Nitrogen();
-		//JsonNode SendBackNT = N_T.Nitrogen(request().body().asJson(), selection, "Client_ID", scenario.mNewRotation);
-		//N_T.Nitrogen(selection, "Client_ID", scenario.mNewRotation);
-
-		// Model_Phosphorus
-		//Model_Phosphorus PH_D = new Model_Phosphorus();
-		//JsonNode SendBackPHD = PH_D.Phosphorus(request().body().asJson(), selection, "Default", Rotation);
 		
-		// Model_Phosphorus
-		//Model_Phosphorus PH_T = new Model_Phosphorus();
-		//JsonNode SendBackPHT = PH_T.Phosphorus(request().body().asJson(), selection, "Client_ID", scenario.mNewRotation);
-		//PH_T.Phosphorus(selection, "Client_ID", scenario.mNewRotation);
+		//Model_Pollinator_Pest_Suppression
+		//Model_Pollinator_Pest_Suppression PPS_D = new Model_Pollinator_Pest_Suppression();
+		//PPS_D.Pollinator_Pest_Suppression(selectionD, "Default", Rotation);
+		Model_Pollinator_Pest_Suppression PPS_T = new Model_Pollinator_Pest_Suppression();
+		PPS_T.Pollinator_Pest_Suppression(selectionD, "Client_ID", scenario.mNewRotation);
+		
+		
 		
 		// Model_Pest_Suppression
 		//Model_Pest_Suppression PS_D = new Model_Pest_Suppression();
-		//JsonNode SendBackPSD = PS_D.Pest_Suppression(request().body().asJson(), selection, "Default", Rotation);
+		//PS_D.Pest_Suppression(selectionD, "Default", Rotation);
+		Model_Selection PS_D = new Model_Selection();
+		JsonNode SendBack_PSD = PS_D.Selection(selectionT, "Pest_Suppression", "Default");
 		
 		// Model_Pest_Suppression
 		//Model_Pest_Suppression PS_T = new Model_Pest_Suppression();
-		//JsonNode SendBackPST = PS_T.Pest_Suppression(request().body().asJson(), selection, "Client_ID", scenario.mNewRotation);
 		//PS_T.Pest_Suppression(selection, "Client_ID", scenario.mNewRotation);
+		Model_Selection PS_T = new Model_Selection();
+		JsonNode SendBack_PST = PS_T.Selection(selectionT, "Pest_Suppression", "Client_ID");
+		
+		
 		
 		// Model_Pollinator
 		//Model_Pollinator PO_D = new Model_Pollinator();
-		//JsonNode SendBackPOD = PO_D.Pollinator(request().body().asJson(), selection, "Default", Rotation);
+		//PO_D.Pollinator(selectionD, "Default", Rotation);
+		Model_Selection PODS = new Model_Selection();
+		JsonNode SendBack_POD = PODS.Selection(selectionT, "Pollinator", "Default");
 		
 		// Model_Pollinator
 		//Model_Pollinator PO_T = new Model_Pollinator();
-		//JsonNode SendBackPOT = PO_T.Pollinator(request().body().asJson(), selection, "Client_ID", scenario.mNewRotation);
-		//PO_T.Pollinator(selection, "Client_ID", scenario.mNewRotation);
+		//PO_T.Pollinator(selectionD, "Client_ID", scenario.mNewRotation);
+		Model_Selection POTS = new Model_Selection();
+		JsonNode SendBack_POT = POTS.Selection(selectionT, "Pollinator", "Client_ID");
+		
+		
+		
+		// Models at watershed scale
+		// Run Both Models as the same time
+		//Model_Nitrogen_Phosphorus N_P_D = new Model_Nitrogen_Phosphorus();
+		//N_P_D.Nitrogen_Phosphorus(selectionD, "Default", Rotation);
+		Model_Nitrogen_Phosphorus NPT = new Model_Nitrogen_Phosphorus();
+		NPT.Nitrogen_Phosphorus(selectionD, "Client_ID", scenario.mNewRotation);
+		
+		// Model_Nitrogen
+		//Model_Nitrogen_Phosphorus N_P_D = new Model_Nitrogen_Phosphorus();
+		//N_P_D.Nitrogen_Phosphorus(selectionD, "Default", Rotation);
+		Model_Selection NDS = new Model_Selection();
+		JsonNode SendBack_ND = NDS.Selection(selectionT, "Nitrogen", "Default");
+		
+		// Model_Nitrogen
+		//Model_Nitrogen N_T = new Model_Nitrogen();
+		//N_T.Nitrogen(selectionD, "Client_ID", scenario.mNewRotation);
+		Model_Selection NTS = new Model_Selection();
+		JsonNode SendBack_NT = NTS.Selection(selectionT, "Nitrogen", "Client_ID");
+
+		// Model_Phosphorus
+		//Model_Phosphorus PH_D = new Model_Phosphorus();
+		//PH_D.Phosphorus(selectionD, "Default", Rotation);
+		Model_Selection PHDS = new Model_Selection();
+		JsonNode SendBack_PHD = PHDS.Selection(selectionT, "Phosphorus", "Default");
+		
+		// Model_Phosphorus
+		//Model_Phosphorus PH_T = new Model_Phosphorus();
+		//PH_T.Phosphorus(selectionD, "Client_ID", scenario.mNewRotation);
+		Model_Selection PHTS = new Model_Selection();
+		JsonNode SendBack_PHT = PHTS.Selection(selectionT, "Phosphorus", "Client_ID");
+		
+		//Model_Nitrogen_Phosphorus
+
+		//Model_Selection N_P_D = new Model_Selection();
+		//JsonNode SendBack_NPD = N_P_D.Selection(selectionT, "Nitrogen_Phosphorus", "Default");
+		
+		// Model_Nitrogen_Phosphorus
+		//Model_Selection N_P_T = new Model_Selection();
+		//JsonNode SendBack_NPT = N_P_T.Pollinator(selectionT, "Nitrogen_Phosphorus", "Client_ID");
+		
+		
+		
+		// Write Delat Files
+		//WriteDelta("Ethanol", selectionT);
+		//WriteDelta("Net_Energy", selectionT);
+		//WriteDelta("Net_Income", selectionT);
+		//WriteDelta("Habitat_Index", selectionT);
+		//WriteDelta("Nitrogen", selectionT);
+		//WriteDelta("Phosphorus", selectionT);
+		//WriteDelta("Pest_Suppression", selectionT);
+		//WriteDelta("Pollinator", selectionT);
 		
 		
 		
@@ -302,9 +389,14 @@ public class Application extends Controller
 		
 		
 		
-		// SendBack to Client
-		//ObjectNode SendBack = JsonNodeFactory.instance.objectNode();
+		// Run the model with the old rotation....
+		//Models modelD = new Models();
+		//JsonNode SendBackD = modelD.modeloutcome(selection, "Default", Rotation);
 		
+		// Run the model with the new transformed rotation...
+		//Models modelT = new Models();
+		//JsonNode SendBackT = modelT.modeloutcome(selection, "Client_ID", scenario.mNewRotation);
+
 		// SendBack.put("Ethanol", Ethanol);
 		// SendBack.put("Net_Energy", Net_Energy);
 		// SendBack.put("Net_Income", Net_Income);
@@ -314,60 +406,35 @@ public class Application extends Controller
 		// SendBack.put("Pest_Suppression", Pest_Suppression);
 		// SendBack.put("Pollinator", Pollinator);
 		
-		//ObjectNode SendBack = JsonNodeFactory.instance.objectNode();
-		
-		//SendBack.put("Ethanol_D", SendBackED);
-		//SendBack.put("Ethanol_T", SendBackET);
-		//SendBack.put("Net_Energy_D", SendBackNED);
-		//SendBack.put("Net_Energy_T", SendBackNET);
-		//SendBack.put("Net_Income_D", SendBackNID);
-		//SendBack.put("Net_Income_T", SendBackNIT);
-		//SendBack.put("Habitat_Index_D", SendBackHID);
-		//SendBack.put("Habitat_Index_T", SendBackHIT);
-		//SendBack.put("Nitrogen_D", SendBackND);
-		//SendBack.put("Nitrogen_T", SendBackNT);
-		//SendBack.put("Phosphorus_D", SendBackPHD);
-		//SendBack.put("Phosphorus_T", SendBackPHT);
-		//SendBack.put("Pest_Suppression_D", SendBackPSD);
-		//SendBack.put("Pest_Suppression_T", SendBackPST);
-		//SendBack.put("Pollinator_D", SendBackPOD);
-		//SendBack.put("Pollinator_T", SendBackPOT);
 		
 		
+		// SendBack to Client
+		ObjectNode SendBack  = JsonNodeFactory.instance.objectNode();
+		ObjectNode SendBackD = JsonNodeFactory.instance.objectNode();
+		ObjectNode SendBackT = JsonNodeFactory.instance.objectNode();
 		
-		// Write Delat Files
-		// WriteDelta("Ethanol", selection);
-		// WriteDelta("Net_Energy", selection);
-		// WriteDelta("Net_Income", selection);
-		// WriteDelta("Habitat_Index", selection);
-		// WriteDelta("Nitrogen", selection);
-		// WriteDelta("Phosphorus", selection);
-		// WriteDelta("Pest_Suppression", selection);
-		// WriteDelta("Pollinator", selection);
+		SendBackD.put("Ethanol", SendBack_ED);
+		SendBackT.put("Ethanol", SendBack_ET);
+		SendBackD.put("Net_Energy", SendBack_NED);
+		SendBackT.put("Net_Energy", SendBack_NET);
+		SendBackD.put("Net_Income", SendBack_NID);
+		SendBackT.put("Net_Income", SendBack_NIT);
+		SendBackD.put("Habitat_Index", SendBack_HID);
+		SendBackT.put("Habitat_Index", SendBack_HIT);
+		SendBackD.put("Nitrogen", SendBack_ND);
+		SendBackT.put("Nitrogen", SendBack_NT);
+		SendBackD.put("Phosphorus", SendBack_PHD);
+		SendBackT.put("Phosphorus", SendBack_PHT);
+		SendBackD.put("Pest_Suppression", SendBack_PSD);
+		SendBackT.put("Pest_Suppression", SendBack_PST);
+		SendBackD.put("Pollinator", SendBack_POD);
+		SendBackT.put("Pollinator", SendBack_POT);
 		
-		
-		
-		// Run the model with the old rotation....
-		Models modelD = new Models();
-		JsonNode SendBackD = modelD.modeloutcome(selection, "Default", Rotation);
-		
-		// Run the model with the new transformed rotation...
-		Models modelT = new Models();
-		JsonNode SendBackT = modelT.modeloutcome(selection, "Client_ID", scenario.mNewRotation);
-		
-		// Get some data to send back...
-		ObjectNode SendBack = JsonNodeFactory.instance.objectNode();
-		
-		SendBack.put("Default", SendBackD);
+		SendBack.put("Default",   SendBackD);
 		SendBack.put("Transform", SendBackT);
 		
-		// 
-		// WriteDelta("Bird_Index", selection, model);
-		// WriteDelta("Nitrogen", selection, model);
-		// WriteDelta("Phosphorus", selection, model);
-		// WriteDelta("Pest", selection, model);
-		// WriteDelta("Pollinator", selection, model);
-
+		Logger.info(SendBack.toString());
+		
 		return ok(SendBack);
 	}
 	

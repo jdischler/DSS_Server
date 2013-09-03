@@ -30,53 +30,55 @@ public class Global extends GlobalSettings
 		{
 			Output.mkdir();
 			
-			//Layer_Base layer;
-			//int width, height;
-			// Rotation
-			//int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
-			//layer = Layer_Base.getLayer("Rotation");
-			//width = layer.getWidth();
-			//height = layer.getHeight();
+			Layer_Base layer;
+			int width, height;
 			
-			//Selection selection = new Selection(width, height);
-		
+			// Rotation
+			int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
+			layer = Layer_Base.getLayer("Rotation");
+			width = layer.getWidth();
+			height = layer.getHeight();
+			
+			Selection selection = new Selection(width, height);
+
 			// Corn and Grass Production for D
-			//Model_Corn_Grass_Production Model_CGD = new Model_Corn_Grass_Production();
-			//TwoArrays ArrayD = Model_CGD.Corn_Grass_P(selection, "Default", Rotation);
-			//float ArrayCD[] = ArrayD.a;
-			//float ArrayGD[] = ArrayD.b;
+			Model_Crop_Yield Model_CGD = new Model_Crop_Yield();
+			FourArrays ArrayD = Model_CGD.Crop_Y(selection, "Default", Rotation);
+			float ArrayCD[] = ArrayD.a;
+			float ArrayGD[] = ArrayD.b;
+			float ArraySD[] = ArrayD.c;
+			float ArrayAD[] = ArrayD.d;
 			
 			// Regular Models
-			//Model_Ethanol ED = new Model_Ethanol();
-			//ED.Ethanol(ArrayCD, ArrayGD, selection, "Default", Rotation);
+			// Model_Ethanol
+			Model_Ethanol E_D = new Model_Ethanol();
+			E_D.Ethanol(ArrayCD, ArrayGD, ArraySD, ArrayAD, selection, "Default", Rotation);
+	
+			// Model_Net_Energy
+			Model_Net_Energy NE_D = new Model_Net_Energy();
+			NE_D.Net_Energy(ArrayCD, ArrayGD, ArraySD, ArrayAD, selection, "Default", Rotation);
+	
+			// Model_Net_Income
+			Model_Net_Income NI_D = new Model_Net_Income();
+			NI_D.Net_Income(ArrayCD, ArrayGD, ArraySD, ArrayAD, selection, "Default", Rotation);
+	
+			// Models with Moving Window
+			// Model_Habitat_Index
+			Model_Habitat_Index HI_D = new Model_Habitat_Index();
+			HI_D.Habitat_Index(selection, "Default", Rotation);
 			
-			//Model_Net_Energy NE_D = new Model_Net_Energy();
-			//NE_D.Net_Energy(ArrayCD, ArrayGD, selection, "Default", Rotation);
+			// Model_Pest_Suppression
+			Model_Pest_Suppression PS_D = new Model_Pest_Suppression();
+			PS_D.Pest_Suppression(selection, "Default", Rotation);
+	
+			// Model_Pollinator
+			Model_Pollinator PO_D = new Model_Pollinator();
+			PO_D.Pollinator(selection, "Default", Rotation);
 			
-			//Model_Net_Income NI_D = new Model_Net_Income();
-			//NI_D.Net_Income(ArrayCD, ArrayGD, selection, "Default", Rotation);
-			
-			//Regular_Functions RF = new Regular_Functions();
-			//RF.Regular_Functions(selection, "Default", Rotation);
-			
-			// Moving Window Models
-			//Model_Habitat_Index HI_D = new Model_Habitat_Index();
-			//HI_D.Habitat_Index(selection, "Default", Rotation);
-			
-			//Model_Nitrogen N_D = new Model_Nitrogen();
-			//N_D.Nitrogen(selection, "Default", Rotation);
-			
-			//Model_Phosphorus PH_D = new Model_Phosphorus();
-			//PH_D.Phosphorus(selection, "Default", Rotation);
-			
-			//Model_Pest_Suppression PS_D = new Model_Pest_Suppression();
-			//PS_D.Pest_Suppression(selection, "Default", Rotation);
-			
-			//Model_Pollinator PO_D = new Model_Pollinator();
-			//PO_D.Pollinator(selection, "Default", Rotation);
-			
-			//Moving_Window_Functions MWF = new Moving_Window_Functions();
-			//MWF.Moving_Window_Functions(selection, "Default", Rotation);
+			//Model_Nitrogen_Phosphorus
+			Model_Nitrogen_Phosphorus N_P_D = new Model_Nitrogen_Phosphorus();
+			N_P_D.Nitrogen_Phosphorus(selection, "Default", Rotation);
+
 		}
 			
 			// Run Default for Each Model

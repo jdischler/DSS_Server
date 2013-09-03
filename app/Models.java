@@ -314,7 +314,14 @@ public class Models
 			//int Window_Size = 0;
 			//int Count_C = 0;
 			//int Count_G = 0;
-
+			
+			int Buffer = 390; // In Meter
+			int Window_Size = Buffer / 30; // Number of Cells in Raster Map
+			int Ag_Mask = 1 + 2 + 4 + 8 + 16 + 32 + 64 + 512; // 1, 2, 3, 4, 5, 6, 7, 10
+			int Forest_Mask = 1024; // 11
+			int Grass_Mask = 128 + 256; // 8 and 9
+			int Corn_Mask = 1; // 1
+									
 			// Precompute this so we don't do it on every cell
 			String stringNoData = Integer.toString(NO_DATA);
 			
@@ -363,20 +370,14 @@ public class Models
 						// The Sie of Moving Window Size to Calculate Bird Habitat
 						//int Buffer = 150; // In Meter
 						
-						int Buffer = 390; // In Meter
-						int Window_Size = Buffer / 30; // Number of Cells in Raster Map
 						float Prop_Ag = 0;
 						int Count_Ag = 0;
-						int Ag_Mask = 1 + 2 + 4 + 8 + 16 + 32 + 64 + 512; // 1, 2, 3, 4, 5, 6, 7, 10
 						float Prop_Forest = 0;
 						int Count_Forest = 0;
-						int Forest_Mask = 1024; // 11
 						float Prop_Grass = 0;
 						int Count_Grass = 0;
-						int Grass_Mask = 128 + 256; // 8 and 9
-						int Corn_Mask = 1; // 1
 						
-						
+
 						
 						// Calculate number of cells inside Bins
 						int Value_E = 0;
@@ -562,8 +563,10 @@ public class Models
 						Moving_Window mWin = new Moving_Window(x, y, Window_Size, width, height);
 						
 						// I to Width and J to Height
-						for (int j = mWin.ULY; j <= mWin.LRY; j++) {
-							for (int i = mWin.ULX; i <= mWin.LRX; i++) {
+						for (int j = mWin.ULY; j <= mWin.LRY; j++) 
+						{
+							for (int i = mWin.ULX; i <= mWin.LRX; i++) 
+							{
 								if (RotationT[j][i] != 0)
 								{
 									mWin.Total++;
@@ -571,11 +574,11 @@ public class Models
 									{
 										Count_Ag = Count_Ag + 1;	
 									}
-									else if ((RotationT[j][i] & Forest_Mask) > 0 )
+									else if ((RotationT[j][i] & Forest_Mask) > 0)
 									{
 										Count_Forest = Count_Forest + 1;
 									}
-									else if ((RotationT[j][i] & Grass_Mask) > 0 )
+									else if ((RotationT[j][i] & Grass_Mask) > 0)
 									{
 										Count_Grass = Count_Grass + 1;
 									}
@@ -601,7 +604,7 @@ public class Models
 						
 						// Bird Habitat
 						// Lambda
-						float Lambda = -4.47f + 2.95f * Prop_Ag + 5.17f * Prop_Forest; 
+						float Lambda = -4.47f + 2.95f * Prop_Ag + 5.17f * Prop_Grass; 
 						// Habitat Index
 						float Habitat_Index = (float)((1 / ( 1 / Math.exp(Lambda) + 1 ) ) / 0.67f);
 						Habitat_Index_T = Habitat_Index + Habitat_Index_T;
@@ -672,7 +675,7 @@ public class Models
 						//Max_Pest = (float)(0.25 + 0.19f * 1 + 0.62f * 1);
 						//Min_Pest = (float)(0.25 + 0.19f * 0 + 0.62f * 0);
 						// Normalize using Max
-						float Pest = (float)(0.25 + 0.19f * Crop_Type + 0.62f * Prop_Forest);
+						float Pest = (float)(0.25f + 0.19f * Crop_Type + 0.62f * Prop_Grass);
 						Min_Pest_T = Min(Min_Pest_T, Pest);
 						Max_Pest_T = Max(Max_Pest_T, Pest);
 						//float Pest = (float)(0.25 + 0.19f * Crop_Type + 0.62f * Prop_Forest) / Max_Pest;
@@ -693,7 +696,7 @@ public class Models
 						//Max_Poll = (float)Math.pow(0.6617f + 2.98 * 1 + 1.83 * 1, 2);
 						//Min_Poll = (float)Math.pow(0.6617f + 2.98 * 0 + 1.83 * 0, 2);
 						// Normalize using Max
-						float Poll = (float)Math.pow(0.6617f + 2.98 * Prop_Forest + 1.83 * Prop_Grass, 2);
+						float Poll = (float)Math.pow(0.6617f + 2.98f * Prop_Forest + 1.83f * Prop_Grass, 2);
 						Min_Poll_T = Min(Min_Poll_T, Poll);
 						Max_Poll_T = Max(Max_Poll_T, Poll);
 						//float Poll = (float)Math.pow(0.6617f + 2.98 * Prop_Forest + 1.83 * Prop_Grass, 2) / Max_Poll;
@@ -811,6 +814,7 @@ public class Models
 		Total_Bins_Num1 = 0; 
 		// 10 Bins
 		Total_Bins_Num2 = 0;
+		
 		// Ethonal
 		for (int i = 0; i < CountBin_E.length; i++) 
 		{

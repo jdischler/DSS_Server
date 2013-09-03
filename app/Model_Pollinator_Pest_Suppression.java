@@ -19,11 +19,11 @@ import org.codehaus.jackson.node.*;
 // Version 08/20/2013
 //
 //------------------------------------------------------------------------------
-public class Model_Pollinator
+public class Model_Pollinator_Pest_Suppression
 {
 	
 	//--------------------------------------------------------------------------
-	public void Pollinator(Selection selection, String Output_Folder, int[][] RotationT)
+	public void Pollinator_Pest_Suppression(Selection selection, String Output_Folder, int[][] RotationT)
 	{
 		// This particular block will be removed once we can recycle moving window results
 		
@@ -37,6 +37,7 @@ public class Model_Pollinator
 		
 		// Initialize default variables
 		float Poll = 0;
+		float Pest = 0;
 		float Prop_Forest = 0;
 		int Count_Forest = 0;
 		int Forest_Mask = 1024; // 11
@@ -56,24 +57,29 @@ public class Model_Pollinator
 			width = layer.getWidth();
 			height = layer.getHeight();
 
-		try {
+		try 
+		{
 			
 			// Open a ASCII file to write the output 
-			PrintWriter out_P = new HeaderWrite("Pollinator", width, height, Output_Folder).getWriter();
-
+			PrintWriter out_Po = new HeaderWrite("Pollinator", width, height, Output_Folder).getWriter();
+			PrintWriter out_Pe = new HeaderWrite("Pest_Suppression", width, height, Output_Folder).getWriter();
+			
 			// Precompute this so we don't do it on every cell
 			String stringNoData = Integer.toString(NO_DATA);
 			
 			for (int y = 0; y < height; y++) 
 			{
 				
-				StringBuffer sb_P = new StringBuffer();
+				StringBuffer sb_Po = new StringBuffer();
+				StringBuffer sb_Pe = new StringBuffer();
 				
-				for (int x = 0; x < width; x++) {				
+				for (int x = 0; x < width; x++) 
+				{				
 					if (RotationT[y][x] == 0 || selection.mSelection[y][x] == 0) 
 					{
 						// Check for No-Data Value
-						sb_P.append(stringNoData);
+						sb_Po.append(stringNoData);
+						sb_Pe.append(stringNoData);
 					} 
 					else if (selection.mSelection[y][x] == 1)
 					{
@@ -90,17 +96,34 @@ public class Model_Pollinator
 						Poll = (float)Math.pow(0.6617f + (2.98f * Prop_Forest) + (1.83f * Prop_Grass), 2) / 18;
 						
 						// Write Pollinator to The ASCII File
-						sb_P.append(String.format("%.4f", Poll));
+						sb_Po.append(String.format("%.4f", Poll));
+						
+						// Crop type is zero for Ag
+						int Crop_Type = 0;
+						// Crop type is 1 for grass
+						if ((RotationT[y][x] & Grass_Mask) > 0)
+						{
+							Crop_Type = 1;
+						}
+							
+						// Pest suppression calculation
+						Pest = (float)(0.25 + (0.19f * Crop_Type) + (0.62f * Prop_Grass));
+	
+						// Write Pest to The File
+						sb_Pe.append(String.format("%.4f", Pest));
 					}
 					if (x != width - 1) 
 					{
-						sb_P.append(" ");
+						sb_Po.append(" ");
+						sb_Pe.append(" ");
 					}
 				}
-				out_P.println(sb_P.toString());
+				out_Po.println(sb_Po.toString());
+				out_Pe.println(sb_Pe.toString());
 			}
 			// Close output files
-			out_P.close();
+			out_Po.close();
+			out_Pe.close();
 		}
 		catch(Exception err) 
 		{

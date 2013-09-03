@@ -10,95 +10,62 @@ import org.codehaus.jackson.node.*;
 //------------------------------------------------------------------------------
 // Modeling Process
 //
-// This program uses crop rotation layers to assess the impact of crop rotation on other things
+// This program uses corn, soy, grass and alfalfa production to calculate Net Income 
+// This model is from unpublished work by Tim University of Wisconsin Madison
+// Inputs are corn, soy, grass and alfalfa layers and crop rotation layer 
+// Outputs are ASCII map of Net Income
+// Version 08/20/2013
 //
 //------------------------------------------------------------------------------
 public class Model_Net_Income
 {
-		
-	//static float Net_Income;
-	//static float Net_Income_C;
-	//static float Net_Income_G;
-	//static float Net_Income_T;
 	
 	//--------------------------------------------------------------------------
-	public void Net_Income(float[] Corn_P, float[] Grass_P, Selection selection, String Output_Folder, int[][] RotationT)
+	public void Net_Income(float[] Corn_Y, float[] Grass_Y, float[] Soy_Y, float[] Alfalfa_Y, Selection selection, String Output_Folder, int[][] RotationT)
 	{
-		
+		// Defining variables based on the selected layer
 		Layer_Base layer;
 		int width, height;
 		int NO_DATA = -9999;
 		int i = 0;
 		int Total_Cells = selection.countSelectedPixels();
 		float Net_Income = 0;
-		//float Net_Income_T = 0;
-		//int Forest_Mask = 1024; // 11
-		int Grass_Mask = 128 + 256; // 8 and 9
-		int Corn_Mask = 1; // 1
-		//int Bin = 10;
-		//int Value_NI = 0;
-		//int[] CountBin_NI = new int [Bin];
+		int Grass_Mask = 256; // 9
+		int Corn_Mask = 1; // 1	
+		int Soy_Mask = 2; // 2	
+		int Alfalfa_Mask = 128; // 8	
 		
-		// Ton/ha
-		//float Min_Corn_Y = 3.08f - 0.11f * 70;
-		//float Max_Corn_Y = 3.08f + 0.02f * 210 + 0.10f * 75 + 0.04f * 200;
-		// Tons per pixel
-		//float Min_Corn_P = 0.0001f * 900 * Min_Corn_Y;
-		//float Max_Corn_P = 0.0001f * 900 * Max_Corn_Y;
-		
-		// Ton/ha
-		//float Min_Grass_Y = 2.20f - 0.07f * 70;
-		//float Max_Grass_Y = 2.20f + 0.02f * 210 + 0.07f * 75 + 0.03f * 200;
-		// Tons per pixel
-		//float Min_Grass_P = 0.0001f * 900 * Min_Grass_Y;
-		//float Max_Grass_P = 0.0001f * 900 * Max_Grass_Y;
-		
-		// Net Income
+		// Gross return
 		float Return;
-		// $ per pixel cost for Corn
-		float PC_Cost = 1124 * 0.0001f * 900;
-		// $ per pixel cost for Grass
-		float PG_Cost = 412  * 0.0001f * 900;
-		// Price per pixel
-		float P_Per_Corn = 300;
-		float P_Per_Stover = 100;
-		float P_Per_Grass = 100;
-		// Calculation
-		//float Min_NI_C = P_Per_Corn * 0.5f * Min_Corn_P + P_Per_Stover * 0.25f * Min_Corn_P - PC_Cost;
-		//float Max_NI_C = P_Per_Corn * 0.5f * Max_Corn_P + P_Per_Stover * 0.25f * Max_Corn_P - PC_Cost;
-		//Logger.info("Max_NI_C:" + Float.toString(Max_NI_C));
-		//float Min_NI_G = P_Per_Grass * Min_Grass_P - PG_Cost;
-		//float Max_NI_G = P_Per_Grass * Max_Grass_P - PG_Cost;
-		// Net Income
-		//float NI_Min = 0;
-		//float NI_Max = 0;
 		
-		// Min in Net Income
-		//if (Min_NI_C <= Min_NI_G)
-		//{
-		//	NI_Min = Min_NI_C;
-		//}
-		//else 
-		//{
-		//	NI_Min = Min_NI_G;
-		//}
-		// Max in Net Income
-		//if (Max_NI_C <= Max_NI_G)
-		//{
-		//	NI_Max = Max_NI_G;
-		//}
-		//else 
-		//{
-		//	NI_Max = Max_NI_C;
-		//}
+		// $ per hec cost for Corn
+		float PC_Cost = 1135;
+		// $ per hec cost for Corn Stover
+		float PCS_Cost = 412;
+		// $ per hec cost for Grass
+		float PG_Cost = 412;
+		// $ per hec cost for Soy
+		float PS_Cost = 627;
+		// $ per hec cost for Alfalfa
+		float PA_Cost = 620;
 		
-		// Rotation
-		int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
-		if (Rotation == null)
+		// Price per tonne
+		float P_Per_Corn = 274;
+		float P_Per_Stover = 70;
+		float P_Per_Grass = 107;
+		float P_Per_Soy = 249;
+		float P_Per_Alfalfa = 230;
+		
+		// Proportion of Stover 
+		float Prop_Stover_Harvest = 0.38f;
+		
+		// Retrive rotation layer from memory
+		//int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
+		if (RotationT == null)
 		{
 			Logger.info("Fail Rotation");
 			layer = new Layer_Raw("Rotation"); layer.init();
-			Rotation = Layer_Base.getLayer("Rotation").getIntData();
+			RotationT = Layer_Base.getLayer("Rotation").getIntData();
 		}
 			layer = Layer_Base.getLayer("Rotation");
 			width = layer.getWidth();
@@ -108,10 +75,6 @@ public class Model_Net_Income
 		{
 			// Net Energy
 			PrintWriter out_NI = new HeaderWrite("Net_Income", width, height, Output_Folder).getWriter();
-			// Cron Ethanol
-			//PrintWriter out_EC = HeaderWrite("Corn_Ethanol", width, height, Output_Folder);
-			// Grass Ethanol
-			//PrintWriter out_EG = HeaderWrite("Grass_Ethanol", width, height, Output_Folder);
 			
 			// Precompute this so we don't do it on every cell
 			String stringNoData = Integer.toString(NO_DATA);
@@ -120,8 +83,6 @@ public class Model_Net_Income
 			{
 				// Outputs
 				StringBuffer sb_NI = new StringBuffer();
-				//StringBuffer sb_EC = new StringBuffer();
-				//StringBuffer sb_EG = new StringBuffer();
 				
 				for (int x = 0; x < width; x++) 
 				{
@@ -129,100 +90,69 @@ public class Model_Net_Income
 					{
 						// Check for No-Data
 						sb_NI.append(stringNoData);
-						//sb_EC.append(stringNoData);
-						//sb_EG.append(stringNoData);
 					}
-					else if (selection.mSelection[y][x] == 1)
+					else
+					//else if (selection.mSelection[y][x] == 1)
 					{
-						Net_Income = 0;
-						//Value_NI = 0;
-						
+						// Corn
 						if ((RotationT[y][x] & Corn_Mask) > 0)
 						{
-							// Tonnes per Ha
-							Return = P_Per_Corn * 0.5f * Corn_P[i] + P_Per_Stover * 0.25f * Corn_P[i];
-							Net_Income = Return - PC_Cost;
-							//Ethanol_C = Corn_P[i] * 0.5f * 0.4f * 1000 + Corn_P * 0.25f * 0.38f * 1000;
-							//Value_NI = (int)((Net_Income - NI_Min)/(NI_Max - NI_Min) * (Bin - 1));
-							//CountBin_NI[Value_NI]++;
+							// Gross return $ per hec
+							Return = P_Per_Corn * 0.5f * Corn_Y[i] + P_Per_Stover * Prop_Stover_Harvest * 0.5f * Corn_Y[i];
+							// Net Income $ per hec
+							Net_Income = Return - PC_Cost - PCS_Cost;
+							sb_NI.append(String.format("%.4f", Net_Income));
 						}
+						// Grass
 						else if ((RotationT[y][x] & Grass_Mask) > 0)
 						{
-							// Tonnes per pixel
-							Return = P_Per_Grass * Grass_P[i];
-							Net_Income = Return  - PC_Cost;
-							//Ethanol_G = Grass_P[i] * 0.38f * 1000;
-							//Value_NI = (int)((Net_Income - NI_Min)/(NI_Max - NI_Min) * (Bin - 1));
-							//CountBin_NI[Value_NI]++;
+							// Gross return $ per pixel
+							Return = P_Per_Grass * Grass_Y[i];
+							// Net Income $ per pixel
+							Net_Income = Return  - PG_Cost;
+							sb_NI.append(String.format("%.4f", Net_Income));
 						}
-						
-						sb_NI.append(String.format("%.4f", Net_Income));
-						//sb_EC.append(Ethanol_C.toString());
-						//sb_EG.append(Ethanol_G.toString());
+						// Soy
+						else if ((RotationT[y][x] & Soy_Mask) > 0)
+						{
+							// Soy return $ per pixel
+							Return = P_Per_Soy * Soy_Y[i];
+							// Net Income $ per pixel
+							Net_Income = Return  - PS_Cost;
+							sb_NI.append(String.format("%.4f", Net_Income));
+						}
+						// Alfalfa
+						else if ((RotationT[y][x] & Alfalfa_Mask) > 0)
+						{
+							// Alfalfa return $ per pixel
+							Return = P_Per_Alfalfa * Alfalfa_Y[i];
+							// Net Income $ per pixel
+							Net_Income = Return  - PA_Cost;
+							sb_NI.append(String.format("%.4f", Net_Income));
+						}
+						else 
+						{
+							sb_NI.append(stringNoData);
+						}
 						
 						i = i + 1;
 					}
-					
-					// Net Income
-					//Net_Income_T += Net_Income;
-					//if (Value_NI < 0 || Value_NI >= Bin)
-					//{
-					//	Logger.info("Out of range NI:" + Float.toString(Net_Income) + " " + Integer.toString(Value_NI));
-					//}
 						
 					if (x != width - 1) 
 					{
 						sb_NI.append(" ");
-						//sb_EC.append(" ");
-						//sb_EG.append(" ");
 					}
 				}
 				out_NI.println(sb_NI.toString());
-				//out_EC.println(sb_EC.toString());
-				//out_EG.println(sb_EG.toString());
 			}
-			// Close input files
-			//br1.close();
-			//br2.close();
-			//br3.close();
-			//br4.close();
 			// Close output files
 			out_NI.close();
-			//out_EC.close();
-			//out_EG.close();
 		}
 		catch(Exception err) 
 		{
 			Logger.info(err.toString());
 			Logger.info("Oops, something went wrong with writing to the files!");
 		}
-		
-		// Data to return to the client		
-		//ObjectNode obj = JsonNodeFactory.instance.objectNode();
-		//ObjectNode N_I = JsonNodeFactory.instance.objectNode();
-		
-		//Total_Cells = 0;
-		// Net_Income
-		//ArrayNode NI = JsonNodeFactory.instance.arrayNode();
-		//for (i = 0; i < CountBin_NI.length; i++) 
-		//{
-			//Total_Cells = CountBin_NI[i] + Total_Cells;
-		//	NI.add(CountBin_NI[i]);
-		//}
-		// Average of Net_Income per pixel
-		//float Net_Income_Per_Cell = Net_Income_T / Total_Cells;
-		
-		// Net_Income
-		//N_I.put("Result", NI);
-		//N_I.put("Min", String.format("%.4f", NI_Min));
-		//N_I.put("Max", String.format("%.4f", NI_Max));
-		//N_I.put("Net_Income", String.format("%.4f", Net_Income_Per_Cell));
-		
-		// Add branches to JSON Node 
-		//obj.put("Net_Income", N_I);
-		
-		//Logger.info(N_I.toString());
-		//return N_I;
 	}
 	
 }

@@ -10,97 +10,81 @@ import org.codehaus.jackson.node.*;
 //------------------------------------------------------------------------------
 // Modeling Process
 //
-// This program uses crop rotation layers to assess the impact of crop rotation on other things
+// This program uses corn, soy, grass and alfalfa production to calculate Net Energy 
+// This model is from unpublished work by Tim University of Wisconsin Madison
+// Inputs are corn, soy, grass and alfalfa layers and crop rotation layer 
+// Outputs are ASCII map of Net Energy
+// Version 08/20/2013
 //
 //------------------------------------------------------------------------------
 public class Model_Net_Energy
 {
-		
-	//static float Net_Energy;
-	//static float Net_Energy_C;
-	//static float Net_Energy_G;
-	//static float Net_Energy_T;
 	
 	//--------------------------------------------------------------------------
-	public void Net_Energy(float[] Corn_P, float[] Grass_P, Selection selection, String Output_Folder, int[][] RotationT)
+	public void Net_Energy(float[] Corn_Y, float[] Grass_Y, float[] Soy_Y, float[] Alfalfa_Y, Selection selection, String Output_Folder, int[][] RotationT)
 	{
 		
+		// Defining variables based on the selected layer
 		Layer_Base layer;
 		int width, height;
 		int NO_DATA = -9999;
 		int i = 0;
 		int Total_Cells = selection.countSelectedPixels();
 		float Net_Energy = 0;
-		//float Net_Energy_T = 0;
-		//int Forest_Mask = 1024; // 11
-		int Grass_Mask = 128 + 256; // 8 and 9
-		int Corn_Mask = 1; // 1
-		//int Value_NE;	
-		//int Bin = 10;
-		//int[] CountBin_NE = new int [Bin];
+		float Net_Energy_C = 0;
+		float Net_Energy_S = 0;
+		int Grass_Mask = 256; // 9
+		int Corn_Mask = 1; // 1	
+		int Soy_Mask = 2; // 2	
+		int Alfalfa_Mask = 128; // 8
 		
-		// Ton/ha
-		//float Min_Corn_Y = 3.08f - 0.11f * 70;
-		//float Max_Corn_Y = 3.08f + 0.02f * 210 + 0.10f * 75 + 0.04f * 200;
-		// Tons per pixel
-		//float Min_Corn_P = 0.0001f * 900 * Min_Corn_Y;
-		//float Max_Corn_P = 0.0001f * 900 * Max_Corn_Y;
+		// Proportion of Stover 
+		float Prop_Stover_Harvest = 0.38f;
 		
-		// Ton/ha
-		//float Min_Grass_Y = 2.20f - 0.07f * 70;
-		//float Max_Grass_Y = 2.20f + 0.02f * 210 + 0.07f * 75 + 0.03f * 200;
-		// Tons per pixel
-		//float Min_Grass_P = 0.0001f * 900 * Min_Grass_Y;
-		//float Max_Grass_P = 0.0001f * 900 * Max_Grass_Y;
+		// Energy Input at Farm (MJ per Ha)
+		float EI_CF = 18151f; // HILL
+		float EI_CSF = 2121f; // HILL 1/4 fuel use for stover harvest
+		float EI_GF = 7411f; // EBAMM
+		float EI_SF = 6096f; // Hill
+		float EI_AF = 9075f; // Corn Grain Hill * 1/2
 		
-		// Net Income
-		//float Min_NE_C = (Min_Corn_P * 0.5f * 0.4f * 1000 * 21.20f + Min_Corn_P * 0.25f * 0.38f * 1000 * 21.20f) - (18.92f / 10000 * 900 + 7.41f / 10000 * 900 + 15.25f * Max_Corn_P * 0.5f * 0.4f * 1000 + 1.71f * Max_Corn_P * 0.25f * 0.38f * 1000);
-		//float Max_NE_C = (Max_Corn_P * 0.5f * 0.4f * 1000 * 21.20f + Max_Corn_P * 0.25f * 0.38f * 1000 * 21.20f) - (18.92f / 10000 * 900 + 7.41f / 10000 * 900 + 15.25f * Min_Corn_P * 0.5f * 0.4f * 1000 + 1.71f * Min_Corn_P * 0.25f * 0.38f * 1000);
-		//float Min_NE_G = (Min_Grass_P * 0.38f * 1000 * 21.20f) - (7.41f / 10000 * 900 + 1.71f * Max_Grass_P * 0.38f * 1000);
-		//float Max_NE_G = (Max_Grass_P * 0.38f * 1000 * 21.20f) - (7.41f / 10000 * 900 + 1.71f * Min_Grass_P * 0.38f * 1000);
-		// Net Energy
-		//float NE_Min = 0;
-		//float NE_Max = 0;
+		// Energy Input in Processing (MJ per L)
+		float EI_CP = 13.99f; // HILL
+		float EI_CSP = 1.71f; // EBAMM cellulosic
+		float EI_GP = 1.71f; // EBAMM cellulosic
+		float EI_SP = 10.39f; // Hill
+		float EI_AP = 1.71f; // Corn Grain Hill * 1/2
 		
-		// Min in Net Income
-		//if (Min_NE_C <= Min_NE_G)
-		//{
-		//	NE_Min = Min_NE_C;
-		//}
-		//else 
-		//{
-		//	NE_Min = Min_NE_G;
-		//}
-		// Max in Net Income
-		//if (Max_NE_G <= Max_NE_C)
-		//{
-		//	NE_Max = Max_NE_C;
-		//}
-		//else 
-		//{
-		//	NE_Max = Max_NE_G;
-		//}
+		// Energy output (MJ per L)
+		float EO_C = 21.26f + 4.31f; // HILL
+		float EO_CS = 21.26f + 3.40f; // EBAMM cellulosic
+		float EO_G = 21.26f + 3.40f; // EBAMM cellulosic
+		float EO_S = 32.93f + 21.94f; // Hill
+		float EO_A = 21.26f + 3.40f; // EBAMM cellulosic
 		
-		// Rotation
-		int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
-		if (Rotation == null)
+		// Conversion Efficiency (L per Mg)
+		float CEO_C = 400; // HILL
+		float CEO_CS = 380; // EBAMM cellulosic
+		float CEO_G = 380; // EBAMM cellulosic
+		float CEO_S = 200; // Hill
+		float CEO_A = 380; // EBAMM cellulosic
+		
+		// Retrive rotation layer from memory
+		//int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
+		if (RotationT == null)
 		{
 			Logger.info("Fail Rotation");
 			layer = new Layer_Raw("Rotation"); layer.init();
-			Rotation = Layer_Base.getLayer("Rotation").getIntData();
+			RotationT = Layer_Base.getLayer("Rotation").getIntData();
 		}
 			layer = Layer_Base.getLayer("Rotation");
 			width = layer.getWidth();
 			height = layer.getHeight();
 		
-		try {
-			
+		try 
+		{	
 			// Net Energy
 			PrintWriter out_NE = new HeaderWrite("Net_Energy", width, height, Output_Folder).getWriter();
-			// Cron Ethanol
-			//PrintWriter out_EC = HeaderWrite("Corn_Ethanol", width, height, Output_Folder);
-			// Grass Ethanol
-			//PrintWriter out_EG = HeaderWrite("Grass_Ethanol", width, height, Output_Folder);
 			
 			// Precompute this so we don't do it on every cell
 			String stringNoData = Integer.toString(NO_DATA);
@@ -109,8 +93,6 @@ public class Model_Net_Energy
 			{
 				// Outputs
 				StringBuffer sb_NE = new StringBuffer();
-				//StringBuffer sb_EC = new StringBuffer();
-				//StringBuffer sb_EG = new StringBuffer();
 				
 				for (int x = 0; x < width; x++) 
 				{
@@ -118,95 +100,63 @@ public class Model_Net_Energy
 					{
 						// Check for No-Data
 						sb_NE.append(stringNoData);
-						//sb_EC.append(stringNoData);
-						//sb_EG.append(stringNoData);
 					}
-					else if (selection.mSelection[y][x] == 1)
+					else
+					//else if (selection.mSelection[y][x] == 1)
 					{
-						Net_Energy = 0;
-						//Value_NE = 0;
-						
+						// Corn
 						if ((RotationT[y][x] & Corn_Mask) > 0)
 						{
-							// Tonnes per Ha
-							Net_Energy = (Corn_P[i] * 0.5f * 0.4f * 1000 * 21.20f + Corn_P[i] * 0.25f * 0.38f * 1000 * 21.20f) - (18.92f / 10000 * 900 + 7.41f / 10000 * 900 + 15.25f * Corn_P[i] * 0.5f * 0.4f * 1000 + 1.71f * Corn_P[i] * 0.25f * 0.38f * 1000);
-							//Ethanol_C = Corn_P[i] * 0.5f * 0.4f * 1000 + Corn_P * 0.25f * 0.38f * 1000;
-							//Value_NE = (int)((Net_Energy - NE_Min)/(NE_Max - NE_Min) * (Bin - 1));
-							//CountBin_NE[Value_NE]++;
+							// MJ per Ha
+							// Net_Energy
+							Net_Energy_C = (Corn_Y[i] * 0.5f * CEO_C * EO_C) - (EI_CF + EI_CP * Corn_Y[i] * 0.5f * CEO_C);
+							Net_Energy_S = (Corn_Y[i] * Prop_Stover_Harvest * 0.5f * CEO_CS * EO_CS) - (EI_CSF + EI_CSP * Corn_Y[i] * Prop_Stover_Harvest * 0.5f * CEO_CS);
+							Net_Energy = Net_Energy_C + Net_Energy_S;
+							sb_NE.append(String.format("%.4f", Net_Energy));
 						}
+						// Grass
 						else if ((RotationT[y][x] & Grass_Mask) > 0)
 						{
-							// Tonnes per pixel
-							Net_Energy = (Grass_P[i] * 0.38f * 1000 * 21.20f) - (7.41f / 10000 * 900 + 1.71f * Grass_P[i] * 0.38f * 1000);
-							//Ethanol_G = Grass_P[i] * 0.38f * 1000;
-							//Value_NE = (int)((Net_Energy - NE_Min)/(NE_Max - NE_Min) * (Bin - 1));
-							//CountBin_NE[Value_NE]++;
+							// MJ per Ha
+							Net_Energy = (Grass_Y[i] * CEO_G * EO_G) - (EI_GF + EI_GP * Grass_Y[i] * CEO_G);
+							sb_NE.append(String.format("%.4f", Net_Energy));
 						}
-						
-						// Net Energy
-						//Net_Energy_T += Net_Energy;
-						//if (Value_NE < 0 || Value_NE >= Bin)
-						//{
-						//	Logger.info("Out of range NE:" + Float.toString(Net_Energy) + " " + Integer.toString(Value_NE));
-						//}
-						
-						sb_NE.append(String.format("%.4f", Net_Energy));
-						//sb_EC.append(Ethanol_C.toString());
-						//sb_EG.append(Ethanol_G.toString());
+						// Soy
+						else if ((RotationT[y][x] & Soy_Mask) > 0)
+						{
+							// MJ per Ha
+							Net_Energy = (Soy_Y[i] * 0.40f * CEO_S * EO_S) - (EI_SF + EI_SP * Soy_Y[i] * CEO_S);
+							sb_NE.append(String.format("%.4f", Net_Energy));
+						}
+						// Alfalfa
+						else if ((RotationT[y][x] & Alfalfa_Mask) > 0)
+						{
+							// MJ per Ha
+							Net_Energy = (Alfalfa_Y[i] * CEO_A * EO_A) - (EI_AF + EI_AP * Alfalfa_Y[i] * CEO_A);
+							sb_NE.append(String.format("%.4f", Net_Energy));
+						}
+						else 
+						{
+							sb_NE.append(stringNoData);
+						}
 						
 						i = i + 1;
 					}
 					if (x != width - 1) 
 					{
 						sb_NE.append(" ");
-						//sb_EC.append(" ");
-						//sb_EG.append(" ");
 					}
 				}
 				out_NE.println(sb_NE.toString());
-				//out_EC.println(sb_EC.toString());
-				//out_EG.println(sb_EG.toString());
 			}
-			// Close input files
-			//br1.close();
-			//br2.close();
-			//br3.close();
-			//br4.close();
 			// Close output files
 			out_NE.close();
-			//out_EC.close();
-			//out_EG.close();
 		}
 		catch(Exception err) 
 		{
 			Logger.info(err.toString());
 			Logger.info("Oops, something went wrong with writing to the files!");
 		}
-		
-		// Data to return to the client		
-		//ObjectNode obj = JsonNodeFactory.instance.objectNode();
-		//ObjectNode N_E = JsonNodeFactory.instance.objectNode();
-		//Total_Cells = 0;
-		// Net Energy
-		//ArrayNode NE = JsonNodeFactory.instance.arrayNode();
-		//for (i = 0; i < CountBin_NE.length; i++) 
-		//{
-			//Total_Cells = CountBin_NE[i] + Total_Cells;
-		//	NE.add(CountBin_NE[i]);
-		//}
-		// Average of Net_Energy per pixel
-		//float Net_Energy_Per_Cell = Net_Energy_T / Total_Cells;
-		
-		// Net_Energy
-		//N_E.put("Result", NE);
-		//N_E.put("Min", String.format("%.4f", NE_Min));
-		//N_E.put("Max", String.format("%.4f", NE_Max));
-		//N_E.put("Net_Energy", String.format("%.4f", Net_Energy_Per_Cell));
-		
-		// Add branches to JSON Node
-		//obj.put("Net_Energy", N_E);
-		//Logger.info(N_E.toString());
-		//return N_E;
 	}
 	
 }

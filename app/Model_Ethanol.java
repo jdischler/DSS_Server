@@ -10,83 +10,46 @@ import org.codehaus.jackson.node.*;
 //------------------------------------------------------------------------------
 // Modeling Process
 //
-// This program uses crop rotation layers to assess the impact of crop rotation on other things
+// This program uses corn and grass production to calculate Ethanol
+// This model is from unpublished work by Tim University of Wisconsin Madison
+// Inputs are corn and grass production layers, selected cells in the raster map and crop rotation layer 
+// Outputs are ASCII map of Ethanol
+// Version 08/20/2013
 //
 //------------------------------------------------------------------------------
 public class Model_Ethanol
 {
-		
-	//static float Ethanol;
-	//static float Ethanol_C;
-	//static float Ethanol_G;
-	//static float Ethanol_T;
 	
 	//--------------------------------------------------------------------------
-	public void Ethanol(float[] Corn_P, float[] Grass_P, Selection selection, String Output_Folder, int[][] RotationT)
+	public void Ethanol(float[] Corn_Y, float[] Grass_Y, float[] Soy_Y, float[] Alfalfa_Y, Selection selection, String Output_Folder, int[][] RotationT)
 	{
 		
+		// Defining variables based on the selected layer
 		Layer_Base layer;
 		int width, height;
 		int NO_DATA = -9999;
 		int i = 0;
 		int Total_Cells = selection.countSelectedPixels();
-		//Logger.info("Total_Cells: " + Float.toString(Total_Cells));
-		int Grass_Mask = 128 + 256; // 8 and 9
-		int Corn_Mask = 1; // 1
 		float Ethanol = 0;
-		//float Ethanol_T = 0;
-		//int Value_E;
-		//int Bin = 10;
-		//int[] CountBin_E = new int [Bin];
+		int Grass_Mask = 256; // 9
+		int Corn_Mask = 1; // 1	
+		int Soy_Mask = 2; // 2	
+		int Alfalfa_Mask = 128; // 8
 		
-		// Ton/ha
-		//float Min_Corn_Y = 3.08f - 0.11f * 70;
-		//float Max_Corn_Y = 3.08f + 0.02f * 210 + 0.10f * 75 + 0.04f * 200;
-		// Tons per pixel
-		//float Min_Corn_P = 0.0001f * 900 * Min_Corn_Y;
-		//float Max_Corn_P = 0.0001f * 900 * Max_Corn_Y;
+		// Conversion Efficiency (L per Mg)
+		float CEO_C = 400; // HILL
+		float CEO_CS = 380; // EBAMM cellulosic
+		float CEO_G = 380; // EBAMM cellulosic
+		float CEO_S = 200; // Hill
+		float CEO_A = 380; // EBAMM cellulosic
 		
-		// Ton/ha
-		//float Min_Grass_Y = 2.20f - 0.07f * 70;
-		//float Max_Grass_Y = 2.20f + 0.02f * 210 + 0.07f * 75 + 0.03f * 200;
-		// Tons per pixel
-		//float Min_Grass_P = 0.0001f * 900 * Min_Grass_Y;
-		//float Max_Grass_P = 0.0001f * 900 * Max_Grass_Y;
-		
-		// Lit per pixel
-		//float C_E_Min = Min_Corn_P * 0.5f * 0.4f * 1000 + Min_Corn_P * 0.25f * 0.38f * 1000;
-		//float C_E_Max = Max_Corn_P * 0.5f * 0.4f * 1000 + Max_Corn_P * 0.25f * 0.38f * 1000;
-		//float G_E_Min = Min_Grass_P * 0.38f * 1000;
-		//float G_E_Max = Max_Grass_P * 0.38f * 1000;
-		//float E_Min = 0;
-		//float E_Max = 0;
-		
-		// Min in E
-		// if (G_E_Min <= C_E_Min)
-		// {
-			// E_Min = G_E_Min;
-		// }
-		// else 
-		// {
-			// E_Min = C_E_Min;
-		// }
-		// Max in E
-		// if (G_E_Max <= C_E_Max)
-		// {
-			// E_Max = C_E_Max;
-		// }
-		// else 
-		// {
-			// E_Max = G_E_Max;
-		// }
-		
-		// Rotation
-		int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
-		if (Rotation == null)
+		// Retrive rotation layer from memory
+		//int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
+		if (RotationT == null)
 		{
 			Logger.info("Fail Rotation");
 			layer = new Layer_Raw("Rotation"); layer.init();
-			Rotation = Layer_Base.getLayer("Rotation").getIntData();
+			RotationT = Layer_Base.getLayer("Rotation").getIntData();
 		}
 			layer = Layer_Base.getLayer("Rotation");
 			width = layer.getWidth();
@@ -94,12 +57,8 @@ public class Model_Ethanol
 		
 		try 
 		{
-			// Ethanol
+			// Creating ASCII file to ouput Ethanol value
 			PrintWriter out_E = new HeaderWrite("Ethanol", width, height, Output_Folder).getWriter();
-			// Cron Ethanol
-			//PrintWriter out_EC = HeaderWrite("Corn_Ethanol", width, height, Output_Folder);
-			// Grass Ethanol
-			//PrintWriter out_EG = HeaderWrite("Grass_Ethanol", width, height, Output_Folder);
 			
 			// Precompute this so we don't do it on every cell
 			String stringNoData = Integer.toString(NO_DATA);
@@ -107,10 +66,8 @@ public class Model_Ethanol
 			for (int y = 0; y < height; y++) 
 			{
 				
-				// Outputs
+				// Make buffer to write outputs
 				StringBuffer sb_E = new StringBuffer();
-				//StringBuffer sb_EC = new StringBuffer();
-				//StringBuffer sb_EG = new StringBuffer();
 				
 				for (int x = 0; x < width; x++) 
 				{
@@ -118,99 +75,63 @@ public class Model_Ethanol
 					{
 						// Check for No-Data
 						sb_E.append(stringNoData);
-						//sb_EC.append(stringNoData);
-						//sb_EG.append(stringNoData);
 					}
 					else if (selection.mSelection[y][x] == 1)
 					{
-						Ethanol = 0;
-						//Value_E = 0;
 						
 						if ((RotationT[y][x] & Corn_Mask) > 0)
 						{
+							// Calculate Ethanol bsaed on Corn Production 
 							// Tonnes per Ha
-							Ethanol = Corn_P[i] * 0.5f * 0.4f * 1000 + Corn_P[i] * 0.25f * 0.38f * 1000;
-							//Ethanol_T += Ethanol;
-							//Ethanol_C = Corn_P[i] * 0.5f * 0.4f * 1000 + Corn_P * 0.25f * 0.38f * 1000;
-							//Value_E = (int)((Ethanol - E_Min)/(E_Max - E_Min) * (Bin - 1));
-							//CountBin_E[Value_E]++;
-
+							Ethanol = Corn_Y[i] * 0.5f * CEO_C + Corn_Y[i] * 0.25f * CEO_CS;
+							sb_E.append(String.format("%.4f", Ethanol));
 						}
 						else if ((RotationT[y][x] & Grass_Mask) > 0)
 						{
+							// Calculate Ethanol bsaed on Grass Production 
 							// Tonnes per pixel
-							Ethanol = Grass_P[i] * 0.38f * 1000;
-							//Ethanol_T += Ethanol;
-							//Ethanol_G = Grass_P[i] * 0.38f * 1000;
-							//Value_E = (int)((Ethanol - E_Min)/(E_Max - E_Min) * (Bin - 1));
-							//CountBin_E[Value_E]++;
+							Ethanol = Grass_Y[i] * CEO_G;
+							sb_E.append(String.format("%.4f", Ethanol));
 						}
-						
-						//Ethanol_T += Ethanol;
-												
-						//if (Value_E < 0 || Value_E >= Bin)
-						//{
-						//	Logger.info("Out of range E: " + Float.toString(Ethanol) + " " + Integer.toString(Value_E));
-						//}
-						
-						sb_E.append(String.format("%.4f", Ethanol));
-						//sb_EC.append(Ethanol_C.toString());
-						//sb_EG.append(Ethanol_G.toString());
+						// Soy
+						else if ((RotationT[y][x] & Soy_Mask) > 0)
+						{
+							// Calculate Ethanol bsaed on Soy Production 
+							// Tonnes per pixel
+							Ethanol = Soy_Y[i] * CEO_S;
+							sb_E.append(String.format("%.4f", Ethanol));
+						}
+						// Alfalfa
+						else if ((RotationT[y][x] & Alfalfa_Mask) > 0)
+						{
+							// Calculate Ethanol bsaed on Alfalfa Production 
+							// Tonnes per pixel
+							Ethanol = Alfalfa_Y[i] * CEO_A;
+							sb_E.append(String.format("%.4f", Ethanol));
+						}
+						else 
+						{
+							sb_E.append(stringNoData);
+						}
+					
 						
 						i = i + 1;
 					}
 					if (x != width - 1) 
 					{
 						sb_E.append(" ");
-						//sb_EC.append(" ");
-						//sb_EG.append(" ");
 					}
 				}
 				out_E.println(sb_E.toString());
-				//out_EC.println(sb_EC.toString());
-				//out_EG.println(sb_EG.toString());
 			}
-			// Close input files
-			//br1.close();
-			//br2.close();
-			//br3.close();
-			//br4.close();
 			// Close output files
 			out_E.close();
-			//out_EC.close();
-			//out_EG.close();
 		}
 		catch(Exception err) 
 		{
 			Logger.info(err.toString());
 			Logger.info("Oops, something went wrong with writing to the files!");
 		}
-		
-		// Data to return to the client		
-		//ObjectNode obj = JsonNodeFactory.instance.objectNode();
-		//ObjectNode E_C_G = JsonNodeFactory.instance.objectNode();
-		// Ethonal
-		//ArrayNode E = JsonNodeFactory.instance.arrayNode();
-		//for (i = 0; i < CountBin_E.length; i++) 
-		//{
-		//	E.add(CountBin_E[i]);
-		//}
-		// Average of Ethanol per pixel
-		//float E_Per_Cell = Ethanol_T / Total_Cells;
-		
-		// Ethonal
-		//E_C_G.put("Result", E);
-		//E_C_G.put("Min", String.format("%.4f", E_Min));
-		//E_C_G.put("Max", String.format("%.4f", E_Max));
-		//E_C_G.put("Ethanol", Ethanol_T / 1000);
-		//E_C_G.put("Ethanol", String.format("%.4f", E_Per_Cell));
-		
-		// Add branches to JSON Node 
-		//obj.put("Ethanol", E_C_G);
-
-		//Logger.info(E_C_G.toString());
-		
-		//return E_C_G;
 	}
 	
 }

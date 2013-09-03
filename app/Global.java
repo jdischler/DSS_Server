@@ -134,6 +134,9 @@ public class Global extends GlobalSettings
 		cr.computeRotation();
 		*/
 		
+		/* new CalculateCornGrassProduction().run();
+		*/
+		
 		Layer_Base layer;
 		try {
 			layer = new Layer_Indexed("rotation"); layer.init();

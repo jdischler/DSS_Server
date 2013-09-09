@@ -35,12 +35,14 @@ public class Layer_Indexed extends Layer_Base
 	}
 	
 	private ArrayList<Layer_Key> mLayerKey;
+	private boolean mbIsShifted;
 	
 	//--------------------------------------------------------------------------
-	public Layer_Indexed(String name) {
+	public Layer_Indexed(String name, boolean shifted) {
 		super(name);
 		
 		mLayerKey = new ArrayList<Layer_Key>();
+		mbIsShifted = shifted;
 	}
 	
 	//--------------------------------------------------------------------------
@@ -51,8 +53,8 @@ public class Layer_Indexed extends Layer_Base
 			int val = Integer.parseInt(lineElementsArray[x]);
 			if (val <= 0) { // mNoDataValue?
 				val = 0;
-			}
-			else {
+			}// NOTE: not converting...
+			else if (mbIsShifted) {
 				// convert to a bit style value for fast/simultaneous compares
 				if (val <= 32) {
 					val = convertIndexToMask(val);
@@ -208,9 +210,19 @@ public class Layer_Indexed extends Layer_Base
 		JsonNode queryValues = queryNode.get("matchValues");
 		int test_mask = getCompareBitMask(queryValues);
 
-		for (int y = 0; y < mHeight; y++) {
-			for (int x = 0; x < mWidth; x++) {
-				selection.mSelection[y][x] &= ((mIntData[y][x] & test_mask) > 0 ? 1 : 0);
+		if (mbIsShifted) {
+			for (int y = 0; y < mHeight; y++) {
+				for (int x = 0; x < mWidth; x++) {
+					selection.mSelection[y][x] &= ((mIntData[y][x] & test_mask) > 0 ? 1 : 0);
+				}
+			}
+		}
+		else {
+			for (int y = 0; y < mHeight; y++) {
+				for (int x = 0; x < mWidth; x++) {
+					int shifted = mIntData[y][x] > 0 ? (1 << (mIntData[y][x]-1)) : 0;
+					selection.mSelection[y][x] &= ((shifted & test_mask) > 0 ? 1 : 0);
+				}
 			}
 		}
 		return selection;

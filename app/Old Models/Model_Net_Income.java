@@ -21,7 +21,8 @@ public class Model_Net_Income
 {
 	
 	//--------------------------------------------------------------------------
-	public void Net_Income(float[] Corn_Y, float[] Grass_Y, float[] Soy_Y, float[] Alfalfa_Y, Selection selection, String Output_Folder, int[][] RotationT)
+	//public void Net_Income(float[] Corn_Y, float[] Grass_Y, float[] Soy_Y, float[] Alfalfa_Y, Selection selection, String Output_Folder, int[][] RotationT)
+	public void Net_Income(float[] YI, Selection selection, String Output_Folder, int[][] RotationT)
 	{
 		// Defining variables based on the selected layer
 		Layer_Base layer;
@@ -98,7 +99,7 @@ public class Model_Net_Income
 						if ((RotationT[y][x] & Corn_Mask) > 0)
 						{
 							// Gross return $ per hec
-							Return = P_Per_Corn * 0.5f * Corn_Y[i] + P_Per_Stover * Prop_Stover_Harvest * 0.5f * Corn_Y[i];
+							Return = P_Per_Corn * 0.5f * YI[i] + P_Per_Stover * Prop_Stover_Harvest * 0.5f * YI[i];
 							// Net Income $ per hec
 							Net_Income = Return - PC_Cost - PCS_Cost;
 							sb_NI.append(String.format("%.4f", Net_Income));
@@ -107,7 +108,7 @@ public class Model_Net_Income
 						else if ((RotationT[y][x] & Grass_Mask) > 0)
 						{
 							// Gross return $ per pixel
-							Return = P_Per_Grass * Grass_Y[i];
+							Return = P_Per_Grass * YI[i];
 							// Net Income $ per pixel
 							Net_Income = Return  - PG_Cost;
 							sb_NI.append(String.format("%.4f", Net_Income));
@@ -116,7 +117,7 @@ public class Model_Net_Income
 						else if ((RotationT[y][x] & Soy_Mask) > 0)
 						{
 							// Soy return $ per pixel
-							Return = P_Per_Soy * Soy_Y[i];
+							Return = P_Per_Soy * YI[i];
 							// Net Income $ per pixel
 							Net_Income = Return  - PS_Cost;
 							sb_NI.append(String.format("%.4f", Net_Income));
@@ -125,7 +126,7 @@ public class Model_Net_Income
 						else if ((RotationT[y][x] & Alfalfa_Mask) > 0)
 						{
 							// Alfalfa return $ per pixel
-							Return = P_Per_Alfalfa * Alfalfa_Y[i];
+							Return = P_Per_Alfalfa * YI[i];
 							// Net Income $ per pixel
 							Net_Income = Return  - PA_Cost;
 							sb_NI.append(String.format("%.4f", Net_Income));

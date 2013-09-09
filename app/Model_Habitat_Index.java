@@ -22,7 +22,8 @@ public class Model_Habitat_Index
 {
 	// Define habitat index function
 	//--------------------------------------------------------------------------
-	public void Habitat_Index(Selection selection, String Output_Folder, int[][] RotationT)
+	public float[] Habitat_Index(Selection selection, int[][] RotationT)
+	//public void Habitat_Index(Selection selection, String Output_Folder, int[][] RotationT)
 	{
 		
 		// Defining variables based on the selected layer
@@ -30,7 +31,7 @@ public class Model_Habitat_Index
 		int width, height;
 		int NO_DATA = -9999;
 		int Total_Cells = selection.countSelectedPixels();
-		float Habitat_Index = 0;
+		//float Habitat_Index = 0;
 							
 		int Buffer = 390; // In Meter
 		int Window_Size = Buffer / 30; // Number of Cells in Raster Map
@@ -41,15 +42,19 @@ public class Model_Habitat_Index
 		int Count_Grass = 0;
 		int Grass_Mask = 128 + 256; // 8 and 9
 		int Corn_Mask = 1; // 1
-						
+		int i = 0;
+		
+		// Net Energy
+		float[] Habitat_Index = new float[Total_Cells];
+		
 		// Retrive rotation layer from memory
 		// int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
-		if (RotationT == null)
-		{
-			Logger.info("Fail Rotation");
-			layer = new Layer_Raw("Rotation"); layer.init();
+		//if (RotationT == null)
+		//{
+		//	Logger.info("Fail Rotation");
+		//	layer = new Layer_Raw("Rotation"); layer.init();
 			//Rotation = Layer_Base.getLayer("Rotation").getIntData();
-		}
+		//}
 			layer = Layer_Base.getLayer("Rotation");
 			width = layer.getWidth();
 			height = layer.getHeight();
@@ -57,24 +62,24 @@ public class Model_Habitat_Index
 		try 
 		{
 			// Creating ASCII file to ouput Bird Index value
-			PrintWriter out_HI = new HeaderWrite("Habitat_Index", width, height, Output_Folder).getWriter();
+			//PrintWriter out_HI = new HeaderWrite("Habitat_Index", width, height, Output_Folder).getWriter();
 
 			// Precompute this so we don't do it on every cell
-			String stringNoData = Integer.toString(NO_DATA);
+			//String stringNoData = Integer.toString(NO_DATA);
 			
 			for (int y = 0; y < height; y++) 
 			{
 				// Outputs
-				StringBuffer sb_HI = new StringBuffer();
+				//StringBuffer sb_HI = new StringBuffer();
 				
 				for (int x = 0; x < width; x++) 
 				{				
-					if (RotationT[y][x] == 0 || selection.mSelection[y][x] == 0) 
-					{
+					//if (RotationT[y][x] == 0 || selection.mSelection[y][x] == 0) 
+					//{
 						// Check for No-Data Value
-						sb_HI.append(stringNoData);
-					}
-					else if (selection.mSelection[y][x] == 1)
+					//	sb_HI.append(stringNoData);
+					//}
+					if (selection.mSelection[y][x] == 1)
 					{
 						
 						// Calling the moving window class to initialize the boundary of moving window
@@ -90,27 +95,33 @@ public class Model_Habitat_Index
 						// Lambda
 						float Lambda = -4.47f + (2.95f * Prop_Ag) + (5.17f * Prop_Grass); 
 						// Habitat Index
-						Habitat_Index = (float)((1 / ( 1 / Math.exp(Lambda) + 1 ) ) / 0.67f);
+						Habitat_Index[i] = (float)((1 / ( 1 / Math.exp(Lambda) + 1 ) ) / 0.67f);
 						// Write Habitat Index to The File
-						sb_HI.append(String.format("%.4f", Habitat_Index));
+						//sb_HI.append(String.format("%.4f", Habitat_Index));
+						
+						i = i + 1;
 					}
 					
-					if (x != width - 1) 
-					{
-						sb_HI.append(" ");
-					}
+					//if (x != width - 1) 
+					//{
+					//	sb_HI.append(" ");
+					//}
 				}
 				
-				out_HI.println(sb_HI.toString());
+				//out_HI.println(sb_HI.toString());
 			}
 			// Close output files
-			out_HI.close();
+			//out_HI.close();
 		}
 		catch(Exception err) 
 		{
 			Logger.info(err.toString());
 			Logger.info("Oops, something went wrong with writing to the files!");
 		}
+		
+		Logger.info("Model_Habitat_Index is finished");
+				
+		return Habitat_Index;
 	}	
 	
 }

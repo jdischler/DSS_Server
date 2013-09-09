@@ -21,7 +21,8 @@ public class Model_Net_Energy
 {
 	
 	//--------------------------------------------------------------------------
-	public void Net_Energy(float[] Corn_Y, float[] Grass_Y, float[] Soy_Y, float[] Alfalfa_Y, Selection selection, String Output_Folder, int[][] RotationT)
+	public void Net_Energy(float[] YI, Selection selection, String Output_Folder, int[][] RotationT)
+	//public void Net_Energy(float[] Corn_Y, float[] Grass_Y, float[] Soy_Y, float[] Alfalfa_Y, Selection selection, String Output_Folder, int[][] RotationT)
 	{
 		
 		// Defining variables based on the selected layer
@@ -109,8 +110,8 @@ public class Model_Net_Energy
 						{
 							// MJ per Ha
 							// Net_Energy
-							Net_Energy_C = (Corn_Y[i] * 0.5f * CEO_C * EO_C) - (EI_CF + EI_CP * Corn_Y[i] * 0.5f * CEO_C);
-							Net_Energy_S = (Corn_Y[i] * Prop_Stover_Harvest * 0.5f * CEO_CS * EO_CS) - (EI_CSF + EI_CSP * Corn_Y[i] * Prop_Stover_Harvest * 0.5f * CEO_CS);
+							Net_Energy_C = (YI[i] * 0.5f * CEO_C * EO_C) - (EI_CF + EI_CP * YI[i] * 0.5f * CEO_C);
+							Net_Energy_S = (YI[i] * Prop_Stover_Harvest * 0.5f * CEO_CS * EO_CS) - (EI_CSF + EI_CSP * YI[i] * Prop_Stover_Harvest * 0.5f * CEO_CS);
 							Net_Energy = Net_Energy_C + Net_Energy_S;
 							sb_NE.append(String.format("%.4f", Net_Energy));
 						}
@@ -118,21 +119,21 @@ public class Model_Net_Energy
 						else if ((RotationT[y][x] & Grass_Mask) > 0)
 						{
 							// MJ per Ha
-							Net_Energy = (Grass_Y[i] * CEO_G * EO_G) - (EI_GF + EI_GP * Grass_Y[i] * CEO_G);
+							Net_Energy = (YI[i] * CEO_G * EO_G) - (EI_GF + EI_GP * YI[i] * CEO_G);
 							sb_NE.append(String.format("%.4f", Net_Energy));
 						}
 						// Soy
 						else if ((RotationT[y][x] & Soy_Mask) > 0)
 						{
 							// MJ per Ha
-							Net_Energy = (Soy_Y[i] * 0.40f * CEO_S * EO_S) - (EI_SF + EI_SP * Soy_Y[i] * CEO_S);
+							Net_Energy = (YI[i] * 0.40f * CEO_S * EO_S) - (EI_SF + EI_SP * YI[i] * CEO_S);
 							sb_NE.append(String.format("%.4f", Net_Energy));
 						}
 						// Alfalfa
 						else if ((RotationT[y][x] & Alfalfa_Mask) > 0)
 						{
 							// MJ per Ha
-							Net_Energy = (Alfalfa_Y[i] * CEO_A * EO_A) - (EI_AF + EI_AP * Alfalfa_Y[i] * CEO_A);
+							Net_Energy = (YI[i] * CEO_A * EO_A) - (EI_AF + EI_AP * YI[i] * CEO_A);
 							sb_NE.append(String.format("%.4f", Net_Energy));
 						}
 						else 

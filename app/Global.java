@@ -28,56 +28,56 @@ public class Global extends GlobalSettings
 		File Output = new File("./layerData/Default");
 		if(!Output.exists())
 		{
-			Output.mkdir();
+			//Output.mkdir();
 			
-			Layer_Base layer;
-			int width, height;
+			//Layer_Base layer;
+			//int width, height;
 			
 			// Rotation
-			int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
-			layer = Layer_Base.getLayer("Rotation");
-			width = layer.getWidth();
-			height = layer.getHeight();
+			//int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
+			//layer = Layer_Base.getLayer("Rotation");
+			//width = layer.getWidth();
+			//height = layer.getHeight();
 			
-			Selection selection = new Selection(width, height);
+			//Selection selection = new Selection(width, height);
 
 			// Corn and Grass Production for D
-			Model_Crop_Yield Model_CGD = new Model_Crop_Yield();
-			FourArrays ArrayD = Model_CGD.Crop_Y(selection, "Default", Rotation);
-			float ArrayCD[] = ArrayD.a;
-			float ArrayGD[] = ArrayD.b;
-			float ArraySD[] = ArrayD.c;
-			float ArrayAD[] = ArrayD.d;
+			//Model_Crop_Yield Model_CGD = new Model_Crop_Yield();
+			//FourArrays ArrayD = Model_CGD.Crop_Y(selection, "Default", Rotation);
+			//float ArrayCD[] = ArrayD.a;
+			//float ArrayGD[] = ArrayD.b;
+			//float ArraySD[] = ArrayD.c;
+			//float ArrayAD[] = ArrayD.d;
 			
 			// Regular Models
 			// Model_Ethanol
-			Model_Ethanol E_D = new Model_Ethanol();
-			E_D.Ethanol(ArrayCD, ArrayGD, ArraySD, ArrayAD, selection, "Default", Rotation);
+			//Model_Ethanol E_D = new Model_Ethanol();
+			//E_D.Ethanol(ArrayCD, ArrayGD, ArraySD, ArrayAD, selection, "Default", Rotation);
 	
 			// Model_Net_Energy
-			Model_Net_Energy NE_D = new Model_Net_Energy();
-			NE_D.Net_Energy(ArrayCD, ArrayGD, ArraySD, ArrayAD, selection, "Default", Rotation);
+			//Model_Net_Energy NE_D = new Model_Net_Energy();
+			//NE_D.Net_Energy(ArrayCD, ArrayGD, ArraySD, ArrayAD, selection, "Default", Rotation);
 	
 			// Model_Net_Income
-			Model_Net_Income NI_D = new Model_Net_Income();
-			NI_D.Net_Income(ArrayCD, ArrayGD, ArraySD, ArrayAD, selection, "Default", Rotation);
+			//Model_Net_Income NI_D = new Model_Net_Income();
+			//NI_D.Net_Income(ArrayCD, ArrayGD, ArraySD, ArrayAD, selection, "Default", Rotation);
 	
 			// Models with Moving Window
 			// Model_Habitat_Index
-			Model_Habitat_Index HI_D = new Model_Habitat_Index();
-			HI_D.Habitat_Index(selection, "Default", Rotation);
+			//Model_Habitat_Index HI_D = new Model_Habitat_Index();
+			//HI_D.Habitat_Index(selection, "Default", Rotation);
 			
 			// Model_Pest_Suppression
-			Model_Pest_Suppression PS_D = new Model_Pest_Suppression();
-			PS_D.Pest_Suppression(selection, "Default", Rotation);
+			//Model_Pest_Suppression PS_D = new Model_Pest_Suppression();
+			//PS_D.Pest_Suppression(selection, "Default", Rotation);
 	
 			// Model_Pollinator
-			Model_Pollinator PO_D = new Model_Pollinator();
-			PO_D.Pollinator(selection, "Default", Rotation);
+			//Model_Pollinator PO_D = new Model_Pollinator();
+			//PO_D.Pollinator(selection, "Default", Rotation);
 			
 			//Model_Nitrogen_Phosphorus
-			Model_Nitrogen_Phosphorus N_P_D = new Model_Nitrogen_Phosphorus();
-			N_P_D.Nitrogen_Phosphorus(selection, "Default", Rotation);
+			//Model_Nitrogen_Phosphorus N_P_D = new Model_Nitrogen_Phosphorus();
+			//N_P_D.Nitrogen_Phosphorus(selection, "Default", Rotation);
 
 		}
 			
@@ -138,7 +138,7 @@ public class Global extends GlobalSettings
 		
 		Layer_Base layer;
 		try {
-			layer = new Layer_Indexed("rotation"); layer.init();
+			layer = new Layer_Indexed("rotation", true); layer.init(); // TRUE, rotation data is shifted for mask compares, etc
 			
 			// data range is 0-90 but expand it up to 0-1000 internally since we are converting to int
 			//	and losing some precision
@@ -148,7 +148,7 @@ public class Global extends GlobalSettings
 			layer = new Layer_Continuous("rivers"); layer.init();
 			
 			// NOTE: if we have more than 32 watersheds, we CAN'T use Layer_Indexed
-			layer = new Layer_Indexed("watersheds"); layer.init();
+			layer = new Layer_Indexed("watersheds", false); layer.init(); // FALSE, watershed data is NOT shifted
 			
 			// NOTE: can put low-priority (rarely used) data layers here so that
 			//	we can have them skip loading in DEVELOPMENT mode. Ie, it gives us
@@ -163,8 +163,8 @@ public class Global extends GlobalSettings
 				// distance to road can get clamped to the nearest int value without losing much...
 //				layer = new Layer_Continuous("roads"); layer.init();
 				
-				layer = new Layer_Indexed("lcc"); layer.init();
-				layer = new Layer_Indexed("lcs"); layer.init();
+				layer = new Layer_Indexed("lcc", true); layer.init(); // TRUE, data is shifted
+				layer = new Layer_Indexed("lcs", true); layer.init(); // TRUE, data is shifted
 			}
 		}
 		catch (Exception e) {

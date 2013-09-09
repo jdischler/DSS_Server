@@ -23,7 +23,8 @@ public class Model_Pollinator_Pest_Suppression
 {
 	
 	//--------------------------------------------------------------------------
-	public void Pollinator_Pest_Suppression(Selection selection, String Output_Folder, int[][] RotationT)
+	//public ThreeArrays Pollinator_Pest_Suppression(Selection selection, String Output_Folder, int[][] RotationT)
+	public TwoArrays Pollinator_Pest_Suppression(Selection selection, int[][] RotationT)
 	{
 		// This particular block will be removed once we can recycle moving window results
 		
@@ -36,23 +37,34 @@ public class Model_Pollinator_Pest_Suppression
 		int Window_Size = Buffer / 30; // Number of Cells in Raster Map
 		
 		// Initialize default variables
-		float Poll = 0;
-		float Pest = 0;
+		//float Poll = 0;
+		//float Pest = 0;
 		float Prop_Forest = 0;
 		int Count_Forest = 0;
 		int Forest_Mask = 1024; // 11
 		float Prop_Grass = 0;
 		int Count_Grass = 0;
 		int Grass_Mask = 128 + 256; // 8 and 9
-
+		int i = 0;
+		
+		// Pollinator
+		float[] Poll = new float[Total_Cells];
+		// Pest Suppression
+		float[] Pest = new float[Total_Cells];
+		
+		float Min_P =  1000000;
+		float Max_P = -1000000;
+		float Min_PS =  1000000;
+		float Max_PS = -1000000;
+		
 		// Retrive rotation layer from memory
 		//int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
-		if (RotationT == null)
-		{
-			Logger.info("Fail Rotation");
-			layer = new Layer_Raw("Rotation"); layer.init();
-			RotationT = Layer_Base.getLayer("Rotation").getIntData();
-		}
+		//if (RotationT == null)
+		//{
+		//	Logger.info("Fail Rotation");
+		//	layer = new Layer_Raw("Rotation"); layer.init();
+		//	RotationT = Layer_Base.getLayer("Rotation").getIntData();
+		//}
 			layer = Layer_Base.getLayer("Rotation");
 			width = layer.getWidth();
 			height = layer.getHeight();
@@ -61,27 +73,28 @@ public class Model_Pollinator_Pest_Suppression
 		{
 			
 			// Open a ASCII file to write the output 
-			PrintWriter out_Po = new HeaderWrite("Pollinator", width, height, Output_Folder).getWriter();
-			PrintWriter out_Pe = new HeaderWrite("Pest_Suppression", width, height, Output_Folder).getWriter();
+			//PrintWriter out_Po = new HeaderWrite("Pollinator", width, height, Output_Folder).getWriter();
+			//PrintWriter out_Pe = new HeaderWrite("Pest_Suppression", width, height, Output_Folder).getWriter();
 			
 			// Precompute this so we don't do it on every cell
-			String stringNoData = Integer.toString(NO_DATA);
+			//String stringNoData = Integer.toString(NO_DATA);
 			
 			for (int y = 0; y < height; y++) 
 			{
 				
-				StringBuffer sb_Po = new StringBuffer();
-				StringBuffer sb_Pe = new StringBuffer();
+				//StringBuffer sb_Po = new StringBuffer();
+				//StringBuffer sb_Pe = new StringBuffer();
 				
 				for (int x = 0; x < width; x++) 
 				{				
-					if (RotationT[y][x] == 0 || selection.mSelection[y][x] == 0) 
-					{
+					//if (RotationT[y][x] == 0 || selection.mSelection[y][x] == 0) 
+					//{
 						// Check for No-Data Value
-						sb_Po.append(stringNoData);
-						sb_Pe.append(stringNoData);
-					} 
-					else if (selection.mSelection[y][x] == 1)
+					//	sb_Po.append(stringNoData);
+					//	sb_Pe.append(stringNoData);
+					//} 
+					//else if (selection.mSelection[y][x] == 1)
+					if (selection.mSelection[y][x] == 1)
 					{
 						
 						// Calculate the Boundary for Moving Window
@@ -93,10 +106,12 @@ public class Model_Pollinator_Pest_Suppression
 						Prop_Grass = Proportion_AFG[2];
 
 						// Calculate visitation index and normalize value by max
-						Poll = (float)Math.pow(0.6617f + (2.98f * Prop_Forest) + (1.83f * Prop_Grass), 2) / 18;
-						
+						Poll[i] = (float)Math.pow(0.6617f + (2.98f * Prop_Forest) + (1.83f * Prop_Grass), 2) / 18;
+						Min_P = Min(Min_P, Poll[i]);
+						Max_P = Max(Max_P, Poll[i]);
+							
 						// Write Pollinator to The ASCII File
-						sb_Po.append(String.format("%.4f", Poll));
+						//sb_Po.append(String.format("%.4f", Poll));
 						
 						// Crop type is zero for Ag
 						int Crop_Type = 0;
@@ -107,29 +122,63 @@ public class Model_Pollinator_Pest_Suppression
 						}
 							
 						// Pest suppression calculation
-						Pest = (float)(0.25 + (0.19f * Crop_Type) + (0.62f * Prop_Grass));
+						Pest[i] = (float)(0.25 + (0.19f * Crop_Type) + (0.62f * Prop_Grass));
+						Min_PS = Min(Min_PS, Pest[i]);
+						Max_PS = Max(Max_PS, Pest[i]);
 	
 						// Write Pest to The File
-						sb_Pe.append(String.format("%.4f", Pest));
+						//sb_Pe.append(String.format("%.4f", Pest));
+						
+						i = i + 1;
 					}
-					if (x != width - 1) 
-					{
-						sb_Po.append(" ");
-						sb_Pe.append(" ");
-					}
+					//if (x != width - 1) 
+					//{
+					//	sb_Po.append(" ");
+					//	sb_Pe.append(" ");
+					//}
 				}
-				out_Po.println(sb_Po.toString());
-				out_Pe.println(sb_Pe.toString());
+				//out_Po.println(sb_Po.toString());
+				//out_Pe.println(sb_Pe.toString());
 			}
 			// Close output files
-			out_Po.close();
-			out_Pe.close();
+			//out_Po.close();
+			//out_Pe.close();
 		}
 		catch(Exception err) 
 		{
 			Logger.info(err.toString());
 			Logger.info("Oops, something went wrong with writing to the files!");
 		}
+		
+				
+		Logger.info("Model_Pollinator_Pest_Suppression is finished");
+		
+		return new TwoArrays(Poll, Pest, Min_P, Max_P, Min_PS, Max_PS);
+
 	}	
 	
+	// Min
+	public float Min(float Min, float Num)
+	{ 
+		// Min
+		if (Num < Min)
+		{
+			Min = Num;
+		}
+		
+		return Min;
+	}
+	
+	// Max
+	public float Max(float Max, float Num)
+	{
+
+		// Max
+		if (Num > Max)
+		{
+			Max = Num;
+		}
+		
+		return Max;
+	}
 }

@@ -19,8 +19,9 @@ import org.codehaus.jackson.node.*;
 //------------------------------------------------------------------------------
 public class Model_Crop_Yield
 {
-	
-	public FourArrays Crop_Y(Selection selection, String Output_Folder, int[][] RotationT)
+	public float[] Crop_Y(Selection selection, int[][] RotationT)
+	//public OneArray Crop_Y(Selection selection, int[][] RotationT)
+	//public FourArrays Crop_Y(Selection selection, String Output_Folder, int[][] RotationT)
 	{
 		
 		// Defining variables based on the selected layer
@@ -28,6 +29,7 @@ public class Model_Crop_Yield
 		int width, height;
 		int NO_DATA = -9999;
 		int i = 0;
+		//int j = 0;
 		int Total_Cells = selection.countSelectedPixels();
 		int Grass_Mask = 256; // 9
 		int Corn_Mask = 1; // 1	
@@ -41,14 +43,16 @@ public class Model_Crop_Yield
 		float Alfalfa_Y = 0;
 		
 		// Define separate arrays to keep corn and grass production
+		// Crop Yield
+		float[] YI = new float[Total_Cells];
 		// Corn Yield
-		float[] Corn_YI = new float[Total_Cells];
+		//float[] Corn_YI = new float[Total_Cells];
 		// Grass Yield
-		float[] Grass_YI = new float[Total_Cells];
+		//float[] Grass_YI = new float[Total_Cells];
 		// Soy Yield
-		float[] Soy_YI = new float[Total_Cells];
+		//float[] Soy_YI = new float[Total_Cells];
 		// Alfalfa Yield
-		float[] Alfalfa_YI = new float[Total_Cells];
+		//float[] Alfalfa_YI = new float[Total_Cells];
 		// Corn Production
 		//float[] Corn_P = new float[Total_Cells];
 		// Grass Production
@@ -60,12 +64,12 @@ public class Model_Crop_Yield
 		
 		// Retrive rotation layer from memory
 		//int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
-		if (RotationT == null)
-		{
-			Logger.info("Fail Rotation");
-			layer = new Layer_Raw("Rotation"); layer.init();
-			RotationT = Layer_Base.getLayer("Rotation").getIntData();
-		}
+		//if (RotationT == null)
+		//{
+		//	Logger.info("Fail Rotation");
+		//	layer = new Layer_Raw("Rotation"); layer.init();
+		//	RotationT = Layer_Base.getLayer("Rotation").getIntData();
+		//}
 			layer = Layer_Base.getLayer("Rotation");
 			width = layer.getWidth();
 			height = layer.getHeight();
@@ -81,16 +85,16 @@ public class Model_Crop_Yield
 			
 			// Creating ASCII file to ouput corn and grass production value
 			// Cron Yield
-			PrintWriter out_C = new HeaderWrite("Corn_Yield", width, height, Output_Folder).getWriter();
+			//PrintWriter out_C = new HeaderWrite("Corn_Yield", width, height, Output_Folder).getWriter();
 			// Grass Yield
-			PrintWriter out_G = new HeaderWrite("Grass_Yield", width, height, Output_Folder).getWriter();
+			//PrintWriter out_G = new HeaderWrite("Grass_Yield", width, height, Output_Folder).getWriter();
 			// Soy Yield
-			PrintWriter out_S = new HeaderWrite("Soy_Yield", width, height, Output_Folder).getWriter();
+			//PrintWriter out_S = new HeaderWrite("Soy_Yield", width, height, Output_Folder).getWriter();
 			// Alfalfa Yield
-			PrintWriter out_A = new HeaderWrite("Alfalfa_Yield", width, height, Output_Folder).getWriter();
+			//PrintWriter out_A = new HeaderWrite("Alfalfa_Yield", width, height, Output_Folder).getWriter();
 			
 			// Precompute this so we don't do it on every cell
-			String stringNoData = Integer.toString(NO_DATA);
+			//String stringNoData = Integer.toString(NO_DATA);
 			
 			
 			for (int y = 0; y < height; y++) 
@@ -107,23 +111,22 @@ public class Model_Crop_Yield
 				String cec[] = line4.split("\\s+");
 				
 				// Make buffer to write outputs
-				StringBuffer sb_C = new StringBuffer();
-				StringBuffer sb_G = new StringBuffer();
-				StringBuffer sb_S = new StringBuffer();
-				StringBuffer sb_A = new StringBuffer();
+				//StringBuffer sb_C = new StringBuffer();
+				//StringBuffer sb_G = new StringBuffer();
+				//StringBuffer sb_S = new StringBuffer();
+				//StringBuffer sb_A = new StringBuffer();
 				
 				for (int x = 0; x < width; x++) 
 				{
-					if (RotationT[y][x] == 0 || selection.mSelection[y][x] == 0) 
-					{
+					//if (RotationT[y][x] == 0 || selection.mSelection[y][x] == 0) 
+					//{
 						// Check for No-Data
-						sb_C.append(stringNoData);
-						sb_G.append(stringNoData);
-						sb_S.append(stringNoData);
-						sb_A.append(stringNoData);
-					}
-					else
-					//else if (selection.mSelection[y][x] == 1)
+					//	sb_C.append(stringNoData);
+					//	sb_G.append(stringNoData);
+					//	sb_S.append(stringNoData);
+					//	sb_A.append(stringNoData);
+					//}
+					if (selection.mSelection[y][x] == 1)
 					{
 						// Corn
 						if ((RotationT[y][x] & Corn_Mask) > 0)
@@ -138,25 +141,27 @@ public class Model_Crop_Yield
 							// add stover
 							Corn_Y = Corn_Y + Corn_Y;
 							// Tonnes per Hec
-							Corn_YI[i] = Corn_Y * 0.053f;
+							//Corn_YI[i] = Corn_Y * 0.053f;
+							YI[i] = Corn_Y * 0.053f;
 							// Tonnes per pixel
 							//Corn_P[i] = 0.0001f * 900 * Corn_Y;
-							if (Corn_YI[i] >= 9 && Corn_YI[i] <= 25)
-							{
-								sb_C.append(String.format("%.4f",  Corn_YI[i]));
-							}
-							else 
-							{
-								sb_C.append(stringNoData);
-							}
-
+							//if (Corn_YI[i] >= 9 && Corn_YI[i] <= 25)
+							//{
+								//sb_C.append(String.format("%.4f",  Corn_YI[i]));
+							//	sb_C.append(String.format("%.4f",  YI[i]));
+							//}
+							//else 
+							//{
+							//	sb_C.append(stringNoData);
+							//}
+							//i++;
 						}
-						else 
-						{
-							sb_C.append(stringNoData);
-						}
+						//else 
+						//{
+						//	sb_C.append(stringNoData);
+						//}
 						// Grass
-						if ((RotationT[y][x] & Grass_Mask) > 0)
+						else if ((RotationT[y][x] & Grass_Mask) > 0)
 						{
 							// Calculate Grass Yield 
 							// short tons per Ac
@@ -165,24 +170,27 @@ public class Model_Crop_Yield
 							// Correct for techno advances
 							Grass_Y = Grass_Y * 1.05f;
 							// Tonnes per Hec
-							Grass_YI[i] = Grass_Y * 1.91f;
+							//Grass_YI[i] = Grass_Y * 1.91f;
+							YI[i] = Grass_Y * 1.91f;
 							// Tonnes per pixel
 							//Grass_P[i] = 0.0001f * 900 * Grass_Y;
-							if (Grass_YI[i] >= 3 && Grass_YI[i] <= 12)
-							{
-								sb_G.append(String.format("%.4f", Grass_YI[i]));
-							}
-							else
-							{
-								sb_G.append(stringNoData);
-							}
+							//if (Grass_YI[i] >= 3 && Grass_YI[i] <= 12)
+							//{
+								//sb_G.append(String.format("%.4f", Grass_YI[i]));
+							//	sb_G.append(String.format("%.4f", YI[i]));
+							//}
+							//else
+							//{
+							//	sb_G.append(stringNoData);
+							//}
+							//i++;
 						}
-						else 
-						{
-							sb_G.append(stringNoData);
-						}	
+						//else 
+						//{
+						//	sb_G.append(stringNoData);
+						//}	
 						// Soy
-						if ((RotationT[y][x] & Soy_Mask) > 0)
+						else if ((RotationT[y][x] & Soy_Mask) > 0)
 						{
 							// Calculate Soy Yield 
 							// Bushels per Ac
@@ -193,24 +201,27 @@ public class Model_Crop_Yield
 							// Tonnes per Hec
 							Soy_Y = Soy_Y * 0.0585f;
 							// add residue
-							Soy_YI[i] = Soy_Y + Soy_Y * 1.5f;
+							//Soy_YI[i] = Soy_Y + Soy_Y * 1.5f;
+							YI[i] = Soy_Y + Soy_Y * 1.5f;
 							// Tonnes per pixel
 							//Soy_P[i] = 0.0001f * 900 * Soy_Y;
-							if (Soy_YI[i] >= 2 && Soy_YI[i] <= 10)
-							{
-								sb_S.append(String.format("%.4f",  Soy_YI[i]));
-							}
-							else
-							{
-								sb_S.append(stringNoData);
-							}
+							//if (Soy_YI[i] >= 2 && Soy_YI[i] <= 10)
+							//{
+								//sb_S.append(String.format("%.4f",  Soy_YI[i]));
+							//	sb_S.append(String.format("%.4f",  YI[i]));
+							//}
+							//else
+							//{
+							//	sb_S.append(stringNoData);
+							//}
+							//i++;
 						}
-						else 
-						{
-							sb_S.append(stringNoData);
-						}
+						//else 
+						//{
+						//	sb_S.append(stringNoData);
+						//}
 						// Alfalfa
-						if ((RotationT[y][x] & Alfalfa_Mask) > 0)
+						else if ((RotationT[y][x] & Alfalfa_Mask) > 0)
 						{
 							// Calculate Alfalfa Yield 
 							// Short tons per Acre
@@ -219,37 +230,47 @@ public class Model_Crop_Yield
 							// Yield Correction Factor for modern yield
 							Alfalfa_Y = Alfalfa_Y * 1.05f;
 							// Tonnes per Hec
-							Alfalfa_YI[i] = Alfalfa_Y * 1.905f;
+							//Alfalfa_YI[i] = Alfalfa_Y * 1.905f;
+							YI[i] = Alfalfa_Y * 1.905f;
 							//Tonnes per pixel
 							//Alfalfa_P[i] = 0.0001f * 900 * Alfalfa_Y;
-							if (Alfalfa_YI[i] >= 4 && Alfalfa_YI[i] <= 12)
-							{
-								sb_A.append(String.format("%.4f",  Alfalfa_YI[i]));
-							}
-							else
-							{
-								sb_A.append(stringNoData);
-							}
+							//if (Alfalfa_YI[i] >= 4 && Alfalfa_YI[i] <= 12)
+							//{
+								//sb_A.append(String.format("%.4f",  Alfalfa_YI[i]));
+							//	sb_A.append(String.format("%.4f",  YI[i]));
+							//}
+							//else
+							//{
+							//	sb_A.append(stringNoData);
+							//}
+							//i++;
 						}
+						//else 
+						//{
+						//	sb_A.append(stringNoData);
+						//}
 						else 
 						{
-							sb_A.append(stringNoData);
+							YI[i] = 0;
+						//	YI[i] = NO_DATA;
+						//	YI[i] = Float.NaN;
+						//	j++;
 						}
 						
 						i = i + 1;
 					}
-					if (x != width - 1) 
-					{
-						sb_C.append(" ");
-						sb_G.append(" ");
-						sb_S.append(" ");
-						sb_A.append(" ");
-					}
+					//if (x != width - 1) 
+					//{
+					//	sb_C.append(" ");
+					//	sb_G.append(" ");
+					//	sb_S.append(" ");
+					//	sb_A.append(" ");
+					//}
 				}
-				out_C.println(sb_C.toString());
-				out_G.println(sb_G.toString());
-				out_S.println(sb_S.toString());
-				out_A.println(sb_A.toString());
+				//out_C.println(sb_C.toString());
+				//out_G.println(sb_G.toString());
+				//out_S.println(sb_S.toString());
+				//out_A.println(sb_A.toString());
 			}
 			// Close input files
 			br1.close();
@@ -257,18 +278,25 @@ public class Model_Crop_Yield
 			br3.close();
 			br4.close();
 			// Close output files
-			out_C.close();
-			out_G.close();
-			out_S.close();
-			out_A.close();
+			//out_C.close();
+			//out_G.close();
+			//out_S.close();
+			//out_A.close();
 		}
 		catch(Exception err) 
 		{
 			Logger.info(err.toString());
-			Logger.info("Oops, something went wrong with writing to the files!");
+			Logger.info("Oops, something went wrong with array!");
+			//Logger.info("Oops, something went wrong with writing to the files!");
 		}
 		
-		return new FourArrays(Corn_YI, Grass_YI, Soy_YI, Alfalfa_YI);
+		Logger.info("Model_Crop_Yield is finished");
+		Logger.info("Number of selected cells are: " + Integer.toString(i));
+		//Logger.info("Number of cells that are Corn, Soy, Grass or Alphaalpha are: " + Integer.toString(i));
+		
+		//return new FourArrays(Corn_YI, Grass_YI, Soy_YI, Alfalfa_YI);
+		//return new OneArray(YI, i);
+		return YI;
 	}
 	
 }

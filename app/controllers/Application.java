@@ -201,28 +201,203 @@ public class Application extends Controller
 		//float ArraySD[] = ArrayD.c;
 		//float ArrayAD[] = ArrayD.d;
 		
+		// Corn and Grass Production for D
+		Model_Crop_Yield Model_CGD = new Model_Crop_Yield();
+		float YID[] = Model_CGD.Crop_Y(selectionD, Rotation);
+		//float YID[] = First.a;
+		//int j = First.b;
+		
+		// Corn and Grass Production for T
+		//Model_Crop_Yield Model_CGT = new Model_Crop_Yield();
+		//FourArrays ArrayT = Model_CGT.Crop_Y(selectionD, "Client_ID", scenario.mNewRotation);
+		//float ArrayCT[] = ArrayT.a;
+		//float ArrayGT[] = ArrayT.b;
+		//float ArrayST[] = ArrayT.c;
+		//float ArrayAT[] = ArrayT.d;
+		
 		// Corn and Grass Production for T
 		Model_Crop_Yield Model_CGT = new Model_Crop_Yield();
-		FourArrays ArrayT = Model_CGT.Crop_Y(selectionD, "Client_ID", scenario.mNewRotation);
-		float ArrayCT[] = ArrayT.a;
-		float ArrayGT[] = ArrayT.b;
-		float ArrayST[] = ArrayT.c;
-		float ArrayAT[] = ArrayT.d;
-		
-		
+		float YIT[] = Model_CGT.Crop_Y(selectionD, scenario.mNewRotation);
+		//float YIT[] = Second.a;
+		//int k = Second.b;
 		
 		// Regular Models
+		// Default
+		Model_Ethanol_Net_Energy_Income ENENID = new Model_Ethanol_Net_Energy_Income();
+		ThreeArrays ArrayD = ENENID.Ethanol_Net_Energy_Income(YID, selectionD, Rotation);
+		float ArrayED[] = ArrayD.a;
+		float ArrayNED[] = ArrayD.b;
+		float ArrayNID[] = ArrayD.c_float;
+		float Min_ED = ArrayD.Min_a;
+		float Max_ED = ArrayD.Max_a;
+		float Min_NED = ArrayD.Min_b;
+		float Max_NED = ArrayD.Max_b;
+		float Min_NID = ArrayD.Min_c;
+		float Max_NID = ArrayD.Max_c;
+		
+		Model_Selection ED = new Model_Selection();
+		JsonNode SendBack_ED = ED.Selection(selectionD, selectionT, ArrayED);
+		Model_Selection NED = new Model_Selection();
+		JsonNode SendBack_NED = NED.Selection(selectionD, selectionT, ArrayNED);
+		Model_Selection NID = new Model_Selection();
+		JsonNode SendBack_NID = NID.Selection(selectionD, selectionT, ArrayNID);
+		
+		// Transform
+		Model_Ethanol_Net_Energy_Income ENENIT = new Model_Ethanol_Net_Energy_Income();
+		ThreeArrays ArrayT = ENENIT.Ethanol_Net_Energy_Income(YIT, selectionD, scenario.mNewRotation);
+		float ArrayET[] = ArrayT.a;
+		float ArrayNET[] = ArrayT.b;
+		float ArrayNIT[] = ArrayT.c_float;
+		float Min_ET = ArrayT.Min_a;
+		float Max_ET = ArrayT.Max_a;
+		float Min_NET = ArrayT.Min_b;
+		float Max_NET = ArrayT.Max_b;
+		float Min_NIT = ArrayT.Min_c;
+		float Max_NIT = ArrayT.Max_c;
+		
+		Model_Selection ET = new Model_Selection();
+		JsonNode SendBack_ET = ET.Selection(selectionD, selectionT, ArrayET);
+		Model_Selection NET = new Model_Selection();
+		JsonNode SendBack_NET = NET.Selection(selectionD, selectionT, ArrayNET);
+		Model_Selection NIT = new Model_Selection();
+		JsonNode SendBack_NIT = NIT.Selection(selectionD, selectionT, ArrayNIT);
+		
+		
+		
+		// Model_Habitat_Index
+		// Default
+		Model_Habitat_Index HID = new Model_Habitat_Index();
+		float ArrayHI_D[] = HID.Habitat_Index(selectionD, Rotation);
+		Model_Selection HIDS = new Model_Selection();
+		JsonNode SendBack_HID = HIDS.Selection(selectionD, selectionT, ArrayHI_D);
+		
+		// Transform
+		Model_Habitat_Index HIT = new Model_Habitat_Index();
+		float ArrayHI_T[] = HIT.Habitat_Index(selectionD, scenario.mNewRotation);
+		Model_Selection HITS = new Model_Selection();
+		JsonNode SendBack_HIT = HITS.Selection(selectionD, selectionT, ArrayHI_T);
+		
+		
+		
+		// Models at watershed scale for Nitrogen and Phosphorus
+		// Default
+		Model_Nitrogen_Phosphorus N_P_D = new Model_Nitrogen_Phosphorus();
+		ThreeArrays ArrayN_P_D = N_P_D.Nitrogen_Phosphorus(selectionD, Rotation);
+		float ArrayND[] = ArrayN_P_D.a;
+		float ArrayPHD[] = ArrayN_P_D.b;
+		int TotalD[] = ArrayN_P_D.c_int;
+		float Min_ND = ArrayN_P_D.Min_a;
+		float Max_ND = ArrayN_P_D.Max_a;
+		float Min_PHD = ArrayN_P_D.Min_b;
+		float Max_PHD = ArrayN_P_D.Max_b;
+		float Min_TD = ArrayN_P_D.Min_c;
+		float Max_TD = ArrayN_P_D.Max_c;
+		
+		Model_Selection_N_P ND = new Model_Selection_N_P();
+		JsonNode SendBack_ND = ND.Selection_N_P(ArrayND, TotalD);
+		Model_Selection_N_P PHD = new Model_Selection_N_P();
+		JsonNode SendBack_PHD = PHD.Selection_N_P(ArrayPHD, TotalD);
+		
+		// Transform
+		Model_Nitrogen_Phosphorus N_P_T = new Model_Nitrogen_Phosphorus();
+		ThreeArrays ArrayN_P_T = N_P_T.Nitrogen_Phosphorus(selectionD, scenario.mNewRotation);
+		float ArrayNT[] = ArrayN_P_T.a;
+		float ArrayPHT[] = ArrayN_P_T.b;
+		int TotalT[] = ArrayN_P_T.c_int;
+		float Min_NT = ArrayN_P_T.Min_a;
+		float Max_NT = ArrayN_P_T.Max_a;
+		float Min_PHT = ArrayN_P_T.Min_b;
+		float Max_PHT = ArrayN_P_T.Max_b;
+		float Min_TT = ArrayN_P_T.Min_c;
+		float Max_TT = ArrayN_P_T.Max_c;
+		
+		Model_Selection_N_P NT = new Model_Selection_N_P();
+		JsonNode SendBack_NT = NT.Selection_N_P(ArrayNT, TotalT);
+		Model_Selection_N_P PHT = new Model_Selection_N_P();
+		JsonNode SendBack_PHT = PHT.Selection_N_P(ArrayPHT, TotalT);
+		
+		
+		
+		// Model_Pollinator_Pest_Suppression
+		// Default
+		Model_Pollinator_Pest_Suppression PPS_D = new Model_Pollinator_Pest_Suppression();
+		TwoArrays ArrayP_PS_D = PPS_D.Pollinator_Pest_Suppression(selectionD, Rotation);
+		float ArrayPOD[] = ArrayP_PS_D.a;
+		float ArrayPSD[] = ArrayP_PS_D.b;
+		float Min_POD = ArrayP_PS_D.Min_a;
+		float Max_POD = ArrayP_PS_D.Max_a;
+		float Min_PSD = ArrayP_PS_D.Min_b;
+		float Max_PSD = ArrayP_PS_D.Max_b;
+		
+		Model_Selection POD = new Model_Selection();
+		JsonNode SendBack_POD = POD.Selection(selectionD, selectionT, ArrayPOD);
+		Model_Selection PSD = new Model_Selection();
+		JsonNode SendBack_PSD = PSD.Selection(selectionD, selectionT, ArrayPSD);
+		
+		// Transform
+		Model_Pollinator_Pest_Suppression PPS_T = new Model_Pollinator_Pest_Suppression();
+		TwoArrays ArrayP_PS_T = PPS_T.Pollinator_Pest_Suppression(selectionD, scenario.mNewRotation);
+		float ArrayPOT[] = ArrayP_PS_T.a;
+		float ArrayPST[] = ArrayP_PS_T.b;
+		float Min_POT = ArrayP_PS_T.Min_a;
+		float Max_POT = ArrayP_PS_T.Max_a;
+		float Min_PST = ArrayP_PS_T.Min_b;
+		float Max_PST = ArrayP_PS_T.Max_b;
+		
+		Model_Selection POT = new Model_Selection();
+		JsonNode SendBack_POT = POT.Selection(selectionD, selectionT, ArrayPOT);
+		Model_Selection PST = new Model_Selection();
+		JsonNode SendBack_PST = PST.Selection(selectionD, selectionT, ArrayPST);
+		
+		
+		
+		//Model_Pollinator_Pest_Suppression
+		//Model_Pollinator_Pest_Suppression PPS_D = new Model_Pollinator_Pest_Suppression();
+		//PPS_D.Pollinator_Pest_Suppression(selectionD, "Default", Rotation);
+		//Model_Pollinator_Pest_Suppression PPS_T = new Model_Pollinator_Pest_Suppression();
+		//PPS_T.Pollinator_Pest_Suppression(selectionD, "Client_ID", scenario.mNewRotation);
+		
+		
+		
+		// Model_Pest_Suppression
+		//Model_Pest_Suppression PS_D = new Model_Pest_Suppression();
+		//PS_D.Pest_Suppression(selectionD, "Default", Rotation);
+		//Model_Selection PS_D = new Model_Selection();
+		//JsonNode SendBack_PSD = PS_D.Selection(selectionT, "Pest_Suppression", "Default");
+		
+		// Model_Pest_Suppression
+		//Model_Pest_Suppression PS_T = new Model_Pest_Suppression();
+		//PS_T.Pest_Suppression(selection, "Client_ID", scenario.mNewRotation);
+		//Model_Selection PS_T = new Model_Selection();
+		//JsonNode SendBack_PST = PS_T.Selection(selectionT, "Pest_Suppression", "Client_ID");
+		
+		
+		
+		// Model_Pollinator
+		//Model_Pollinator PO_D = new Model_Pollinator();
+		//PO_D.Pollinator(selectionD, "Default", Rotation);
+		//Model_Selection PODS = new Model_Selection();
+		//JsonNode SendBack_POD = PODS.Selection(selectionT, "Pollinator", "Default");
+		
+		// Model_Pollinator
+		//Model_Pollinator PO_T = new Model_Pollinator();
+		//PO_T.Pollinator(selectionD, "Client_ID", scenario.mNewRotation);
+		//Model_Selection POTS = new Model_Selection();
+		//JsonNode SendBack_POT = POTS.Selection(selectionT, "Pollinator", "Client_ID");
+		
+		
+		
 		// Model_Ethanol
 		//Model_Ethanol ED = new Model_Ethanol();
 		//ED.Ethanol(ArrayCD, ArrayGD, ArraySD, ArrayAD, selectionD, "Default", Rotation);
-		Model_Selection EDS = new Model_Selection();
-		JsonNode SendBack_ED = EDS.Selection(selectionT, "Ethanol", "Default");
+		//Model_Selection EDS = new Model_Selection();
+		//JsonNode SendBack_ED = EDS.Selection(selectionT, "Ethanol", "Default");
 		
 		// Model_Ethanol
-		Model_Ethanol ET = new Model_Ethanol();
-		ET.Ethanol(ArrayCT, ArrayGT, ArrayST, ArrayAT, selectionD, "Client_ID", scenario.mNewRotation);
-		Model_Selection ETS = new Model_Selection();
-		JsonNode SendBack_ET = ETS.Selection(selectionT, "Ethanol", "Client_ID");
+		//Model_Ethanol ET = new Model_Ethanol();
+		//ET.Ethanol(ArrayCT, ArrayGT, ArrayST, ArrayAT, selectionD, "Client_ID", scenario.mNewRotation);
+		//Model_Selection ETS = new Model_Selection();
+		//JsonNode SendBack_ET = ETS.Selection(selectionT, "Ethanol", "Client_ID");
 		
 		
 		
@@ -230,15 +405,15 @@ public class Application extends Controller
 		// Default
 		//Model_Net_Energy NED = new Model_Net_Energy();
 		//NED.Net_Energy(ArrayCD, ArrayGD, ArraySD, ArrayAD, selectionD, "Default", Rotation);
-		Model_Selection NEDS = new Model_Selection();
-		JsonNode SendBack_NED = NEDS.Selection(selectionT, "Net_Energy", "Default");
+		//Model_Selection NEDS = new Model_Selection();
+		//JsonNode SendBack_NED = NEDS.Selection(selectionT, "Net_Energy", "Default");
 		
 		// Model_Net_Energy
 		// Transform
-		Model_Net_Energy NET = new Model_Net_Energy();
-		NET.Net_Energy(ArrayCT, ArrayGT, ArrayST, ArrayAT, selectionD, "Client_ID", scenario.mNewRotation);
-		Model_Selection NETS = new Model_Selection();
-		JsonNode SendBack_NET = NETS.Selection(selectionT, "Net_Energy", "Client_ID");
+		//Model_Net_Energy NET = new Model_Net_Energy();
+		//NET.Net_Energy(ArrayCT, ArrayGT, ArrayST, ArrayAT, selectionD, "Client_ID", scenario.mNewRotation);
+		//Model_Selection NETS = new Model_Selection();
+		//JsonNode SendBack_NET = NETS.Selection(selectionT, "Net_Energy", "Client_ID");
 		
 		
 		
@@ -246,15 +421,15 @@ public class Application extends Controller
 		// Default
 		//Model_Net_Income NID = new Model_Net_Income();
 		//NID.Net_Income(ArrayCD, ArrayGD, ArraySD, ArrayAD, selectionD, "Default", Rotation);
-		Model_Selection NIDS = new Model_Selection();
-		JsonNode SendBack_NID = NIDS.Selection(selectionT, "Net_Income", "Default");
+		//Model_Selection NIDS = new Model_Selection();
+		//JsonNode SendBack_NID = NIDS.Selection(selectionT, "Net_Income", "Default");
 		
 		// Model_Net_Income
 		// Transform
-		Model_Net_Income NIT = new Model_Net_Income();
-		NIT.Net_Income(ArrayCT, ArrayGT, ArrayST, ArrayAT, selectionD, "Client_ID", scenario.mNewRotation);
-		Model_Selection NITS = new Model_Selection();
-		JsonNode SendBack_NIT = NITS.Selection(selectionT, "Net_Income", "Client_ID");
+		//Model_Net_Income NIT = new Model_Net_Income();
+		//NIT.Net_Income(ArrayCT, ArrayGT, ArrayST, ArrayAT, selectionD, "Client_ID", scenario.mNewRotation);
+		//Model_Selection NITS = new Model_Selection();
+		//JsonNode SendBack_NIT = NITS.Selection(selectionT, "Net_Income", "Client_ID");
 		
 		
 		
@@ -263,51 +438,51 @@ public class Application extends Controller
 		// Default
 		//Model_Habitat_Index HID = new Model_Habitat_Index();
 		//HID.Habitat_Index(selectionD, "Default", Rotation);
-		Model_Selection HIDS = new Model_Selection();
-		JsonNode SendBack_HID = HIDS.Selection(selectionT, "Habitat_Index", "Default");
+		//Model_Selection HIDS = new Model_Selection();
+		//JsonNode SendBack_HID = HIDS.Selection(selectionT, "Habitat_Index", "Default");
 		
 		// Model_Habitat_Index
 		// Transform
-		Model_Habitat_Index HIT = new Model_Habitat_Index();
-		HIT.Habitat_Index(selectionD, "Client_ID", scenario.mNewRotation);
-		Model_Selection HITS = new Model_Selection();
-		JsonNode SendBack_HIT = HITS.Selection(selectionT, "Habitat_Index", "Client_ID");
+		//Model_Habitat_Index HIT = new Model_Habitat_Index();
+		//HIT.Habitat_Index(selectionD, "Client_ID", scenario.mNewRotation);
+		//Model_Selection HITS = new Model_Selection();
+		//JsonNode SendBack_HIT = HITS.Selection(selectionT, "Habitat_Index", "Client_ID");
 		
 		
 		
 		//Model_Pollinator_Pest_Suppression
 		//Model_Pollinator_Pest_Suppression PPS_D = new Model_Pollinator_Pest_Suppression();
 		//PPS_D.Pollinator_Pest_Suppression(selectionD, "Default", Rotation);
-		Model_Pollinator_Pest_Suppression PPS_T = new Model_Pollinator_Pest_Suppression();
-		PPS_T.Pollinator_Pest_Suppression(selectionD, "Client_ID", scenario.mNewRotation);
+		//Model_Pollinator_Pest_Suppression PPS_T = new Model_Pollinator_Pest_Suppression();
+		//PPS_T.Pollinator_Pest_Suppression(selectionD, "Client_ID", scenario.mNewRotation);
 		
 		
 		
 		// Model_Pest_Suppression
 		//Model_Pest_Suppression PS_D = new Model_Pest_Suppression();
 		//PS_D.Pest_Suppression(selectionD, "Default", Rotation);
-		Model_Selection PS_D = new Model_Selection();
-		JsonNode SendBack_PSD = PS_D.Selection(selectionT, "Pest_Suppression", "Default");
+		//Model_Selection PS_D = new Model_Selection();
+		//JsonNode SendBack_PSD = PS_D.Selection(selectionT, "Pest_Suppression", "Default");
 		
 		// Model_Pest_Suppression
 		//Model_Pest_Suppression PS_T = new Model_Pest_Suppression();
 		//PS_T.Pest_Suppression(selection, "Client_ID", scenario.mNewRotation);
-		Model_Selection PS_T = new Model_Selection();
-		JsonNode SendBack_PST = PS_T.Selection(selectionT, "Pest_Suppression", "Client_ID");
+		//Model_Selection PS_T = new Model_Selection();
+		//JsonNode SendBack_PST = PS_T.Selection(selectionT, "Pest_Suppression", "Client_ID");
 		
 		
 		
 		// Model_Pollinator
 		//Model_Pollinator PO_D = new Model_Pollinator();
 		//PO_D.Pollinator(selectionD, "Default", Rotation);
-		Model_Selection PODS = new Model_Selection();
-		JsonNode SendBack_POD = PODS.Selection(selectionT, "Pollinator", "Default");
+		//Model_Selection PODS = new Model_Selection();
+		//JsonNode SendBack_POD = PODS.Selection(selectionT, "Pollinator", "Default");
 		
 		// Model_Pollinator
 		//Model_Pollinator PO_T = new Model_Pollinator();
 		//PO_T.Pollinator(selectionD, "Client_ID", scenario.mNewRotation);
-		Model_Selection POTS = new Model_Selection();
-		JsonNode SendBack_POT = POTS.Selection(selectionT, "Pollinator", "Client_ID");
+		//Model_Selection POTS = new Model_Selection();
+		//JsonNode SendBack_POT = POTS.Selection(selectionT, "Pollinator", "Client_ID");
 		
 		
 		
@@ -315,32 +490,32 @@ public class Application extends Controller
 		// Run Both Models as the same time
 		//Model_Nitrogen_Phosphorus N_P_D = new Model_Nitrogen_Phosphorus();
 		//N_P_D.Nitrogen_Phosphorus(selectionD, "Default", Rotation);
-		Model_Nitrogen_Phosphorus NPT = new Model_Nitrogen_Phosphorus();
-		NPT.Nitrogen_Phosphorus(selectionD, "Client_ID", scenario.mNewRotation);
+		//Model_Nitrogen_Phosphorus NPT = new Model_Nitrogen_Phosphorus();
+		//NPT.Nitrogen_Phosphorus(selectionD, "Client_ID", scenario.mNewRotation);
 		
 		// Model_Nitrogen
 		//Model_Nitrogen_Phosphorus N_P_D = new Model_Nitrogen_Phosphorus();
 		//N_P_D.Nitrogen_Phosphorus(selectionD, "Default", Rotation);
-		Model_Selection NDS = new Model_Selection();
-		JsonNode SendBack_ND = NDS.Selection(selectionT, "Nitrogen", "Default");
+		//Model_Selection NDS = new Model_Selection();
+		//JsonNode SendBack_ND = NDS.Selection(selectionT, "Nitrogen", "Default");
 		
 		// Model_Nitrogen
 		//Model_Nitrogen N_T = new Model_Nitrogen();
 		//N_T.Nitrogen(selectionD, "Client_ID", scenario.mNewRotation);
-		Model_Selection NTS = new Model_Selection();
-		JsonNode SendBack_NT = NTS.Selection(selectionT, "Nitrogen", "Client_ID");
+		//Model_Selection NTS = new Model_Selection();
+		//JsonNode SendBack_NT = NTS.Selection(selectionT, "Nitrogen", "Client_ID");
 
 		// Model_Phosphorus
 		//Model_Phosphorus PH_D = new Model_Phosphorus();
 		//PH_D.Phosphorus(selectionD, "Default", Rotation);
-		Model_Selection PHDS = new Model_Selection();
-		JsonNode SendBack_PHD = PHDS.Selection(selectionT, "Phosphorus", "Default");
+		//Model_Selection PHDS = new Model_Selection();
+		//JsonNode SendBack_PHD = PHDS.Selection(selectionT, "Phosphorus", "Default");
 		
 		// Model_Phosphorus
 		//Model_Phosphorus PH_T = new Model_Phosphorus();
 		//PH_T.Phosphorus(selectionD, "Client_ID", scenario.mNewRotation);
-		Model_Selection PHTS = new Model_Selection();
-		JsonNode SendBack_PHT = PHTS.Selection(selectionT, "Phosphorus", "Client_ID");
+		//Model_Selection PHTS = new Model_Selection();
+		//JsonNode SendBack_PHT = PHTS.Selection(selectionT, "Phosphorus", "Client_ID");
 		
 		//Model_Nitrogen_Phosphorus
 

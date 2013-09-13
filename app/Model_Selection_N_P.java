@@ -38,19 +38,10 @@ public class Model_Selection_N_P
 		float Min =  1000000;
 		float Max = -1000000;
 		
-		try 
+		for (i = 0; i < Data.length; i++) 
 		{
-			for (i = 0; i < Data.length; i++) 
-			{
-				Min = Min(Min, Data[i]);
-				Max = Max(Max, Data[i]);
-			}
-		}
-		
-		catch(Exception err) 
-		{
-			Logger.info(err.toString());
-			//Logger.info("I and J are: " + Integer.toString(i) + " " + Integer.toString(j) );
+			Min = Min(Min, Data[i]);
+			Max = Max(Max, Data[i]);
 		}
 								
 		// Find the bins for data

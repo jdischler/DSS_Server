@@ -233,15 +233,15 @@ public class Models_Default
 		
 		
 		// Rotation
-		int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
-		if (Rotation == null){
+		if (RotationT == null)
+		{
 			Logger.info("Fail Rotation");
-			layer = new Layer_Raw("Rotation"); layer.init();
-			Rotation = Layer_Base.getLayer("Rotation").getIntData();
+			layer = new Layer_Integer("Rotation"); layer.init();
+			RotationT = Layer_Base.getLayer("Rotation").getIntData();
 		}
-			layer = Layer_Base.getLayer("Rotation");
-			width = layer.getWidth();
-			height = layer.getHeight();
+		layer = Layer_Base.getLayer("Rotation");
+		width = layer.getWidth();
+		height = layer.getHeight();
 
 		// DEM 
 		// int[][] DEM = Layer_Base.getLayer("DEM").getIntData();

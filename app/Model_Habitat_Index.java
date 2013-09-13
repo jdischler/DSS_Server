@@ -47,41 +47,38 @@ public class Model_Habitat_Index
 		// Net Energy
 		float[] Habitat_Index = new float[Total_Cells];
 		
-		// Retrive rotation layer from memory
-		// int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
-		//if (RotationT == null)
-		//{
-		//	Logger.info("Fail Rotation");
-		//	layer = new Layer_Raw("Rotation"); layer.init();
-			//Rotation = Layer_Base.getLayer("Rotation").getIntData();
-		//}
-			layer = Layer_Base.getLayer("Rotation");
-			width = layer.getWidth();
-			height = layer.getHeight();
-		
-		try 
-		{
-			// Creating ASCII file to ouput Bird Index value
-			//PrintWriter out_HI = new HeaderWrite("Habitat_Index", width, height, Output_Folder).getWriter();
+		layer = Layer_Base.getLayer("Rotation");
+		width = layer.getWidth();
+		height = layer.getHeight();
 
-			// Precompute this so we don't do it on every cell
-			//String stringNoData = Integer.toString(NO_DATA);
+		if (true) { // use new z-win
+			Moving_Z_Window zWin = new Moving_Z_Window(Window_Size, RotationT, width, height);
 			
-			for (int y = 0; y < height; y++) 
-			{
-				// Outputs
-				//StringBuffer sb_HI = new StringBuffer();
+			boolean moreCells = true;
+			while (moreCells) {
+				Moving_Z_Window.Z_WindowPoint point = zWin.getPoint();
 				
-				for (int x = 0; x < width; x++) 
-				{				
-					//if (RotationT[y][x] == 0 || selection.mSelection[y][x] == 0) 
-					//{
-						// Check for No-Data Value
-					//	sb_HI.append(stringNoData);
-					//}
-					if (selection.mSelection[y][x] == 1)
-					{
-						
+				// calculate an index where to store this info since the pattern through the 
+				//	array is actually the z-win zigzag path!
+				int idx = point.mY * width + point.mX;
+				
+				Prop_Ag = zWin.getProportionAg();
+				Prop_Grass = zWin.getProportionGrass();
+				
+				// Habitat Index
+				float Lambda = -4.47f + (2.95f * Prop_Ag) + (5.17f * Prop_Grass); 
+				Habitat_Index[idx] = (float)((1.0f / (1.0f / Math.exp(Lambda) + 1.0f )) / 0.67f);
+
+				moreCells = zWin.advance();
+			}		
+		}
+		if (false) {// OLD window		
+			try 
+			{
+				for (int y = 0; y < height; y++) 
+				{
+					for (int x = 0; x < width; x++) 
+					{				
 						// Calling the moving window class to initialize the boundary of moving window
 						Moving_Window mWin = new Moving_Window(x, y, Window_Size, width, height);
 						// Calling the moving window class to calculate landscape proportion
@@ -93,32 +90,18 @@ public class Model_Habitat_Index
 		
 						// Bird Habitat
 						// Lambda
-						float Lambda = -4.47f + (2.95f * Prop_Ag) + (5.17f * Prop_Grass); 
-						// Habitat Index
-						Habitat_Index[i] = (float)((1 / ( 1 / Math.exp(Lambda) + 1 ) ) / 0.67f);
-						// Write Habitat Index to The File
-						//sb_HI.append(String.format("%.4f", Habitat_Index));
 						
 						i = i + 1;
 					}
-					
-					//if (x != width - 1) 
-					//{
-					//	sb_HI.append(" ");
-					//}
 				}
-				
-				//out_HI.println(sb_HI.toString());
 			}
-			// Close output files
-			//out_HI.close();
+			catch(Exception err) 
+			{
+				Logger.info(err.toString());
+				Logger.info("Oops, something went wrong with writing to the files!");
+			}
 		}
-		catch(Exception err) 
-		{
-			Logger.info(err.toString());
-			Logger.info("Oops, something went wrong with writing to the files!");
-		}
-		
+			
 		Logger.info("Model_Habitat_Index is finished");
 				
 		return Habitat_Index;

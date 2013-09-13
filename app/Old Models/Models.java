@@ -253,16 +253,15 @@ public class Models
 		int[] CountBin_NE_T = new int [Bin_T];
 		
 		// Rotation
-		int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
-		if (Rotation == null)
+		if (RotationT == null)
 		{
 			Logger.info("Fail Rotation");
-			layer = new Layer_Raw("Rotation"); layer.init();
-			Rotation = Layer_Base.getLayer("Rotation").getIntData();
+			layer = new Layer_Integer("Rotation"); layer.init();
+			RotationT = Layer_Base.getLayer("Rotation").getIntData();
 		}
-			layer = Layer_Base.getLayer("Rotation");
-			width = layer.getWidth();
-			height = layer.getHeight();
+		layer = Layer_Base.getLayer("Rotation");
+		width = layer.getWidth();
+		height = layer.getHeight();
 
 		try 
 		{

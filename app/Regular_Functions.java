@@ -46,12 +46,12 @@ public class Regular_Functions
 		if (Rotation == null)
 		{
 			Logger.info("Fail Rotation");
-			layer = new Layer_Raw("Rotation"); layer.init();
+			layer = new Layer_Integer("Rotation"); layer.init();
 			Rotation = Layer_Base.getLayer("Rotation").getIntData();
 		}
-			layer = Layer_Base.getLayer("Rotation");
-			width = layer.getWidth();
-			height = layer.getHeight();
+		layer = Layer_Base.getLayer("Rotation");
+		width = layer.getWidth();
+		height = layer.getHeight();
 
 		try 
 		{

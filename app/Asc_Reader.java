@@ -27,15 +27,14 @@ class Asc_Reader {
 		return mReader.ready();
 	}
 		
-	// rewinds to last mark, which is set at the end of the header data
 	//--------------------------------------------------------------------------
-	public void rewind() throws Exception {
-		mReader.reset();
-	}
-	
-	//--------------------------------------------------------------------------
-	public void close() throws Exception {
-		mReader.close();
+	public void close() {
+		try {
+			mReader.close();
+		}
+		catch(Exception E) {
+			Logger.error(E.toString());
+		}
 	}
 	
 	// Header Accessors...
@@ -89,19 +88,24 @@ class Asc_Reader {
 		
 		BufferedReader r = null;
 		
-		String file = "./layerData/" + folder + "/" + name + ".asc";
+		String file = "./layerData/";
+		if (folder != null) {
+			file += folder + "/";
+		}
+		file += name + ".asc";
+		
 		Logger.info("Reading: " + file);
 		
 		try {
 			FileReader f = new FileReader(file);
 			r = new BufferedReader(f);
 			
-			String width = r.readLine(); // ncols
-			String height = r.readLine(); // nrows
-			String xllCorner = r.readLine(); // xll corner
-			String yllCorner = r.readLine(); // yll corner
+			String width = r.readLine(); 	// ncols
+			String height = r.readLine(); 	// nrows
+			String xllCorner = r.readLine();// xll corner
+			String yllCorner = r.readLine();// yll corner
 			String cellSize = r.readLine(); // cellsize
-			String noData = r.readLine(); // nodata value
+			String noData = r.readLine(); 	// nodata value
 			
 			// Echo string values in ASC header
 			Logger.info("  " + width);
@@ -118,9 +122,6 @@ class Asc_Reader {
 			mCornerY = Float.parseFloat(getHeaderValue(yllCorner));
 			mCellSize = Float.parseFloat(getHeaderValue(cellSize));
 			mNoDataValue = Integer.parseInt(getHeaderValue(noData));
-			
-			// allow rewinding back to this point...
-		//	f.mark(0);
 		} 
 		catch (Exception e) {
 			Logger.info(e.toString());

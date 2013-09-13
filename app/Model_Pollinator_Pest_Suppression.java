@@ -57,46 +57,59 @@ public class Model_Pollinator_Pest_Suppression
 		float Min_PS =  1000000;
 		float Max_PS = -1000000;
 		
-		// Retrive rotation layer from memory
-		//int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
-		//if (RotationT == null)
-		//{
-		//	Logger.info("Fail Rotation");
-		//	layer = new Layer_Raw("Rotation"); layer.init();
-		//	RotationT = Layer_Base.getLayer("Rotation").getIntData();
-		//}
-			layer = Layer_Base.getLayer("Rotation");
-			width = layer.getWidth();
-			height = layer.getHeight();
+		layer = Layer_Base.getLayer("Rotation");
+		width = layer.getWidth();
+		height = layer.getHeight();
 
-		try 
-		{
+		long timingStart = System.currentTimeMillis();
+		if (true) { // use new z-win
+			Moving_Z_Window zWin = new Moving_Z_Window(Window_Size, RotationT, width, height);
 			
-			// Open a ASCII file to write the output 
-			//PrintWriter out_Po = new HeaderWrite("Pollinator", width, height, Output_Folder).getWriter();
-			//PrintWriter out_Pe = new HeaderWrite("Pest_Suppression", width, height, Output_Folder).getWriter();
-			
-			// Precompute this so we don't do it on every cell
-			//String stringNoData = Integer.toString(NO_DATA);
-			
-			for (int y = 0; y < height; y++) 
+			boolean moreCells = true;
+			while (moreCells) {
+				Moving_Z_Window.Z_WindowPoint point = zWin.getPoint();
+				
+				// calculate an index where to store this info since the pattern through the 
+				//	array is actually the z-win zigzag path!
+				int idx = point.mY * width + point.mX;
+				
+				Prop_Forest = zWin.getProportionForest();
+				Prop_Grass = zWin.getProportionGrass();
+				
+				// Calculate visitation index and normalize value by max
+//				Poll[idx] = (float)Math.pow(0.6617f + (2.98f * Prop_Forest) + (1.83f * Prop_Grass), 2.0f) / 18.0f;
+				Poll[idx] = (float)Math.pow(0.6617f + (2.98f * Prop_Forest) + (1.83f * Prop_Grass), 2.0f);
+				Min_P = Min(Min_P, Poll[idx]);
+				Max_P = Max(Max_P, Poll[idx]);
+					
+				// Crop type is zero for Ag, Crop type is 1 for grass
+				int Crop_Type = 0;
+				if ((RotationT[point.mY][point.mX] & Grass_Mask) > 0) {
+					Crop_Type = 1;
+				}
+					
+				// Pest suppression calculation
+				Pest[idx] = (float)(0.25f + (0.19f * Crop_Type) + (0.62f * Prop_Grass));
+				Min_PS = Min(Min_PS, Pest[idx]);
+				Max_PS = Max(Max_PS, Pest[idx]);
+
+				moreCells = zWin.advance();
+			}		
+		}
+		long timingEnd = System.currentTimeMillis();
+		float timeSec = (timingEnd - timingStart) / 1000.0f;
+		Logger.info("ZWin timing: " + Float.toString(timeSec));
+		
+		if (false) { // Old style window
+			timingStart = System.currentTimeMillis();
+			try 
 			{
-				
-				//StringBuffer sb_Po = new StringBuffer();
-				//StringBuffer sb_Pe = new StringBuffer();
-				
-				for (int x = 0; x < width; x++) 
-				{				
-					//if (RotationT[y][x] == 0 || selection.mSelection[y][x] == 0) 
-					//{
-						// Check for No-Data Value
-					//	sb_Po.append(stringNoData);
-					//	sb_Pe.append(stringNoData);
-					//} 
-					//else if (selection.mSelection[y][x] == 1)
-					if (selection.mSelection[y][x] == 1)
-					{
-						
+				int errors = 0;
+				i = 0;
+				for (int y = 0; y < height; y++) 
+				{
+					for (int x = 0; x < width; x++) 
+					{				
 						// Calculate the Boundary for Moving Window
 						Moving_Window mWin = new Moving_Window(x, y, Window_Size, width, height);
 						float[] Proportion_AFG = mWin.Window_Operation(RotationT);
@@ -106,13 +119,10 @@ public class Model_Pollinator_Pest_Suppression
 						Prop_Grass = Proportion_AFG[2];
 
 						// Calculate visitation index and normalize value by max
-						Poll[i] = (float)Math.pow(0.6617f + (2.98f * Prop_Forest) + (1.83f * Prop_Grass), 2) / 18;
+						Poll[i] = (float)Math.pow(0.6617f + (2.98f * Prop_Forest) + (1.83f * Prop_Grass), 2.0f) / 18.0f;
 						Min_P = Min(Min_P, Poll[i]);
 						Max_P = Max(Max_P, Poll[i]);
 							
-						// Write Pollinator to The ASCII File
-						//sb_Po.append(String.format("%.4f", Poll));
-						
 						// Crop type is zero for Ag
 						int Crop_Type = 0;
 						// Crop type is 1 for grass
@@ -122,32 +132,24 @@ public class Model_Pollinator_Pest_Suppression
 						}
 							
 						// Pest suppression calculation
-						Pest[i] = (float)(0.25 + (0.19f * Crop_Type) + (0.62f * Prop_Grass));
+						Pest[i] = (float)(0.25f + (0.19f * Crop_Type) + (0.62f * Prop_Grass));
 						Min_PS = Min(Min_PS, Pest[i]);
 						Max_PS = Max(Max_PS, Pest[i]);
 	
-						// Write Pest to The File
-						//sb_Pe.append(String.format("%.4f", Pest));
-						
 						i = i + 1;
 					}
-					//if (x != width - 1) 
-					//{
-					//	sb_Po.append(" ");
-					//	sb_Pe.append(" ");
-					//}
 				}
-				//out_Po.println(sb_Po.toString());
-				//out_Pe.println(sb_Pe.toString());
+				
 			}
-			// Close output files
-			//out_Po.close();
-			//out_Pe.close();
-		}
-		catch(Exception err) 
-		{
-			Logger.info(err.toString());
-			Logger.info("Oops, something went wrong with writing to the files!");
+			catch(Exception err) 
+			{
+				Logger.info(err.toString());
+				Logger.info("Oops, something went wrong with writing to the files!");
+			}
+			timingEnd = System.currentTimeMillis();
+			timeSec = (timingEnd - timingStart) / 1000.0f;
+			
+			Logger.info("SlowWin timing: " + Float.toString(timeSec));
 		}
 		
 				

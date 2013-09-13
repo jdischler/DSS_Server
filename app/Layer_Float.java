@@ -3,105 +3,84 @@ package util;
 import play.*;
 import java.util.*;
 import java.io.*;
+import java.nio.*;
 
 import org.codehaus.jackson.*;
 import org.codehaus.jackson.node.*;
 
 
-// example ("slope", 0.0, 90.0, 0, 360); .. remap a slope of 0.0-90.0 to 0-360 to better utilize data range
-// or ("river" )...which doesn't try to maximize value range, just rounds/clamps distance to river to int
 //------------------------------------------------------------------------------
-public class Layer_Continuous extends Layer_Base
+public class Layer_Float extends Layer_Base
 {
-	// Data is currently stored in 32 bit integer - instead of clamping/rounding float
-	//	float to int, I set things up to allow a behind-the-scenes reprojection of
-	//	the value ranges to better use the integer data range
-	boolean mbProjectValues;
+	protected boolean mbInitedMinMaxCache;
+	protected float	mMin, mMax;
+	protected float[][] mFloatData;
 	
-	// for range/value reprojection
-	float 	mFloatMin, mFloatMax;
-	int		mIntMin, mIntMax;
+	//--------------------------------------------------------------------------
+	public Layer_Float(String name) {
+
+		super(name);
+
+		mbInitedMinMaxCache = false;
+	}
 	
-	boolean mbInitedMinMaxCache;
-	float	mLayerMin, mLayerMax;
-	
+	// Min / Max
 	//--------------------------------------------------------------------------
 	public float getLayerMin() {
-		return mLayerMin;
+		
+		return mMin;
 	}
-	
-	//--------------------------------------------------------------------------
 	public float getLayerMax() {
-		return mLayerMax;
-	}
-
-	// Range/Value round and clamp constructor variant, ie, values are not reprojected
-	//--------------------------------------------------------------------------
-	public Layer_Continuous(String name) {
-
-		super(name);
-
-		mbProjectValues = false;
-		mFloatMin = -9000; // FIXME: blugh, so lame
-		mFloatMax = 999999;// FIXME: blugh, so lame
-		mbInitedMinMaxCache = false;
-	}
-	
-	// Range/Value reprojection constructor variant
-	//--------------------------------------------------------------------------
-	public Layer_Continuous(String name, float fMin, float fMax, int iMin, int iMax) {
-
-		super(name);
-
-		mbProjectValues = true;
-		mFloatMin = fMin;
-		mFloatMax = fMax;
-		mIntMin = iMin;
-		mIntMax = iMax;
-		mbInitedMinMaxCache = false;
-	}
-	
-	//--------------------------------------------------------------------------
-	private int conditionalReprojectFloatToInt(float value) {
 		
-		if (mbProjectValues) {
-			return projectFloatToInt(value);
+		return mMax;
+	}
+	
+	//--------------------------------------------------------------------------
+	public float[][] getFloatData() {
+		
+		return mFloatData;
+	}
+
+	//--------------------------------------------------------------------------
+	protected void allocMemory() {
+		
+		Logger.info("  Allocating FLOAT work array");
+		mFloatData = new float[mHeight][mWidth];
+	}
+	
+	// Copies a file read bytebuffer into the internal native float array...
+	//--------------------------------------------------------------------------
+	protected void readCopy(ByteBuffer dataBuffer, int width, int atY) {
+		
+		for (int x = 0; x < width; x++) {
+			mFloatData[atY][x] = dataBuffer.getFloat();
 		}
-		else {
-			return (int)(value + 0.5); // simple round + clamp
+	}
+
+	// Copies the native float data into a bytebuffer that is set up to recieve it (by the caller)
+	//--------------------------------------------------------------------------
+	protected void writeCopy(ByteBuffer dataBuffer, int width, int atY) {
+		
+		for (int x = 0; x < width; x++) {
+			dataBuffer.putFloat(mFloatData[atY][x]);
 		}
 	}
 	
-	// ONLY "project" to new range if in the specified float range to being with
-	//	This allows nodata values (such as -9999) to pass through
-	//--------------------------------------------------------------------------
-	private int projectFloatToInt(float value) {
-		
-		if (value >= mFloatMin && value <= mFloatMax) {
-			//normalize (0-1)
-			value = ((value - mFloatMin) / (mFloatMax - mFloatMin));
-			// "reproject" to new range
-			value = value * (mIntMax - mIntMin) + mIntMin;
-		}
-		return (int)(value + 0.5f);
-	}
-
 	//--------------------------------------------------------------------------
 	private void cacheMinMax(float value) {
 		
-		// Only do data in the specified range
-		if (value >= mFloatMin && value <= mFloatMax) {
+		if (value > -9998.0f) { // FIXME
 			if (!mbInitedMinMaxCache) {
 				mbInitedMinMaxCache = true;
-				mLayerMin = value;
-				mLayerMax = value;
+				mMin = value;
+				mMax = value;
 			}
 		
-			if (value > mLayerMax) {
-				mLayerMax = value;
+			if (value > mMax) {
+				mMax = value;
 			}
-			else if (value < mLayerMin) {
-				mLayerMin = value;
+			else if (value < mMin) {
+				mMin = value;
 			}
 		}
 	}
@@ -109,29 +88,24 @@ public class Layer_Continuous extends Layer_Base
 	//--------------------------------------------------------------------------
 	protected void processASC_Line(int y, String lineElementsArray[]) {
 		
-		if (mbProjectValues) {
-			for (int x = 0; x < lineElementsArray.length; x++) {
-				
-				float val = Float.parseFloat(lineElementsArray[x]);
-				cacheMinMax(val);
-				mIntData[y][x] = conditionalReprojectFloatToInt(val);
-			}
-		}
-		else {
-			for (int x = 0; x < lineElementsArray.length; x++) {
-				
-				int val = Integer.parseInt(lineElementsArray[x]);
-				cacheMinMax((float)val);
-				mIntData[y][x] = val;
-			}
+		for (int x = 0; x < lineElementsArray.length; x++) {
+			
+			float val = Float.parseFloat(lineElementsArray[x]);
+			mFloatData[y][x] = val;
 		}
 	}
 
 	//--------------------------------------------------------------------------
 	protected void onLoadEnd() {
 		
-		Logger.info("  Value range is: " + Float.toString(mLayerMin) + 
-						" to " + Float.toString(mLayerMax));
+		for (int y = 0; y < mHeight; y++) {
+			for (int x = 0; x < mWidth; x++) {
+				cacheMinMax(mFloatData[y][x]);
+			}
+		}
+		
+		Logger.info("  Value range is: " + Float.toString(mMin) + 
+						" to " + Float.toString(mMax));
 	}
 	
 	//--------------------------------------------------------------------------
@@ -163,7 +137,7 @@ public class Layer_Continuous extends Layer_Base
 		JsonNode gtrValNode = queryNode.get("greaterThanValue");
 		JsonNode lessValNode = queryNode.get("lessThanValue");
 		
-		int minVal = 0, maxVal = 0;
+		float minVal = 0, maxVal = 0;
 		boolean isGreaterThan = false, isGreaterThanEqual = false;
 		boolean isLessThan = false, isLessThanEqual = false;
 		
@@ -171,19 +145,19 @@ public class Layer_Continuous extends Layer_Base
 			if (gtrValNode.isNumber()) {
 				isGreaterThan = (gtrTest.compareTo(">") == 0);
 				isGreaterThanEqual = !isGreaterThan;
-				minVal = conditionalReprojectFloatToInt(gtrValNode.getNumberValue().floatValue());
+				minVal = gtrValNode.getNumberValue().floatValue();
 			}
 		}
 		if (lessValNode != null) {
 			if (lessValNode.isNumber()) {
 				isLessThan = (lessTest.compareTo("<") == 0);
 				isLessThanEqual = !isLessThan;
-				maxVal = conditionalReprojectFloatToInt(lessValNode.getNumberValue().floatValue());
+				maxVal = lessValNode.getNumberValue().floatValue();
 			}
 		}
 		
-		Logger.info("Min value:" + Integer.toString(minVal));
-		Logger.info("Max value:" + Integer.toString(maxVal));
+		Logger.info("Min value:" + Float.toString(minVal));
+		Logger.info("Max value:" + Float.toString(maxVal));
 		int x,y;
 		
 		// Blugh, I count 8 permutations that we care about. These are split out this way
@@ -197,7 +171,7 @@ public class Layer_Continuous extends Layer_Base
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
 						selection.mSelection[y][x] &= 
-							((mIntData[y][x] > minVal && mIntData[y][x] < maxVal) 
+							((mFloatData[y][x] > minVal && mFloatData[y][x] < maxVal) 
 							? 1 : 0);
 					}
 				}
@@ -208,7 +182,7 @@ public class Layer_Continuous extends Layer_Base
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
 						selection.mSelection[y][x] &= 
-							((mIntData[y][x] > minVal && mIntData[y][x] <= maxVal) 
+							((mFloatData[y][x] > minVal && mFloatData[y][x] <= maxVal) 
 							? 1 : 0);
 					}
 				}
@@ -219,7 +193,7 @@ public class Layer_Continuous extends Layer_Base
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
 						selection.mSelection[y][x] &= 
-							(mIntData[y][x] > minVal 
+							(mFloatData[y][x] > minVal 
 							? 1 : 0);
 					}
 				}
@@ -232,7 +206,7 @@ public class Layer_Continuous extends Layer_Base
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
 						selection.mSelection[y][x] &= 
-							((mIntData[y][x] >= minVal && mIntData[y][x] < maxVal) 
+							((mFloatData[y][x] >= minVal && mFloatData[y][x] < maxVal) 
 							? 1 : 0);
 					}
 				}
@@ -243,7 +217,7 @@ public class Layer_Continuous extends Layer_Base
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
 						selection.mSelection[y][x] &= 
-							((mIntData[y][x] >= minVal && mIntData[y][x] <= maxVal) 
+							((mFloatData[y][x] >= minVal && mFloatData[y][x] <= maxVal) 
 							? 1 : 0);
 					}
 				}
@@ -254,7 +228,7 @@ public class Layer_Continuous extends Layer_Base
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
 						selection.mSelection[y][x] &= 
-							(mIntData[y][x] >= minVal 
+							(mFloatData[y][x] >= minVal 
 							? 1 : 0);
 					}
 				}
@@ -266,7 +240,7 @@ public class Layer_Continuous extends Layer_Base
 			for (y = 0; y < mHeight; y++) {
 				for (x = 0; x < mWidth; x++) {
 					selection.mSelection[y][x] &= 
-						(mIntData[y][x] < maxVal 
+						(mFloatData[y][x] < maxVal 
 						? 1 : 0);
 				}
 			}
@@ -277,7 +251,7 @@ public class Layer_Continuous extends Layer_Base
 			for (y = 0; y < mHeight; y++) {
 				for (x = 0; x < mWidth; x++) {
 					selection.mSelection[y][x] &= 
-						(mIntData[y][x] <= maxVal 
+						(mFloatData[y][x] <= maxVal 
 						? 1 : 0);
 				}
 			}

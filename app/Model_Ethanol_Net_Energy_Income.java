@@ -110,174 +110,110 @@ public class Model_Ethanol_Net_Energy_Income
 		float Min_NI =  1000000;
 		float Max_NI = -1000000;
 		
-		// Retrive rotation layer from memory
-		//int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
-		//if (RotationT == null)
-		//{
-		//	Logger.info("Fail Rotation");
-		//	layer = new Layer_Raw("Rotation"); layer.init();
-		//	RotationT = Layer_Base.getLayer("Rotation").getIntData();
-		//}
-			layer = Layer_Base.getLayer("Rotation");
-			width = layer.getWidth();
-			height = layer.getHeight();
+		layer = Layer_Base.getLayer("Rotation");
+		width = layer.getWidth();
+		height = layer.getHeight();
 		
-		try 
-		{	
-			// Net Energy
-			//PrintWriter out_NE = new HeaderWrite("Net_Energy", width, height, Output_Folder).getWriter();
-			
-			// Precompute this so we don't do it on every cell
-			//String stringNoData = Integer.toString(NO_DATA);
-			
-			for (int y = 0; y < height; y++) 
-			{
-				// Outputs
-				//StringBuffer sb_NE = new StringBuffer();
-				
-				for (int x = 0; x < width; x++) 
-				{
-					//if (RotationT[y][x] == 0 || selection.mSelection[y][x] == 0) 
-					//{
-						// Check for No-Data
-					//	sb_NE.append(stringNoData);
-					//}
-					//else
-					if (selection.mSelection[y][x] == 1)
-					{
-						// Corn
-						if ((RotationT[y][x] & Corn_Mask) > 0)
-						{
-							
-							// Tonnes per Ha
-							Ethanol[i] = YI[i] * 0.5f * CEO_C + YI[i] * 0.25f * CEO_CS;
-							Min_E = Min(Min_E, Ethanol[i]);
-							Max_E = Max(Max_E, Ethanol[i]);
-							
-							// MJ per Ha
-							// Net_Energy
-							Net_Energy_C = (YI[i] * 0.5f * CEO_C * EO_C) - (EI_CF + EI_CP * YI[i] * 0.5f * CEO_C);
-							Net_Energy_S = (YI[i] * Prop_Stover_Harvest * 0.5f * CEO_CS * EO_CS) - (EI_CSF + EI_CSP * YI[i] * Prop_Stover_Harvest * 0.5f * CEO_CS);
-							Net_Energy[i] = Net_Energy_C + Net_Energy_S;
-							Min_NE = Min(Min_NE, Net_Energy[i]);
-							Max_NE = Max(Max_NE, Net_Energy[i]);
-							
-							// Gross return $ per hec
-							Return = P_Per_Corn * 0.5f * YI[i] + P_Per_Stover * Prop_Stover_Harvest * 0.5f * YI[i];
-							// Net Income $ per hec
-							Net_Income[i] = Return - PC_Cost - PCS_Cost;
-							Min_NI = Min(Min_NI, Net_Income[i]);
-							Max_NI = Max(Max_NI, Net_Income[i]);
-							
-							//i = i + 1;
-							
-							//sb_NE.append(String.format("%.4f", Net_Energy));
-						}
-						// Grass
-						else if ((RotationT[y][x] & Grass_Mask) > 0)
-						{
-							
-							// Tonnes per pixel
-							Ethanol[i] = YI[i] * CEO_G;
-							Min_E = Min(Min_E, Ethanol[i]);
-							Max_E = Max(Max_E, Ethanol[i]);
-							
-							// MJ per Ha
-							Net_Energy[i] = (YI[i] * CEO_G * EO_G) - (EI_GF + EI_GP * YI[i] * CEO_G);
-							Min_NE = Min(Min_NE, Net_Energy[i]);
-							Max_NE = Max(Max_NE, Net_Energy[i]);
-							
-							// Gross return $ per pixel
-							Return = P_Per_Grass * YI[i];
-							// Net Income $ per pixel
-							Net_Income[i] = Return  - PG_Cost;
-							Min_NI = Min(Min_NI, Net_Income[i]);
-							Max_NI = Max(Max_NI, Net_Income[i]);
-							
-							//i = i + 1;
-													
-							//sb_NE.append(String.format("%.4f", Net_Energy));
-						}
-						// Soy
-						else if ((RotationT[y][x] & Soy_Mask) > 0)
-						{
-							
-							// Tonnes per pixel
-							Ethanol[i] = YI[i] * CEO_S;
-							Min_E = Min(Min_E, Ethanol[i]);
-							Max_E = Max(Max_E, Ethanol[i]);
-							
-							// MJ per Ha
-							Net_Energy[i] = (YI[i] * 0.40f * CEO_S * EO_S) - (EI_SF + EI_SP * YI[i] * CEO_S);
-							Min_NE = Min(Min_NE, Net_Energy[i]);
-							Max_NE = Max(Max_NE, Net_Energy[i]);
-							
-							// Soy return $ per pixel
-							Return = P_Per_Soy * YI[i];
-							// Net Income $ per pixel
-							Net_Income[i] = Return  - PS_Cost;
-							Min_NI = Min(Min_NI, Net_Income[i]);
-							Max_NI = Max(Max_NI, Net_Income[i]);
-							
-							//i = i + 1;
-													
-							//sb_NE.append(String.format("%.4f", Net_Energy));
-						}
-						// Alfalfa
-						else if ((RotationT[y][x] & Alfalfa_Mask) > 0)
-						{
-							
-							// Tonnes per pixel
-							Ethanol[i] = YI[i] * CEO_A;
-							Min_E = Min(Min_E, Ethanol[i]);
-							Max_E = Max(Max_E, Ethanol[i]);
-							
-							// MJ per Ha
-							Net_Energy[i] = (YI[i] * CEO_A * EO_A) - (EI_AF + EI_AP * YI[i] * CEO_A);
-							Min_NE = Min(Min_NE, Net_Energy[i]);
-							Max_NE = Max(Max_NE, Net_Energy[i]);
-							
-							// Alfalfa return $ per pixel
-							Return = P_Per_Alfalfa * YI[i];
-							// Net Income $ per pixel
-							Net_Income[i] = Return  - PA_Cost;
-							Min_NI = Min(Min_NI, Net_Income[i]);
-							Max_NI = Max(Max_NI, Net_Income[i]);
-							
-							//i = i + 1;
-													
-							//sb_NE.append(String.format("%.4f", Net_Energy));
-						}
-						else 
-						{
-							Ethanol[i] = 0;
-							Net_Energy[i] = 0;
-							Net_Income[i] = 0;
-						//	Ethanol[i] = Float.NaN;
-						//	Net_Energy[i] = Float.NaN;
-						//	Net_Income[i] = Float.NaN;
-						}
-						//else 
-						//{
-						//	sb_NE.append(stringNoData);
-						//}
-						
-						i = i + 1;
-					}
-					//if (x != width - 1) 
-					//{
-					//	sb_NE.append(" ");
-					//}
-				}
-				//out_NE.println(sb_NE.toString());
-			}
-			// Close output files
-			//out_NE.close();
-		}
-		catch(Exception err) 
+		for (int y = 0; y < height; y++) 
 		{
-			Logger.info(err.toString());
-			Logger.info("Oops, something went wrong with writing to the files!");
+			for (int x = 0; x < width; x++) 
+			{
+				// Corn
+				if ((RotationT[y][x] & Corn_Mask) > 0)
+				{
+					
+					// Tonnes per Ha
+					Ethanol[i] = YI[i] * 0.5f * CEO_C + YI[i] * 0.25f * CEO_CS;
+					Min_E = Min(Min_E, Ethanol[i]);
+					Max_E = Max(Max_E, Ethanol[i]);
+					
+					// MJ per Ha
+					// Net_Energy
+					Net_Energy_C = (YI[i] * 0.5f * CEO_C * EO_C) - (EI_CF + EI_CP * YI[i] * 0.5f * CEO_C);
+					Net_Energy_S = (YI[i] * Prop_Stover_Harvest * 0.5f * CEO_CS * EO_CS) - (EI_CSF + EI_CSP * YI[i] * Prop_Stover_Harvest * 0.5f * CEO_CS);
+					Net_Energy[i] = Net_Energy_C + Net_Energy_S;
+					Min_NE = Min(Min_NE, Net_Energy[i]);
+					Max_NE = Max(Max_NE, Net_Energy[i]);
+					
+					// Gross return $ per hec
+					Return = P_Per_Corn * 0.5f * YI[i] + P_Per_Stover * Prop_Stover_Harvest * 0.5f * YI[i];
+					// Net Income $ per hec
+					Net_Income[i] = Return - PC_Cost - PCS_Cost;
+					Min_NI = Min(Min_NI, Net_Income[i]);
+					Max_NI = Max(Max_NI, Net_Income[i]);
+				}
+				// Grass
+				else if ((RotationT[y][x] & Grass_Mask) > 0)
+				{
+					
+					// Tonnes per pixel
+					Ethanol[i] = YI[i] * CEO_G;
+					Min_E = Min(Min_E, Ethanol[i]);
+					Max_E = Max(Max_E, Ethanol[i]);
+					
+					// MJ per Ha
+					Net_Energy[i] = (YI[i] * CEO_G * EO_G) - (EI_GF + EI_GP * YI[i] * CEO_G);
+					Min_NE = Min(Min_NE, Net_Energy[i]);
+					Max_NE = Max(Max_NE, Net_Energy[i]);
+					
+					// Gross return $ per pixel
+					Return = P_Per_Grass * YI[i];
+					// Net Income $ per pixel
+					Net_Income[i] = Return  - PG_Cost;
+					Min_NI = Min(Min_NI, Net_Income[i]);
+					Max_NI = Max(Max_NI, Net_Income[i]);
+				}
+				// Soy
+				else if ((RotationT[y][x] & Soy_Mask) > 0)
+				{
+					
+					// Tonnes per pixel
+					Ethanol[i] = YI[i] * CEO_S;
+					Min_E = Min(Min_E, Ethanol[i]);
+					Max_E = Max(Max_E, Ethanol[i]);
+					
+					// MJ per Ha
+					Net_Energy[i] = (YI[i] * 0.40f * CEO_S * EO_S) - (EI_SF + EI_SP * YI[i] * CEO_S);
+					Min_NE = Min(Min_NE, Net_Energy[i]);
+					Max_NE = Max(Max_NE, Net_Energy[i]);
+					
+					// Soy return $ per pixel
+					Return = P_Per_Soy * YI[i];
+					// Net Income $ per pixel
+					Net_Income[i] = Return  - PS_Cost;
+					Min_NI = Min(Min_NI, Net_Income[i]);
+					Max_NI = Max(Max_NI, Net_Income[i]);
+				}
+				// Alfalfa
+				else if ((RotationT[y][x] & Alfalfa_Mask) > 0)
+				{
+					
+					// Tonnes per pixel
+					Ethanol[i] = YI[i] * CEO_A;
+					Min_E = Min(Min_E, Ethanol[i]);
+					Max_E = Max(Max_E, Ethanol[i]);
+					
+					// MJ per Ha
+					Net_Energy[i] = (YI[i] * CEO_A * EO_A) - (EI_AF + EI_AP * YI[i] * CEO_A);
+					Min_NE = Min(Min_NE, Net_Energy[i]);
+					Max_NE = Max(Max_NE, Net_Energy[i]);
+					
+					// Alfalfa return $ per pixel
+					Return = P_Per_Alfalfa * YI[i];
+					// Net Income $ per pixel
+					Net_Income[i] = Return  - PA_Cost;
+					Min_NI = Min(Min_NI, Net_Income[i]);
+					Max_NI = Max(Max_NI, Net_Income[i]);
+				}
+				else 
+				{
+					Ethanol[i] = 0;
+					Net_Energy[i] = 0;
+					Net_Income[i] = 0;
+				}
+				
+				i = i + 1;
+			}
 		}
 		
 		Logger.info("Model_Ethanol_Net_Energy_Income is finished");

@@ -65,7 +65,7 @@ Ext.define('MyApp.view.LayerPanel_CurrentSelection', {
 		var headerCheck = this.getHeader().getComponent('DSS_visibilityToggle');
 		headerCheck.setValue(true);
 		var headerSlider = this.getHeader().getComponent('DSS_opacitySlider');
-		this.DSS_Layer.setOpacity(0.5);// FIXME; headerSlider.getValue() / 100.0);
+		this.DSS_Layer.setOpacity(0.8);// FIXME; headerSlider.getValue() / 100.0);
 		
 		this.show();
 	},

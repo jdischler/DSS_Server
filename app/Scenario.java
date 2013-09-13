@@ -99,7 +99,7 @@ public class Scenario
 				//	.vs the index value itself.
 				int newLanduse = transformElement.get("newLandUse").getValueAsInt();
 				Logger.info("+New land use code: " + Integer.toString(newLanduse));
-				newLanduse = Layer_Indexed.convertIndexToMask(newLanduse);
+				newLanduse = Layer_Integer.convertIndexToMask(newLanduse);
 				
 				try {
 					currentSelection = query.execute(transformElement);

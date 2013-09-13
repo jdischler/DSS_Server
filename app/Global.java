@@ -125,7 +125,6 @@ public class Global extends GlobalSettings
 	//--------------------------------------------------------------------------
 	private void cacheLayers() 
 	{
-
 		/* // Uncomment if need to recalculate and output slope
 		CalculateSlope cs = new CalculateSlope();
 		cs.computeSlope();
@@ -141,33 +140,27 @@ public class Global extends GlobalSettings
 		
 		Layer_Base layer;
 		try {
-			layer = new Layer_Indexed("rotation", true); layer.init(); // TRUE, rotation data is shifted for mask compares, etc
+			if (Play.isProd() || LOAD_ALL_LAYERS_FOR_DEV == true) {
+				Logger.info("Loading all layers");
+			}
 			
-			// data range is 0-90 but expand it up to 0-1000 internally since we are converting to int
-			//	and losing some precision
-			layer = new Layer_Continuous("slope", 0.0f, 90.0f, 0, 1000); layer.init();
+			layer = new Layer_Integer("rotation"); layer.init();
+			layer = new Layer_Float("slope"); layer.init();
+			layer = new Layer_Float("cec"); layer.init();
+			layer = new Layer_Float("depth"); layer.init();
+			layer = new Layer_Float("silt"); layer.init();
+			layer = new Layer_Float("soc"); layer.init();
+			layer = new Layer_Integer("watersheds", Layer_Integer.EType.EQueryShiftedIndex); layer.init();
 			
-			// distance to river can get clamped to the nearest int value without losing much...
-			layer = new Layer_Continuous("rivers"); layer.init();
-			
-			// NOTE: if we have more than 32 watersheds, we CAN'T use Layer_Indexed
-			layer = new Layer_Indexed("watersheds", false); layer.init(); // FALSE, watershed data is NOT shifted
-			
-			// NOTE: can put low-priority (rarely used) data layers here so that
-			//	we can have them skip loading in DEVELOPMENT mode. Ie, it gives us
-			//	some ways that we can get the server up as quickly as possible for
-			//	testing and development
+			// NOTE: am putting low-priority (rarely used) data layers here so that
+			//	we can have them skip loading in DEVELOPMENT mode. Ie, faster loads
+			//	and less memory usage...
 			if (Play.isProd() || LOAD_ALL_LAYERS_FOR_DEV == true) {
 				
-				Logger.info("Loading all layers");
-				// SOC can get clamped to the nearest int value without losing much...
-				layer = new Layer_Continuous("soc"); layer.init();
-			
-				// distance to road can get clamped to the nearest int value without losing much...
+				layer = new Layer_Float("rivers"); layer.init();
+				layer = new Layer_Integer("lcc"); layer.init();
+				layer = new Layer_Integer("lcs"); layer.init();
 //				layer = new Layer_Continuous("roads"); layer.init();
-				
-				layer = new Layer_Indexed("lcc", true); layer.init(); // TRUE, data is shifted
-				layer = new Layer_Indexed("lcs", true); layer.init(); // TRUE, data is shifted
 			}
 		}
 		catch (Exception e) {

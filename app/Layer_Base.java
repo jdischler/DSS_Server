@@ -12,16 +12,22 @@ import org.codehaus.jackson.node.*;
 //------------------------------------------------------------------------------
 public abstract class Layer_Base
 {
+	// STATIC DATA --------------------------
+	// NOTE: Width, height, cellSize, and corners were deliberately made static because
+	//	no code can currently handle layers of different dimensions or data density.
 	private static Map<String, Layer_Base>	mLayers;
 	
-	protected final boolean mbUseBinaryFormat = false;
+	protected static int mWidth, mHeight;
+	protected static float mCellSize, mCornerX, mCornerY;
 	
+	protected final static boolean mbUseBinaryFormat = true;
+	protected final static int mBinaryWriteVersion = 1; // NOTE: update version for each new header version change
+	
+	// CLASS DATA --------------------------
 	protected String mName;
-	protected int mWidth, mHeight;
-	protected float mCellSize, mCornerX, mCornerY;
+	// TODO: move noDataValue into subclasses? Is that even possible? Considering float might store NaN
 	protected int mNoDataValue;
-	protected int[][] mIntData;
-
+	
 	// Return the Layer_Base object when asked for it by name
 	//--------------------------------------------------------------------------
 	public static Layer_Base getLayer(String name) {
@@ -70,15 +76,18 @@ public abstract class Layer_Base
 	public int getWidth() {
 		return mWidth;
 	}
-
-	//--------------------------------------------------------------------------
 	public int getHeight() {
 		return mHeight;
 	}
 	
 	//--------------------------------------------------------------------------
 	public int[][] getIntData() {
-		return mIntData;
+		return null;
+	}
+	
+	//--------------------------------------------------------------------------
+	public float[][] getFloatData() {
+		return null;
 	}
 	
 	//--------------------------------------------------------------------------
@@ -87,7 +96,7 @@ public abstract class Layer_Base
 		try {
 			// TODO: FIXME: binary format reading or writing has an issue, not sure which
 			if (mbUseBinaryFormat) {
-				File input = new File("./layerData/" + mName + ".bin");
+				File input = new File("./layerData/" + mName + ".dss");
 				if(input.exists()) {
 					readBinary();
 				}
@@ -160,7 +169,7 @@ public abstract class Layer_Base
 		BufferedReader br = new BufferedReader(new FileReader("./layerData/" + mName + ".asc"));
 		try {
 			readASC_Header(br);
-			allocMemory(mWidth, mHeight);
+			allocMemory();
 			
 			Logger.info("  Attempting to read the array data");
 			
@@ -189,11 +198,7 @@ public abstract class Layer_Base
 	}
 	
 	//--------------------------------------------------------------------------
-	protected void allocMemory(int width, int height) {
-		
-		Logger.info("  Allocating new work array");
-		mIntData = new int[mHeight][mWidth];
-	}
+	abstract protected void allocMemory();
 	
 	// Generally comes from a client request for data about this layer...
 	//	this could be layer width/height, maybe cell size (30m), maybe the layer
@@ -230,6 +235,10 @@ public abstract class Layer_Base
 	abstract protected void onLoadEnd();
 	abstract protected void processASC_Line(int y, String lineElementsArray[]);
 	abstract protected Selection query(JsonNode queryNode, Selection selection);
+		// Copies a file read bytebuffer into the internal native float array...
+	abstract protected void readCopy(ByteBuffer dataBuffer, int width, int atY);
+		// Copies the native float data into a bytebuffer that is set up to recieve it (by the caller)
+	abstract protected void writeCopy(ByteBuffer dataBuffer, int width, int atY);
 		
 	//--------------------------------------------------------------------------
 	public static void execQuery(JsonNode layerList, Selection selection) {
@@ -254,24 +263,30 @@ public abstract class Layer_Base
 
 	//--------------------------------------------------------------------------
 	// BINARY format reading/writing
-	//	~3-5x faster 
-	//	FIXME: TODO: (but doesn't current work right yet) unsure exactly why. 
-	//	Needs diagnosing and fixing...
+	//	~3-6x faster 
 	//--------------------------------------------------------------------------
 	private void writeBinary() throws Exception {
 		
 		Logger.info("Writing Binary");
-		File output = new File("./layerData/" + mName + ".bin");
+		File output = new File("./layerData/" + mName + ".dss");
 
 		FileOutputStream fos = new FileOutputStream(output);
 		try {
 			WritableByteChannel channel = fos.getChannel();
-			ByteBuffer buf = ByteBuffer.allocateDirect(3 * 4); // FIXME: size of int * header?
+			ByteBuffer buf = ByteBuffer.allocateDirect(4); // FIXME: size of int
 			
-			// FIXME: TODO: Continuous layers need min/max range property read
-			//	else...could scan the data layer later worst case
+			// write version type			
+			buf.putInt(mBinaryWriteVersion);
+			buf.flip();
+			channel.write(buf);
+			
+			buf = ByteBuffer.allocateDirect(6 * 4); // FIXME: header field ct * size of int
+			
 			buf.putInt(mWidth);
 			buf.putInt(mHeight);
+			buf.putFloat(mCornerX);
+			buf.putFloat(mCornerY);
+			buf.putFloat(mCellSize);
 			buf.putInt(mNoDataValue);
 			buf.flip();
 			channel.write(buf);
@@ -279,10 +294,9 @@ public abstract class Layer_Base
 			buf = ByteBuffer.allocateDirect(mWidth * 4); // FIXME: size of int?
 			
 			for (int y = 0; y < mHeight; y++) {
+				// shuttle native internal data, line by line, into buf for writing
 				buf.clear();
-				for (int x = 0; x < mWidth; x++) {
-					buf.putInt(mIntData[y][x]);
-				}
+				writeCopy(buf, mWidth, y);
 				buf.flip();
 				channel.write(buf);
 			}
@@ -302,7 +316,7 @@ public abstract class Layer_Base
 		Logger.info("+-------------------------------------------------------+");
 		Logger.info("| Binary Read: " + mName);
 		Logger.info("+-------------------------------------------------------+");
-		File input = new File("./layerData/" + mName + ".bin");
+		File input = new File("./layerData/" + mName + ".dss");
 
 		FileInputStream fis = new FileInputStream(input);
 		
@@ -310,29 +324,36 @@ public abstract class Layer_Base
 			ReadableByteChannel channel = fis.getChannel();
 			
 			Logger.info("  Reading header...");
-			ByteBuffer buf = ByteBuffer.allocateDirect(3 * 4); // FIXME: size of header * size of int?
+			ByteBuffer buf = ByteBuffer.allocateDirect(4); // FIXME: size of int (version)?
 			channel.read(buf); 
 			buf.rewind();
+			Logger.info("  - Binary file version: " + Integer.toString(buf.getInt()));
+				
 			Logger.info("  Extracting header...");
-			// FIXME: TODO: Continuous layers need min/max range property read
-			//	else...could scan the data layer later worst case
+			buf = ByteBuffer.allocateDirect(6 * 4); // FIXME: size of header * size of int?
+			channel.read(buf); 
+			buf.rewind();
+			
 			mWidth = buf.getInt();
 			mHeight = buf.getInt();
+			mCornerX = buf.getFloat();
+			mCornerY = buf.getFloat();
+			mCellSize = buf.getFloat();
 			mNoDataValue = buf.getInt();
 			
 			Logger.info("  Width: " + Integer.toString(mWidth) 
 							+ "  Height: " + Integer.toString(mHeight));
-			allocMemory(mWidth, mHeight);
+			allocMemory();
 			
 			buf = ByteBuffer.allocateDirect(mWidth * 4); // FIXME: size of int?
 			Logger.info("  Reading file with ByteBuffer and NIO...");
 			
 			for (int y = 0; y < mHeight; y++) {
-				buf.rewind();
+				// shuttle read data from buf, line by line, into native internal arrays.
+				buf.clear();
 				channel.read(buf);
-				for (int x = 0; x < mWidth; x++) {
-					mIntData[y][x] = buf.getInt(x * 4);
-				}
+				buf.rewind();
+				readCopy(buf, mWidth, y);
 			}
 			channel.close();
 		}
@@ -346,3 +367,4 @@ public abstract class Layer_Base
 		onLoadEnd();
 	}
 }
+

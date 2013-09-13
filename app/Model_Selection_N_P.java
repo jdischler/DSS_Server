@@ -71,7 +71,8 @@ public class Model_Selection_N_P
 		}
 		
 		// Calculate average between selected cells
-		Per_Cell = Total / (Total_Cells * Max);
+		//Per_Cell = Total / (Total_Cells * Max);
+		Per_Cell = Total / Total_Cells;
 		
 		// Define Json to store and return data to client
 		ObjectNode obj = JsonNodeFactory.instance.objectNode();
@@ -80,7 +81,7 @@ public class Model_Selection_N_P
 		obj.put("Bins", ArrayS);
 		obj.put("Min", Min);
 		obj.put("Max", Max);
-		obj.put("Average_Normalized", Per_Cell);
+		obj.put("Average", Per_Cell);
 		
 		return obj;
 	}

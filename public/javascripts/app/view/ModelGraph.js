@@ -406,76 +406,76 @@ Ext.define('MyApp.view.ModelGraph', {
     SetData: function(obj)
     {
     	// Habitat Index
-    	var val1 = obj.Default.Habitat_Index.Average_Normalized;
-    	var val2 = obj.Transform.Habitat_Index.Average_Normalized;
+    	var val1 = obj.Default.Habitat_Index.Average;
+    	var val2 = obj.Transform.Habitat_Index.Average;
     	//var Max1 = this.Max(obj.Default.Habitat_Index.Max, obj.Transform.Habitat_Index.Max);
     	//var val1 = obj.Habitat_Index_D.Average_HI;
     	//var val2 = obj.Habitat_Index_T.Average_HI;
     	var Habitat_Text = this.getComponent('Habitat_Index');
-    	Habitat_Text.setValue((val2-val1).toFixed(4));
+    	Habitat_Text.setValue((val2 - val1).toFixed(4));
     	
     	// Nitrogen
-    	var val3 = obj.Default.Nitrogen.Average_Normalized;
-    	var val4 = obj.Transform.Nitrogen.Average_Normalized;
-    	//var Max2 = this.Max(obj.Default.Nitrogen.Max, obj.Transform.Nitrogen.Max);
+    	var val3 = obj.Default.Nitrogen.Average;
+    	var val4 = obj.Transform.Nitrogen.Average;
+    	var Max2 = this.Max(obj.Default.Nitrogen.Max, obj.Transform.Nitrogen.Max);
     	//var val3 = obj.Nitrogen_D.Nitrogen;
     	//var val4 = obj.Nitrogen_T.Nitrogen;
     	var Nitrogen_Text = this.getComponent('Nitrogen');
-    	Nitrogen_Text.setValue((val4-val3).toFixed(4));
+    	Nitrogen_Text.setValue((val4 / Max2 - val3 / Max2).toFixed(4));
     	
     	// Phosphorus
-    	var val5 = obj.Default.Phosphorus.Average_Normalized;
-    	var val6 = obj.Transform.Phosphorus.Average_Normalized;
+    	var val5 = obj.Default.Phosphorus.Average;
+    	var val6 = obj.Transform.Phosphorus.Average;
     	//var Max3 = this.Max(obj.Default.Phosphorus.Max, obj.Transform.Phosphorus.Max);
     	//var val5 = obj.Phosphorus_D.Phosphorus;
     	//var val6 = obj.Phosphorus_T.Phosphorus;
     	var Phosphorus_Text = this.getComponent('Phosphorus');
-    	Phosphorus_Text.setValue((val6-val5).toFixed(4));
+    	Phosphorus_Text.setValue((val6 - val5).toFixed(4));
     	
     	// Pest_Suppression
-    	var val7 = obj.Default.Pest_Suppression.Average_Normalized;
-    	var val8 = obj.Transform.Pest_Suppression.Average_Normalized;
+    	var val7 = obj.Default.Pest_Suppression.Average;
+    	var val8 = obj.Transform.Pest_Suppression.Average;
     	//var Max4 = this.Max(obj.Default.Pest.Max, obj.Transform.Phosphorus.Max);
     	//var val7 = obj.Pest_Suppression_D.Pest;
     	//var val8 = obj.Pest_Suppression_T.Pest;
     	var Pest_Text = this.getComponent('Pest_Suppression');
-    	Pest_Text.setValue((val8-val7).toFixed(4));
+    	Pest_Text.setValue((val8 - val7).toFixed(4));
     	
     	// Pollinator
-    	var val9 = obj.Default.Pollinator.Average_Normalized;
-    	var val10 = obj.Transform.Pollinator.Average_Normalized;
-    	//var Max5 = this.Max(obj.Default.Pollinator.Max, obj.Transform.Pollinator.Max);
+    	var val9 = obj.Default.Pollinator.Average;
+    	var val10 = obj.Transform.Pollinator.Average;
+    	var Max5 = this.Max(obj.Default.Pollinator.Max, obj.Transform.Pollinator.Max);
     	//var val9  = obj.Pollinator_D.Pollinator;
     	//var val10 = obj.Pollinator_T.Pollinator;
     	var Pollinator_Text = this.getComponent('Pollinator');
-    	Pollinator_Text.setValue((val10-val9).toFixed(4));
+    	Pollinator_Text.setValue((val10 / Max5 - val9 / Max5).toFixed(4));
     	
     	// Ethanol
-    	var val11 = obj.Default.Ethanol.Average_Normalized;
-    	var val12 = obj.Transform.Ethanol.Average_Normalized;
-    	//var Max6 = this.Max(obj.Default.Ethanol.Max, obj.Transform.Ethanol.Max);
+    	var val11 = obj.Default.Ethanol.Average;
+    	var val12 = obj.Transform.Ethanol.Average;
+    	var Max6 = this.Max(obj.Default.Ethanol.Max, obj.Transform.Ethanol.Max);
     	//var val11 = obj.Ethanol_D.Ethanol;
     	//var val12 = obj.Ethanol_T.Ethanol;
     	var Biomass_Text = this.getComponent('Ethanol');
-    	Biomass_Text.setValue((val12-val11).toFixed(4));
+    	Biomass_Text.setValue((val12 / Max6 - val11 / Max6).toFixed(4));
     	
     	// Net_Income
-    	var val13 = obj.Default.Net_Income.Average_Normalized;
-    	var val14 = obj.Transform.Net_Income.Average_Normalized;
-    	//var Max7 = this.Max(obj.Default.Ethanol.Max, obj.Transform.Ethanol.Max);
+    	var val13 = obj.Default.Net_Income.Average;
+    	var val14 = obj.Transform.Net_Income.Average;
+    	var Max7 = this.Max(obj.Default.Ethanol.Max, obj.Transform.Ethanol.Max);
     	//var val13 = obj.Net_Income_D.Net_Income;
     	//var val14 = obj.Net_Income_T.Net_Income;
     	var Net_Energy_Text = this.getComponent('Net_Income');
-    	Net_Energy_Text.setValue((val14-val13).toFixed(4));
+    	Net_Energy_Text.setValue((val14 / Max7 - val13 / Max7).toFixed(4));
     	
     	// Net_Energy
-    	var val15 = obj.Default.Net_Energy.Average_Normalized;
-    	var val16 = obj.Transform.Net_Energy.Average_Normalized;
-    	//var Max8 = this.Max(obj.Default.Net_Energy.Max, obj.Transform.Net_Energy.Max);
+    	var val15 = obj.Default.Net_Energy.Average;
+    	var val16 = obj.Transform.Net_Energy.Average;
+    	var Max8 = this.Max(obj.Default.Net_Energy.Max, obj.Transform.Net_Energy.Max);
     	//var val15 = obj.Net_Energy_D.Net_Energy;
     	//var val16 = obj.Net_Energy_T.Net_Energy;
     	var Net_Energy_Text = this.getComponent('Net_Energy');
-    	Net_Energy_Text.setValue((val16-val15).toFixed(4));
+    	Net_Energy_Text.setValue((val16 / Max8 - val15 / Max8).toFixed(4));
     	
     	
     	
@@ -537,9 +537,11 @@ Ext.define('MyApp.view.ModelGraph', {
     	
     	// Spider_Graph
     	var spiderPanel = Ext.getCmp('DSS_SpiderGraphPanel');
-    	var arrayDef   = [val1, val3, val5, val7, val9,  val11, val13, val15];
-    	var arrayTrans = [val2, val4, val6, val8, val10, val12, val14, val16];
-    	//var arrayDef = [val1/Max1, val3/Max2, val5/Max3, val7/Max4,  val9/Max5, val11/Max6, val13/Max7, val15/Max8];
+    	var arrayDef   = [val1, val3 / Max2, val5, val7,  val9 / Max5, val11 / Max6, val13 / Max7, val15 / Max8];
+    	var arrayTrans = [val2, val4 / Max2, val6, val8, val10 / Max5, val12 / Max6, val14 / Max7, val16 / Max8];
+    	//var arrayDef   = [val1, val3, val5, val7, val9,  val11, val13, val15];
+    	//var arrayTrans = [val2, val4, val6, val8, val10, val12, val14, val16];
+    	//var arrayDef   = [val1/Max1, val3/Max2, val5/Max3, val7/Max4,  val9/Max5, val11/Max6, val13/Max7, val15/Max8];
     	//var arrayTrans = [val2/Max1, val4/Max2, val6/Max3, val8/Max4, val10/Max5, val12/Max6, val14/Max7, val16/Max8];
     	//var arrayDef = [1, 1, 1, 1, 1, 1, 1, 1];
     	//var arrayTrans = [(val2-val1)/(val1+val2), (val4-val3)/(val3+val4), (val6-val5)/(val5+val6), (val8-val7)/(val7+val8), (val10-val9)/(val9+val10), (val12-val11)/(val11+val12), (val14-val13)/(val13+val4), (val16-val15)/(val15+val16)];

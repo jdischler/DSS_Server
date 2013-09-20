@@ -158,7 +158,10 @@ public class Application extends Controller
 	//----------------------------------------------------------------------
 	public static Result Models() throws Exception 
 	{
+		
+		
 long modelTimeStart = System.currentTimeMillis();
+
 		Logger.info("----- Model Process Started ----");
 		//Logger.info("Called into Model:");
 		//Logger.info(request().body().asJson().toString());
@@ -180,6 +183,7 @@ long modelTimeStart = System.currentTimeMillis();
 		layer = Layer_Base.getLayer("Rotation");
 		width = layer.getWidth();
 		height = layer.getHeight();
+
 		
 long timeStart = System.currentTimeMillis();
 		
@@ -198,50 +202,53 @@ long timeEnd = System.currentTimeMillis();
 float timeSec = (timeEnd - timeStart) / 1000.0f;
 Logger.info(">>> Transformation timing: " + Float.toString(timeSec));
 		
-timeStart = System.currentTimeMillis();
-		// Model_Pollinator_Pest_Suppression
-		// Default
-		Model_Pollinator_Pest_Suppression PPS_D = new Model_Pollinator_Pest_Suppression();
-		TwoArrays ArrayP_PS_D = PPS_D.Pollinator_Pest_Suppression(selectionD, Rotation);
-		float ArrayPOD[] = ArrayP_PS_D.a;
-		float ArrayPSD[] = ArrayP_PS_D.b;
-		float Min_POD = ArrayP_PS_D.Min_a;
-		float Max_POD = ArrayP_PS_D.Max_a;
-		float Min_PSD = ArrayP_PS_D.Min_b;
-		float Max_PSD = ArrayP_PS_D.Max_b;
-		
-		Model_Selection POD = new Model_Selection();
-		JsonNode SendBack_POD = POD.Selection(selectionD, selectionT, ArrayPOD);
-		Model_Selection PSD = new Model_Selection();
-		JsonNode SendBack_PSD = PSD.Selection(selectionD, selectionT, ArrayPSD);
-		ArrayP_PS_D = null;
-		ArrayPOD = null;
-		ArrayPSD = null;
-		System.gc();
-		
-		// Transform
-		Model_Pollinator_Pest_Suppression PPS_T = new Model_Pollinator_Pest_Suppression();
-		TwoArrays ArrayP_PS_T = PPS_T.Pollinator_Pest_Suppression(selectionD, scenario.mNewRotation);
-		float ArrayPOT[] = ArrayP_PS_T.a;
-		float ArrayPST[] = ArrayP_PS_T.b;
-		float Min_POT = ArrayP_PS_T.Min_a;
-		float Max_POT = ArrayP_PS_T.Max_a;
-		float Min_PST = ArrayP_PS_T.Min_b;
-		float Max_PST = ArrayP_PS_T.Max_b;
-		
-		Model_Selection POT = new Model_Selection();
-		JsonNode SendBack_POT = POT.Selection(selectionD, selectionT, ArrayPOT);
-		Model_Selection PST = new Model_Selection();
-		JsonNode SendBack_PST = PST.Selection(selectionD, selectionT, ArrayPST);
-		ArrayP_PS_T = null;
-		ArrayPOT = null;
-		ArrayPSD = null;
-		System.gc();
 
+timeStart = System.currentTimeMillis();
+		
+		// Model_Soil_Carbon
+		// Default and Transform
+		Model_Soil_Carbon Model_SOC_T = new Model_Soil_Carbon();
+		TwoArrays Array_SOC = Model_SOC_T.Soil_Carbon(selectionD, Rotation, scenario.mNewRotation);
+		float SOC_D[] = Array_SOC.a;
+		float SOC_T[] = Array_SOC.b;
+		float Min_SOC_D = Array_SOC.Min_a;
+		float Max_SOC_D = Array_SOC.Max_a;
+		float Min_SOC_T = Array_SOC.Min_b;
+		float Max_SOC_T = Array_SOC.Max_b;
+		
+		// Selection for default
+		Model_Selection SOCD = new Model_Selection();
+		JsonNode SendBack_SOCD = SOCD.Selection(selectionD, selectionT, SOC_D);
+		// Selection for transform
+		Model_Selection SOCT = new Model_Selection();
+		JsonNode SendBack_SOCT = SOCT.Selection(selectionD, selectionT, SOC_T);
+		
 timeEnd = System.currentTimeMillis();
 timeSec = (timeEnd - timeStart) / 1000.0f;
-Logger.info(">>> Model - Pollinator / Pest timing: " + Float.toString(timeSec));
+Logger.info(">>> Model - Soil Carbon timing:  " + Float.toString(timeSec));
+
+
+timeStart = System.currentTimeMillis();
+		// Model_Nitrous_Oxide_Emissions
+		// Default
+		Model_Nitrous_Oxide_Emissions NOED = new Model_Nitrous_Oxide_Emissions();
+		float ArrayNOE_D[] = NOED.Nitrous_Oxide_Emissions(selectionD, Rotation);
+		Model_Selection NOE_D = new Model_Selection();
+		JsonNode SendBack_NOED = NOE_D.Selection(selectionD, selectionT, ArrayNOE_D);
+		ArrayNOE_D = null;
 		
+		// Transform
+		Model_Nitrous_Oxide_Emissions NOET = new Model_Nitrous_Oxide_Emissions();
+		float ArrayNOE_T[] = NOET.Nitrous_Oxide_Emissions(selectionD, scenario.mNewRotation);
+		Model_Selection NOE_T = new Model_Selection();
+		JsonNode SendBack_NOET = NOE_T.Selection(selectionD, selectionT, ArrayNOE_T);
+		ArrayNOE_T = null;
+		System.gc();
+timeEnd = System.currentTimeMillis();
+timeSec = (timeEnd - timeStart) / 1000.0f;
+Logger.info(">>> Model Nitrous Oxide Emissions timing: " + Float.toString(timeSec));
+
+
 timeStart = System.currentTimeMillis();
 		// Corn and Grass Production for D
 		Model_Crop_Yield Model_CGD = new Model_Crop_Yield();
@@ -380,6 +387,52 @@ timeEnd = System.currentTimeMillis();
 timeSec = (timeEnd - timeStart) / 1000.0f;
 Logger.info(">>> Model - Nitrogen / Phosphorus timing: " + Float.toString(timeSec));
 		
+
+timeStart = System.currentTimeMillis();
+		// Model_Pollinator_Pest_Suppression
+		// Default
+		Model_Pollinator_Pest_Suppression PPS_D = new Model_Pollinator_Pest_Suppression();
+		TwoArrays ArrayP_PS_D = PPS_D.Pollinator_Pest_Suppression(selectionD, Rotation);
+		float ArrayPOD[] = ArrayP_PS_D.a;
+		float ArrayPSD[] = ArrayP_PS_D.b;
+		float Min_POD = ArrayP_PS_D.Min_a;
+		float Max_POD = ArrayP_PS_D.Max_a;
+		float Min_PSD = ArrayP_PS_D.Min_b;
+		float Max_PSD = ArrayP_PS_D.Max_b;
+		
+		Model_Selection POD = new Model_Selection();
+		JsonNode SendBack_POD = POD.Selection(selectionD, selectionT, ArrayPOD);
+		Model_Selection PSD = new Model_Selection();
+		JsonNode SendBack_PSD = PSD.Selection(selectionD, selectionT, ArrayPSD);
+		ArrayP_PS_D = null;
+		ArrayPOD = null;
+		ArrayPSD = null;
+		System.gc();
+		
+		// Transform
+		Model_Pollinator_Pest_Suppression PPS_T = new Model_Pollinator_Pest_Suppression();
+		TwoArrays ArrayP_PS_T = PPS_T.Pollinator_Pest_Suppression(selectionD, scenario.mNewRotation);
+		float ArrayPOT[] = ArrayP_PS_T.a;
+		float ArrayPST[] = ArrayP_PS_T.b;
+		float Min_POT = ArrayP_PS_T.Min_a;
+		float Max_POT = ArrayP_PS_T.Max_a;
+		float Min_PST = ArrayP_PS_T.Min_b;
+		float Max_PST = ArrayP_PS_T.Max_b;
+		
+		Model_Selection POT = new Model_Selection();
+		JsonNode SendBack_POT = POT.Selection(selectionD, selectionT, ArrayPOT);
+		Model_Selection PST = new Model_Selection();
+		JsonNode SendBack_PST = PST.Selection(selectionD, selectionT, ArrayPST);
+		ArrayP_PS_T = null;
+		ArrayPOT = null;
+		ArrayPSD = null;
+		System.gc();
+
+timeEnd = System.currentTimeMillis();
+timeSec = (timeEnd - timeStart) / 1000.0f;
+Logger.info(">>> Model - Pollinator / Pest timing: " + Float.toString(timeSec));
+
+
 		// SendBack to Client
 		ObjectNode SendBack  = JsonNodeFactory.instance.objectNode();
 		ObjectNode SendBackD = JsonNodeFactory.instance.objectNode();
@@ -401,11 +454,16 @@ Logger.info(">>> Model - Nitrogen / Phosphorus timing: " + Float.toString(timeSe
 		SendBackT.put("Pest_Suppression", SendBack_PST);
 		SendBackD.put("Pollinator", SendBack_POD);
 		SendBackT.put("Pollinator", SendBack_POT);
+		SendBackD.put("Soil_Carbon", SendBack_SOCD);
+		SendBackT.put("Soil_Carbon", SendBack_SOCT);
+		SendBackD.put("Nitrous_Oxide_Emissions", SendBack_NOED);
+		SendBackT.put("Nitrous_Oxide_Emissions", SendBack_NOET);
 		
-		SendBack.put("Default",   SendBackD);
+		SendBack.put(  "Default", SendBackD);
 		SendBack.put("Transform", SendBackT);
 		
-		Logger.info(SendBack.toString());
+		Logger.info(SendBackD.toString());
+		Logger.info(SendBackT.toString());
 		
 long modelTimeEnd = System.currentTimeMillis();
 timeSec = (modelTimeEnd - modelTimeStart) / 1000.0f;

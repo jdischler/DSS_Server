@@ -79,8 +79,8 @@ public class Model_Pollinator_Pest_Suppression
 				// Calculate visitation index and normalize value by max
 //				Poll[idx] = (float)Math.pow(0.6617f + (2.98f * Prop_Forest) + (1.83f * Prop_Grass), 2.0f) / 18.0f;
 				Poll[idx] = (float)Math.pow(0.6617f + (2.98f * Prop_Forest) + (1.83f * Prop_Grass), 2.0f);
-				Min_P = Min(Min_P, Poll[idx]);
-				Max_P = Max(Max_P, Poll[idx]);
+				//Min_P = Min(Min_P, Poll[idx]);
+				//Max_P = Max(Max_P, Poll[idx]);
 					
 				// Crop type is zero for Ag, Crop type is 1 for grass
 				int Crop_Type = 0;
@@ -90,8 +90,8 @@ public class Model_Pollinator_Pest_Suppression
 					
 				// Pest suppression calculation
 				Pest[idx] = (float)(0.25f + (0.19f * Crop_Type) + (0.62f * Prop_Grass));
-				Min_PS = Min(Min_PS, Pest[idx]);
-				Max_PS = Max(Max_PS, Pest[idx]);
+				//Min_PS = Min(Min_PS, Pest[idx]);
+				//Max_PS = Max(Max_PS, Pest[idx]);
 
 				moreCells = zWin.advance();
 			}		
@@ -119,9 +119,10 @@ public class Model_Pollinator_Pest_Suppression
 						Prop_Grass = Proportion_AFG[2];
 
 						// Calculate visitation index and normalize value by max
-						Poll[i] = (float)Math.pow(0.6617f + (2.98f * Prop_Forest) + (1.83f * Prop_Grass), 2.0f) / 18.0f;
-						Min_P = Min(Min_P, Poll[i]);
-						Max_P = Max(Max_P, Poll[i]);
+						//Poll[i] = (float)Math.pow(0.6617f + (2.98f * Prop_Forest) + (1.83f * Prop_Grass), 2.0f) / 18.0f;
+						Poll[i] = (float)Math.pow(0.6617f + (2.98f * Prop_Forest) + (1.83f * Prop_Grass), 2.0f);
+						//Min_P = Min(Min_P, Poll[i]);
+						//Max_P = Max(Max_P, Poll[i]);
 							
 						// Crop type is zero for Ag
 						int Crop_Type = 0;
@@ -133,8 +134,8 @@ public class Model_Pollinator_Pest_Suppression
 							
 						// Pest suppression calculation
 						Pest[i] = (float)(0.25f + (0.19f * Crop_Type) + (0.62f * Prop_Grass));
-						Min_PS = Min(Min_PS, Pest[i]);
-						Max_PS = Max(Max_PS, Pest[i]);
+						//Min_PS = Min(Min_PS, Pest[i]);
+						//Max_PS = Max(Max_PS, Pest[i]);
 	
 						i = i + 1;
 					}
@@ -160,27 +161,27 @@ public class Model_Pollinator_Pest_Suppression
 	}	
 	
 	// Min
-	public float Min(float Min, float Num)
-	{ 
-		// Min
-		if (Num < Min)
-		{
-			Min = Num;
-		}
-		
-		return Min;
-	}
+	// public float Min(float Min, float Num)
+	// { 
+		// // Min
+		// if (Num < Min)
+		// {
+			// Min = Num;
+		// }
+		// 
+		// return Min;
+	// }
 	
 	// Max
-	public float Max(float Max, float Num)
-	{
-
-		// Max
-		if (Num > Max)
-		{
-			Max = Num;
-		}
-		
-		return Max;
-	}
+	// public float Max(float Max, float Num)
+	// {
+// 
+		// // Max
+		// if (Num > Max)
+		// {
+			// Max = Num;
+		// }
+		// 
+		// return Max;
+	// }
 }

@@ -35,7 +35,7 @@ public class Model_Selection
 		int Value = 0;
 		int Bin = 10;
 		int[] CountBin = new int [Bin];
-		float Per_Cell = 0;
+		float Sum = 0;
 		int Zero_Num = 0;
 		
 		// Load selection layer to the array
@@ -47,14 +47,15 @@ public class Model_Selection
 		layer = Layer_Base.getLayer("Rotation");
 		width = layer.getWidth();
 		height = layer.getHeight();
-	
+		
 		for (int y = 0; y < height; y++) 
 		{
 			for (int x = 0; x < width; x++) 
 			{
 				if (selection1.mSelection[y][x] == 1 && selection2.mSelection[y][x] == 1)
 				{
-					if (Data[i] != 0)
+					//if (Data[i] != 0)
+					if (Data[i] > 0 || Data[i] < 0)
 					{
 						// Fill the array
 						//Array_Selection[i] = Float.parseFloat(text[x]);
@@ -80,7 +81,8 @@ public class Model_Selection
 			{
 				if (selection1.mSelection[y][x] == 1 && selection2.mSelection[y][x] == 1)
 				{
-					if (Data[i] != 0)
+					//if (Data[i] != 0)
+					if (Data[i] > 0 || Data[i] < 0)
 					{
 						Total = Total + Data[i];
 						// Calculate value tp find the bin
@@ -102,7 +104,8 @@ public class Model_Selection
 		
 		// Calculate average between selected cells
 //		Per_Cell = Total / (totalCount * Max);
-		Per_Cell = Total / totalCount;
+		//Per_Cell = Total / totalCount;
+		Sum = Total;
 		
 		// Define Json to store and return data to client
 		ObjectNode obj = JsonNodeFactory.instance.objectNode();
@@ -111,7 +114,8 @@ public class Model_Selection
 		obj.put("Bins", ArrayS);
 		obj.put("Min", Min);
 		obj.put("Max", Max);
-		obj.put("Average", Per_Cell);
+		obj.put("Sum", Sum);
+		obj.put("Count", totalCount);
 		
 		return obj;
 	}

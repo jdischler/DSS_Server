@@ -20,9 +20,9 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
         this.graphstore = Ext.create('Ext.data.Store', {
 			model: 'Habitat_Index',
 			//data: [{Freq_Default: 1, Freq_Transform: 4, Bin: "Sunday"}, {Freq_Default: 5, Freq_Transform: 8, Bin: "Sat"}, {Freq_Default: 0, Freq_Transform: 9, Bin: "Mon"}],
-			data: [{Bin: "Habitat Idx"}, {Bin: "Nitrogen"}, {Bin: "Phosphorus"}, 
-					{Bin: "Crop Pest"}, {Bin: "Pollinator"}, {Bin: "Biomass"}, 
-					{Bin: "Net Income"}, {Bin: "Net Energy"}]
+			data: [{Bin: "Bird Index"}, {Bin: "Nitrogen"}, {Bin: "Phosphorus"}, 
+					{Bin: "Biocontrol Index"}, {Bin: "Pollinator Index"}, {Bin: "Fuel"}, 
+					{Bin: "Net Income"}, {Bin: "Net Energy"}, {Bin: "Soil Carbon"} , {Bin: "Nitrous Oxide"}]
 		});
                     
         Ext.applyIf(me, {
@@ -115,9 +115,9 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 		var data2 = objT;
 		console.log(data1);
 		console.log(data2);
-		var Bin1 = ["Habitat Idx", "Nitrogen", "Phosphorus", 
-					"Crop Pest", "Pollinator", "Biomass", 
-					"Net Income", "Net Energy"];
+		var Bin1 = ["Bird Index", "Nitrogen", "Phosphorus", 
+					"Biocontrol Index", "Pollinator Index", "Fuel", 
+					"Net Income", "Net Energy", "Soil Carbon", "Nitrous Oxide"];
 		var chart = this.getComponent("MyGraph_Spider");
     	
 		var array = [];

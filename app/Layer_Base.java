@@ -65,11 +65,20 @@ public abstract class Layer_Base
 	//--------------------------------------------------------------------------
 	public Layer_Base(String name) {
 		
-		if (mLayers == null) {
-			mLayers = new HashMap<String, Layer_Base>();
-		}
+		this(name, false); // not temporary...
+	}
+	
+	// TEMPORARY layers are not added to the managed list...
+	//--------------------------------------------------------------------------
+	public Layer_Base(String name, boolean temporary) {
+	
 		mName = name.toLowerCase();
-		mLayers.put(mName, this);
+		if (!temporary) {
+			if (mLayers == null) {
+				mLayers = new HashMap<String, Layer_Base>();
+			}
+			mLayers.put(mName, this);
+		}
 	}
 	
 	//--------------------------------------------------------------------------
@@ -329,7 +338,6 @@ public abstract class Layer_Base
 			buf.rewind();
 			Logger.info("  - Binary file version: " + Integer.toString(buf.getInt()));
 				
-			Logger.info("  Extracting header...");
 			buf = ByteBuffer.allocateDirect(6 * 4); // FIXME: size of header * size of int?
 			channel.read(buf); 
 			buf.rewind();
@@ -341,12 +349,11 @@ public abstract class Layer_Base
 			mCellSize = buf.getFloat();
 			mNoDataValue = buf.getInt();
 			
-			Logger.info("  Width: " + Integer.toString(mWidth) 
+			Logger.info("  - Width: " + Integer.toString(mWidth) 
 							+ "  Height: " + Integer.toString(mHeight));
 			allocMemory();
 			
 			buf = ByteBuffer.allocateDirect(mWidth * 4); // FIXME: size of int?
-			Logger.info("  Reading file with ByteBuffer and NIO...");
 			
 			for (int y = 0; y < mHeight; y++) {
 				// shuttle read data from buf, line by line, into native internal arrays.

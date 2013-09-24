@@ -29,32 +29,31 @@ Ext.define('MyApp.view.ModelGraph', {
     
     initComponent: function() {
         var me = this;
-
 	
 	Ext.applyIf(me, {
             items: [
 			 {
-			    itemId: 'Habitat_Index',  
+			    itemId: 'value_habitat_index',  
 			    xtype: 'textfield',
 			    x: 0,
 			    y: 10,
 			    width: 160,
-			    fieldLabel: 'Habitat',
+			    fieldLabel: 'Birds',
 			    labelWidth: 80,
 			    labelAlign: 'right'
 			},
 			{
-			    itemId: 'Carbon',
+			    itemId: 'value_soc',
 			    xtype: 'textfield',
 			    x: 250,
 			    y: 10,
 			    width: 160,
-			    fieldLabel: 'Carbon',
+			    fieldLabel: 'Soil Carbon',
 			    labelWidth: 80,
 			    labelAlign: 'right'
 			},
 			{
-			    itemId: 'Nitrogen',
+			    itemId: 'value_nitrogen',
 			    xtype: 'textfield',
 			    x: 0,
 			    y: 40,
@@ -64,17 +63,17 @@ Ext.define('MyApp.view.ModelGraph', {
 			    labelAlign: 'right'
 			},
 			{
-			    itemId: 'Pollinator',
+			    itemId: 'value_pollinator',
 			    xtype: 'textfield',
 			    x: 250,
 			    y: 40,
 			    width: 160,
-			    fieldLabel: 'Pollinator',
+			    fieldLabel: 'Pollinators',
 			    labelWidth: 80,
 			    labelAlign: 'right'
 			},
 			{
-			    itemId: 'Phosphorus',
+			    itemId: 'value_phosphorus',
 			    xtype: 'textfield',
 			    x: 0,
 			    y: 70,
@@ -84,7 +83,7 @@ Ext.define('MyApp.view.ModelGraph', {
 			    labelAlign: 'right'
 			},
 			{
-			    itemId: 'Net_Energy',
+			    itemId: 'value_net_energy',
 			    xtype: 'textfield',
 			    x: 250,
 			    y: 70,
@@ -94,17 +93,17 @@ Ext.define('MyApp.view.ModelGraph', {
 			    labelAlign: 'right'
 			},
 			{
-			    itemId: 'Pest_Suppression',
+			    itemId: 'value_pest',
 			    xtype: 'textfield',
 			    x: 0,
 			    y: 100,
 			    width: 160,
-			    fieldLabel: 'Pest Suppression',
+			    fieldLabel: 'Biocontrol',
 			    labelWidth: 80,
 			    labelAlign: 'right'
 			},
 			{
-			    itemId: 'Net_Income',
+			    itemId: 'value_net_income',
 			    xtype: 'textfield',
 			    x: 250,
 			    y: 100,
@@ -114,27 +113,27 @@ Ext.define('MyApp.view.ModelGraph', {
 			    labelAlign: 'right'
 			},
 			{
-			    itemId: 'Ethanol',
+			    itemId: 'value_ethanol',
 			    xtype: 'textfield',
 			    x: 0,
 			    y: 130,
 			    width: 160,
-			    fieldLabel: 'Ethanol',
+			    fieldLabel: 'Fuel',
 			    labelWidth: 80,
 			    labelAlign: 'right'
 			},
 			{
-			    itemId: 'Drainage',
+			    itemId: 'value_nitrous_oxide',
 			    xtype: 'textfield',
 			    x: 250,
 			    y: 130,
 			    width: 160,
-			    fieldLabel: 'Drainage',
+			    fieldLabel: 'Nitrous Oxide',
 			    labelWidth: 80,
 			    labelAlign: 'right'
 			}, //-------------------- End of Text Fields
 			{
-			    itemId: 'Graph_Habitat_Index',
+			    itemId: 'graph_habitat_index',
 			    xtype: 'button',
 			    x: 162,
 			    y: 10,
@@ -143,24 +142,24 @@ Ext.define('MyApp.view.ModelGraph', {
 			    {
 					var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Bird Habitat Index'});
 					mypopup.show();
-					mypopup.SetChartData(self.graphdataD, self.graphdataT);
+					mypopup.SetChartData(self.DSS_data);
 			    }
 			},
 			{
-			    itemId: 'Graph_Carbon',
+			    itemId: 'graph_soc',
 			    xtype: 'button',
 			    x: 412,
 			    y: 10,
 			    text: 'Graph',
 			    handler: function (self)
 			    {
-					var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Carbon'});
+					var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Soil Carbon'});
 					mypopup.show();
-					mypopup.SetChartData(self.graphdataD, self.graphdataT);
+					mypopup.SetChartData(self.DSS_data);
 			    }
 			},
 			{
-			    itemId: 'Graph_Nitrogen',
+			    itemId: 'graph_nitrogen',
 			    xtype: 'button',
 			    x: 162,
 			    y: 40,
@@ -169,11 +168,11 @@ Ext.define('MyApp.view.ModelGraph', {
 			    {
 					var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Nitrogen'});
 					mypopup.show();
-					mypopup.SetChartData(self.graphdataD, self.graphdataT);
+					mypopup.SetChartData(self.DSS_data);
 			    }
 			},
 			{
-			    itemId: 'Graph_Pollinator',
+			    itemId: 'graph_pollinator',
 			    xtype: 'button',
 			    x: 412,
 			    y: 40,
@@ -182,11 +181,11 @@ Ext.define('MyApp.view.ModelGraph', {
 			    {
 					var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Pollinator'});
 					mypopup.show();
-					mypopup.SetChartData(self.graphdataD, self.graphdataT);
+					mypopup.SetChartData(self.DSS_data);
 			    }
 			},
 			{
-			    itemId: 'Graph_Phosphorus',
+			    itemId: 'graph_phosphorus',
 			    xtype: 'button',
 			    x: 162,
 			    y: 70,
@@ -195,11 +194,11 @@ Ext.define('MyApp.view.ModelGraph', {
 			    {
 					var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Phosphorus'});
 					mypopup.show();
-					mypopup.SetChartData(self.graphdataD, self.graphdataT);
+					mypopup.SetChartData(self.DSS_data);
 			    }
 			},
 			{
-			    itemId: 'Graph_Net_Energy',
+			    itemId: 'graph_net_energy',
 			    xtype: 'button',
 			    x: 412,
 			    y: 70,
@@ -208,11 +207,11 @@ Ext.define('MyApp.view.ModelGraph', {
 			    {
 					var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Net Energy'});
 					mypopup.show();
-					mypopup.SetChartData(self.graphdataD, self.graphdataT);
+					mypopup.SetChartData(self.DSS_data);
 			    }
 			},
 			{
-			    itemId: 'Graph_Pest_Suppression',
+			    itemId: 'graph_pest',
 			    xtype: 'button',
 			    x: 162,
 			    y: 100,
@@ -221,11 +220,11 @@ Ext.define('MyApp.view.ModelGraph', {
 			    {
 					var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Crop Pest Supression'});
 					mypopup.show();
-					mypopup.SetChartData(self.graphdataD, self.graphdataT);
+					mypopup.SetChartData(self.DSS_data);
 			    }
 			},
 			{
-			    itemId: 'Graph_Net_Income',
+			    itemId: 'graph_net_income',
 			    xtype: 'button',
 			    x: 412,
 			    y: 100,
@@ -234,11 +233,11 @@ Ext.define('MyApp.view.ModelGraph', {
 			    {
 					var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Net Income'});
 					mypopup.show();
-					mypopup.SetChartData(self.graphdataD, self.graphdataT);
+					mypopup.SetChartData(self.DSS_data);
 			    }
 			},
 			{
-			    itemId: 'Graph_Ethanol',
+			    itemId: 'graph_ethanol',
 			    xtype: 'button',
 			    x: 162,
 			    y: 130,
@@ -247,136 +246,170 @@ Ext.define('MyApp.view.ModelGraph', {
 			    {
 					var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Ethanol'});
 					mypopup.show();
-					mypopup.SetChartData(self.graphdataD, self.graphdataT);
+					mypopup.SetChartData(self.DSS_data);
 			    }
 			},
 			{
-			    itemId: 'Graph_Drainage',
+			    itemId: 'graph_nitrous_oxide',
 			    xtype: 'button',
 			    x: 412,
 			    y: 130,
 			    text: 'Graph',
 			    handler: function (self)
 			    {
-					var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Drainage'});
+					var mypopup = Ext.create("MyApp.view.GraphPopUp", {title: 'Nitrous Oxide Emissions'});
 					mypopup.show();
-					mypopup.SetChartData(self.graphdataD, self.graphdataT);
+					mypopup.SetChartData(self.DSS_data);
 			    }
 			}, //----------------------- End of Graph buttons
 			{
-			    itemId: 'Heat_Habitat_Index',
+			    itemId: 'heat_habitat_index',
 			    xtype: 'button',
 			    x: 207,
 			    y: 10,
+			    enableToggle: true,
 			    text: 'Heat',
 			    tooltip: {
 			    	text: 'View a heatmap overlay',
 			    	showDelay: 100
 			    },
 			    handler: function(self) {
-			    	self.up().showFakeHeatmap(self,'Heat','app/file/heat.png');
+			    	self.up().showHeatmap(self);
 			    }
 			},
 			{
-			    itemId: 'Heat_Carbon',
+			    itemId: 'heat_soc',
 			    xtype: 'button',
 			    x: 457,
 			    y: 10,
-			    text: 'Heat',
-			    tooltip: {
-			    	text: 'View a heatmap overlay',
-			    	showDelay: 100
-			    }
-			},
-			{
-			    itemId: 'Heat_Nitrogen',
-			    xtype: 'button',
-			    x: 207,
-			    y: 40,
+			    enableToggle: true,
 			    text: 'Heat',
 			    tooltip: {
 			    	text: 'View a heatmap overlay',
 			    	showDelay: 100
 			    },
 			    handler: function(self) {
-			    	self.up().showFakeHeatmap(self,'Heat2','app/file/heat_2.png');
+			    	self.up().showHeatmap(self);
 			    }
 			},
 			{
-			    itemId: 'Heat_Pollinator',
+			    itemId: 'heat_nitrogen',
+			    xtype: 'button',
+			    x: 207,
+			    y: 40,
+			    enableToggle: true,
+			    text: 'Heat',
+			    tooltip: {
+			    	text: 'View a heatmap overlay',
+			    	showDelay: 100
+			    },
+			    handler: function(self) {
+			    	self.up().showHeatmap(self);
+			    }
+			},
+			{
+			    itemId: 'heat_pollinator',
 			    xtype: 'button',
 			    x: 457,
 			    y: 40,
+			    enableToggle: true,
 			    text: 'Heat',
 			    tooltip: {
 			    	text: 'View a heatmap overlay',
 			    	showDelay: 100
+			    },
+			    handler: function(self) {
+			    	self.up().showHeatmap(self);
 			    }
 			},
 			{
-			    itemId: 'Heat_Phosphorus',
+			    itemId: 'heat_phosphorus',
 			    xtype: 'button',
 			    x: 207,
 			    y: 70,
+			    enableToggle: true,
 			    text: 'Heat',
 			    tooltip: {
 			    	text: 'View a heatmap overlay',
 			    	showDelay: 100
+			    },
+			    handler: function(self) {
+			    	self.up().showHeatmap(self);
 			    }
 			},
 			{
-			    itemId: 'Heat_Net_Energy',
+			    itemId: 'heat_net_energy',
 			    xtype: 'button',
 			    x: 457,
 			    y: 70,
+			    enableToggle: true,
 			    text: 'Heat',
 			    tooltip: {
 			    	text: 'View a heatmap overlay',
 			    	showDelay: 100
+			    },
+			    handler: function(self) {
+			    	self.up().showHeatmap(self);
 			    }
 			},
 			{
-			    itemId: 'Heat_Crop_Pest',
+			    itemId: 'heat_pest',
 			    xtype: 'button',
 			    x: 207,
 			    y: 100,
+			    enableToggle: true,
 			    text: 'Heat',
 			    tooltip: {
 			    	text: 'View a heatmap overlay',
 			    	showDelay: 100
+			    },
+			    handler: function(self) {
+			    	self.up().showHeatmap(self);
 			    }
 			},
 			{
-			    itemId: 'Heat_Net_Income',
+			    itemId: 'heat_net_income',
 			    xtype: 'button',
 			    x: 457,
 			    y: 100,
+			    enableToggle: true,
 			    text: 'Heat',
 			    tooltip: {
 			    	text: 'View a heatmap overlay',
 			    	showDelay: 100
+			    },
+			    handler: function(self) {
+			    	self.up().showHeatmap(self);
 			    }
 			},
 			{
-			    itemId: 'Heat_Biomass',
+			    itemId: 'heat_ethanol',
 			    xtype: 'button',
 			    x: 207,
 			    y: 130,
+			    enableToggle: true,
 			    text: 'Heat',
 			    tooltip: {
 			    	text: 'View a heatmap overlay',
 			    	showDelay: 100
+			    },
+			    handler: function(self) {
+			    	self.up().showHeatmap(self);
 			    }
 			},
 			{
-			    itemId: 'Heat_Drainage',
+			    itemId: 'heat_nitrous_oxide',
 			    xtype: 'button',
 			    x: 457,
 			    y: 130,
+			    enableToggle: true,
 			    text: 'Heat',
 			    tooltip: {
 			    	text: 'View a heatmap overlay',
 			    	showDelay: 100
+			    },
+			    handler: function(self) {
+			    	self.up().showHeatmap(self);
 			    }
 			}, // ----------------- End of Heat Buttons
 			{
@@ -385,16 +418,8 @@ Ext.define('MyApp.view.ModelGraph', {
 			    x: 230,
 			    y: 160,
 			    text: 'Clear Fields',
-			    handler: function ()
-			    {
-			    	    this.up().getComponent('Habitat_Index').setValue(null);
-			    	    this.up().getComponent('Nitrogen').setValue(null);
-			    	    this.up().getComponent('Phosphorus').setValue(null);
-			    	    this.up().getComponent('Pest_Suppression').setValue(null);
-			    	    this.up().getComponent('Pollinator').setValue(null);
-			    	    this.up().getComponent('Biomass').setValue(null);
-			    	    this.up().getComponent('Net_Income').setValue(null);
-			    	    this.up().getComponent('Net_Energy').setValue(null);
+			    handler: function () {
+			    	this.up().clearFields();
 			    }
 			},
 	    ]
@@ -402,201 +427,361 @@ Ext.define('MyApp.view.ModelGraph', {
         
         me.callParent(arguments);
     },
-    
+
+    //--------------------------------------------------------------------------
+	clearFields: function() {
+		
+		Ext.getCmp('DSS_SpiderGraphPanel').clearSpiderData(0);// set all fields to zero
+		
+		this.getComponent('value_habitat_index').setValue(null);
+		this.getComponent('value_nitrogen').setValue(null);
+		this.getComponent('value_phosphorus').setValue(null);
+		this.getComponent('value_pest').setValue(null);
+		this.getComponent('value_pollinator').setValue(null);
+		this.getComponent('value_ethanol').setValue(null);
+		this.getComponent('value_net_income').setValue(null);
+		this.getComponent('value_net_energy').setValue(null);
+		this.getComponent('value_soc').setValue(null);
+		this.getComponent('value_nitrous_oxide').setValue(null);
+	},
+	
+    //--------------------------------------------------------------------------
+	setWaitFields: function() {
+		this.clearFields();
+
+		var spinnerStyle = {"background-image":"url(app/images/spinner_16a.gif)",
+			"background-repeat":"no-repeat","background-position":"center center", 
+			"padding-left":"16px"};
+		
+		this.getComponent('value_habitat_index').setFieldStyle(spinnerStyle);
+		this.getComponent('value_nitrogen').setFieldStyle(spinnerStyle);
+		this.getComponent('value_phosphorus').setFieldStyle(spinnerStyle);
+		this.getComponent('value_pest').setFieldStyle(spinnerStyle);
+		this.getComponent('value_pollinator').setFieldStyle(spinnerStyle);
+		this.getComponent('value_ethanol').setFieldStyle(spinnerStyle);
+		this.getComponent('value_net_income').setFieldStyle(spinnerStyle);
+		this.getComponent('value_net_energy').setFieldStyle(spinnerStyle);
+		this.getComponent('value_soc').setFieldStyle(spinnerStyle);
+		this.getComponent('value_nitrous_oxide').setFieldStyle(spinnerStyle);
+	},
+	
     SetData: function(obj)
     {
+    	// Average Fields ----------------------
     	// Habitat Index
-    	var val1 = obj.Default.Habitat_Index.Average;
-    	var val2 = obj.Transform.Habitat_Index.Average;
-    	//var Max1 = this.Max(obj.Default.Habitat_Index.Max, obj.Transform.Habitat_Index.Max);
-    	//var val1 = obj.Habitat_Index_D.Average_HI;
-    	//var val2 = obj.Habitat_Index_T.Average_HI;
+    	var hi_1 = obj.Habitat_Index.averageFile1;
+    	var hi_2 = obj.Habitat_Index.averageFile2;
     	var Habitat_Text = this.getComponent('Habitat_Index');
-    	Habitat_Text.setValue((val2 - val1).toFixed(4));
+    	Habitat_Text.setValue((hi_2 - hi_1).toFixed(4));
     	
     	// Nitrogen
-    	var val3 = obj.Default.Nitrogen.Average;
-    	var val4 = obj.Transform.Nitrogen.Average;
-    	var Max2 = this.Max(obj.Default.Nitrogen.Max, obj.Transform.Nitrogen.Max);
-    	//var val3 = obj.Nitrogen_D.Nitrogen;
-    	//var val4 = obj.Nitrogen_T.Nitrogen;
+    	var n_1 = obj.Nitrogen.averageFile1;
+    	var n_2 = obj.Nitrogen.averageFile2;
+    	var n_max = obj.Nitrogen.max;
     	var Nitrogen_Text = this.getComponent('Nitrogen');
-    	Nitrogen_Text.setValue((val4 / Max2 - val3 / Max2).toFixed(4));
+    	Nitrogen_Text.setValue((n_2 / n_max - n_1 / n_max).toFixed(4));
     	
     	// Phosphorus
-    	var val5 = obj.Default.Phosphorus.Average;
-    	var val6 = obj.Transform.Phosphorus.Average;
-    	//var Max3 = this.Max(obj.Default.Phosphorus.Max, obj.Transform.Phosphorus.Max);
-    	//var val5 = obj.Phosphorus_D.Phosphorus;
-    	//var val6 = obj.Phosphorus_T.Phosphorus;
+    	var p_1 = obj.Phosphorus.averageFile1;
+    	var p_2 = obj.Phosphorus.averageFile2;
     	var Phosphorus_Text = this.getComponent('Phosphorus');
-    	Phosphorus_Text.setValue((val6 - val5).toFixed(4));
+    	Phosphorus_Text.setValue((p_2 - p_1).toFixed(4));
     	
     	// Pest_Suppression
-    	var val7 = obj.Default.Pest_Suppression.Average;
-    	var val8 = obj.Transform.Pest_Suppression.Average;
-    	//var Max4 = this.Max(obj.Default.Pest.Max, obj.Transform.Phosphorus.Max);
-    	//var val7 = obj.Pest_Suppression_D.Pest;
-    	//var val8 = obj.Pest_Suppression_T.Pest;
+    	var ps_1 = obj.Pest_Suppression.averageFile1;
+    	var ps_2 = obj.Pest_Suppression.averageFile2;
     	var Pest_Text = this.getComponent('Pest_Suppression');
-    	Pest_Text.setValue((val8 - val7).toFixed(4));
+    	Pest_Text.setValue((ps_2 - ps_1).toFixed(4));
     	
     	// Pollinator
-    	var val9 = obj.Default.Pollinator.Average;
-    	var val10 = obj.Transform.Pollinator.Average;
-    	var Max5 = this.Max(obj.Default.Pollinator.Max, obj.Transform.Pollinator.Max);
-    	//var val9  = obj.Pollinator_D.Pollinator;
-    	//var val10 = obj.Pollinator_T.Pollinator;
+    	var pol_1 = obj.Pollinator.averageFile1;
+    	var pol_2 = obj.Pollinator.averageFile2;
+    	var pol_max = obj.Pollinator.max;
     	var Pollinator_Text = this.getComponent('Pollinator');
-    	Pollinator_Text.setValue((val10 / Max5 - val9 / Max5).toFixed(4));
+    	Pollinator_Text.setValue((pol_2 / pol_max - pol_1 / pol_max).toFixed(4));
     	
     	// Ethanol
-    	var val11 = obj.Default.Ethanol.Average;
-    	var val12 = obj.Transform.Ethanol.Average;
-    	var Max6 = this.Max(obj.Default.Ethanol.Max, obj.Transform.Ethanol.Max);
-    	//var val11 = obj.Ethanol_D.Ethanol;
-    	//var val12 = obj.Ethanol_T.Ethanol;
+    	var e_1 = obj.Ethanol.averageFile1;
+    	var e_2 = obj.Ethanol.averageFile2;
+    	var e_max = obj.Ethanol.max;
     	var Biomass_Text = this.getComponent('Ethanol');
-    	Biomass_Text.setValue((val12 / Max6 - val11 / Max6).toFixed(4));
+    	Biomass_Text.setValue((e_2 / e_max - e_1 / e_max).toFixed(4));
     	
     	// Net_Income
-    	var val13 = obj.Default.Net_Income.Average;
-    	var val14 = obj.Transform.Net_Income.Average;
-    	var Max7 = this.Max(obj.Default.Ethanol.Max, obj.Transform.Ethanol.Max);
-    	//var val13 = obj.Net_Income_D.Net_Income;
-    	//var val14 = obj.Net_Income_T.Net_Income;
+    	var ni_1 = obj.Net_Income.averageFile1;
+    	var ni_2 = obj.Net_Income.averageFile2;
+    	var ni_max = obj.Net_Income.max;
     	var Net_Energy_Text = this.getComponent('Net_Income');
-    	Net_Energy_Text.setValue((val14 / Max7 - val13 / Max7).toFixed(4));
+    	Net_Energy_Text.setValue((ni_2 / ni_max - ni_1 / ni_max).toFixed(4));
     	
     	// Net_Energy
-    	var val15 = obj.Default.Net_Energy.Average;
-    	var val16 = obj.Transform.Net_Energy.Average;
-    	var Max8 = this.Max(obj.Default.Net_Energy.Max, obj.Transform.Net_Energy.Max);
-    	//var val15 = obj.Net_Energy_D.Net_Energy;
-    	//var val16 = obj.Net_Energy_T.Net_Energy;
+    	var ne_1 = obj.Net_Energy.averageFile1;
+    	var ne_2 = obj.Net_Energy.averageFile2;
+    	var ne_max = obj.Net_Energy.max;
     	var Net_Energy_Text = this.getComponent('Net_Energy');
-    	Net_Energy_Text.setValue((val16 / Max8 - val15 / Max8).toFixed(4));
+    	Net_Energy_Text.setValue((ne_2 / ne_max - ne_1 / ne_max).toFixed(4));
     	
     	
-    	
-    	// Graph_Habitat_Index
+    	// Graphs ---------------
     	var Habitat_Button = this.getComponent('Graph_Habitat_Index');
-    	Habitat_Button.graphdataD = obj.Default.Habitat_Index;
-    	Habitat_Button.graphdataT = obj.Transform.Habitat_Index;
-    	//Habitat_Button.graphdataD = obj.Habitat_Index_D;
-    	//Habitat_Button.graphdataT = obj.Habitat_Index_T;
+    	Habitat_Button.graphdataD = obj.Habitat_Index.histogramFile1;
+    	Habitat_Button.graphdataT = obj.Habitat_Index.histogramFile2;
+    	this.getComponent('Heat_Habitat_Index').DSS_heatString = 'habitat_index';
     	
-    	// Graph_Nitrogen
     	var Nitrogen_Button = this.getComponent('Graph_Nitrogen');
-    	Nitrogen_Button.graphdataD = obj.Default.Nitrogen;
-    	Nitrogen_Button.graphdataT = obj.Transform.Nitrogen;
-    	//Nitrogen_Button.graphdataD = obj.Nitrogen_D;
-    	//Nitrogen_Button.graphdataT = obj.Nitrogen_T;
+    	Nitrogen_Button.graphdataD = obj.Nitrogen.histogramFile1;
+    	Nitrogen_Button.graphdataT = obj.Nitrogen.histogramFile2;
+    	this.getComponent('Heat_Nitrogen').DSS_heatString = 'nitrogen';
     	
-    	// Graph_Phosphorus
     	var Phosphorus_Button = this.getComponent('Graph_Phosphorus');
-    	Phosphorus_Button.graphdataD = obj.Default.Phosphorus;
-    	Phosphorus_Button.graphdataT = obj.Transform.Phosphorus;
-    	//Phosphorus_Button.graphdataD = obj.Phosphorus_D;
-    	//Phosphorus_Button.graphdataT = obj.Phosphorus_T;
+    	Phosphorus_Button.graphdataD = obj.Phosphorus.histogramFile1;
+    	Phosphorus_Button.graphdataT = obj.Phosphorus.histogramFile2;
+    	this.getComponent('Heat_Phosphorus').DSS_heatString = 'phosphorus';
     	
-    	// Graph_Pest_Suppression
     	var Pest_Button = this.getComponent('Graph_Pest_Suppression');
-    	Pest_Button.graphdataD = obj.Default.Pest_Suppression;
-    	Pest_Button.graphdataT = obj.Transform.Pest_Suppression;
-    	//Pest_Button.graphdataD = obj.Pest_Suppression_D;
-    	//Pest_Button.graphdataT = obj.Pest_Suppression_T;
+    	Pest_Button.graphdataD = obj.Pest_Suppression.histogramFile1;
+    	Pest_Button.graphdataT = obj.Pest_Suppression.histogramFile2;
+    	this.getComponent('Heat_Crop_Pest').DSS_heatString = 'pest';
     	
-    	// Graph_Pollinator
     	var Pollinator_Button = this.getComponent('Graph_Pollinator');
-    	Pollinator_Button.graphdataD = obj.Default.Pollinator;
-    	Pollinator_Button.graphdataT = obj.Transform.Pollinator;
-    	//Pollinator_Button.graphdataD = obj.Pollinator_D;
-    	//Pollinator_Button.graphdataT = obj.Pollinator_T;
+    	Pollinator_Button.graphdataD = obj.Pollinator.histogramFile1;
+    	Pollinator_Button.graphdataT = obj.Pollinator.histogramFile2;
+    	this.getComponent('Heat_Pollinator').DSS_heatString = 'pollinator';
     	
-    	// Graph_Ethanol
     	var Biomass_Button = this.getComponent('Graph_Ethanol');
-    	Biomass_Button.graphdataD = obj.Default.Ethanol;
-    	Biomass_Button.graphdataT = obj.Transform.Ethanol;
-    	//Biomass_Button.graphdataD = obj.Ethanol_D;
-    	//Biomass_Button.graphdataT = obj.Ethanol_T;
+    	Biomass_Button.graphdataD = obj.Ethanol.histogramFile1;
+    	Biomass_Button.graphdataT = obj.Ethanol.histogramFile2;
+    	this.getComponent('Heat_Ethanol').DSS_heatString = 'ethanol';
     	
-    	// Graph_Net_Income
     	var Net_Income_Button = this.getComponent('Graph_Net_Income');
-    	Net_Income_Button.graphdataD = obj.Default.Net_Income;
-    	Net_Income_Button.graphdataT = obj.Transform.Net_Income;
-    	//Net_Income_Button.graphdataD = obj.Net_Income_D;
-    	//Net_Income_Button.graphdataT = obj.Net_Income_T;
+    	Net_Income_Button.graphdataD = obj.Net_Income.histogramFile1;
+    	Net_Income_Button.graphdataT = obj.Net_Income.histogramFile2;
+    	this.getComponent('Heat_Net_Income').DSS_heatString = 'net_income';
     	
-    	// Graph_Net_Energy
     	var Net_Energy_Button = this.getComponent('Graph_Net_Energy');
-    	Net_Energy_Button.graphdataD = obj.Default.Net_Energy;
-    	Net_Energy_Button.graphdataT = obj.Transform.Net_Energy;
-    	//Net_Energy_Button.graphdataD = obj.Net_Energy_D;
-    	//Net_Energy_Button.graphdataT = obj.Net_Energy_T;
+    	Net_Energy_Button.graphdataD = obj.Net_Energy.histogramFile1;
+    	Net_Energy_Button.graphdataT = obj.Net_Energy.histogramFile2;
+    	this.getComponent('Heat_Net_Energy').DSS_heatString = 'net_energy';
     	
     	// Spider_Graph
     	var spiderPanel = Ext.getCmp('DSS_SpiderGraphPanel');
-    	var arrayDef   = [val1, val3 / Max2, val5, val7,  val9 / Max5, val11 / Max6, val13 / Max7, val15 / Max8];
-    	var arrayTrans = [val2, val4 / Max2, val6, val8, val10 / Max5, val12 / Max6, val14 / Max7, val16 / Max8];
-    	//var arrayDef   = [val1, val3, val5, val7, val9,  val11, val13, val15];
-    	//var arrayTrans = [val2, val4, val6, val8, val10, val12, val14, val16];
-    	//var arrayDef   = [val1/Max1, val3/Max2, val5/Max3, val7/Max4,  val9/Max5, val11/Max6, val13/Max7, val15/Max8];
-    	//var arrayTrans = [val2/Max1, val4/Max2, val6/Max3, val8/Max4, val10/Max5, val12/Max6, val14/Max7, val16/Max8];
-    	//var arrayDef = [1, 1, 1, 1, 1, 1, 1, 1];
-    	//var arrayTrans = [(val2-val1)/(val1+val2), (val4-val3)/(val3+val4), (val6-val5)/(val5+val6), (val8-val7)/(val7+val8), (val10-val9)/(val9+val10), (val12-val11)/(val11+val12), (val14-val13)/(val13+val4), (val16-val15)/(val15+val16)];
-    	spiderPanel.setSpiderData(arrayDef, arrayTrans);
+    	var array_1 = [hi_1, 
+    					n_1 / n_max, 
+    					p_1, 
+    					ps_1, 
+    					pol_1 / pol_max, 
+    					e_1 / e_max, 
+    					ni_1 / ni_max, 
+    					ne_1 / ne_max];
+    	var array_2 = [hi_2, 
+    					n_2 / n_max, 
+    					p_2, 
+    					ps_2, 
+    					pol_2 / pol_max, 
+    					e_2 / e_max, 
+    					ni_2 / ni_max, 
+    					ne_2 / ne_max];
+    	spiderPanel.setSpiderData(array_1, array_2);
     },
 
-    Max: function (a1, a2)
-    {
-		if (a1 >= a2)
-		{
-			return a1;
-		}
-		else 
-		{
-			return a2;
-		}
-    },
-    
     //--------------------------------------------------------------------------
-    showFakeHeatmap: function(button, layerName, imagePath) {
+    showHeatmap: function(button) {
 
 		if (button.DSS_Layer) { 
 			globalMap.removeLayer(button.DSS_Layer);
 			button.DSS_Layer = null;
 		}
 		else {
-			var bounds = new OpenLayers.Bounds(
-				-10062652.65061, 5278060.469521415,
-				-9878152.65061, 5415259.640662575
-			);
-			var imgTest = new OpenLayers.Layer.Image(
-				layerName,
-				imagePath,
-				bounds,
-				new OpenLayers.Size(2113.0,-2113.0),
-				{
-					buffer: 0,
-					opacity: 1.0,
-					isBaseLayer: false,
-					displayInLayerSwitcher: false,
-					transitionEffect: "resize",
-					visibility: true,
-					maxResolution: "auto",
-					projection: globalMap.getProjectionObject(),
-					numZoomLevels: 19
+			var obj = Ext.Ajax.request({
+				url: location.href + 'getHeatmap',
+				jsonData: {
+					'model': button.DSS_heatString
+				},
+				timeout: 10 * 60 * 1000, // minutes * seconds * (i.e. converted to) milliseconds
+				
+				success: function(response, opts) {
+					
+					var obj= JSON.parse(response.responseText);
+					console.log("success: ");
+					console.log(obj);
+					Ext.defer(function(obj) {		
+						var bounds = new OpenLayers.Bounds(
+							-10062652.65061, 5278060.469521415,
+							-9878152.65061, 5415259.640662575
+						);
+						var imgTest = new OpenLayers.Layer.Image(
+							button.DSS_heatString,
+							'app/file/' + obj.heatFile,
+							bounds,
+							new OpenLayers.Size(2113.0,-2113.0),
+							{
+								buffer: 0,
+								opacity: 1.0,
+								isBaseLayer: false,
+								displayInLayerSwitcher: false,
+								transitionEffect: "resize",
+								visibility: true,
+								maxResolution: "auto",
+								projection: globalMap.getProjectionObject(),
+								numZoomLevels: 19
+							}
+						);
+						
+						if (button.DSS_Layer) { 
+							globalMap.removeLayer(button.DSS_Layer);
+						}
+						button.DSS_Layer = imgTest;
+						globalMap.addLayer(button.DSS_Layer);
+						button.DSS_Layer.setOpacity(0.9);
+					}, 1000, this, [obj]);
+				},
+				
+				failure: function(respose, opts) {
+					alert("heatmap request failed, request timed out?");
 				}
-			);
-			
-			if (button.DSS_Layer) { 
-				globalMap.removeLayer(button.DSS_Layer);
-			}
-			button.DSS_Layer = imgTest;
-			globalMap.addLayer(button.DSS_Layer);
-			button.DSS_Layer.setOpacity(0.9);
+			});
+		}
+    },
+    
+    //--------------------------------------------------------------------------
+	// OBJ Data comes in with this format
+	// obj.*model_name*	// where model name is something like 'habitat_index', 'soc', 'nitrogen', etc.
+	//		.file1		// right now, Default, but could be any model run when arbitrary model compares are supported
+	//			.sum
+	//			.count
+	//			.min
+	//			.max
+	//		.file2		// right now, Transform, but could be any model run later...
+	//			.sum
+	//			.count
+	//			.min
+	//			.max
+    //--------------------------------------------------------------------------
+    SetData_new: function(obj)
+    {
+    	var clearSpinnerStyle = {"background-image":"none"};
+     	var spiderPanel = Ext.getCmp('DSS_SpiderGraphPanel');
+
+    	if (obj.habitat_index) {
+    		var data = obj.habitat_index;
+    		var field = 'habitat_index';
+			var dat_1 = data.file1.sum / data.file1.count;
+			var dat_2 = data.file2.sum / data.file2.count;
+			var value = (dat_2 - dat_1).toFixed(4);
+			spiderPanel.setSpiderDataElement(dat_1, dat_2, field);
+			this.getComponent('value_' + field).setValue(value).setFieldStyle(clearSpinnerStyle);
+			this.getComponent('graph_' + field).DSS_data = data;
+			this.getComponent('heat_' + field).DSS_heatString = field;
+		}	
+
+    	if (obj.soc) {
+    		var data = obj.soc;
+    		var field = 'soc';
+			var dat_1 = data.file1.sum;
+			var dat_2 = data.file2.sum;
+			var value = (dat_2 - dat_1).toFixed(4);
+			spiderPanel.setSpiderDataElement(dat_1, dat_2, field);
+			this.getComponent('value_' + field).setValue(value).setFieldStyle(clearSpinnerStyle);
+			this.getComponent('graph_' + field).DSS_data = data;
+			this.getComponent('heat_' + field).DSS_heatString = field;
+		}	
+		
+    	if (obj.ethanol) {
+    		var data = obj.ethanol;
+    		var field = 'ethanol';
+			var dat_1 = data.file1.sum;
+			var dat_2 = data.file2.sum;
+			var value = (dat_2 - dat_1).toFixed(4);
+			spiderPanel.setSpiderDataElement(dat_1, dat_2, field);
+			this.getComponent('value_' + field).setValue(value).setFieldStyle(clearSpinnerStyle);
+			this.getComponent('graph_' + field).DSS_data = data;
+			this.getComponent('heat_' + field).DSS_heatString = field;
+		}
+    	
+		if (obj.net_income) {
+    		var data = obj.net_income;
+    		var field = 'net_income';
+			var dat_1 = data.file1.sum;
+			var dat_2 = data.file2.sum;
+			var value = (dat_2 - dat_1).toFixed(4);
+			spiderPanel.setSpiderDataElement(dat_1, dat_2, field);
+			this.getComponent('value_' + field).setValue(value).setFieldStyle(clearSpinnerStyle);
+			this.getComponent('graph_' + field).DSS_data = data;
+			this.getComponent('heat_' + field).DSS_heatString = field;
+		}
+
+		if (obj.net_energy) {    	
+    		var data = obj.net_energy;
+    		var field = 'net_energy';
+			var dat_1 = data.file1.sum;
+			var dat_2 = data.file2.sum;
+			var value = (dat_2 - dat_1).toFixed(4);
+			spiderPanel.setSpiderDataElement(dat_1, dat_2, field);
+			this.getComponent('value_' + field).setValue(value).setFieldStyle(clearSpinnerStyle);
+			this.getComponent('graph_' + field).DSS_data = data;
+			this.getComponent('heat_' + field).DSS_heatString = field;
+		}
+		
+		if (obj.nitrogen) {    	
+    		var data = obj.nitrogen;
+    		var field = 'nitrogen';
+			var dat_1 = data.file1.sum;
+			var dat_2 = data.file2.sum;
+			var value = (dat_2 - dat_1).toFixed(4);
+			spiderPanel.setSpiderDataElement(dat_1, dat_2, field);
+			this.getComponent('value_' + field).setValue(value).setFieldStyle(clearSpinnerStyle);
+			this.getComponent('graph_' + field).DSS_data = data;
+			this.getComponent('heat_' + field).DSS_heatString = field;
+		}
+    	
+		if (obj.phosphorus) {    	
+    		var data = obj.phosphorus;
+    		var field = 'phosphorus';
+			var dat_1 = data.file1.sum;
+			var dat_2 = data.file2.sum;
+			var value = (dat_2 - dat_1).toFixed(4);
+			spiderPanel.setSpiderDataElement(dat_1, dat_2, field);
+			this.getComponent('value_' + field).setValue(value).setFieldStyle(clearSpinnerStyle);
+			this.getComponent('graph_' + field).DSS_data = data;
+			this.getComponent('heat_' + field).DSS_heatString = field;
+		}
+    	
+    	if (obj.pest) {
+    		var data = obj.pest;
+    		var field = 'pest';
+			var dat_1 = data.file1.sum / data.file1.count;
+			var dat_2 = data.file2.sum / data.file2.count;
+			var value = (dat_2 - dat_1).toFixed(4);
+			spiderPanel.setSpiderDataElement(dat_1, dat_2, field);
+			this.getComponent('value_' + field).setValue(value).setFieldStyle(clearSpinnerStyle);
+			this.getComponent('graph_' + field).DSS_data = data;
+			this.getComponent('heat_' + field).DSS_heatString = field;
+		}
+    	
+    	if (obj.pollinator) {
+    		var data = obj.pollinator;
+    		var field = 'pollinator';
+			var dat_1 = data.file1.sum / (data.file1.count * data.max);
+			var dat_2 = data.file2.sum / (data.file2.count * data.max);
+			var value = (dat_2 - dat_1).toFixed(4);
+			spiderPanel.setSpiderDataElement(dat_1, dat_2, field);
+			this.getComponent('value_' + field).setValue(value).setFieldStyle(clearSpinnerStyle);
+			this.getComponent('graph_' + field).DSS_data = data;
+			this.getComponent('heat_' + field).DSS_heatString = field;
+		}
+	
+    	if (obj.nitrous_oxide) {
+    		var data = obj.nitrous_oxide;
+    		var field = 'nitrous_oxide';
+			var dat_1 = data.file1.sum;
+			var dat_2 = data.file2.sum;
+			var value = (dat_2 - dat_1).toFixed(4);
+			spiderPanel.setSpiderDataElement(dat_1, dat_2, field);
+			this.getComponent('value_' + field).setValue(value).setFieldStyle(clearSpinnerStyle);
+			this.getComponent('graph_' + field).DSS_data = data;
+			this.getComponent('heat_' + field).DSS_heatString = field;
 		}
     }
 
 });
+

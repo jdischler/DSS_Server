@@ -13,79 +13,26 @@ public class Global extends GlobalSettings
 	// If the play server is started in DEV mode, should we skip loading certain layers
 	//	to get a faster server startup time and use less memory?
 	private static final boolean LOAD_ALL_LAYERS_FOR_DEV = false;
+	private static final boolean LOAD_DEFAULT_DATA = true;
 	
 	//--------------------------------------------------------------------------
 	@Override
 	public void onStart(play.Application app) 
 	{
-		// Test of heatmapping...
-//		Png.createHeatMap_I("Nitrogen", "Default", "Client_ID"); 
- 
 		systemReport("Application has started");
+		
+		// create any computed layers (currently don't have any in here?)
+		computeLayers();
+		
 		cacheLayers();
+
+		QueuedWriter.beginWatchWriteQueue();
+		conditionalCreateDefaultModelOutputs();		
+		cacheModelDefaults();
+		
 		systemReport("Data Layers Cached");
-				
-		File Output = new File("./layerData/Default");
-		if(!Output.exists())
-		{
-			//Output.mkdir();
-			
-			//Layer_Base layer;
-			//int width, height;
-			
-			// Rotation
-			//int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
-			//layer = Layer_Base.getLayer("Rotation");
-			//width = layer.getWidth();
-			//height = layer.getHeight();
-			
-			//Selection selection = new Selection(width, height);
-
-			// Corn and Grass Production for D
-			//Model_Crop_Yield Model_CGD = new Model_Crop_Yield();
-			//FourArrays ArrayD = Model_CGD.Crop_Y(selection, "Default", Rotation);
-			//float ArrayCD[] = ArrayD.a;
-			//float ArrayGD[] = ArrayD.b;
-			//float ArraySD[] = ArrayD.c;
-			//float ArrayAD[] = ArrayD.d;
-			
-			// Regular Models
-			// Model_Ethanol
-			//Model_Ethanol E_D = new Model_Ethanol();
-			//E_D.Ethanol(ArrayCD, ArrayGD, ArraySD, ArrayAD, selection, "Default", Rotation);
-	
-			// Model_Net_Energy
-			//Model_Net_Energy NE_D = new Model_Net_Energy();
-			//NE_D.Net_Energy(ArrayCD, ArrayGD, ArraySD, ArrayAD, selection, "Default", Rotation);
-	
-			// Model_Net_Income
-			//Model_Net_Income NI_D = new Model_Net_Income();
-			//NI_D.Net_Income(ArrayCD, ArrayGD, ArraySD, ArrayAD, selection, "Default", Rotation);
-	
-			// Models with Moving Window
-			// Model_Habitat_Index
-			//Model_Habitat_Index HI_D = new Model_Habitat_Index();
-			//HI_D.Habitat_Index(selection, "Default", Rotation);
-			
-			// Model_Pest_Suppression
-			//Model_Pest_Suppression PS_D = new Model_Pest_Suppression();
-			//PS_D.Pest_Suppression(selection, "Default", Rotation);
-	
-			// Model_Pollinator
-			//Model_Pollinator PO_D = new Model_Pollinator();
-			//PO_D.Pollinator(selection, "Default", Rotation);
-			
-			//Model_Nitrogen_Phosphorus
-			//Model_Nitrogen_Phosphorus N_P_D = new Model_Nitrogen_Phosphorus();
-			//N_P_D.Nitrogen_Phosphorus(selection, "Default", Rotation);
-
-		}
-			
-			// Run Default for Each Model
-			//Models_Default_T MD = new Models_Default_T();
-			//MD.Calculate_T("Default_T");
 	}
-	
+
 	//--------------------------------------------------------------------------
 	@Override
 	public void onStop(play.Application app) {
@@ -121,10 +68,8 @@ public class Global extends GlobalSettings
 		Logger.info("+-------------------------------------------------------+");
 	}
 	
-	// Only tries to load a layer if it isn't in memory already
 	//--------------------------------------------------------------------------
-	private void cacheLayers() 
-	{
+	private void computeLayers() {
 		/* // Uncomment if need to recalculate and output slope
 		CalculateSlope cs = new CalculateSlope();
 		cs.computeSlope();
@@ -137,7 +82,11 @@ public class Global extends GlobalSettings
 		
 		/* new CalculateCornGrassProduction().run();
 		*/
-		
+	}
+	
+	//--------------------------------------------------------------------------
+	private void cacheLayers() 
+	{
 		Layer_Base layer;
 		try {
 			if (Play.isProd() || LOAD_ALL_LAYERS_FOR_DEV == true) {
@@ -151,6 +100,10 @@ public class Global extends GlobalSettings
 			layer = new Layer_Float("silt"); layer.init();
 			layer = new Layer_Float("soc"); layer.init();
 			layer = new Layer_Integer("watersheds", Layer_Integer.EType.EQueryShiftedIndex); layer.init();
+			layer = new Layer_Float("texture"); layer.init();
+			layer = new Layer_Float("om_soc"); layer.init();
+			layer = new Layer_Float("drainage"); layer.init();
+			layer = new Layer_Float("ph"); layer.init();
 			
 			// NOTE: am putting low-priority (rarely used) data layers here so that
 			//	we can have them skip loading in DEVELOPMENT mode. Ie, faster loads
@@ -166,7 +119,79 @@ public class Global extends GlobalSettings
 		catch (Exception e) {
 			Logger.info(e.toString());
 		}
-		finally {
+	}
+	
+	//--------------------------------------------------------------------------
+	private void cacheModelDefaults() {
+		
+		if (LOAD_DEFAULT_DATA) {
+			Logger.info(" --- LOADING MODEL DEFAULT RESULT FILES ---");
+			Layer_Base layer;
+			try {
+				layer = new Layer_Float("default/net_income"); layer.init();
+				layer = new Layer_Float("default/net_energy"); layer.init();
+				layer = new Layer_Float("default/ethanol"); layer.init();
+				layer = new Layer_Float("default/habitat_index"); layer.init();
+				layer = new Layer_Float("default/nitrogen"); layer.init();
+				layer = new Layer_Float("default/phosphorus"); layer.init();
+				layer = new Layer_Float("default/pest"); layer.init();
+				layer = new Layer_Float("default/pollinator"); layer.init();
+				layer = new Layer_Float("default/nitrous_oxide"); layer.init();
+			}
+			catch (Exception e) {
+				Logger.info(e.toString());
+			}
+		}
+		else {
+			Logger.info(" --- SKIPPING LOAD OF MODEL DEFAULT RESULT FILES ---");
+		}
+	}
+
+	// TODO: potentially check for individual model files vs. just the directory?
+	//--------------------------------------------------------------------------
+	private void conditionalCreateDefaultModelOutputs() {
+		
+		// Check for Default Scenario files...to replace them, you need to delete the whole
+		//	DEFAULT folder otherwise they will not be recalculated with how this is coded
+		//	The default folder also cannot exist for first generation (even if empty...)
+		File Output = new File("./layerData/default");
+		if(!Output.exists()) {
+			
+			Logger.info("Default scenario folder does not exist, creating it and default model files!");
+			// Rotation
+			Layer_Base layer = Layer_Base.getLayer("Rotation");
+			int width = layer.getWidth();
+			int height = layer.getHeight();
+			int[][] defaultRotation = Layer_Base.getLayer("Rotation").getIntData();
+			
+			List<ModelResult> results;
+			results = new Model_HabitatIndex_New().run(defaultRotation, width, height, "default");
+			QueuedWriter.queueResults(results);
+
+			results = new Model_EthanolNetEnergyIncome_New().run(defaultRotation, width, height, "default");
+			QueuedWriter.queueResults(results);
+			
+			results = new Model_PollinatorPestSuppression_New().run(defaultRotation, width, height, "default");
+			QueuedWriter.queueResults(results);
+			
+			results = new Model_NitrogenPhosphorus_New().run(defaultRotation, width, height, "default");
+			QueuedWriter.queueResults(results);
+
+			results = new Model_NitrousOxideEmissions_New().run(defaultRotation, width, height, "default");
+			QueuedWriter.queueResults(results);
+
+			// NOTE: SOC for the default is not in the model run because it is not a computed data layer like others...
+			
+			// wait for write queue to dump out the defaults...
+			while(QueuedWriter.doesWriteQueueHaveFiles()) {
+				Logger.info("Waiting for defaults to be written by the QueuedWriter");
+				try {
+					Thread.sleep(4000);
+				}
+				catch(Exception e) {
+					// blah, java exception handling...
+				}
+			}
 		}
 	}
 }

@@ -14,7 +14,7 @@ Ext.define('MyApp.view.LegendElement', {
     initComponent: function() {
     	
         var me = this;
-        var pattern = (me.index & 0x3);
+        var pattern = (this.DSS_LegendElementIndex & 0x3);
         var BGcolor = (pattern == 0 || pattern == 1) ? '#ffffff' : '#f7faff';
         
         Ext.applyIf(me, {

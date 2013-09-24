@@ -92,8 +92,10 @@ public class Downsampler
 					for (int xx = upLeftX; xx <= lowRightX; xx++) {
 						float result = mData[yy][xx];
 						if (!Float.isNaN(result)) {
+							// test absolute value so we capture the largest magnitude, be it pos or neg
 							if (Math.abs(result) > Math.abs(max)) {
-								max = Math.abs(result);
+								// but save the original max result, vs. absolute val.
+								max = result;
 							}
 						}
 					}

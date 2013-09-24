@@ -86,21 +86,23 @@ Ext.define('MyApp.view.GraphPopUp', {
         me.callParent(arguments);
     },
     
-    SetChartData: function(objD, objT)
+    SetChartData: function(data)
     {
-		var data1 = objD.Bins;
-		var data2 = objT.Bins;
-		var Min = objD.Min;
-		var Max = objD.Max;
+		var data1 = data.file1.histogram;
+		var data2 = data.file2.histogram;
+		var min = data.min;
+		var max = data.max;
 		
 		var chart = this.getComponent("MyGraph");
-		chart.axes.items[1].maximum = Max;
-		chart.axes.items[1].minimum = Min;
+		chart.axes.items[1].maximum = max;
+		chart.axes.items[1].minimum = min;
 		
 		var array = [];
 		for (var i = 0; i < data1.length; i++)
 		{
-			array.push({ Freq_Default: data1[i]*900/1000000, Freq_Transform: data2[i]*900/1000000, Bin: (Max-Min)/(data1.length) * i + Min });
+			array.push({ 	Freq_Default: data1[i]*900/1000000, 
+							Freq_Transform: data2[i]*900/1000000, 
+							Bin: (max-min)/(data1.length) * i + min });
 		}
 		
 		this.graphstore.loadData(array);

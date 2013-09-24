@@ -134,7 +134,7 @@ public class Png {
 	}
 	
 	//--------------------------------------------------------------------------
-	private static void interpolatePaletteEntries(PngChunkPLTE palette, 
+	public static void interpolatePaletteEntries(PngChunkPLTE palette, 
 			int startIndex, int startR, int startG, int startB,
 			int endIndex, int endR, int endG, int endB) {
 	
@@ -284,6 +284,207 @@ public class Png {
 		catch (Exception e) {
 			Logger.info(e.toString());
 		}
+	}
+
+	//--------------------------------------------------------------------------
+	public static void createHeatMap_II() {
+	
+long heatmapBuildStart = System.currentTimeMillis();
+long heatmapResampleStart = 0, heatmapResampleEnd = 0;
+long heatmapPngStart = 0, heatmapPngEnd = 0;
+		try {
+			Layer_Float hi = new Layer_Float("habitat_index", true);
+			hi.init();
+
+			float data[][] = hi.getFloatData();
+			
+			int width = hi.getWidth();
+			int height = hi.getHeight();
+			
+heatmapResampleStart = System.currentTimeMillis();
+			Downsampler downSample = new Downsampler(data, width, height);
+			
+			int newWidth = width/10;
+			int newHeight = height/10;
+			
+			float resampled[][] = downSample.generateAveraged(newWidth, newHeight);
+heatmapResampleEnd = System.currentTimeMillis();
+			
+heatmapPngStart = System.currentTimeMillis();
+			float min = resampled[0][0], max = resampled[0][0];
+			
+			for (int y = 0; y < newHeight; y++) {
+				for (int x = 0; x < newWidth; x++) {
+					if (resampled[y][x] > max) {
+						max = resampled[y][x];
+					}
+					if (resampled[y][x] < min) {
+						min = resampled[y][x];
+					}
+				}
+			}
+			
+			Logger.info("Min: " + Float.toString(min) + "   Max: " + Float.toString(max));
+			Logger.info("Generating IDX array");
+	
+			byte[][] idx = new byte[newHeight][newWidth];
+
+			// Now generate the heatmap image
+			for (int y = 0; y < newHeight; y++) {
+				for (int x = 0; x < newWidth; x++) {
+					idx[y][x] = (byte)(resampled[y][x] * 8.0f + 0.5f);
+				}
+			}
+		
+			Logger.info("Creating png");
+			String file = "./public/file/heat_3.png";
+			Png png = new Png(newWidth, newHeight, 
+				8, 1, file);
+		
+			Logger.info("Creating palette");
+			PngChunkPLTE palette = png.createPalette(9);
+			Logger.info("Setting palette entries");
+			
+			interpolatePaletteEntries(palette, 
+				0, 128, 0, 255,		// purple
+				2, 255, 0, 0);		// red
+			interpolatePaletteEntries(palette, 
+				2, 255, 0, 0,		// red
+				4, 255, 255, 0);	// yellow
+			interpolatePaletteEntries(palette, 
+				4, 255, 255, 0,		// yellow
+				6, 0, 255, 0);		// green
+			interpolatePaletteEntries(palette, 
+				6, 0, 255, 0,		// yellow
+				8, 0, 128, 255);	// blue
+			
+			png.mPngWriter.writeRowsByte(idx);
+			png.mPngWriter.end();
+heatmapPngEnd = System.currentTimeMillis();
+		}
+		catch (Exception e) {
+			Logger.info(e.toString());
+		}
+long heatmapBuildEnd = System.currentTimeMillis();
+float timeSec = (heatmapBuildEnd - heatmapBuildStart) / 1000.0f;
+Logger.info(">>> Heatmap generation timing: " + Float.toString(timeSec));
+
+timeSec = (heatmapResampleEnd - heatmapResampleStart) / 1000.0f;
+Logger.info(">>> Heatmap resample timing: " + Float.toString(timeSec));
+
+timeSec = (heatmapPngEnd - heatmapPngStart) / 1000.0f;
+Logger.info(">>> Heatmap PNG creation/write timing: " + Float.toString(timeSec));
+	}
+
+	//--------------------------------------------------------------------------
+	public static void createHeatMap_III() {
+	
+long heatmapBuildStart = System.currentTimeMillis();
+long heatmapResampleStart = 0, heatmapResampleEnd = 0;
+long heatmapPngStart = 0, heatmapPngEnd = 0;
+		try {
+			Layer_Float hi_1 = new Layer_Float("habitat_index", true);
+			hi_1.init();
+			Layer_Float hi_2 = new Layer_Float("habitat_index_t", true);
+			hi_2.init();
+
+			float data1[][] = hi_1.getFloatData();
+			float data2[][] = hi_2.getFloatData();
+			
+			int width = hi_1.getWidth();
+			int height = hi_1.getHeight();
+			
+			for (int y = 0; y < height; y++) {
+				for (int x = 0; x < width; x++) {
+					data1[y][x] -= data2[y][x];
+				}
+			}
+			
+heatmapResampleStart = System.currentTimeMillis();
+			Downsampler downSample = new Downsampler(data1, width, height);
+			
+			int newWidth = width/10;
+			int newHeight = height/10;
+			
+			float resampled[][] = downSample.generateMax(newWidth, newHeight);
+heatmapResampleEnd = System.currentTimeMillis();
+			
+heatmapPngStart = System.currentTimeMillis();
+			float min = resampled[0][0], max = resampled[0][0];
+			
+			for (int y = 0; y < newHeight; y++) {
+				for (int x = 0; x < newWidth; x++) {
+					if (resampled[y][x] > max) {
+						max = resampled[y][x];
+					}
+					if (resampled[y][x] < min) {
+						min = resampled[y][x];
+					}
+				}
+			}
+			
+			Logger.info("Min: " + Float.toString(min) + "   Max: " + Float.toString(max));
+			Logger.info("Generating IDX array");
+	
+			byte[][] idx = new byte[newHeight][newWidth];
+
+			// Now generate the heatmap image
+			for (int y = 0; y < newHeight; y++) {
+				for (int x = 0; x < newWidth; x++) {
+					float delta = resampled[y][x] * 4.0f + 4.5f; // round
+					if (delta < 0) delta = 0;
+					else if (delta > 8) delta = 8;
+					idx[y][x] = (byte)(delta);
+				}
+			}
+		
+			Logger.info("Creating png");
+			String file = "./public/file/heat_max.png";
+			Png png = new Png(newWidth, newHeight, 
+				8, 1, file);
+		
+			Logger.info("Creating palette");
+			PngChunkPLTE palette = png.createPalette(9);
+			Logger.info("Setting palette entries");
+			
+			interpolatePaletteEntries(palette, 
+				0, 128, 0, 255,		// purple
+				2, 255, 0, 0);		// red
+			interpolatePaletteEntries(palette, 
+				2, 255, 0, 0,		// red
+				4, 255, 255, 0);	// yellow
+			interpolatePaletteEntries(palette, 
+				4, 255, 255, 0,		// yellow
+				6, 0, 255, 0);		// green
+			interpolatePaletteEntries(palette, 
+				6, 0, 255, 0,		// green
+				8, 0, 128, 255);	// blue
+
+			Logger.info("Setting transparent");
+			// set index 4 as transparent
+			int[] alpha = new int[9];
+			alpha[0] = 255; alpha[1] = 255; alpha[2] = 255; alpha[3] = 255;
+			alpha[4] = 0;
+			alpha[5] = 255; alpha[6] = 255; alpha[7] = 255; alpha[8] = 255;
+			
+			png.setTransparentArray(alpha);//TransparentIndex(0);
+			
+			png.mPngWriter.writeRowsByte(idx);
+			png.mPngWriter.end();
+heatmapPngEnd = System.currentTimeMillis();
+		}
+		catch (Exception e) {
+			Logger.info(e.toString());
+		}
+long heatmapBuildEnd = System.currentTimeMillis();
+float timeSec = (heatmapBuildEnd - heatmapBuildStart) / 1000.0f;
+Logger.info(">>> Heatmap generation timing: " + Float.toString(timeSec));
+
+timeSec = (heatmapResampleEnd - heatmapResampleStart) / 1000.0f;
+Logger.info(">>> Heatmap resample timing: " + Float.toString(timeSec));
+
+timeSec = (heatmapPngEnd - heatmapPngStart) / 1000.0f;
+Logger.info(">>> Heatmap PNG creation/write timing: " + Float.toString(timeSec));
 	}
 }
 

@@ -85,7 +85,6 @@ Ext.define('MyApp.view.ScenarioTools', {
     alias: 'widget.scenariotools',
 
     requires: [
-//    	'MyApp.view.GlobalScenarioPopup',
     	'MyApp.view.Assumptions.PropertyWindow',
     	'MyApp.view.TransformPopup'
     ],
@@ -170,7 +169,21 @@ Ext.define('MyApp.view.ScenarioTools', {
 				mouseOffset: [15,-40] // make it pop up at a lower Y value than normal (18)
 			},
 			handler: function(self) {
-				this.up().up().buildModel();
+				// Blah, if made changes but didn't change selection on the grid, the results
+				//	won't be saved...forcing it here. TODO: consolidate with listener handler code that
+				//	does the same thing?
+				var chart = this.up().up();
+				var selModel = chart.getSelectionModel();
+				if (selModel.selected.getCount() > 0) {
+					var rec = selModel.getSelection()[0];
+					if (rec) {
+						var query = DSS_ViewSelectToolbar.buildQuery()
+						rec.set('Query', query);
+						rec.commit();
+					}
+				}
+				
+				chart.buildModel_NEW();
 			}
 		}]
 	}],
@@ -390,7 +403,8 @@ Ext.define('MyApp.view.ScenarioTools', {
 		
 		console.log(requestData);
 		if (haveQuery) {
-			this.submitModel(requestData);
+			//this.submitModel(requestData);
+			this.createScenario(requestData);
 		}
 		else {
 			alert("No query built - nothing to query");
@@ -403,7 +417,7 @@ Ext.define('MyApp.view.ScenarioTools', {
 		var button = Ext.getCmp('DSS_runModelButton');
 		button.setIcon('app/images/spinner_16a.gif');
 		button.setDisabled(true);
-
+		
 		var obj = Ext.Ajax.request({
 			url: location.href + 'models',
 			jsonData: queryJson,
@@ -411,17 +425,52 @@ Ext.define('MyApp.view.ScenarioTools', {
 			
 			success: function(response, opts) {
 				
-				var obj = JSON.parse(response.responseText);
-				console.log("success: ");
-				console.log(obj);
-				
-				Ext.getCmp('Model_Graph').SetData(obj);
-				button.setIcon('app/images/go_icon.png');
-				button.setDisabled(false);
-				
+				try {
+					var obj= JSON.parse(response.responseText);
+					console.log("success: ");
+					console.log(obj);
+					Ext.getCmp('Model_Graph').SetData(obj);
+				}
+				catch(err) {
+					console.log(err);
+				}
 				var reportPanel = Ext.getCmp('DSS_report_panel');
 				if (reportPanel.getCollapsed() != false) {
 					reportPanel.expand();
+				}
+				button.setIcon('app/images/go_icon.png');
+				button.setDisabled(false);
+			},
+			
+			failure: function(respose, opts) {
+				button.setIcon('app/images/go_icon.png');
+				button.setDisabled(false);
+				alert("Model run failed, request timed out?");
+			}
+		});
+	},
+
+    //--------------------------------------------------------------------------
+	createScenario: function(requestData) {
+		
+		var self = this;
+		var obj = Ext.Ajax.request({
+			url: location.href + 'createScenario',
+			jsonData: requestData,
+			timeout: 10 * 60 * 1000, // minutes * seconds * (i.e. converted to) milliseconds
+			
+			success: function(response, opts) {
+				
+				try {
+					var obj= JSON.parse(response.responseText);
+					console.log("success: ");
+					console.log(obj);
+					var newRequest = requestData;
+					newRequest.scenarioID = obj.scenarioID;
+					self.submitModel_new(newRequest);
+				}
+				catch(err) {
+					console.log(err);
 				}
 			},
 			
@@ -431,7 +480,59 @@ Ext.define('MyApp.view.ScenarioTools', {
 				alert("Model run failed, request timed out?");
 			}
 		});
-	}
+	},
 
+    //--------------------------------------------------------------------------
+    submitModel_new: function(queryJson) {
+    	
+		var button = Ext.getCmp('DSS_runModelButton');
+		button.setIcon('app/images/spinner_16a.gif');
+		button.setDisabled(true);
+		
+		console.log(queryJson);
+		
+		// NOTE: these strings MUST be synchronized with the server, or else the server will
+		//	not know which models to run. FIXME: should maybe set this up in a more robust fashion?? How?
+		var modelTypes = ['yield', 'n_p', 'pest_pol', 'soc', 'nitrous', 'habitat_index'];
+		Ext.getCmp('Model_Graph').setWaitFields();
+		Ext.getCmp('DSS_SpiderGraphPanel').clearSpiderData(0);// set all fields to zero
+
+		for (var i = 0; i < modelTypes.length; i++) {
+			var request = queryJson;
+			request.modelType = modelTypes[i];
+			
+			var obj = Ext.Ajax.request({
+				url: location.href + 'modelCluster',
+				jsonData: request,
+				timeout: 10 * 60 * 1000, // minutes * seconds * (i.e. converted to) milliseconds
+				
+				success: function(response, opts) {
+					
+					try {
+						var obj= JSON.parse(response.responseText);
+						console.log("success: ");
+						console.log(obj);
+						Ext.getCmp('Model_Graph').SetData_new(obj);
+					}
+					catch(err) {
+						console.log(err);
+					}
+					var reportPanel = Ext.getCmp('DSS_report_panel');
+					if (reportPanel.getCollapsed() != false) {
+						reportPanel.expand();
+					}
+					button.setIcon('app/images/go_icon.png');
+					button.setDisabled(false);
+				},
+				
+				failure: function(respose, opts) {
+					button.setIcon('app/images/go_icon.png');
+					button.setDisabled(false);
+					alert("Model run failed, request timed out?");
+				}
+			});
+		}
+	}
+	
 });
 

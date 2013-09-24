@@ -12,17 +12,23 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
     initComponent: function() {
         var me = this;
 
-		Ext.define('Habitat_Index', {
+		Ext.define('Spider_Model', {
 			extend: 'Ext.data.Model',
-			fields: ['Default', 'Transform', 'Bin']
+			fields: ['Default', 'Transform', 'Bin', 'Match']
 		});
 	
         this.graphstore = Ext.create('Ext.data.Store', {
-			model: 'Habitat_Index',
-			//data: [{Freq_Default: 1, Freq_Transform: 4, Bin: "Sunday"}, {Freq_Default: 5, Freq_Transform: 8, Bin: "Sat"}, {Freq_Default: 0, Freq_Transform: 9, Bin: "Mon"}],
-			data: [{Bin: "Habitat Idx"}, {Bin: "Nitrogen"}, {Bin: "Phosphorus"}, 
-					{Bin: "Crop Pest"}, {Bin: "Pollinator"}, {Bin: "Biomass"}, 
-					{Bin: "Net Income"}, {Bin: "Net Energy"}]
+			model: 'Spider_Model',
+			data: [{Bin: 'Bird Index', Match: 'habitat_index'}, 
+					{Bin: 'Nitrogen', Match: 'nitrogen'}, 
+					{Bin: 'Phosphorus', Match: 'phosphorus'}, 
+					{Bin: 'Biocontrol Index', Match: 'pest'}, 
+					{Bin: 'Pollinator Index', Match: 'pollinator'}, 
+					{Bin: 'Fuel', Match: 'ethanol'}, 
+					{Bin: 'Net Income', Match: 'net_income'}, 
+					{Bin: 'Net Energy', Match: 'net_energy'}, 
+					{Bin: 'Soil Carbon', Match: 'soc'}, 
+					{Bin: 'Nitrous Oxide', Match: 'nitrous_oxide'}]
 		});
                     
         Ext.applyIf(me, {
@@ -39,19 +45,12 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 					x: -55,
 					y: -55
 			    },
-				axes: [{
-					title: '', // square kilometers
-					type: 'Radial',
-					position: 'radial',
-					label: {
-						display: true
-					},
-					fields: ['Default', 'Transform']
-				},
+				axes: [
 				{
 					title: '',
 					type: 'Radial',
 					position: 'radial',
+					maximum: 1,
 					label: {
 						display: true
 					},
@@ -76,8 +75,9 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 						}
 					},
 					style: {
-					'stroke-width': 2,
-					fill: 'none'
+						'stroke-width': 2,
+						'fill-opacity': 0.1,
+						'stroke-opacity': 1
 					}
 				},
 				{
@@ -99,8 +99,9 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 						}
 					},
 					style: {
-					'stroke-width': 2,
-					fill: 'none'
+						'stroke-width': 2,
+						'fill-opacity': 0.1,
+						'stroke-opacity': 1
 					}
 				}]
 			}]
@@ -109,26 +110,32 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
         me.callParent(arguments);
     },
     
-    setSpiderData: function(objD, objT)
+    //--------------------------------------------------------------------------
+    setSpiderDataElement: function(value1, value2, element) {
+
+    	var rec = this.graphstore.findRecord('Match', element);
+    	if (rec) {
+    		var max = value1;
+    		if (value2 > max) {
+    			max = value2;
+    		}
+			rec.set("Default", value1 / max);
+			rec.set("Transform", value2 / max);
+			rec.commit();
+    	}
+    },
+    
+    //--------------------------------------------------------------------------
+    clearSpiderData: function(defaultValue)
     {
-		var data1 = objD;
-		var data2 = objT;
-		console.log(data1);
-		console.log(data2);
-		var Bin1 = ["Habitat Idx", "Nitrogen", "Phosphorus", 
-					"Crop Pest", "Pollinator", "Biomass", 
-					"Net Income", "Net Energy"];
-		var chart = this.getComponent("MyGraph_Spider");
-    	
-		var array = [];
-		for (var i = 0; i < data1.length; i++)
+		for (var idx = 0; idx < this.graphstore.count(); idx++)
 		{
-			array.push({ Default: data1[i], Transform: data2[i], Bin: Bin1[i]});
+			var rec = this.graphstore.getAt(idx);
+			rec.set("Default", defaultValue);
+			rec.set("Transform", defaultValue);
+			rec.commit();
 		}
-		
-		this.graphstore.loadData(array);
     }
 
 });
-
 

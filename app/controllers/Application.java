@@ -20,18 +20,17 @@ import javax.xml.bind.DatatypeConverter;
 //------------------------------------------------------------------------------
 public class Application extends Controller 
 {
+	static int mHeatCount = 0;
 	
 	//--------------------------------------------------------------------------
 	public static Result index() 
 	{
-		
 		return ok(index.render());
 	}
 	
 	//--------------------------------------------------------------------------
 	public static Result query() throws Exception 
 	{
-		
 		Query query = new Query();
 		JsonNode result = query.selection(request().body().asJson());
 		return ok(result);
@@ -40,7 +39,6 @@ public class Application extends Controller
 	//--------------------------------------------------------------------------
 	public static Result layerParmRequest() throws Exception 
 	{
-		
 		JsonNode request = request().body().asJson();
 
 		JsonNode ret = Layer_Base.getParameter(request);
@@ -55,7 +53,6 @@ public class Application extends Controller
 	//----------------------------------------------------------------------
 	public static Result wmsRequest() 
 	{
-		
 		// Open up request from client...
 		JsonNode request = request().body().asJson();
 
@@ -156,528 +153,223 @@ public class Application extends Controller
 	}
 
 	//----------------------------------------------------------------------
-	public static Result Models() throws Exception 
+	public static Result setUpScenario() throws Exception
 	{
-long modelTimeStart = System.currentTimeMillis();
-		Logger.info("----- Model Process Started ----");
-		//Logger.info("Called into Model:");
-		//Logger.info(request().body().asJson().toString());
-		
-		File output = new File("./layerData/Client_ID");
-		if(output.exists())
-		{
-			Logger.info("This folder already exists");
-		}
-		else
-		{
-			output.mkdir();
-		}
-		
-		Layer_Base layer;
-		int width, height;
-		// Rotation
-		int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
-		layer = Layer_Base.getLayer("Rotation");
-		width = layer.getWidth();
-		height = layer.getHeight();
-		
-long timeStart = System.currentTimeMillis();
-		
-		//int[][] Rotation = Layer_Base.getLayer("Rotation").getIntData();
-		// Select the entire landscape before transform
-		Selection selectionD = new Selection(width, height);
-
+		Logger.info("----- Initializing scenario ----");
 		// Create a new scenario and get a transformed crop rotation layer from it...
 		Scenario scenario = new Scenario();
 		scenario.getTransformedRotation(request().body().asJson());
-		// Select based on user selection after transform
-		Selection selectionT = scenario.mSelection;
-		//Logger.info("Server Run The Models Request:");
+		
+		String cacheID = Scenario.cacheScenario(scenario, 12345); // FIXME: real clientID
+
+		ObjectNode sendback = JsonNodeFactory.instance.objectNode();
+		sendback.put("scenarioID", cacheID);
+		
+		return ok(sendback);
+	}
+	
+	//----------------------------------------------------------------------
+	public static Result runModels() throws Exception 
+	{
+long modelTimeStart = System.currentTimeMillis();
+		Logger.info("----- Model Process Started ----");
+		
+		// Rotation
+		int[][] defaultRotation = Layer_Base.getLayer("Rotation").getIntData();
+		Layer_Base layer = Layer_Base.getLayer("Rotation");
+		int width = layer.getWidth(), height = layer.getHeight();
+		
+		JsonNode request = request().body().asJson();
+		Logger.info(request.toString());
+long timeStart = System.currentTimeMillis();
+		
+		// Create a new scenario and get a transformed crop rotation layer from it...
+		Scenario scenario = new Scenario();
+		scenario.getTransformedRotation(request);
 		
 long timeEnd = System.currentTimeMillis();
 float timeSec = (timeEnd - timeStart) / 1000.0f;
 Logger.info(">>> Transformation timing: " + Float.toString(timeSec));
-		
-timeStart = System.currentTimeMillis();
-		// Model_Pollinator_Pest_Suppression
-		// Default
-		Model_Pollinator_Pest_Suppression PPS_D = new Model_Pollinator_Pest_Suppression();
-		TwoArrays ArrayP_PS_D = PPS_D.Pollinator_Pest_Suppression(selectionD, Rotation);
-		float ArrayPOD[] = ArrayP_PS_D.a;
-		float ArrayPSD[] = ArrayP_PS_D.b;
-		float Min_POD = ArrayP_PS_D.Min_a;
-		float Max_POD = ArrayP_PS_D.Max_a;
-		float Min_PSD = ArrayP_PS_D.Min_b;
-		float Max_PSD = ArrayP_PS_D.Max_b;
-		
-		Model_Selection POD = new Model_Selection();
-		JsonNode SendBack_POD = POD.Selection(selectionD, selectionT, ArrayPOD);
-		Model_Selection PSD = new Model_Selection();
-		JsonNode SendBack_PSD = PSD.Selection(selectionD, selectionT, ArrayPSD);
-		ArrayP_PS_D = null;
-		ArrayPOD = null;
-		ArrayPSD = null;
-		System.gc();
-		
-		// Transform
-		Model_Pollinator_Pest_Suppression PPS_T = new Model_Pollinator_Pest_Suppression();
-		TwoArrays ArrayP_PS_T = PPS_T.Pollinator_Pest_Suppression(selectionD, scenario.mNewRotation);
-		float ArrayPOT[] = ArrayP_PS_T.a;
-		float ArrayPST[] = ArrayP_PS_T.b;
-		float Min_POT = ArrayP_PS_T.Min_a;
-		float Max_POT = ArrayP_PS_T.Max_a;
-		float Min_PST = ArrayP_PS_T.Min_b;
-		float Max_PST = ArrayP_PS_T.Max_b;
-		
-		Model_Selection POT = new Model_Selection();
-		JsonNode SendBack_POT = POT.Selection(selectionD, selectionT, ArrayPOT);
-		Model_Selection PST = new Model_Selection();
-		JsonNode SendBack_PST = PST.Selection(selectionD, selectionT, ArrayPST);
-		ArrayP_PS_T = null;
-		ArrayPOT = null;
-		ArrayPSD = null;
-		System.gc();
 
-timeEnd = System.currentTimeMillis();
-timeSec = (timeEnd - timeStart) / 1000.0f;
-Logger.info(">>> Model - Pollinator / Pest timing: " + Float.toString(timeSec));
-		
-timeStart = System.currentTimeMillis();
-		// Corn and Grass Production for D
-		Model_Crop_Yield Model_CGD = new Model_Crop_Yield();
-		float YID[] = Model_CGD.Crop_Y(selectionD, Rotation);
-		
-		// Regular Models
-		// Default
-		Model_Ethanol_Net_Energy_Income ENENID = new Model_Ethanol_Net_Energy_Income();
-		ThreeArrays ArrayD = ENENID.Ethanol_Net_Energy_Income(YID, selectionD, Rotation);
-		float ArrayED[] = ArrayD.a;
-		float ArrayNED[] = ArrayD.b;
-		float ArrayNID[] = ArrayD.c_float;
-		float Min_ED = ArrayD.Min_a;
-		float Max_ED = ArrayD.Max_a;
-		float Min_NED = ArrayD.Min_b;
-		float Max_NED = ArrayD.Max_b;
-		float Min_NID = ArrayD.Min_c;
-		float Max_NID = ArrayD.Max_c;
-		
-		Model_Selection ED = new Model_Selection();
-		JsonNode SendBack_ED = ED.Selection(selectionD, selectionT, ArrayED);
-		Model_Selection NED = new Model_Selection();
-		JsonNode SendBack_NED = NED.Selection(selectionD, selectionT, ArrayNED);
-		Model_Selection NID = new Model_Selection();
-		JsonNode SendBack_NID = NID.Selection(selectionD, selectionT, ArrayNID);
-		ArrayD = null;
-		ArrayNID = null;
-		ArrayED = null;
-		ArrayNED = null;
-		YID = null;
-		System.gc();
-		
-		// Corn and Grass Production for T
-		Model_Crop_Yield Model_CGT = new Model_Crop_Yield();
-		float YIT[] = Model_CGT.Crop_Y(selectionD, scenario.mNewRotation);
-		
-		// Transform
-		Model_Ethanol_Net_Energy_Income ENENIT = new Model_Ethanol_Net_Energy_Income();
-		ThreeArrays ArrayT = ENENIT.Ethanol_Net_Energy_Income(YIT, selectionD, scenario.mNewRotation);
-		float ArrayET[] = ArrayT.a;
-		float ArrayNET[] = ArrayT.b;
-		float ArrayNIT[] = ArrayT.c_float;
-		float Min_ET = ArrayT.Min_a;
-		float Max_ET = ArrayT.Max_a;
-		float Min_NET = ArrayT.Min_b;
-		float Max_NET = ArrayT.Max_b;
-		float Min_NIT = ArrayT.Min_c;
-		float Max_NIT = ArrayT.Max_c;
-		
-		Model_Selection ET = new Model_Selection();
-		JsonNode SendBack_ET = ET.Selection(selectionD, selectionT, ArrayET);
-		Model_Selection NET = new Model_Selection();
-		JsonNode SendBack_NET = NET.Selection(selectionD, selectionT, ArrayNET);
-		Model_Selection NIT = new Model_Selection();
-		JsonNode SendBack_NIT = NIT.Selection(selectionD, selectionT, ArrayNIT);
-		ArrayT = null;
-		ArrayET = null;
-		ArrayNET = null;
-		ArrayNIT = null;
-		YIT = null;
-		System.gc();
-timeEnd = System.currentTimeMillis();
-timeSec = (timeEnd - timeStart) / 1000.0f;
-Logger.info(">>> Model - Ethanol / Energy / Income timing: " + Float.toString(timeSec));
-		
-		
-timeStart = System.currentTimeMillis();
-		// Model_Habitat_Index
-		// Default
-		Model_Habitat_Index HID = new Model_Habitat_Index();
-		float ArrayHI_D[] = HID.Habitat_Index(selectionD, Rotation);
-		Model_Selection HIDS = new Model_Selection();
-		JsonNode SendBack_HID = HIDS.Selection(selectionD, selectionT, ArrayHI_D);
-		ArrayHI_D = null;
-		
-		// Transform
-		Model_Habitat_Index HIT = new Model_Habitat_Index();
-		float ArrayHI_T[] = HIT.Habitat_Index(selectionD, scenario.mNewRotation);
-		Model_Selection HITS = new Model_Selection();
-		JsonNode SendBack_HIT = HITS.Selection(selectionD, selectionT, ArrayHI_T);
-		ArrayHI_T = null;
-		System.gc();
-timeEnd = System.currentTimeMillis();
-timeSec = (timeEnd - timeStart) / 1000.0f;
-Logger.info(">>> Model - Habitat Index timing: " + Float.toString(timeSec));
-		
-		
-timeStart = System.currentTimeMillis();
-		// Models at watershed scale for Nitrogen and Phosphorus
-		// Default
-		Model_Nitrogen_Phosphorus N_P_D = new Model_Nitrogen_Phosphorus();
-		ThreeArrays ArrayN_P_D = N_P_D.Nitrogen_Phosphorus(selectionD, Rotation);
-		float ArrayND[] = ArrayN_P_D.a;
-		float ArrayPHD[] = ArrayN_P_D.b;
-		int TotalD[] = ArrayN_P_D.c_int;
-		float Min_ND = ArrayN_P_D.Min_a;
-		float Max_ND = ArrayN_P_D.Max_a;
-		float Min_PHD = ArrayN_P_D.Min_b;
-		float Max_PHD = ArrayN_P_D.Max_b;
-		float Min_TD = ArrayN_P_D.Min_c;
-		float Max_TD = ArrayN_P_D.Max_c;
-		
-		Model_Selection_N_P ND = new Model_Selection_N_P();
-		JsonNode SendBack_ND = ND.Selection_N_P(ArrayND, TotalD);
-		Model_Selection_N_P PHD = new Model_Selection_N_P();
-		JsonNode SendBack_PHD = PHD.Selection_N_P(ArrayPHD, TotalD);
-		ArrayN_P_D = null;
-		ArrayND = null;
-		ArrayPHD = null;
-		TotalD = null;
-		System.gc();
-		
-		// Transform
-		Model_Nitrogen_Phosphorus N_P_T = new Model_Nitrogen_Phosphorus();
-		ThreeArrays ArrayN_P_T = N_P_T.Nitrogen_Phosphorus(selectionD, scenario.mNewRotation);
-		float ArrayNT[] = ArrayN_P_T.a;
-		float ArrayPHT[] = ArrayN_P_T.b;
-		int TotalT[] = ArrayN_P_T.c_int;
-		float Min_NT = ArrayN_P_T.Min_a;
-		float Max_NT = ArrayN_P_T.Max_a;
-		float Min_PHT = ArrayN_P_T.Min_b;
-		float Max_PHT = ArrayN_P_T.Max_b;
-		float Min_TT = ArrayN_P_T.Min_c;
-		float Max_TT = ArrayN_P_T.Max_c;
-		
-		Model_Selection_N_P NT = new Model_Selection_N_P();
-		JsonNode SendBack_NT = NT.Selection_N_P(ArrayNT, TotalT);
-		Model_Selection_N_P PHT = new Model_Selection_N_P();
-		JsonNode SendBack_PHT = PHT.Selection_N_P(ArrayPHT, TotalT);
-		ArrayN_P_T = null;
-		ArrayNT = null;
-		ArrayPHT = null;
-		TotalT = null;
-		System.gc();
-timeEnd = System.currentTimeMillis();
-timeSec = (timeEnd - timeStart) / 1000.0f;
-Logger.info(">>> Model - Nitrogen / Phosphorus timing: " + Float.toString(timeSec));
+		// Run each model for the transformed landscape in turn...
+//		Model_HabitatIndex_New habitatIndex = new Model_HabitatIndex_New();
+//		habitatIndex.run(scenario.mNewRotation, width, height, "clientID");
+
+//		Model_PollinatorPestSuppression_New pestPollinator = new Model_PollinatorPestSuppression_New();
+//		pestPollinator.run(scenario.mNewRotation, width, height, "clientID");
+
+//		Model_NitrogenPhosphorus_New nitrogenPhosphorus = new Model_NitrogenPhosphorus_New();
+//		nitrogenPhosphorus.run(scenario.mNewRotation, width, height, "clientID");
+
+//		Model_EthanolNetEnergyIncome_New ethanolEnergyIncome = new Model_EthanolNetEnergyIncome_New();
+//		ethanolEnergyIncome.run(scenario.mNewRotation, width, height, "clientID");
 		
 		// SendBack to Client
-		ObjectNode SendBack  = JsonNodeFactory.instance.objectNode();
-		ObjectNode SendBackD = JsonNodeFactory.instance.objectNode();
-		ObjectNode SendBackT = JsonNodeFactory.instance.objectNode();
+		ObjectNode sendBack  = JsonNodeFactory.instance.objectNode();
+		Analyzer_Histogram histogram = new Analyzer_Histogram(scenario.mSelection);
 		
-		SendBackD.put("Ethanol", SendBack_ED);
-		SendBackT.put("Ethanol", SendBack_ET);
-		SendBackD.put("Net_Energy", SendBack_NED);
-		SendBackT.put("Net_Energy", SendBack_NET);
-		SendBackD.put("Net_Income", SendBack_NID);
-		SendBackT.put("Net_Income", SendBack_NIT);
-		SendBackD.put("Habitat_Index", SendBack_HID);
-		SendBackT.put("Habitat_Index", SendBack_HIT);
-		SendBackD.put("Nitrogen", SendBack_ND);
-		SendBackT.put("Nitrogen", SendBack_NT);
-		SendBackD.put("Phosphorus", SendBack_PHD);
-		SendBackT.put("Phosphorus", SendBack_PHT);
-		SendBackD.put("Pest_Suppression", SendBack_PSD);
-		SendBackT.put("Pest_Suppression", SendBack_PST);
-		SendBackD.put("Pollinator", SendBack_POD);
-		SendBackT.put("Pollinator", SendBack_POT);
+		sendBack.put("Habitat_Index", histogram.run(
+							new File("./layerData/default/habitat_index.dss"),
+							new File("./layerData/clientID/habitat_index.dss")));
 		
-		SendBack.put("Default",   SendBackD);
-		SendBack.put("Transform", SendBackT);
+		sendBack.put("Ethanol", histogram.run(
+							new File("./layerData/default/ethanol.dss"),
+							new File("./layerData/clientID/ethanol.dss")));
 		
-		Logger.info(SendBack.toString());
+		sendBack.put("Net_Energy", histogram.run(
+							new File("./layerData/default/net_energy.dss"),
+							new File("./layerData/clientID/net_energy.dss")));
+		
+		sendBack.put("Net_Income", histogram.run(
+							new File("./layerData/default/net_income.dss"),
+							new File("./layerData/clientID/net_income.dss")));
+		
+		sendBack.put("Nitrogen", histogram.run(
+							new File("./layerData/default/nitrogen.dss"),
+							new File("./layerData/clientID/nitrogen.dss")));
+		
+		sendBack.put("Phosphorus", histogram.run(
+							new File("./layerData/default/phosphorus.dss"),
+							new File("./layerData/clientID/phosphorus.dss")));
+		
+		sendBack.put("Pest_Suppression", histogram.run(
+							new File("./layerData/default/pest.dss"),
+							new File("./layerData/clientID/pest.dss")));
+		
+		sendBack.put("Pollinator", histogram.run(
+							new File("./layerData/default/pollinator.dss"),
+							new File("./layerData/clientID/pollinator.dss")));
+		Logger.info(sendBack.toString());
 		
 long modelTimeEnd = System.currentTimeMillis();
 timeSec = (modelTimeEnd - modelTimeStart) / 1000.0f;
 Logger.info("---- Model Process Finished ----");
 Logger.info("   Model total time: " + Float.toString(timeSec) + "s");
 		
-		return ok(SendBack);
+		return ok(sendBack);
+	}
+
+	//----------------------------------------------------------------------
+	public static Result runModelCluster() throws Exception 
+	{
+		Logger.info("----- Model Cluster Process Started ----");
+
+		JsonNode request = request().body().asJson();
+		
+		// Rotation
+		int[][] defaultRotation = Layer_Base.getLayer("Rotation").getIntData();
+		Layer_Base layer = Layer_Base.getLayer("Rotation");
+		int width = layer.getWidth(), height = layer.getHeight();
+		
+		Scenario scenario = Scenario.getCachedScenario(request.get("scenarioID").getTextValue());
+		
+		String modelType = request.get("modelType").getTextValue();
+		List<ModelResult> results = null;
+		
+		if (modelType.equals("yield")) {
+			Model_EthanolNetEnergyIncome_New ethanolEnergyIncome = new Model_EthanolNetEnergyIncome_New();
+			results = ethanolEnergyIncome.run(scenario.mNewRotation, width, height, "clientID");
+		}
+		else if (modelType.equals("n_p")) {
+			Model_NitrogenPhosphorus_New np = new Model_NitrogenPhosphorus_New();
+			results = np.run(scenario.mNewRotation, width, height, "clientID");
+		}
+		else if (modelType.equals("soc")) {
+			Model_SoilCarbon_New soc = new Model_SoilCarbon_New();
+			results = soc.run(scenario.mNewRotation, width, height, "clientID");
+		}
+		else if (modelType.equals("pest_pol")) {
+			Model_PollinatorPestSuppression_New pp = new Model_PollinatorPestSuppression_New();
+			results = pp.run(scenario.mNewRotation, width, height, "clientID");
+		}
+		else if (modelType.equals("nitrous")) {
+			Model_NitrousOxideEmissions_New n20 = new Model_NitrousOxideEmissions_New();
+			results = n20.run(scenario.mNewRotation, width, height, "clientID");
+		}
+		
+		else {//(modelType.equals("habitat_index")) {
+			Model_HabitatIndex_New hi = new Model_HabitatIndex_New();
+			results = hi.run(scenario.mNewRotation, width, height, "clientID");
+		}
+		
+		// SendBack to Client
+		ObjectNode sendBack  = JsonNodeFactory.instance.objectNode();
+		
+		if (results != null) {
+			Analyzer_Histogram histogram = new Analyzer_Histogram(scenario.mSelection);
+			
+			for (int i = 0; i < results.size(); i++) {
+				
+				ModelResult res = results.get(i);
+				
+				// Try to an in-memory compare of (usually) default...
+				//	if layer is not in memory, try doin a file-based compare
+				Logger.info("Procesing results for " + res.mName);
+				
+				String defaultCompare = "default/" + res.mName;
+				 // CRUTCH up SOC layer since it is not in DEFAULT/SOC in memory...
+				 if (modelType.equals("soc")) {
+					defaultCompare = "soc";
+				}
+				layer = Layer_Base.getLayer(defaultCompare);
+				
+				if (layer == null) {
+					// No layer data, try compare as a file...
+					// TODO: Add crutching up for SOC comparisons? will not be in /default....!
+					File compareTo = new File("./layerData/default/" + res.mName + ".dss");
+					sendBack.put(res.mName, histogram.run(compareTo, res.mWidth, res.mHeight, res.mRasterData));
+				}
+				else {
+					// other ayer should be in memory, try to compare with that.
+					float[][] data1 = layer.getFloatData();
+					if (data1 == null) {
+						Logger.info("could not get layer in runModelCluster");
+					}
+					else {
+						sendBack.put(res.mName, histogram.run(res.mWidth, res.mHeight, data1, res.mRasterData));
+					}
+				}
+			}
+		}
+		Logger.info("Done processing list of results, queuing results for file writer");
+		QueuedWriter.queueResults(results);
+
+		Logger.info(sendBack.toString());
+		return ok(sendBack);
 	}
 	
 	//----------------------------------------------------------------------
-	public static void WriteDelta(String InputFile, Selection selection)
+	public static Result getHeatmap() throws Exception 
 	{
-		// Open a file to write Delta for HI
-		int w = selection.mWidth;
-		int h = selection.mHeight;
-		int NO_DATA = -9999;
+		// Open up request from client...
+		JsonNode request = request().body().asJson();
+		String model = request.get("model").getTextValue();
+
+		String path1 = "./layerData/default/" + model + ".dss";
+		String path2 = "./layerData/clientID/" + model + ".dss";
 		
-		try
-		{
-			BufferedReader br1 = new HeaderRead(InputFile, w, h, "Default").getReader();
-			BufferedReader br2 = new HeaderRead(InputFile, w, h, "Client_ID").getReader();
-			
-			File output = new File("./layerData/Client_ID/Delta");
-			if(output.exists()) 
-			{
-				Logger.info("The Delta folder is already exist");
-			}
-			else 
-			{
-				output.mkdir();
-			}
-	
-			// Buffer writer
-			PrintWriter out1 = new HeaderWrite("Delta_" + InputFile, w, h, "Client_ID/Delta").getWriter();
-			
-			int y = 0;
-		
-			while (br1.ready() && br2.ready()) 
-			{
-				StringBuffer sb1 = new StringBuffer();
-				
-				if (y >= h) 
-				{
-					Logger.error("BAD READ - more lines than expected!");
-					break;
-				}
-				
-				String line1 = br1.readLine();
-				String split1[] = line1.split("\\s+");
-				String line2 = br2.readLine();
-				String split2[] = line2.split("\\s+");
-				
-				for (int x = 0; x < split1.length; x++) 
-				{	
-					//if (Integer.valueOf(split1[x]) == (int)NO_DATA) 
-					if (selection.mSelection[y][x] == 0)
-					{
-						sb1.append(Integer.toString(NO_DATA));
-					}
-					else
-					{
-						// Compare Default with After Transformation
-						float Delta = Float.parseFloat(split1[x]) - Float.parseFloat(split2[x]);
-						
-						sb1.append(String.format("%.4f", Delta));
-					}
-					if (x != w - 1) 
-					{
-						sb1.append(" ");
-					}
-					
-				}
-				
-				out1.println(sb1.toString());
-				
-				y++;
-			}
-			br1.close();
-			br2.close();
-		
-			out1.close();
-		}
-		catch (Exception e)
-		{
-			Logger.info(e.toString());
-		}
-	}
-	
-	//----------------------------------------------------------------------
-	public static float[] Max_Min(String InputFile, Selection selection)
-	{
-		// Open a file to write Delta
-		int w = selection.mWidth;
-		int h = selection.mHeight;
-		int NO_DATA = -9999;
-		float Max = -1000f;
-		float Min =  1000f;
-		float Min_Max[] = new float[2];
-		
-		try
-		{
-			BufferedReader br1 = new HeaderRead(InputFile, w, h, "Default").getReader();
-			BufferedReader br2 = new HeaderRead(InputFile, w, h, "Client_ID").getReader();
-			
-			int y = 0;
-		
-			while (br1.ready() && br2.ready()) 
-			{
-				StringBuffer sb1 = new StringBuffer();
-				
-				if (y >= h) 
-				{
-					Logger.error("BAD READ - more lines than expected!");
-					break;
-				}
-				
-				String line1 = br1.readLine();
-				String split1[] = line1.split("\\s+");
-				String line2 = br2.readLine();
-				String split2[] = line2.split("\\s+");
-				
-				for (int x = 0; x < split1.length; x++) 
-				{	
-					//if (Integer.valueOf(split1[x]) == (int)NO_DATA) 
-					//if (selection.mSelection[y][x] == 0)
-					if (Float.parseFloat(split1[x]) != -9999)
-					{
-						// Min
-						if (Float.parseFloat(split1[x]) < Min)
-						{
-							Min = Float.parseFloat(split1[x]);
-						}
-						else if (Float.parseFloat(split2[x]) < Min)
-						{
-							Min = Float.parseFloat(split2[x]);
-						}
-						// Max
-						if (Float.parseFloat(split1[x]) > Max)
-						{
-							Max = Float.parseFloat(split1[x]);
-						}
-						else if (Float.parseFloat(split2[x]) > Max)
-						{
-							Max = Float.parseFloat(split2[x]);
-						}
-					}
-				}
-				
-				y++;
-			}
-			br1.close();
-			br2.close();
-		}
-		catch (Exception e)
-		{
-			Logger.info(e.toString());
+		// BLURF, crutching up for SOC layer being handled/stored kind of differntly...
+		if (model.equals("soc")) {
+			path1 = "./layerData/soc.dss";
 		}
 		
-		Min_Max[0] = Min;
-		Min_Max[1] = Max;
-		return Min_Max;
-	}
-	
-	//----------------------------------------------------------------------
-	public static JsonNode Bins(float[] Array_Min_Max, String InputFile, Selection selection)
-	{
-		// Open a file to write Delta
-		int w = selection.mWidth;
-		int h = selection.mHeight;
-		int NO_DATA = -9999;
-		float Min = Array_Min_Max[0];
-		float Max = Array_Min_Max[1];
-		int Bin = 10;
-		int[] CountBin_D = new int [Bin];
-		int[] CountBin_T = new int [Bin];
-		float a = 0; float b = 0;
-		int Value_A, Value_B;
-		int Total_Cells = selection.countSelectedPixels();
-		float Total_A = 0; float Total_B = 0;
-		int i = 0;
+		Logger.info("Requesting heatmap for " + path1);
+		Logger.info("Requesting heatmap for " + path2);
 		
-		try
-		{
-			BufferedReader br1 = new HeaderRead(InputFile, w, h, "Default").getReader();
-			BufferedReader br2 = new HeaderRead(InputFile, w, h, "Client_ID").getReader();
-			
-			int y = 0;
+		File file1 = new File(path1);
+		File file2 = new File(path2);
 		
-			while (br1.ready() && br2.ready()) 
-			{
-				StringBuffer sb1 = new StringBuffer();
-				
-				if (y >= h) 
-				{
-					Logger.error("BAD READ - more lines than expected!");
-					break;
-				}
-				
-				String line1 = br1.readLine();
-				String split1[] = line1.split("\\s+");
-				String line2 = br2.readLine();
-				String split2[] = line2.split("\\s+");
-				
-				for (int x = 0; x < split1.length; x++) 
-				{
-					a = Float.parseFloat(split1[x]);
-					b = Float.parseFloat(split2[x]);
-					// Calculate Total for Entire Raster
-					Total_A = Total_A + a;
-					Total_B = Total_B + b;
-					//if (Integer.valueOf(split1[x]) == (int)NO_DATA) 
-					//if (selection.mSelection[y][x] == 0)
-					if (a != -9999 && b != -9999)
-					{
-							Value_A = (int)((a - Min)/(Max - Min) * (Bin - 1));
-							CountBin_D[Value_A]++;
-							Value_B = (int)((b - Min)/(Max - Min) * (Bin - 1));
-							CountBin_T[Value_B]++;
-					}
-				}
-				
-				y++;
-			}
-			br1.close();
-			br2.close();
-		}
-		catch (Exception e)
-		{
-			Logger.info(e.toString());
+		if (!file1.exists() || !file2.exists()) {
+			return ok(); // FIXME: not ok.
 		}
 		
-		// Data to return to the client	for Default and Transform	
-		ObjectNode Obj = JsonNodeFactory.instance.objectNode();
-		ObjectNode NodeD = JsonNodeFactory.instance.objectNode();
-		ObjectNode NodeT = JsonNodeFactory.instance.objectNode();
-		
-		// Default
-		ArrayNode Default = JsonNodeFactory.instance.arrayNode();
-		for (i = 0; i < CountBin_D.length; i++) 
-		{
-			Default.add(CountBin_D[i]);
-		}
-		
-		// Average of Default
-		float Average_A = Total_A / Total_Cells;
-		
-		NodeD.put("Result", Default);
-		NodeD.put("Min", Min);
-		NodeD.put("Max", Max);
-		NodeD.put("Average", Average_A);
-		
-		// Transform
-		ArrayNode Transform = JsonNodeFactory.instance.arrayNode();
-		for (i = 0; i < CountBin_T.length; i++) 
-		{
-			Transform.add(CountBin_T[i]);
-		}
-		
-		// Average of Transform
-		float Average_B = Total_B / Total_Cells;
-		
-		NodeT.put("Result", Transform);
-		NodeT.put("Min", Min);
-		NodeT.put("Max", Max);
-		NodeT.put("Average", Average_B);
-		
-		ObjectNode SendBack = JsonNodeFactory.instance.objectNode();
-		
-		SendBack.put("Default", NodeD);
-		SendBack.put("Transform", NodeT);
-		
-		return SendBack;
+		File outputFile = new File("./public/file/heat_max" + Integer.toString(mHeatCount++) +".png");
+		ObjectNode sendBack = Analyzer_Heatmap.run(file1, file2, 
+							outputFile, 
+							10);
+
+		sendBack.put("heatFile", outputFile.getName());
+		return ok(sendBack);
 	}
 }
 

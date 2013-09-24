@@ -10,6 +10,10 @@ import org.codehaus.jackson.node.*;
 //------------------------------------------------------------------------------
 public class Scenario 
 {
+	// Scenarios can be cached for sharing amongst other threads
+	private static Map<String, Scenario>	mCachedScenarios;
+	private long mCachedAtTime;
+	
 	public Selection mSelection; 
 	private String mOutputDir;
 	private JsonNode mConfiguration;
@@ -26,6 +30,106 @@ public class Scenario
 	public Scenario() {
 		
 	}
+
+	//--------------------------------------------------------------------------
+	public final int getWidth() {
+		if (mSelection != null) {
+			return mSelection.getWidth();
+		}
+		return 0;
+	}
+
+	//--------------------------------------------------------------------------
+	public final int getHeight() {
+		if (mSelection != null) {
+			return mSelection.getHeight();
+		}
+		return 0;
+	}
+	
+	// Returns a cacheStringID, which should be saved and returned to free the scenario...
+	//--------------------------------------------------------------------------
+	public static final String cacheScenario(Scenario theScenario, int clientID) {
+		
+		if (mCachedScenarios == null) {
+			mCachedScenarios = new HashMap<String, Scenario>();
+		}
+		
+		RandomString uniqueID = new RandomString();
+		int tryCount = 0;
+		while(tryCount < 1000) {
+			String scenarioCacheID = uniqueID.get(5) + 
+						Integer.toString(clientID) + 
+						((tryCount > 0) ? Integer.toString(tryCount) : "");
+			if (!mCachedScenarios.containsKey(scenarioCacheID)) {
+				mCachedScenarios.put(scenarioCacheID, theScenario);
+				theScenario.mCachedAtTime = System.currentTimeMillis();
+				return scenarioCacheID;
+			}
+			tryCount++;
+		}
+		
+		return null;
+	}
+	
+	//--------------------------------------------------------------------------
+	private static final void checkPurgeStaleScenarios() {
+		
+		if (mCachedScenarios == null) {
+			return;
+		}
+
+		// giving 5 minutes 		
+		long expireHours = 0 * 5 * 60 * 1000; // 0 hour -> minutes -> seconds -> milliseconds
+		long roughlyNow = System.currentTimeMillis();
+		for (Map.Entry<String, Scenario> entry : mCachedScenarios.entrySet()) {
+			Scenario value = entry.getValue();
+			if (roughlyNow - value.mCachedAtTime > expireHours) {
+				Logger.info("Warning - removing potentially stale scenario. " +
+					"Anything caching a scenario should be remove cached scenario when " +
+					"done using that scenario!");
+				String key = entry.getKey();
+				releaseCachedScenario(key);
+			}
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	public static final Scenario getCachedScenario(String cacheStringID) {
+		
+		if (mCachedScenarios == null) {
+			Logger.info("Attempting to fetch a scenario but the cache has not been initialized!");
+			return null;
+		}
+		Scenario res = mCachedScenarios.get(cacheStringID);
+		if (res == null) {
+			Logger.info("Attempting to fetch scenario named <" + cacheStringID + 
+							"> but that does not appear to be cached");
+			return null;
+		}
+		
+		return res;
+	}
+	
+	//--------------------------------------------------------------------------
+	public static final void releaseCachedScenario(String cacheStringID) {
+		
+		if (mCachedScenarios == null) {
+			Logger.info("Attempting to uncache a scenario but the cache has not been initialized!");
+			return;
+		}
+		
+		Scenario res = mCachedScenarios.get(cacheStringID);
+		if (res == null) {
+			Logger.info("Attempting to uncache acenario named <" + cacheStringID + 
+							"> but that does not appear to be cached");
+			return;
+		}
+		Logger.info(" - releasing cache for scenario, cache string named <" + cacheStringID + ">");
+		mCachedScenarios.put(cacheStringID, null);
+		mCachedScenarios.remove(cacheStringID);
+	}
+	
 	
 	//--------------------------------------------------------------------------
 /*	public JsonNode run() {

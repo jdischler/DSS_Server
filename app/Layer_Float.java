@@ -19,7 +19,13 @@ public class Layer_Float extends Layer_Base
 	//--------------------------------------------------------------------------
 	public Layer_Float(String name) {
 
-		super(name);
+		this(name, false); // not temporary
+	}
+	
+	//--------------------------------------------------------------------------
+	public Layer_Float(String name, boolean temporary) {
+
+		super(name, temporary);
 
 		mbInitedMinMaxCache = false;
 	}

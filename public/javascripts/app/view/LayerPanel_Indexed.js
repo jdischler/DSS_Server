@@ -52,7 +52,7 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
 			var cont = me.getComponent('legendcontainer');
 			for (var i = 0; i < me.DSS_LegendElements.length; i++) {
 				// add index for every other colouring
-//				me.DSS_LegendElements[i].DSS_LegendElementIndex = i-1;
+				me.DSS_LegendElements[i].DSS_LegendElementIndex = i-1;
 				var element = Ext.create('MyApp.view.LegendElement', 
 					me.DSS_LegendElements[i]);
 				cont.insert(i, element);
@@ -94,6 +94,7 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
 					var cont = this.getComponent('legendcontainer');
 					for (var i = 0; i < obj.length; i++) {
 						// add index for every other colouring
+						obj[i].DSS_LegendElementIndex = i-1;
 						var element = Ext.create('MyApp.view.LegendElement', 
 							obj[i]);
 						cont.insert(i, element);

@@ -31,6 +31,14 @@ public class Selection
 	}
 
 	//--------------------------------------------------------------------------
+	public final int getWidth() {
+		return mWidth;
+	}
+	public final int getHeight() {
+		return mHeight;
+	}
+	
+	//--------------------------------------------------------------------------
 	public boolean isSelected(int atX, int atY) {
 		
 		return (mSelection[atY][atX] > 0);

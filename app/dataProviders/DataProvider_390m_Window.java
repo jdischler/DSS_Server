@@ -32,7 +32,7 @@ public class DataProvider_390m_Window extends DataProvider {
 		mForestMask = Layer_Integer.convertIndicesToMask(11);
 		mGrassMask = Layer_Integer.convertIndicesToMask(8, 9);
 		
-		mProcessedLine = new float[4][];
+		mProcessedLine = new float[3][];
 		mProcessedLine[PROP_AG] = new float[mWidth];
 		mProcessedLine[PROP_FOREST] = new float[mWidth];
 		mProcessedLine[PROP_GRASS] = new float[mWidth];

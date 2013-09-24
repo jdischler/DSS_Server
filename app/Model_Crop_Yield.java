@@ -125,7 +125,8 @@ public class Model_Crop_Yield
 				}
 				else 
 				{
-					YI[i] = 0;
+					//YI[i] = 0;
+					YI[i] = -9999;
 				}
 				
 				i = i + 1;

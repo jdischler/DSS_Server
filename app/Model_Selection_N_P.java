@@ -32,7 +32,7 @@ public class Model_Selection_N_P
 		int Bin = 10;
 		int[] CountBin = new int [Bin];
 		int Total_Cells = 0;
-		float Per_Cell = 0;
+		float Sum = 0;
 		
 		// Load selection layer to the array
 		float Min =  1000000;
@@ -63,7 +63,7 @@ public class Model_Selection_N_P
 		
 		// Calculate average between selected cells
 		//Per_Cell = Total / (Total_Cells * Max);
-		Per_Cell = Total / Total_Cells;
+		Sum = Total;
 		
 		// Define Json to store and return data to client
 		ObjectNode obj = JsonNodeFactory.instance.objectNode();
@@ -72,7 +72,8 @@ public class Model_Selection_N_P
 		obj.put("Bins", ArrayS);
 		obj.put("Min", Min);
 		obj.put("Max", Max);
-		obj.put("Average", Per_Cell);
+		obj.put("Sum", Sum);
+		//obj.put("Count", totalCount);
 		
 		return obj;
 	}

@@ -22,7 +22,7 @@ public class Model_Soil_Carbon
 {
 	
 	//----------------------------------------------------------------------
-	public void Soil_Carbon(Selection selection, int[][] RotationD, int[][] RotationT)
+	public TwoArrays Soil_Carbon(Selection selection, int[][] RotationD, int[][] RotationT)
 	//public OneArray Soil_Carbon(Selection selection, int[][] RotationD, int[][] RotationT)
 	//public OneArray Soil_Carbon(float[] YI, Selection selection, int[][] RotationT)
 	//public void Net_Energy(float[] Corn_Y, float[] Grass_Y, float[] Soy_Y, float[] Alfalfa_Y, Selection selection, String Output_Folder, int[][] RotationT)
@@ -52,25 +52,33 @@ public class Model_Soil_Carbon
 		
 		// Raw Soil Carbon Change Factor (RSCCF) 
 		//float RSCCF_Corn_Soy = 1.0f; // Continuous Corn to Soy
-		float RSCCF_Corn_Grass = 1.63f; // Continuous Corn to Grass
-		float RSCCF_Corn_Alfalfa = 1.37f; // Continuous Corn to Alfalfa
-		float RSCCF_Soy_Grass = 1.63f; // Continuous Soy to Grass
-		float RSCCF_Soy_Alfalfa = 1.37f; // Continuous Soy to Alfalfa
-		float RSCCF_Grass_Alfalfa = 0.85f; // Continuous Grass to Alfalfa
+		//float RSCCF_Corn_Grass = 1.63f; // Continuous Corn to Grass
+		//float RSCCF_Corn_Alfalfa = 1.37f; // Continuous Corn to Alfalfa
+		//float RSCCF_Soy_Grass = 1.63f; // Continuous Soy to Grass
+		//float RSCCF_Soy_Alfalfa = 1.37f; // Continuous Soy to Alfalfa
+		//float RSCCF_Grass_Alfalfa = 0.85f; // Continuous Grass to Alfalfa
+		float RSCCF_Corn_Grass = 0.63f; // Continuous Corn to Grass
+		float RSCCF_Corn_Alfalfa = 0.37f; // Continuous Corn to Alfalfa
+		float RSCCF_Soy_Grass = 0.63f; // Continuous Soy to Grass
+		float RSCCF_Soy_Alfalfa = 0.37f; // Continuous Soy to Alfalfa
+		float RSCCF_Alfalfa_Grass = 0.59f; // Continuous Grass to Alfalfa
 		float factor = 1.0f;
+		float Adj_Factor = 0;
+		
 		// Soil Carbon
 		//int[] Soil_CarbonD = new float[Total_Cells];
 		//int[] Soil_CarbonT = new float[Total_Cells];
 		
-		//float Min_SC =  1000000;
-		//float Max_SC = -1000000;
+		float Min_SC =  1000000;
+		float Max_SC = -1000000;
 		
 		layer = Layer_Base.getLayer("Rotation");
 		width = layer.getWidth();
 		height = layer.getHeight();
 		
-		int[][] SOC_D = Layer_Base.getLayer("SOC").getIntData();
-		int[] SOC_T = new int[Total_Cells];
+		float[][] SOC = Layer_Base.getLayer("SOC").getFloatData();
+		float[] SOC_D = new float[Total_Cells];
+		float[] SOC_T = new float[Total_Cells];
 		
 		try 
 		{	
@@ -92,151 +100,211 @@ public class Model_Soil_Carbon
 					if (RotationD[y][x] == 0 || RotationT[y][x] == 0 || selection.mSelection[y][x] == 0) 
 					{
 						// Check for No-Data
+						SOC_D[i] = 0;
+						SOC_T[i] = 0;
 						sb_SC.append(stringNoData);
 					}
-					else
-					//else if (selection.mSelection[y][x] == 1)
+					//else
+					else if (selection.mSelection[y][x] == 1)
 					{
+						
+						// Calculate factors for each conversion
+						
 						// Corn to Grass
-						if ((RotationD[y][x] & Corn_Mask) > 0 && (RotationT[y][x] & Grass_Mask) > 0)
+						if ((RotationD[y][x] & Corn_Mask) > 0 && (RotationT[y][x] & Grass_Mask) > 0 && SOC[y][x] > 0)
 						{
 							
 							// Tonnes per Ha
 							factor = RSCCF_Corn_Grass;
+							//SOC_D[i] = SOC[y][x];
+							//SOC_T[i] = SOC[y][x] * factor * (-0.5938f * (float)(Math.log(SOC[y][x] * 0.1f) + 1.6524f));
 							//Soil_Carbon[i] = YI[i] + SOC[y][x] * RSR_Corn * 0.0058f;
 							// SOC_T[i] = (int)(SOC_D[y][x] * RSCCF_Corn_Grass * (-0.5938f * Math.log(SOC_D[y][x] * 0.1f) + 1.6524f));
 							//Min_SC = Min(Min_SC, Soil_Carbon[i]);
 							//Max_SC = Max(Max_SC, Soil_Carbon[i]);
 							
 							//i = i + 1;
-							
+							//sb_SC.append(Float.toString(SOC_T[i]));
 							//sb_SC.append(String.format("%.4f", SOC_T[i]));
 						}
 						// Corn to Alfalfa
-						else if ((RotationD[y][x] & Corn_Mask) > 0 && (RotationT[y][x] & Alfalfa_Mask) > 0)
+						else if ((RotationD[y][x] & Corn_Mask) > 0 && (RotationT[y][x] & Alfalfa_Mask) > 0 && SOC[y][x] > 0)
 						{
 							
 							// Tonnes per Ha
 							factor = RSCCF_Corn_Alfalfa;
+							//SOC_D[i] = SOC[y][x];
+							//SOC_T[i] = SOC[y][x] * factor * (-0.5938f * (float)(Math.log(SOC[y][x] * 0.1f) + 1.6524f));
 							//SOC_T[i] = (int)(SOC_D[y][x] * RSCCF_Corn_Alfalfa * (-0.5938f * Math.log(SOC_D[y][x] * 0.1f) + 1.6524f));
 							
 							//i = i + 1;
-							
+							//sb_SC.append(Float.toString(SOC_T[i]));
 							//sb_SC.append(String.format("%.4f", SOC_T[i]));
 						}
 						// Soy to Grass
-						else if ((RotationD[y][x] & Soy_Mask) > 0 && (RotationT[y][x] & Grass_Mask) > 0)
+						else if ((RotationD[y][x] & Soy_Mask) > 0 && (RotationT[y][x] & Grass_Mask) > 0 && SOC[y][x] > 0)
 						{
 							
 							// Tonnes per Ha
 							factor = RSCCF_Soy_Grass;
+							//SOC_D[i] = SOC[y][x];
+							//SOC_T[i] = SOC[y][x] * factor * (-0.5938f * (float)(Math.log(SOC[y][x] * 0.1f) + 1.6524f));
 							//SOC_T[i] = (int)(SOC_D[y][x] * RSCCF_Soy_Grass * (-0.5938f * Math.log(SOC_D[y][x] * 0.1f) + 1.6524));
 							
 							//i = i + 1;
-							
+							//sb_SC.append(Float.toString(SOC_T[i]));
 							//sb_SC.append(String.format("%.4f", SOC_T[i]));
 						}
 						// Soy to Alfalfa
-						else if ((RotationD[y][x] & Soy_Mask) > 0 && (RotationT[y][x] & Alfalfa_Mask) > 0)
+						else if ((RotationD[y][x] & Soy_Mask) > 0 && (RotationT[y][x] & Alfalfa_Mask) > 0 && SOC[y][x] > 0)
 						{
 							
 							// Tonnes per Ha
 							factor = RSCCF_Soy_Alfalfa;
+							//SOC_D[i] = SOC[y][x];
+							//SOC_T[i] = SOC[y][x] * factor * (-0.5938f * (float)(Math.log(SOC[y][x] * 0.1f) + 1.6524f));
 							//SOC_T[i] = SOC_D[y][x] * RSCCF_Soy_Alfalfa * (-0.5938f * Math.Log(SOC_D[y][x] * 0.1f) + 1.6524);
 							
 							//i = i + 1;
-							
+							//sb_SC.append(Float.toString(SOC_T[i]));
 							//sb_SC.append(String.format("%.4f", SOC_T[i]));
 						}
 						// Grass to Alfalfa
-						else if ((RotationD[y][x] & Grass_Mask) > 0 && (RotationT[y][x] & Alfalfa_Mask) > 0)
+						else if ((RotationD[y][x] & Alfalfa_Mask) > 0 && (RotationT[y][x] & Grass_Mask) > 0 && SOC[y][x] > 0)
 						{
 							
 							// Tonnes per Ha
-							factor = RSCCF_Grass_Alfalfa;
+							factor = RSCCF_Alfalfa_Grass;
+							//SOC_D[i] = SOC[y][x];
+							//SOC_T[i] = SOC[y][x] * factor * (-0.5938f * (float)(Math.log(SOC[y][x] * 0.1f) + 1.6524f));
 							//SOC_T[i] = SOC_D[y][x] * RSCCF_Grass_Alfalfa * (-0.5938f * Math.Log(SOC_D[y][x] * 0.1f) + 1.6524);
 							
 							//i = i + 1;
-							
+							//sb_SC.append(Float.toString(SOC_T[i]));
 							//sb_SC.append(String.format("%.4f", SOC_T[i]));
 						}
 						// Grass to Corn
-						else if ((RotationD[y][x] & Grass_Mask) > 0 && (RotationT[y][x] & Corn_Mask) > 0)
+						else if ((RotationD[y][x] & Grass_Mask) > 0 && (RotationT[y][x] & Corn_Mask) > 0 && SOC[y][x] > 0)
 						{
 							
 							// Tonnes per Ha
-							factor = 1 / RSCCF_Corn_Grass;
+							factor = - RSCCF_Corn_Grass;
+							//factor = 1 / RSCCF_Corn_Grass;
+							//SOC_D[i] = SOC[y][x];
+							//SOC_T[i] = SOC[y][x] * factor * (-0.5938f * (float)(Math.log(SOC[y][x] * 0.1f) + 1.6524f));
 							//SOC_T[i] = SOC_D[y][x] * (-0.5938f * Math.Log(SOC_D[y][x] * 0.1f) + 1.6524) / RSCCF_Corn_Grass;
 							
 							//i = i + 1;
-							
+							//sb_SC.append(Float.toString(SOC_T[i]));
 							//sb_SC.append(String.format("%.4f", SOC_T[i]));
 						}
 						// Alfalfa to Corn
-						else if ((RotationD[y][x] & Alfalfa_Mask) > 0 && (RotationT[y][x] & Corn_Mask) > 0)
+						else if ((RotationD[y][x] & Alfalfa_Mask) > 0 && (RotationT[y][x] & Corn_Mask) > 0 && SOC[y][x] > 0)
 						{
 							
 							// Tonnes per Ha
-							factor = 1 / RSCCF_Corn_Alfalfa;
+							//factor = 1 / RSCCF_Corn_Alfalfa;
+							factor = - RSCCF_Corn_Alfalfa;
+							//SOC_D[i] = SOC[y][x];
+							//SOC_T[i] = SOC[y][x] * factor * (-0.5938f * (float)(Math.log(SOC[y][x] * 0.1f) + 1.6524f));
 							//SOC_T[i] = SOC_D[y][x] * (-0.5938f * Math.Log(SOC_D[y][x] * 0.1f) + 1.6524) / RSCCF_Corn_Alfalfa;
 							
 							//i = i + 1;
-							
+							//sb_SC.append(Float.toString(SOC_T[i]));
 							//sb_SC.append(String.format("%.4f", SOC_T[i]));
 						}
 						// Grass to Soy
-						else if ((RotationD[y][x] & Grass_Mask) > 0 && (RotationT[y][x] & Soy_Mask) > 0)
+						else if ((RotationD[y][x] & Grass_Mask) > 0 && (RotationT[y][x] & Soy_Mask) > 0 && SOC[y][x] > 0)
 						{
 							
 							// Tonnes per Ha
-							factor = 1 / RSCCF_Soy_Grass;
+							factor = - RSCCF_Soy_Grass;
+							//factor = 1 / RSCCF_Soy_Grass;
+							//SOC_D[i] = SOC[y][x];
+							//SOC_T[i] = SOC[y][x] * factor * (-0.5938f * (float)(Math.log(SOC[y][x] * 0.1f) + 1.6524f));
 							//SOC_T[i] = SOC_D[y][x] * (-0.5938f * Math.Log(SOC_D[y][x] * 0.1f) + 1.6524) / RSCCF_Soy_Grass;
 							
 							//i = i + 1;
-							
+							//sb_SC.append(Float.toString(SOC_T[i]));
 							//sb_SC.append(String.format("%.4f", SOC_T[i]));
 						}
 						// Alfalfa to Soy
-						else if ((RotationD[y][x] & Alfalfa_Mask) > 0 && (RotationT[y][x] & Soy_Mask) > 0)
+						else if ((RotationD[y][x] & Alfalfa_Mask) > 0 && (RotationT[y][x] & Soy_Mask) > 0 && SOC[y][x] > 0)
 						{
 							
 							// Tonnes per Ha
-							factor = 1 / RSCCF_Soy_Alfalfa;
+							factor = - RSCCF_Soy_Alfalfa;
+							//factor = 1 / RSCCF_Soy_Alfalfa;
+							//SOC_D[i] = SOC[y][x];
+							//SOC_T[i] = SOC[y][x] * factor * (-0.5938f * (float)(Math.log(SOC[y][x] * 0.1f) + 1.6524f));
 							//SOC_T[i] = SOC_D[y][x] * (-0.5938f * Math.Log(SOC_D[y][x] * 0.1f) + 1.6524) / RSCCF_Soy_Alfalfa;
 							
 							//i = i + 1;
-							
+							//sb_SC.append(Float.toString(SOC_T[i]));
 							//sb_SC.append(String.format("%.4f", SOC_T[i]));
 						}
 						// Alfalfa to Grass
-						else if ((RotationD[y][x] & Alfalfa_Mask) > 0 && (RotationT[y][x] & Grass_Mask) > 0)
+						else if ((RotationD[y][x] & Grass_Mask) > 0 && (RotationT[y][x] & Alfalfa_Mask) > 0 && SOC[y][x] > 0)
 						{
 							
 							// Tonnes per Ha
-							factor = 1 / RSCCF_Grass_Alfalfa;
+							factor = - RSCCF_Alfalfa_Grass;
+							//factor = 1 / RSCCF_Grass_Alfalfa;
+							//SOC_D[i] = SOC[y][x];
+							//SOC_T[i] = SOC[y][x] * factor * (-0.5938f * (float)(Math.log(SOC[y][x] * 0.1f) + 1.6524f));
 							//SOC_T[i] = SOC_D[y][x] * (-0.5938f * Math.Log(SOC_D[y][x] * 0.1f) + 1.6524) / RSCCF_Grass_Alfalfa;
 							
 							//i = i + 1;
-							
+							//sb_SC.append(Float.toString(SOC_T[i]));
 							//sb_SC.append(String.format("%.4f", SOC_T[i]));
 						}
 						else 
 						{
-							factor = 1;
+							factor = 0;
+							//SOC_D[i] = 0;
+							//SOC_T[i] = 0;
 							//SOC_T[i] = SOC_D[i];
+							//sb_SC.append(stringNoData);
 							//sb_SC.append(String.format("%.4f", SOC_T[i]));
 						}
 						
-						SOC_T[i] = (int)(SOC_D[y][x] * factor * (-0.5938f * Math.log10(SOC_D[y][x] * 0.1f) + 1.6524f));
-						//sb_SC.append(String.format("%.4f", SOC_T[i]));
-						sb_SC.append(Integer.toString(SOC_T[i]));
+						// Calculate equation based on calculated factor and SOC layer
+						if (SOC[y][x] > 0)
+						{
+							SOC_D[i] = SOC[y][x];
+							
+							Adj_Factor = -0.5938f * (float)(Math.log(SOC[y][x] * 0.1f)) + 1.6524f;
+							
+							if (Adj_Factor <= 0.2f)
+							{
+								Adj_Factor = 0.2f;
+							}
+							else if (Adj_Factor >= 1.2f)
+							{
+								Adj_Factor = 1.2f;
+							}
+							
+							SOC_T[i] = SOC[y][x] + SOC[y][x] * factor * Adj_Factor;
+							
+							sb_SC.append(Float.toString(SOC_T[i]));
+						}
+						else
+						{
+							SOC_D[i] = 0;
+							SOC_T[i] = 0;
+							sb_SC.append(stringNoData);
+						}
 						
-						i = i + 1;
+						//sb_SC.append(String.format("%.4f", SOC_T[i]));
+						//sb_SC.append(Float.toString(SOC_T[i]));
+						
 					}
 					if (x != width - 1) 
 					{
 						sb_SC.append(" ");
 					}
+					
+					i = i + 1;
 				}
 				
 				out_SC.println(sb_SC.toString());
@@ -252,33 +320,35 @@ public class Model_Soil_Carbon
 		}
 		
 		Logger.info("Model_Soil_Carbon is finished");
-				
+		
+		//return SOC_T;
+		return new TwoArrays(SOC_D, SOC_T, Min_SC, Max_SC, Min_SC, Max_SC);
 		//return new OneArray(Soil_Carbon, Min_SC, Max_SC);
 	}
 	
 	// Min
-	public float Min(float Min, float Num)
-	{ 
-		// Min
-		if (Num < Min)
-		{
-			Min = Num;
-		}
-		
-		return Min;
-	}
-	
-	// Max
-	public float Max(float Max, float Num)
-	{
-
-		// Max
-		if (Num > Max)
-		{
-			Max = Num;
-		}
-		
-		return Max;
-	}
+	// public float Min(float Min, float Num)
+	// { 
+		// // Min
+		// if (Num < Min)
+		// {
+			// Min = Num;
+		// }
+		// 
+		// return Min;
+	// }
+	// 
+	// // Max
+	// public float Max(float Max, float Num)
+	// {
+// 
+		// // Max
+		// if (Num > Max)
+		// {
+			// Max = Num;
+		// }
+		// 
+		// return Max;
+	// }
 	
 }

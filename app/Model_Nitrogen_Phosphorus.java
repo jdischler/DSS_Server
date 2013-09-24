@@ -22,7 +22,7 @@ public class Model_Nitrogen_Phosphorus
 {
 
 	//--------------------------------------------------------------------------
-	public ThreeArrays Nitrogen_Phosphorus(Selection selection, int[][] RotationT)
+	public ThreeArrays Nitrogen_Phosphorus(Selection selection, int[][] RotationT, String Output_Folder)
 	//public TwoArrays Nitrogen_Phosphorus(Selection selection, int[][] RotationT)
 	//public void Nitrogen_Phosphorus(Selection selection, String Output_Folder, int[][] RotationT)
 	{
@@ -124,14 +124,14 @@ public class Model_Nitrogen_Phosphorus
 				//Logger.info("Nitrogen for watershed " + Integer.toString(i) + " is: " + Float.toString(Nitrogen[i]));
 				//Logger.info("Phosphorus for watershed " + Integer.toString(i) + " is: " + Float.toString(Phosphorus[i]));
 				
-				Min_T = Min(Min_T, Total[i]);
-				Max_T = Max(Max_T, Total[i]);
+				//Min_T = Min(Min_T, Total[i]);
+				//Max_T = Max(Max_T, Total[i]);
 				
-				Min_N = Min(Min_N, Nitrogen[i]);
-				Max_N = Max(Max_N, Nitrogen[i]);
+				//Min_N = Min(Min_N, Nitrogen[i]);
+				//Max_N = Max(Max_N, Nitrogen[i]);
 				
-				Min_P = Min(Min_P, Phosphorus[i]);
-				Max_P = Max(Max_P, Phosphorus[i]);
+				//Min_P = Min(Min_P, Phosphorus[i]);
+				//Max_P = Max(Max_P, Phosphorus[i]);
 			}
 			
 			// Raad input file for watershed layer
@@ -207,28 +207,28 @@ public class Model_Nitrogen_Phosphorus
 	}
 
 	// Min
-	public float Min(float Min, float Num)
-	{ 
-		// Min
-		if (Num < Min)
-		{
-			Min = Num;
-		}
-		
-		return Min;
-	}
+	// public float Min(float Min, float Num)
+	// { 
+		// // Min
+		// if (Num < Min)
+		// {
+			// Min = Num;
+		// }
+		// 
+		// return Min;
+	// }
 	
 	// Max
-	public float Max(float Max, float Num)
-	{
-
-		// Max
-		if (Num > Max)
-		{
-			Max = Num;
-		}
-		
-		return Max;
-	}	
+	// public float Max(float Max, float Num)
+	// {
+		// 
+		// // Max
+		// if (Num > Max)
+		// {
+			// Max = Num;
+		// }
+		// 
+		// return Max;
+	// }	
 	
 }

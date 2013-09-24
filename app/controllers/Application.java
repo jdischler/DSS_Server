@@ -245,14 +245,14 @@ timeStart = System.currentTimeMillis();
 		// Model_Nitrous_Oxide_Emissions
 		// Default
 		Model_Nitrous_Oxide_Emissions NOED = new Model_Nitrous_Oxide_Emissions();
-		float ArrayNOE_D[] = NOED.Nitrous_Oxide_Emissions(selectionD, Rotation);
+		float ArrayNOE_D[] = NOED.Nitrous_Oxide_Emissions(selectionD, Rotation, "folder");
 		Model_Selection NOE_D = new Model_Selection();
 		JsonNode SendBack_NOED = NOE_D.Selection(selectionD, selectionT, ArrayNOE_D);
 		ArrayNOE_D = null;
 		
 		// Transform
 		Model_Nitrous_Oxide_Emissions NOET = new Model_Nitrous_Oxide_Emissions();
-		float ArrayNOE_T[] = NOET.Nitrous_Oxide_Emissions(selectionD, scenario.mNewRotation);
+		float ArrayNOE_T[] = NOET.Nitrous_Oxide_Emissions(selectionD, scenario.mNewRotation, "folder");
 		Model_Selection NOE_T = new Model_Selection();
 		JsonNode SendBack_NOET = NOE_T.Selection(selectionD, selectionT, ArrayNOE_T);
 		ArrayNOE_T = null;
@@ -270,7 +270,7 @@ timeStart = System.currentTimeMillis();
 		// Regular Models
 		// Default
 		Model_Ethanol_Net_Energy_Income ENENID = new Model_Ethanol_Net_Energy_Income();
-		ThreeArrays ArrayD = ENENID.Ethanol_Net_Energy_Income(YID, selectionD, Rotation);
+		ThreeArrays ArrayD = ENENID.Ethanol_Net_Energy_Income(YID, selectionD, Rotation, "folder");
 		float ArrayED[] = ArrayD.a;
 		float ArrayNED[] = ArrayD.b;
 		float ArrayNID[] = ArrayD.c_float;
@@ -300,7 +300,7 @@ timeStart = System.currentTimeMillis();
 		
 		// Transform
 		Model_Ethanol_Net_Energy_Income ENENIT = new Model_Ethanol_Net_Energy_Income();
-		ThreeArrays ArrayT = ENENIT.Ethanol_Net_Energy_Income(YIT, selectionD, scenario.mNewRotation);
+		ThreeArrays ArrayT = ENENIT.Ethanol_Net_Energy_Income(YIT, selectionD, scenario.mNewRotation, "folder");
 		float ArrayET[] = ArrayT.a;
 		float ArrayNET[] = ArrayT.b;
 		float ArrayNIT[] = ArrayT.c_float;
@@ -353,7 +353,7 @@ timeStart = System.currentTimeMillis();
 		// Models at watershed scale for Nitrogen and Phosphorus
 		// Default
 		Model_Nitrogen_Phosphorus N_P_D = new Model_Nitrogen_Phosphorus();
-		ThreeArrays ArrayN_P_D = N_P_D.Nitrogen_Phosphorus(selectionD, Rotation);
+		ThreeArrays ArrayN_P_D = N_P_D.Nitrogen_Phosphorus(selectionD, Rotation, "folder");
 		float ArrayND[] = ArrayN_P_D.a;
 		float ArrayPHD[] = ArrayN_P_D.b;
 		int TotalD[] = ArrayN_P_D.c_int;
@@ -376,7 +376,7 @@ timeStart = System.currentTimeMillis();
 		
 		// Transform
 		Model_Nitrogen_Phosphorus N_P_T = new Model_Nitrogen_Phosphorus();
-		ThreeArrays ArrayN_P_T = N_P_T.Nitrogen_Phosphorus(selectionD, scenario.mNewRotation);
+		ThreeArrays ArrayN_P_T = N_P_T.Nitrogen_Phosphorus(selectionD, scenario.mNewRotation, "folder");
 		float ArrayNT[] = ArrayN_P_T.a;
 		float ArrayPHT[] = ArrayN_P_T.b;
 		int TotalT[] = ArrayN_P_T.c_int;

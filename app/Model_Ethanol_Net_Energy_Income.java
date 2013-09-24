@@ -117,11 +117,11 @@ public class Model_Ethanol_Net_Energy_Income
 		try
 		{
 			// Ethanol
-			PrintWriter out_E = new HeaderWrite("Ethanol", width, height, Output).getWriter();
+			PrintWriter out_E = new HeaderWrite("Ethanol", width, height, Output_Folder).getWriter();
 			// Net Energy
-			PrintWriter out_NE = new HeaderWrite("Net_Energy", width, height, Output).getWriter();
+			PrintWriter out_NE = new HeaderWrite("Net_Energy", width, height, Output_Folder).getWriter();
 			// Net Income
-			PrintWriter out_NI = new HeaderWrite("Net_Income", width, height, Output).getWriter();
+			PrintWriter out_NI = new HeaderWrite("Net_Income", width, height, Output_Folder).getWriter();
 			
 			// Precompute this so we don't do it on every cell
 			String stringNoData = Integer.toString(NO_DATA);
@@ -244,9 +244,9 @@ public class Model_Ethanol_Net_Energy_Income
 							Net_Income[i] = -9999;
 						}
 						
-						sb_NOE.append(E[i]);
-						sb_NOE.append(NE[i]);
-						sb_NOE.append(NI[i]);
+						sb_E.append(Ethanol[i]);
+						sb_NE.append(Net_Energy[i]);
+						sb_NI.append(Net_Income[i]);
 						
 					}
 					if (x != width - 1) 
@@ -308,3 +308,4 @@ public class Model_Ethanol_Net_Energy_Income
 	// }
 	
 }
+

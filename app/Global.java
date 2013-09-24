@@ -3,6 +3,8 @@ package util;
 import play.*;
 import java.util.*;
 import java.io.*;
+import java.nio.*;
+import java.nio.channels.*;
 
 import org.codehaus.jackson.*;
 import org.codehaus.jackson.node.*;
@@ -19,6 +21,8 @@ public class Global extends GlobalSettings
 	@Override
 	public void onStart(play.Application app) 
 	{
+//		convertFolderBinariesToASC("./layerData/default/", "./layerData/defaultConverted/");
+		
 		systemReport("Application has started");
 		
 		// create any computed layers (currently don't have any in here?)
@@ -191,6 +195,95 @@ public class Global extends GlobalSettings
 				catch(Exception e) {
 					// blah, java exception handling...
 				}
+			}
+		}
+	}
+	
+	// converts all .DSS files in a given folder to ASC. E.g. convert...("./layerData/default");
+	//-----------------------------------------------------------
+	private void convertFolderBinariesToASC(String folderPath, String destPath) {
+
+		File folder = new File(folderPath);
+		if (!folder.isDirectory()) {
+			Logger.info(folderPath + " is not a directory!!");
+			return;
+		}
+		
+		// get all files in that directory...
+		File[] listOfFiles = folder.listFiles();
+		if (listOfFiles != null) {
+			for (int i = 0; i < listOfFiles.length; i++) {
+				
+				File sourceBinary = listOfFiles[i];
+				// extract off just the name of that file in the directory...
+				String destFile = sourceBinary.getName();
+				// make sure it has a .dss it in...
+				if (destFile.indexOf(".dss") > 0) {
+					// make dest dir if needed
+					File destDir = new File(destPath);
+					if (!destDir.exists()) {
+						destDir.mkdirs();
+					}
+					// now create the new final path....with the new .asc file extension...
+					destFile = destPath + destFile.replace(".dss", ".asc");
+					
+					Binary_Reader fileReader = new Binary_Reader(sourceBinary);
+					if (fileReader.readHeader()) {
+						
+						PrintWriter ascOut = null;
+						int width = fileReader.getWidth(), height = fileReader.getHeight();
+						try 
+						{
+							ascOut = new PrintWriter(new BufferedWriter(new FileWriter(destFile)));
+							ascOut.println("ncols         " + Integer.toString(width));
+							ascOut.println("nrows         " + Integer.toString(height));
+							ascOut.println("xllcorner     -10062652.65061");
+							ascOut.println("yllcorner     5249032.6922889");
+							ascOut.println("cellsize      30");
+							ascOut.println("NODATA_value  -9999");
+						} 
+						catch (Exception err) 
+						{
+							Logger.info(err.toString());
+						}
+						
+						if (ascOut != null) {	
+							String stringNoData = Integer.toString(-9999);
+
+							for (int y = 0; y < height; y++) {
+								ByteBuffer buff = fileReader.readLine();
+								StringBuffer ascLine = new StringBuffer();
+
+								if (buff != null) {
+									for (int x=0; x < width; x++) {
+										float data = buff.getFloat(x * 4); // blah, 4 = size of float, ie 32bit
+										if (data > -9999.0f) {
+											ascLine.append(Float.toString(data));
+										}
+										else {
+											ascLine.append(stringNoData);
+										}
+										if (x != width - 1) {
+											ascLine.append(" ");
+										}
+									}
+								}
+								ascOut.println(ascLine.toString());
+							}
+							fileReader.close();
+							try {
+								ascOut.close();
+							}
+							catch (Exception err) {
+								Logger.info(err.toString());
+							}
+						}
+					}
+					else {
+						Logger.info("File read problem with file: " + sourceBinary.toString());
+					}
+				}
+				Logger.info(destFile);
 			}
 		}
 	}

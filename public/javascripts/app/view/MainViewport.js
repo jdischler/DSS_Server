@@ -327,7 +327,7 @@ Ext.define('MyApp.view.MainViewport', {
 		var lpSlope = Ext.create('MyApp.view.LayerPanel_Continuous', {
 			title: 'Slope',
 			DSS_Layer: wmsSlope,
-			DSS_LayerUnit: '\xb0',
+			DSS_LayerUnit: '%',//'\xb0',
 			DSS_LayerRangeMin: 0,
 			DSS_LayerRangeMax: 45.5,
 			DSS_ValueDefaultGreater: 10,

@@ -18,7 +18,7 @@ var ScenarioGridStore = Ext.create('Ext.data.Store', {
         		queryLayers: [{
 					name: 'rotation',
 					type: 'indexed',
-					matchValues: [1,2,3,5]
+					matchValues: [1,2,3]
         		},
         		{
         			greaterThanTest: '>=',
@@ -243,6 +243,9 @@ Ext.define('MyApp.view.ScenarioTools', {
 			var dssLeftPanel = Ext.getCmp('DSS_LeftPanel');
 			dssLeftPanel.up().DSS_SetTitle(record.get('SelectionName'));
 
+		},
+		viewready: function(me, eOpts ) {
+			me.getSelectionModel().select(0);
 		}
 	},
 	//--------------------------------------------------------------------------

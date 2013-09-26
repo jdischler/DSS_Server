@@ -4,7 +4,7 @@ Ext.define('MyApp.view.ModelGraph', {
     
     id: "Model_Graph",
     
-    height: 220,
+    height: 260,
     width: 500,
         layout: {
         type: 'absolute'
@@ -48,7 +48,7 @@ Ext.define('MyApp.view.ModelGraph', {
 			    x: 250,
 			    y: 10,
 			    width: 160,
-			    fieldLabel: 'Soil Carbon',
+			    fieldLabel: 'Soil Carbon (Tg)',
 			    labelWidth: 80,
 			    labelAlign: 'right'
 			},
@@ -88,7 +88,7 @@ Ext.define('MyApp.view.ModelGraph', {
 			    x: 250,
 			    y: 70,
 			    width: 160,
-			    fieldLabel: 'Net Energy',
+			    fieldLabel: 'Net Energy (TJ)',
 			    labelWidth: 80,
 			    labelAlign: 'right'
 			},
@@ -108,7 +108,7 @@ Ext.define('MyApp.view.ModelGraph', {
 			    x: 250,
 			    y: 100,
 			    width: 160,
-			    fieldLabel: 'Net Income',
+			    fieldLabel: 'Net Income ($ million)',
 			    labelWidth: 80,
 			    labelAlign: 'right'
 			},
@@ -118,7 +118,7 @@ Ext.define('MyApp.view.ModelGraph', {
 			    x: 0,
 			    y: 130,
 			    width: 160,
-			    fieldLabel: 'Fuel',
+			    fieldLabel: 'Fuel (Gl)',
 			    labelWidth: 80,
 			    labelAlign: 'right'
 			},
@@ -422,6 +422,22 @@ Ext.define('MyApp.view.ModelGraph', {
 			    	this.up().clearFields();
 			    }
 			},
+			{
+				xtype: 'container',
+				itemId: 'heatlegendcontainer',
+				x: 10,
+				y: 200,
+				style: {
+//					border: '1px solid #c0c0c0'
+					border: '1px solid #f0f0f0'
+				},
+				width: 358,
+				layout: {
+//					align: 'stretch',
+//					type: 'vbox'
+					type: 'hbox'
+				}
+			}
 	    ]
         });
         
@@ -665,7 +681,17 @@ Ext.define('MyApp.view.ModelGraph', {
 
     //--------------------------------------------------------------------------
     showHeatmap: function(button) {
-
+    	    	//
+		var cont = button.up().getComponent('heatlegendcontainer');
+		for (var i = 0; i < 8/*obj.length*/; i++) {
+			// add index for every other colouring
+			//obj[i].DSS_LegendElementIndex = i-1;
+			var element = Ext.create('MyApp.view.HeatMapLegend', 
+				/*obj[i]*/button);
+			cont.add(element);
+		}
+		//return;
+		
 		if (button.DSS_Layer) { 
 			globalMap.removeLayer(button.DSS_Layer);
 			button.DSS_Layer = null;
@@ -683,6 +709,16 @@ Ext.define('MyApp.view.ModelGraph', {
 					var obj= JSON.parse(response.responseText);
 					console.log("success: ");
 					console.log(obj);
+					
+					var cont = button.up().getComponent('heatlegendcontainer');
+					for (var i = 0; i < 8/*obj.length*/; i++) {
+						// add index for every other colouring
+						//obj[i].DSS_LegendElementIndex = i-1;
+						var element = Ext.create('MyApp.view.HeatMapLegend', 
+							/*obj[i]*/obj);
+						cont.insert(i, element);
+					}
+					
 					Ext.defer(function(obj) {		
 						var bounds = new OpenLayers.Bounds(
 							-10062652.65061, 5278060.469521415,
@@ -756,8 +792,9 @@ Ext.define('MyApp.view.ModelGraph', {
     	if (obj.soc) {
     		var data = obj.soc;
     		var field = 'soc';
-			var dat_1 = data.file1.sum;
-			var dat_2 = data.file2.sum;
+    		// Total Tera Grams
+			var dat_1 = data.file1.sum * 0.09 / 1000000;
+			var dat_2 = data.file2.sum * 0.09 / 1000000;
 			var value = (dat_2 - dat_1).toFixed(4);
 			spiderPanel.setSpiderDataElement(dat_1, dat_2, field);
 			this.getComponent('value_' + field).setValue(value).setFieldStyle(clearSpinnerStyle);
@@ -768,8 +805,9 @@ Ext.define('MyApp.view.ModelGraph', {
     	if (obj.ethanol) {
     		var data = obj.ethanol;
     		var field = 'ethanol';
-			var dat_1 = data.file1.sum;
-			var dat_2 = data.file2.sum;
+    		// Total Giga Liter
+			var dat_1 = data.file1.sum * 0.09 / 1000000;
+			var dat_2 = data.file2.sum * 0.09 / 1000000;
 			var value = (dat_2 - dat_1).toFixed(4);
 			spiderPanel.setSpiderDataElement(dat_1, dat_2, field);
 			this.getComponent('value_' + field).setValue(value).setFieldStyle(clearSpinnerStyle);
@@ -780,8 +818,9 @@ Ext.define('MyApp.view.ModelGraph', {
 		if (obj.net_income) {
     		var data = obj.net_income;
     		var field = 'net_income';
-			var dat_1 = data.file1.sum;
-			var dat_2 = data.file2.sum;
+    		// Total Million Dollar $
+			var dat_1 = data.file1.sum * 0.09 / 1000000;
+			var dat_2 = data.file2.sum * 0.09 / 1000000;
 			var value = (dat_2 - dat_1).toFixed(4);
 			spiderPanel.setSpiderDataElement(dat_1, dat_2, field);
 			this.getComponent('value_' + field).setValue(value).setFieldStyle(clearSpinnerStyle);
@@ -792,8 +831,9 @@ Ext.define('MyApp.view.ModelGraph', {
 		if (obj.net_energy) {    	
     		var data = obj.net_energy;
     		var field = 'net_energy';
-			var dat_1 = data.file1.sum;
-			var dat_2 = data.file2.sum;
+    		// Total Tera Jul
+			var dat_1 = data.file1.sum * 0.09 / 1000000;
+			var dat_2 = data.file2.sum * 0.09 / 1000000;
 			var value = (dat_2 - dat_1).toFixed(4);
 			spiderPanel.setSpiderDataElement(dat_1, dat_2, field);
 			this.getComponent('value_' + field).setValue(value).setFieldStyle(clearSpinnerStyle);

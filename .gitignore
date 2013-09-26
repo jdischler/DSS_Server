@@ -29,3 +29,10 @@ dist
 *.marks
 
 *.dss
+
+*.ovr
+*.adf
+*.dat
+*.nit
+*.aux.xml
+*.dir

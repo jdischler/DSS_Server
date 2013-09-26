@@ -56,6 +56,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					itemId: 'result_habitat_index',
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'habitat_index',
+					DSS_UnitLabel: '-1 to 1',
 					DSS_Label: 'Bird Habitat',
 					DSS_GraphTitle: 'Bird Habitat Index'
 				},{
@@ -63,24 +64,27 @@ Ext.define('MyApp.view.Report_Detail', {
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'soc',
 					DSS_Label: 'Soil Carbon',
-					DSS_UnitLabel: 'Tg',
+					DSS_UnitLabel: 'Mg',
 					DSS_GraphTitle: 'Soil Carbon'
 				},{
 					itemId: 'result_nitrogen',
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'nitrogen',
+					DSS_UnitLabel: 'mg/l',
 					DSS_Label: 'Nitrogen',
 					DSS_GraphTitle: 'Nitrogen Runoff'
 				},{
 					itemId: 'result_phosphorus',
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'phosphorus',
+					DSS_UnitLabel: 'mg/l',
 					DSS_Label: 'Phosphorus',
 					DSS_GraphTitle: 'Phosphorus Runoff'
 				},{
 					itemId: 'result_pollinators',
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'pollinator',
+					DSS_UnitLabel: '-1 to 1',
 					DSS_Label: 'Pollinators',
 					DSS_GraphTitle: 'Key Pollinators'
 				},{
@@ -101,6 +105,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					itemId: 'result_pest',
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'pest',
+					DSS_UnitLabel: '-1 to 1',
 					DSS_Label: 'Biocontrol',
 					DSS_GraphTitle: 'Biocontrol / Crop Pest Supression'
 				},{
@@ -114,19 +119,20 @@ Ext.define('MyApp.view.Report_Detail', {
 					itemId: 'result_nitrous_oxide',
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'nitrous_oxide',
+					DSS_UnitLabel: 'Tg',
 					DSS_Label: 'Nitrous Oxide',
 					DSS_GraphTitle: 'Nitrous Oxide Emissions'
 				}]
 			},{
 				xtype: 'container',
 				id: 'DSS_heatmap_legend',
-				x: 30,
+				x: 25,
 				y: 280,
 				
 				style: {
 					border: '1px solid #f0f0f0'
 				},
-				width: 420,
+				width: 450,
 				height: 40,
 				layout: {
 					type: 'hbox'
@@ -189,9 +195,10 @@ Ext.define('MyApp.view.Report_Detail', {
 		}
 		
 		if (obj.soc) {
-			var val1 = obj.soc.file1.sum * 0.09 / 1000000;
-			var val2 = obj.soc.file2.sum * 0.09 / 1000000;
-			var totalVal = (val2 - val1).toFixed(4);
+			var val1 = obj.soc.file1.sum * 0.09 / 1000;
+			var val2 = obj.soc.file2.sum * 0.09 / 1000;
+			// Convert change from 20 years to 1 year
+			var totalVal = ((val2 - val1) / 20).toFixed(4);
 			c.getComponent('result_soc').setData(val1, val2, totalVal, obj.soc);
 		}	
 
@@ -210,15 +217,15 @@ Ext.define('MyApp.view.Report_Detail', {
 		}	
 		
 		if (obj.nitrogen) {
-			var val1 = obj.nitrogen.file1.sum;
-			var val2 = obj.nitrogen.file2.sum;
+			var val1 = obj.nitrogen.file1.sum /  obj.nitrogen.file1.count;
+			var val2 = obj.nitrogen.file2.sum /  obj.nitrogen.file2.count;
 			var totalVal = (val2 - val1).toFixed(4);
 			c.getComponent('result_nitrogen').setData(val1, val2, totalVal, obj.nitrogen);
 		}	
 
 		if (obj.phosphorus) {
-			var val1 = obj.phosphorus.file1.sum;
-			var val2 = obj.phosphorus.file2.sum;
+			var val1 = obj.phosphorus.file1.sum /  obj.phosphorus.file1.count;
+			var val2 = obj.phosphorus.file2.sum /  obj.phosphorus.file2.count;
 			var totalVal = (val2 - val1).toFixed(4);
 			c.getComponent('result_phosphorus').setData(val1, val2, totalVal, obj.phosphorus);
 		}	
@@ -245,8 +252,8 @@ Ext.define('MyApp.view.Report_Detail', {
 		}	
 	
     	if (obj.nitrous_oxide) {
-			var val1 = obj.nitrous_oxide.file1.sum;
-			var val2 = obj.nitrous_oxide.file2.sum;
+			var val1 = obj.nitrous_oxide.file1.sum * 0.09 / 1000000;
+			var val2 = obj.nitrous_oxide.file2.sum * 0.09 / 1000000;
 			var totalVal = (val2 - val1).toFixed(4);
 			c.getComponent('result_nitrous_oxide').setData(val1, val2, totalVal, obj.nitrous_oxide);
 		}	

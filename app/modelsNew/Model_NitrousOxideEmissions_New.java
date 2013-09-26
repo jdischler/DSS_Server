@@ -31,7 +31,9 @@ Logger.info("  > Allocated memory for N20");
 		int Grass_Mask = 256; // 9
 		int Corn_Mask = 1; // 1	
 		int Soy_Mask = 2; // 2	
+		int Corn_Soy_Mask = 4; // 3	
 		int Alfalfa_Mask = 128; // 8	
+		int Mask = Grass_Mask | Corn_Mask | Soy_Mask | Alfalfa_Mask | Corn_Soy_Mask;
 		
 		// Input layers
 		float texture[][] = Layer_Base.getLayer("Texture").getFloatData();
@@ -47,8 +49,8 @@ Logger.info("  > Allocated memory for N20");
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				
-				if (texture[y][x] > -9999.0f && OM_SOC[y][x] > -9999.0f &&
-					drainage[y][x] > -9999.0f && pH[y][x] > -9999.0f)
+				if (texture[y][x] > -9995.0f && OM_SOC[y][x] > -9995.0f &&
+					drainage[y][x] > -9995.0f && pH[y][x] > -9995.0f)
 				{
 					fertRate = 0.0f;
 					
@@ -70,14 +72,26 @@ Logger.info("  > Allocated memory for N20");
 					{
 						cropRotation = -1.023f;
 					}
+					else if ((rotationT_Data[y][x] & Corn_Soy_Mask) > 0) // Corn_Soy
+					{
+						cropRotation = -0.5115f;
+						fertRate = 84.0f;
+					}
 					else // OTHER crops
 					{
 						cropRotation = 0.0f;
 					}
 					
-					// Calculate Nitrous Oxide Emissions
-					nitrousOxideData[y][x] = (float)(Math.exp(0.414f + 0.825f + fertRate * 0.005f + cropRotation +
-						texture[y][x] + OM_SOC[y][x] + drainage[y][x] + pH[y][x]));
+					if ((rotationT_Data[y][x] & Mask) > 0)
+					{
+						// Calculate Nitrous Oxide Emissions (Unit Kg/Ha per year)
+						nitrousOxideData[y][x] = (float)(Math.exp(0.414f + 0.825f + fertRate * 0.005f + cropRotation +
+							texture[y][x] + OM_SOC[y][x] + drainage[y][x] + pH[y][x]));
+					}
+					else
+					{
+						nitrousOxideData[y][x] = -9999.0f;
+					}
 				}
 				else 
 				{

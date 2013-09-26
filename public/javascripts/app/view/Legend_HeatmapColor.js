@@ -18,11 +18,11 @@ Ext.define('MyApp.view.Legend_HeatmapColor', {
         Ext.applyIf(me, {
             items: [{
             	xtype: 'container',
-				x: 2,
-				y: 1,
+				x: 20,
+				y: 0,
 				frame: false,
-				height: 40,
-				width: 56,
+				height: 20,
+				width: 55,
 				html: '',
 				style: {
 					'background-color': me.DSS_ElementColor,
@@ -30,9 +30,9 @@ Ext.define('MyApp.view.Legend_HeatmapColor', {
 				}
 			},{
 				xtype: 'label',
-				x: 5,
-				y: 20,
-				text: me.DSS_ElementValue.toFixed(3)
+				x: 0,
+				y: 25,
+				text: me.DSS_ElementValue.toFixed(2)
 			}]
         });
 

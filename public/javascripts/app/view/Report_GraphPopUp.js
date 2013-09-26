@@ -1,4 +1,4 @@
-Ext.define('MyApp.view.GraphPopUp', {
+Ext.define('MyApp.view.Report_GraphPopUp', {
     extend: 'Ext.window.Window',
 
     height: 320,

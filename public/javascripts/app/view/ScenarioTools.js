@@ -497,7 +497,7 @@ Ext.define('MyApp.view.ScenarioTools', {
 		// NOTE: these strings MUST be synchronized with the server, or else the server will
 		//	not know which models to run. FIXME: should maybe set this up in a more robust fashion?? How?
 		var modelTypes = ['yield', 'n_p', 'pest_pol', 'soc', 'nitrous', 'habitat_index'];
-		Ext.getCmp('Model_Graph').setWaitFields();
+		Ext.getCmp('DSS_ReportDetail').setWaitFields();
 		Ext.getCmp('DSS_SpiderGraphPanel').clearSpiderData(0);// set all fields to zero
 
 		for (var i = 0; i < modelTypes.length; i++) {
@@ -515,7 +515,7 @@ Ext.define('MyApp.view.ScenarioTools', {
 						var obj= JSON.parse(response.responseText);
 						console.log("success: ");
 						console.log(obj);
-						Ext.getCmp('Model_Graph').SetData_new(obj);
+						Ext.getCmp('DSS_ReportDetail').setData(obj);
 					}
 					catch(err) {
 						console.log(err);

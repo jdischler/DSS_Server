@@ -1,15 +1,15 @@
 
 //------------------------------------------------------------------------------
-Ext.define('MyApp.view.ReportMasterLayout', {
+Ext.define('MyApp.view.Report_MasterLayout', {
 		
     extend: 'Ext.panel.Panel',
     alias: 'widget.report_master_layout',
 
 	requires: [
-		'MyApp.view.ModelGraph',
-		'MyApp.view.ReportTools',
+		'MyApp.view.Report_ScenarioComparison',
 		'MyApp.view.Report_SpiderGraph',
-		'MyApp.view.Report_ScenarioComparison'
+		'MyApp.view.Report_Detail',
+		'MyApp.view.Report_GenerateReport'
 	],
 	
 	dock: 'right',
@@ -57,13 +57,13 @@ Ext.define('MyApp.view.ReportMasterLayout', {
 				collapsed: false
 			},
 			{
-				xtype: 'spiderpanel'
+				xtype: 'report_spider'
 			},
 			{
-				xtype: 'ModelGraph'
+				xtype: 'report_detail'
 			},
 			{
-				xtype: 'reporttools',
+				xtype: 'report_generate_report',
 				collapsed: true
 			}]
         });

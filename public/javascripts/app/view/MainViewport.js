@@ -35,7 +35,7 @@ Ext.define('MyApp.view.MainViewport', {
         'MyApp.view.LogoPanel',
         'MyApp.view.ViewSelectToolbar',
         'MyApp.view.ScenarioMasterLayout',        
-        'MyApp.view.ReportMasterLayout'        
+        'MyApp.view.Report_MasterLayout'        
 	],
 	
 	//autoScroll: true,

@@ -1,8 +1,10 @@
+
+//------------------------------------------------------------------------------
 Ext.define('MyApp.view.Report_ScenarioComparison', {
-    extend: 'Ext.panel.Panel',
+    extend: 'Ext.container.Container',
     alias: 'widget.scenariocompare',
 
-    height: 60,
+    height: 34,
     layout: {
         type: 'absolute'
     },
@@ -12,47 +14,37 @@ Ext.define('MyApp.view.Report_ScenarioComparison', {
     	'background-color': '#f4f8ff'
     },
    
+    //--------------------------------------------------------------------------
     initComponent: function() {
         var me = this;
 
         Ext.applyIf(me, {
             items: [{
 				xtype: 'combobox',
-				x: 50,
+				x: 0,
 				y: 5,
-				width: 300,
-				fieldLabel: 'Scenario 1',
+				width: 230,
+				fieldLabel: 'Compare Scenario',
 				labelAlign: 'right',
-				labelWidth: 80
-			},
-			{
-				itemId: 'DSS_ScenarioCompare',
-				xtype: 'combobox',
-				x: 50,
-				y: 30,
-				width: 300,
-				fieldLabel: 'Scenario 2',
-				labelAlign: 'right',
-				labelWidth: 80,
+				labelWidth: 110,
 				value: 'DEFAULT'
 			},
 			{
-				xtype: 'checkboxfield',
-				x: 360,
-				y: 30,
-				boxLabel: 'Compare',
-				checked: true,
-				listeners: {
-					'dirtychange': function(me) {
-						var combo = me.up().getComponent('DSS_ScenarioCompare');
-						if (me.getValue() == true) {
-							combo.enable(true);
-						}
-						else {
-							combo.disable(true);
-						}
-					}
-				}
+				xtype: 'combobox',
+				x: 220,
+				y: 5,
+				width: 230,
+				fieldLabel: 'To Scenario',
+				labelAlign: 'right',
+				labelWidth: 90,
+				value: 'TRANSFORM 1'
+			},
+			{
+				xtype: 'button',
+				x: 455,
+				y: 5,
+				width: 30,
+				text: 'Go'
 			}]
         });
 
@@ -60,3 +52,4 @@ Ext.define('MyApp.view.Report_ScenarioComparison', {
     }
 
 });
+

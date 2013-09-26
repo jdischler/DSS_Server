@@ -20,7 +20,7 @@ import javax.xml.bind.DatatypeConverter;
 //------------------------------------------------------------------------------
 public class Application extends Controller 
 {
-	static int mHeatCount = 0;
+//	static int mHeatCount = 0;
 	
 	//--------------------------------------------------------------------------
 	public static Result index() 
@@ -580,8 +580,30 @@ Logger.info("   Model total time: " + Float.toString(timeSec) + "s");
 	{
 		// Open up request from client...
 		JsonNode request = request().body().asJson();
+		Logger.info("---- getHeatmap request ----");
+		Logger.info(request.toString());
+		
+		// model can be: (TODO: verify list)
+		//	habitat_index, soc, nitrogen, phosphorus, pest, pollinator(s?), net_energy,
+		//		net_income, ethanol, nitrous_oxide
 		String model = request.get("model").getTextValue();
 
+		if (model == null) {
+			Logger.info("Tried to find a model data file but none was passed. Aborting heatmap.");
+			return ok(); // FIXME: not ok.
+		}
+
+		// type can be: 
+		//	delta - shows change between file1 and file2
+		//	file1 - shows file1 as an absolute map
+		//	file2 - shows file2 as an absolute map		
+		String type = request.get("type").getTextValue();
+
+		if (type == null) {
+			Logger.info("Tried to find a heatmap 'type' key but didn't. Assuming 'delta'");
+			type = "delta";
+		}
+		
 		String path1 = "./layerData/default/" + model + ".dss";
 		String path2 = "./layerData/clientID/" + model + ".dss";
 		
@@ -590,20 +612,60 @@ Logger.info("   Model total time: " + Float.toString(timeSec) + "s");
 			path1 = "./layerData/soc.dss";
 		}
 		
-		Logger.info("Requesting heatmap for " + path1);
-		Logger.info("Requesting heatmap for " + path2);
-		
 		File file1 = new File(path1);
 		File file2 = new File(path2);
 		
-		if (!file1.exists() || !file2.exists()) {
+		if (type.equals("delta")) {
+			// for 'delta' type, both files must exist!
+			if (!file1.exists() || !file2.exists()) {
+				Logger.info("Wanted to open files for 'delta' heatmap but one of the files did not exist");
+				return ok(); // FIXME: not ok.
+			}
+		}
+		else if (type.equals("file1")) {
+			if (!file1.exists()) {
+				Logger.info("Wanted to open file for 'file1' heatmap but that file did not exist");
+				return ok(); // FIXME: not ok.
+			}
+		}
+		else if (type.equals("file2")) {
+			if (!file2.exists()) {
+				Logger.info("Wanted to open file for 'file2' heatmap but that file did not exist");
+				return ok(); // FIXME: not ok.
+			}
+		}
+		else {
+			Logger.info("Error, unknown heatmap type: <" + type + ">");
 			return ok(); // FIXME: not ok.
 		}
+
+		String outputPath = "/public/file/heat_max_" + model +".png";
 		
-		File outputFile = new File("./public/file/heat_max" + Integer.toString(mHeatCount++) +".png");
-		ObjectNode sendBack = Analyzer_Heatmap.run(file1, file2, 
+		// FIXME: not sure why play doesn't hand me back the expected directory path in production?
+		if (Play.isProd()) {
+			// FIXME: blugh, like this won't be totally fragile? :)
+			outputPath = "/target/scala-2.10/classes" + outputPath;
+		}
+		outputPath = "." + outputPath;
+		
+		File outputFile = new File(outputPath);
+		ObjectNode sendBack = null;
+		
+		if (type.equals("delta")) { // TWO file heatmap
+			sendBack = Analyzer_Heatmap.run(file1, file2, 
 							outputFile, 
 							10);
+		}
+		else if (type.equals("file1")) { // ONE file absolute map
+			sendBack = Analyzer_Heatmap.run(file1, 
+							outputFile, 
+							10);
+		}
+		else if (type.equals("file2")) { // ONE file absolute map
+			sendBack = Analyzer_Heatmap.run(file2, 
+							outputFile, 
+							10);
+		}
 
 		sendBack.put("heatFile", outputFile.getName());
 		return ok(sendBack);

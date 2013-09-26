@@ -1,11 +1,11 @@
 
 //------------------------------------------------------------------------------
-Ext.define('MyApp.view.HeatMapLegend', {
+Ext.define('MyApp.view.Legend_HeatmapColor', {
     extend: 'Ext.container.Container',
-    alias: 'widget.Unique',
+    alias: 'widget.heatmapcolor',
 
-    height: 30,
-    width: 25,
+    width: 60,
+    height: 40,
     layout: {
         type: 'absolute'
     },
@@ -16,30 +16,28 @@ Ext.define('MyApp.view.HeatMapLegend', {
         var me = this;
         
         Ext.applyIf(me, {
-        		
             items: [{
-				xtype: 'container',
-				x: 5,
+            	xtype: 'container',
+				x: 2,
 				y: 1,
 				frame: false,
-				height: 19,
-				width: 20,
+				height: 40,
+				width: 56,
 				html: '',
 				style: {
-					'background-color': '#FFBBBB',//DSS_LegendElementColor,
+					'background-color': me.DSS_ElementColor,
 					border: '1px dotted #BBBBBB'
 				}
-			},
-			{
+			},{
 				xtype: 'label',
-				x: 1,
-				y: 25,
-				text: 1,//DSS_LegendElementType
+				x: 5,
+				y: 20,
+				text: me.DSS_ElementValue.toFixed(3)
 			}]
         });
 
         me.callParent(arguments);
-    },
+    }
 
 });
 

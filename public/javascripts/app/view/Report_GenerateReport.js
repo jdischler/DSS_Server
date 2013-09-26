@@ -2,9 +2,9 @@
  * File: app/view/ReportTools.js
  */
 
-Ext.define('MyApp.view.ReportTools', {
+Ext.define('MyApp.view.Report_GenerateReport', {
     extend: 'Ext.tab.Panel',
-    alias: 'widget.reporttools',
+    alias: 'widget.report_generate_report',
 
     height: 300,
     width: 300,

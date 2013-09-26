@@ -1,6 +1,8 @@
+
+//------------------------------------------------------------------------------
 Ext.define('MyApp.view.Report_SpiderGraph', {
     extend: 'Ext.panel.Panel',
-    alias: 'widget.spiderpanel',
+    alias: 'widget.report_spider',
 
     height: 500,
     width: 500,
@@ -9,6 +11,7 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
     layout: 'fit',
     id: 'DSS_SpiderGraphPanel',
 
+    //------------------------------------------------------------------------------
     initComponent: function() {
         var me = this;
 

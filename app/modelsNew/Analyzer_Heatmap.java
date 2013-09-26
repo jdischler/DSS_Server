@@ -15,13 +15,13 @@ import ar.com.hjg.pngj.chunks.*;
 public class Analyzer_Heatmap {
 	
 	//--------------------------------------------------------------------------
-	private static ObjectNode copyPaletteForClient(PngChunkPLTE palette, ObjectNode sendBack) {
+	private static ObjectNode copyPaletteForClient(PngChunkPLTE palette, int numColors, ObjectNode sendBack) {
 		
 		ArrayNode colorArray = JsonNodeFactory.instance.arrayNode();
 		
 		int[] rgb = new int[3];
 		
-		for (int i=0; i < palette.getNentries(); i++) {
+		for (int i=0; i < numColors; i++) {
 			String color = "#";
 			palette.getEntryRgb(i, rgb);
 			for (int t=0; t<3; t++) {
@@ -103,7 +103,7 @@ public class Analyzer_Heatmap {
 						heatmap[y][x] = data_2 - data_1;
 					}
 					else {
-						heatmap[y][x] = 0;
+						heatmap[y][x] = -9999.0f;
 					}
 				}
 			}
@@ -115,12 +115,20 @@ public class Analyzer_Heatmap {
 		int newHeight = height/downsampleFactor;
 		
 		float resampled[][] = downSample.generateMax(newWidth, newHeight);
-		float max = Math.abs(resampled[0][0]);
+		float max = 0;
+		boolean mbHasMax = false;
 		
 		for (int y = 0; y < newHeight; y++) {
 			for (int x = 0; x < newWidth; x++) {
-				if (Math.abs(resampled[y][x]) > max) {
-					max = Math.abs(resampled[y][x]);
+				float data = resampled[y][x];
+				if (data > -9999.0f) {
+					if (!mbHasMax) {
+						max = data;
+						mbHasMax = true;
+					}
+					if (Math.abs(data) > max) {
+						max = Math.abs(data);
+					}
 				}
 			}
 		}
@@ -133,10 +141,15 @@ public class Analyzer_Heatmap {
 		// Now generate the heatmap image
 		for (int y = 0; y < newHeight; y++) {
 			for (int x = 0; x < newWidth; x++) {
-				float delta = (resampled[y][x] / max) * 3.0f + 3.5f; // round
-				if (delta < 0) delta = 0;
-				else if (delta > 6) delta = 6;
-				idx[y][x] = (byte)(delta);
+				if (resampled[y][x] > -9999.0f) {
+					float delta = (resampled[y][x] / max) * 3.0f + 3.5f; // round
+					if (delta < 0) delta = 0;
+					else if (delta > 6) delta = 6;
+					idx[y][x] = (byte)(delta);
+				}
+				else {
+					idx[y][x] = numPaletteEntries; // last color is transparent color
+				}
 			}
 		}
 	
@@ -148,7 +161,7 @@ public class Analyzer_Heatmap {
 		Logger.info("Creating palette");
 		PngChunkPLTE palette = null;
 		try {
-			palette = png.createPalette(numPaletteEntries);
+			palette = png.createPalette(numPaletteEntries + 1); // extra one for the transparent color
 		}
 		catch(Exception e) {
 			Logger.info(e.toString());
@@ -169,6 +182,7 @@ public class Analyzer_Heatmap {
 		palette.setEntry(4, 212, 255, 164);
 		palette.setEntry(5, 155, 245, 90);
 		palette.setEntry(6, 90, 178, 0); // lime green
+		palette.setEntry(7, 255, 0, 0); // transparent color
 /*		Png.interpolatePaletteEntries(palette, 
 				3, 255, 255, 255,	// white
 				6, 128, 255, 32);	// limey-green
@@ -187,16 +201,16 @@ public class Analyzer_Heatmap {
 			6, 0, 64, 255);		// blue
 */
 		ObjectNode sendBack = JsonNodeFactory.instance.objectNode();
-		sendBack = copyPaletteForClient(palette, sendBack);
+		sendBack = copyPaletteForClient(palette, numPaletteEntries, sendBack);
 		sendBack = copyValuesForClient(max, numPaletteEntries, sendBack);
 		
 		Logger.info("Setting transparent");
 		// set index 4 as transparent
-		int[] alpha = new int[numPaletteEntries];
+		int[] alpha = new int[numPaletteEntries + 1];
 		alpha[0] = 255; alpha[1] = 255; alpha[2] = 255;
-		alpha[3] = 0;
+		alpha[3] = 255;
 		alpha[4] = 255; alpha[5] = 255; alpha[6] = 255;
-		
+		alpha[7] = 0; // transparent color
 		png.setTransparentArray(alpha);
 		
 		png.mPngWriter.writeRowsByte(idx);
@@ -227,13 +241,7 @@ public class Analyzer_Heatmap {
 			ByteBuffer buff = fileReader.readLine();
 			if (buff != null) {
 				for (int x=0; x < width; x++) {
-					float data = buff.getFloat(x * 4);
-					if (data > -9999.0f) {
-						heatmap[y][x] = data;
-					}
-					else {
-						heatmap[y][x] = 0;
-					}
+					heatmap[y][x] = buff.getFloat(x * 4);
 				}
 			}
 		}
@@ -244,15 +252,24 @@ public class Analyzer_Heatmap {
 		int newHeight = height/downsampleFactor;
 		
 		float resampled[][] = downSample.generateAveraged(newWidth, newHeight);
-		float min = resampled[0][0], max = resampled[0][0];
+		float min = 0, max = 0;
+		boolean mbHasMinMax = false;
 		
 		for (int y = 0; y < newHeight; y++) {
 			for (int x = 0; x < newWidth; x++) {
-				if (resampled[y][x] > max) {
-					max = resampled[y][x];
-				}
-				else if (resampled[y][x] < min) {
-					min = resampled[y][x];
+				float data = resampled[y][x];
+				if (data > -9999.0f) {
+					if (!mbHasMinMax) {
+						mbHasMinMax = true;
+						max = data;
+						min = data;
+					}
+					if (data > max) {
+						max = data;
+					}
+					else if (data < min) {
+						min = data;
+					}
 				}
 			}
 		}
@@ -265,10 +282,16 @@ public class Analyzer_Heatmap {
 		// Now generate the heatmap image
 		for (int y = 0; y < newHeight; y++) {
 			for (int x = 0; x < newWidth; x++) {
-				float delta = (resampled[y][x] - min) / (max - min) * (numPaletteEntries - 1);
-				if (delta < 0) delta = 0;
-				else if (delta > numPaletteEntries - 1) delta = numPaletteEntries - 1;
-				idx[y][x] = (byte)(delta);
+				float data = resampled[y][x];
+				if (data > -9999.0f) {
+					float delta = (data - min) / (max - min) * (numPaletteEntries - 1);
+					if (delta < 0) delta = 0;
+					else if (delta > numPaletteEntries - 1) delta = numPaletteEntries - 1;
+					idx[y][x] = (byte)(delta);
+				}
+				else {
+					idx[y][x] = numPaletteEntries; // transparent
+				}
 			}
 		}
 	
@@ -280,7 +303,7 @@ public class Analyzer_Heatmap {
 		Logger.info("Creating palette");
 		PngChunkPLTE palette = null;
 		try {
-			palette = png.createPalette(numPaletteEntries);
+			palette = png.createPalette(numPaletteEntries + 1); // +1 for transparent color
 		}
 		catch(Exception e) {
 			Logger.info(e.toString());
@@ -294,9 +317,19 @@ public class Analyzer_Heatmap {
 		palette.setEntry(4, 65, 182, 196); // greenish blue
 		palette.setEntry(5, 34, 94, 168); // blueish
 		palette.setEntry(6, 106, 21, 160);//blueish purple
+		palette.setEntry(7, 255, 0, 0);// red, but transparent
+
+		Logger.info("Setting transparent");
+		// set index 4 as transparent
+		int[] alpha = new int[numPaletteEntries + 1];
+		alpha[0] = 255; alpha[1] = 255; alpha[2] = 255;
+		alpha[3] = 255;
+		alpha[4] = 255; alpha[5] = 255; alpha[6] = 255;
+		alpha[7] = 0; // transparent color
+		png.setTransparentArray(alpha);
 		
 		ObjectNode sendBack = JsonNodeFactory.instance.objectNode();
-		sendBack = copyPaletteForClient(palette, sendBack);
+		sendBack = copyPaletteForClient(palette, numPaletteEntries, sendBack);
 		sendBack = copyAbsoluteValuesForClient(min, max, numPaletteEntries, sendBack);
 		
 		png.mPngWriter.writeRowsByte(idx);

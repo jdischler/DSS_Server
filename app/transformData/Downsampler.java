@@ -46,14 +46,14 @@ public class Downsampler
 				int ct = 0;
 				for (int yy = upLeftY; yy <= lowRightY; yy++) {
 					for (int xx = upLeftX; xx <= lowRightX; xx++) {
-						if (!Float.isNaN(mData[yy][xx])) {
+						if (mData[yy][xx] > -9999.0f) {
 							sum += mData[yy][xx];
 							ct++;
 						}
 					}
 				}
 				
-				float ave = 0;
+				float ave = -9999.0f;
 				if (ct > 0) {
 					ave = sum / ct;
 				}
@@ -87,11 +87,16 @@ public class Downsampler
 				int lowRightX = Math.round((x + 1) * widthFactor);
 				
 				// Find the max value and stuff it into mResampledData[y][x]
-				float max = 0;
+				float max = -9999.0f;
+				boolean mbHasMax = false;
 				for (int yy = upLeftY; yy <= lowRightY; yy++) {
 					for (int xx = upLeftX; xx <= lowRightX; xx++) {
 						float result = mData[yy][xx];
-						if (!Float.isNaN(result)) {
+						if (result > -9999.0f) {
+							if (!mbHasMax) {
+								max = result;
+								mbHasMax = true;
+							}
 							// test absolute value so we capture the largest magnitude, be it pos or neg
 							if (Math.abs(result) > Math.abs(max)) {
 								// but save the original max result, vs. absolute val.

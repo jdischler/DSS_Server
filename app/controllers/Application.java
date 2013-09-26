@@ -20,7 +20,7 @@ import javax.xml.bind.DatatypeConverter;
 //------------------------------------------------------------------------------
 public class Application extends Controller 
 {
-//	static int mHeatCount = 0;
+	static int mHeatCount = 0;
 	
 	//--------------------------------------------------------------------------
 	public static Result index() 
@@ -639,7 +639,7 @@ Logger.info("   Model total time: " + Float.toString(timeSec) + "s");
 			return ok(); // FIXME: not ok.
 		}
 
-		String outputPath = "/public/file/heat_max_" + model +".png";
+		String outputPath = "/public/file/heat_max_" + model + "_" + Integer.toString(mHeatCount++) + ".png";
 		
 		// FIXME: not sure why play doesn't hand me back the expected directory path in production?
 		if (Play.isProd()) {

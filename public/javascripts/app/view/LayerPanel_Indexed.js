@@ -14,7 +14,9 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
     
     //--------------------------------------------------------------------------
     initComponent: function() {
+    	
         var me = this;
+        me.DSS_RecievedColorKey = false;
 
         Ext.applyIf(me, {
             items: [{
@@ -65,6 +67,8 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
 	//--------------------------------------------------------------------------
     requestLayerRange: function(container) {
 
+    	var me = this;
+    	
 		var queryLayerRequest = { 
 			name: container.DSS_QueryTable,
 			type: 'colorKey',
@@ -99,6 +103,17 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
 							obj[i]);
 						cont.insert(i, element);
 					}
+					me.DSS_RecievedColorKey = true;
+
+					// Based on weird timing issues, the selection information can
+					//	get set before a color key comes in...So crutching that up
+					if (me.DSS_SavedSetSelectionCriteria) {
+						me.setSelectionCriteria(me.DSS_SavedSetSelectionCriteria);
+					}
+					if (me.header.getComponent('DSS_ShouldQuery').pressed && DSS_DoExpandQueried) {
+						me.expand();
+					};
+
 					// Layouts were disabled...must turn them back on!!
 					Ext.resumeLayouts(true);
 				}
@@ -160,6 +175,11 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
     	if (!jsonQuery || !jsonQuery.queryLayers) {
 			this.header.getComponent('DSS_ShouldQuery').toggle(false);
 			this.clearChecks();
+    		return;
+    	}
+
+    	if (!this.DSS_RecievedColorKey) {
+    		this.DSS_SavedSetSelectionCriteria = jsonQuery;
     		return;
     	}
     	

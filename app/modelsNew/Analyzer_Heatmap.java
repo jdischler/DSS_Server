@@ -54,6 +54,20 @@ public class Analyzer_Heatmap {
 		return sendBack;
 	}
 
+	//--------------------------------------------------------------------------
+	private static ObjectNode copyAbsoluteValuesForClient(float min, float max, int entries, ObjectNode sendBack) {
+		
+		ArrayNode valueArray = JsonNodeFactory.instance.arrayNode();
+		
+		for (int i=0; i < entries; i++) {
+			float value = (float)(min + i * ((max - min) / entries));
+			valueArray.add(value);
+		}
+		
+		sendBack.put("values", valueArray);
+		return sendBack;
+	}
+	
 	// TWO FILE DELTA STYLE MAP
 	// downsampleFactor: how much to scale the image down, e.g. 10 generates an image of:
 	//	sourceWidth/10, sourceHeight/10
@@ -200,7 +214,7 @@ public class Analyzer_Heatmap {
 		final int numPaletteEntries = 7;
 		
 		Binary_Reader fileReader = new Binary_Reader(file);
-		if (fileReader.readHeader()) {
+		if (!fileReader.readHeader()) {
 			Logger.info("Heatmap generation unable to open the file and/or read the header");
 			return null;
 		}
@@ -251,9 +265,9 @@ public class Analyzer_Heatmap {
 		// Now generate the heatmap image
 		for (int y = 0; y < newHeight; y++) {
 			for (int x = 0; x < newWidth; x++) {
-				float delta = (resampled[y][x] / max) * 3.0f + 3.5f; // round
+				float delta = (resampled[y][x] - min) / (max - min) * (numPaletteEntries - 1);
 				if (delta < 0) delta = 0;
-				else if (delta > 6) delta = 6;
+				else if (delta > numPaletteEntries - 1) delta = numPaletteEntries - 1;
 				idx[y][x] = (byte)(delta);
 			}
 		}
@@ -273,49 +287,17 @@ public class Analyzer_Heatmap {
 		}
 		Logger.info("Setting palette entries");
 		
-		/*Png.interpolatePaletteEntries(palette, 
-				0, 0, 102, 190,		// aqua blue
-				3, 255, 255, 255);	// white
+		palette.setEntry(0, 255, 210, 170);	// orangish
 		Png.interpolatePaletteEntries(palette, 
-				3, 255, 255, 255,	// white
-				6, 190, 81, 10);	// brown
-		*/
-		palette.setEntry(0, 240, 16, 116); // magenta
-		palette.setEntry(1, 255, 136, 187);
-		palette.setEntry(2, 255, 210, 229);
-		palette.setEntry(3, 255, 255, 255); // white
-		palette.setEntry(4, 212, 255, 164);
-		palette.setEntry(5, 155, 245, 90);
-		palette.setEntry(6, 90, 178, 0); // lime green
-/*		Png.interpolatePaletteEntries(palette, 
-				3, 255, 255, 255,	// white
-				6, 128, 255, 32);	// limey-green
-/
-/*		Png.interpolatePaletteEntries(palette, 
-			0, 128, 0, 255,		// purple
-			2, 255, 0, 0);		// red
-		Png.interpolatePaletteEntries(palette, 
-			2, 255, 0, 0,		// red
-			4, 255, 255, 0);	// yellow
-		Png.interpolatePaletteEntries(palette, 
-			3, 255, 255, 0,		// yellow
-			4, 0, 255, 0);		// green
-		Png.interpolatePaletteEntries(palette, 
-			4, 0, 255, 0,		// green
-			6, 0, 64, 255);		// blue
-*/
+				1, 255, 255, 204,	// yellowish
+				3, 160, 218, 180);	// greenish
+		palette.setEntry(4, 65, 182, 196); // greenish blue
+		palette.setEntry(5, 34, 94, 168); // blueish
+		palette.setEntry(6, 106, 21, 160);//blueish purple
+		
 		ObjectNode sendBack = JsonNodeFactory.instance.objectNode();
 		sendBack = copyPaletteForClient(palette, sendBack);
-		sendBack = copyValuesForClient(max, numPaletteEntries, sendBack);
-		
-		Logger.info("Setting transparent");
-		// set index 4 as transparent
-		int[] alpha = new int[numPaletteEntries];
-		alpha[0] = 255; alpha[1] = 255; alpha[2] = 255;
-		alpha[3] = 0;
-		alpha[4] = 255; alpha[5] = 255; alpha[6] = 255;
-		
-		png.setTransparentArray(alpha);
+		sendBack = copyAbsoluteValuesForClient(min, max, numPaletteEntries, sendBack);
 		
 		png.mPngWriter.writeRowsByte(idx);
 		png.mPngWriter.end();

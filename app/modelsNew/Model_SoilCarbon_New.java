@@ -40,6 +40,8 @@ Logger.info("  > Allocated memory for SOC");
 		int Grass_Mask = 256; // 9
 		int Corn_Mask = 1; // 1	
 		int Soy_Mask = 2; // 2	
+		int Corn_Soy_Mask = 4; // 3
+		Corn_Mask = Corn_Mask | Corn_Soy_Mask;
 		int Alfalfa_Mask = 128; // 8
 		float factor = 1.0f;
 		float adjFactor = 0;

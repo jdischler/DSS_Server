@@ -97,7 +97,7 @@ Logger.info("  > Allocated memory for Yield");
 						// Tonnes per Hec
 						Soy_Y = Soy_Y * 0.0585f;
 						// add residue
-						Yield = (Corn_Y * 0.053f + Soy_Y + Soy_Y * 1.5f) / 2;
+						Yield = ((Corn_Y * 0.053f) + (Soy_Y + Soy_Y * 1.5f)) / 2.0f;
 					}
 					else if ((rotationData[y][x] & Alfalfa_Mask) > 0) {
 						// Short tons per Acre

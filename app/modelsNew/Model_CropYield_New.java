@@ -27,8 +27,9 @@ Logger.info(" >> Computing Yield");
 		int Grass_Mask = 256; // 9
 		int Corn_Mask = 1; // 1	
 		int Soy_Mask = 2; // 2	
+		int Corn_Soy_Mask = 4; // 3
 		int Alfalfa_Mask = 128; // 8	
-		int TotalMask = Grass_Mask | Corn_Mask | Soy_Mask | Alfalfa_Mask;
+		int TotalMask = Grass_Mask | Corn_Mask | Soy_Mask | Alfalfa_Mask | Corn_Soy_Mask;
 		
 		// Corn and Grass Yield
 		float Corn_Y = 0;
@@ -81,6 +82,22 @@ Logger.info("  > Allocated memory for Yield");
 						Soy_Y = Soy_Y * 0.0585f;
 						// add residue
 						Yield = Soy_Y + Soy_Y * 1.5f;
+					}
+					else if ((rotationData[y][x] & Corn_Soy_Mask) > 0) {
+						// Bushels per Ac
+						Corn_Y = 22.000f - 1.05f * slope[y][x] + 0.190f * depth[y][x] + 0.817f * silt[y][x] + 1.32f * cec[y][x];
+						// Correct for techno advances
+						Corn_Y = Corn_Y * 1.30f;
+						// add stover
+						Corn_Y = Corn_Y + Corn_Y;
+						// Bushels per Ac
+						Soy_Y = 6.37f - 0.34f * slope[y][x] + 0.065f * depth[y][x] + 0.278f * silt[y][x] + 0.437f * cec[y][x];
+						// Correct for techno advances
+						Soy_Y = Soy_Y * 1.2f;
+						// Tonnes per Hec
+						Soy_Y = Soy_Y * 0.0585f;
+						// add residue
+						Yield = (Corn_Y * 0.053f + Soy_Y + Soy_Y * 1.5f) / 2;
 					}
 					else if ((rotationData[y][x] & Alfalfa_Mask) > 0) {
 						// Short tons per Acre

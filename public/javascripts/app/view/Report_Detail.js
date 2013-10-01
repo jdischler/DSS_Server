@@ -6,7 +6,7 @@ Ext.define('MyApp.view.Report_Detail', {
     
     id: "DSS_ReportDetail",
     
-    height: 350,
+    height: 380,
     width: 500,
         layout: {
         type: 'absolute'
@@ -16,8 +16,9 @@ Ext.define('MyApp.view.Report_Detail', {
     activeTab: 0,
 
     requires : [
-    	    'MyApp.view.Report_GraphPopUp',
-    	    'MyApp.view.Report_DetailElement'
+    	    'MyApp.view.Report_DetailHeader',
+    	    'MyApp.view.Report_DetailElement',
+    	    'MyApp.view.Report_GraphPopUp'
     ],
     
     tools:[{
@@ -53,6 +54,9 @@ Ext.define('MyApp.view.Report_Detail', {
 					type: 'vbox'
 				},
 				items: [{
+					xtype: 'report_detail_header'
+				},
+				{
 					itemId: 'result_habitat_index',
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'habitat_index',
@@ -127,7 +131,7 @@ Ext.define('MyApp.view.Report_Detail', {
 				xtype: 'container',
 				id: 'DSS_heatmap_legend',
 				x: 25,
-				y: 280,
+				y: 310,
 				
 				style: {
 					border: '1px solid #f0f0f0'
@@ -169,6 +173,28 @@ Ext.define('MyApp.view.Report_Detail', {
 		}
 	},
 	
+	// valid style values: 'delta', 'file1', 'file2'
+    //--------------------------------------------------------------------------
+	setDataStyle: function(newStyle) {
+		
+		var c = this.getComponent('results_container');
+		for (var idx = 0; idx < c.items.getCount(); idx++) {
+			var comp = c.items.getAt(idx);
+			comp.changeDataStyleType(newStyle);
+		}
+	},
+
+	// valid style values: 'absolute', '%'	
+    //--------------------------------------------------------------------------
+	setValueStyle: function(newStyle) {
+		
+		var c = this.getComponent('results_container');
+		for (var idx = 0; idx < c.items.getCount(); idx++) {
+			var comp = c.items.getAt(idx);
+			comp.changeValueStyleType(newStyle);
+		}
+	},
+	
     //--------------------------------------------------------------------------
 	// OBJ Data comes in with this format
 	// obj.*model_name*	// where model name is something like 'habitat_index', 'soc', 'nitrogen', etc.
@@ -190,71 +216,70 @@ Ext.define('MyApp.view.Report_Detail', {
 		if (obj.habitat_index) {
 			var val1 = obj.habitat_index.file1.sum / obj.habitat_index.file1.count;
 			var val2 = obj.habitat_index.file2.sum / obj.habitat_index.file2.count;
-			var totalVal = (val2 - val1).toFixed(4);
+			var totalVal = (val2 - val1);
 			c.getComponent('result_habitat_index').setData(val1, val2, totalVal, obj.habitat_index);
 		}
 		
 		if (obj.soc) {
 			var val1 = obj.soc.file1.sum * 0.09 / 1000;
 			var val2 = obj.soc.file2.sum * 0.09 / 1000;
-			// Convert change from 20 years to 1 year
-			var totalVal = ((val2 - val1) / 20).toFixed(4);
+			var totalVal = (val2 - val1);
 			c.getComponent('result_soc').setData(val1, val2, totalVal, obj.soc);
 		}	
 
 		if (obj.net_income) {
 			var val1 = obj.net_income.file1.sum * 0.09 / 1000000;
 			var val2 = obj.net_income.file2.sum * 0.09 / 1000000;
-			var totalVal = (val2 - val1).toFixed(4);
+			var totalVal = (val2 - val1);
 			c.getComponent('result_net_income').setData(val1, val2, totalVal, obj.net_income);
 		}	
 
 		if (obj.net_energy) {
 			var val1 = obj.net_energy.file1.sum * 0.09 / 1000000;
 			var val2 = obj.net_energy.file2.sum * 0.09 / 1000000;
-			var totalVal = (val2 - val1).toFixed(4);
+			var totalVal = (val2 - val1);
 			c.getComponent('result_net_energy').setData(val1, val2, totalVal, obj.net_energy);
 		}	
 		
 		if (obj.nitrogen) {
 			var val1 = obj.nitrogen.file1.sum /  obj.nitrogen.file1.count;
 			var val2 = obj.nitrogen.file2.sum /  obj.nitrogen.file2.count;
-			var totalVal = (val2 - val1).toFixed(4);
+			var totalVal = (val2 - val1);
 			c.getComponent('result_nitrogen').setData(val1, val2, totalVal, obj.nitrogen);
 		}	
 
 		if (obj.phosphorus) {
 			var val1 = obj.phosphorus.file1.sum /  obj.phosphorus.file1.count;
 			var val2 = obj.phosphorus.file2.sum /  obj.phosphorus.file2.count;
-			var totalVal = (val2 - val1).toFixed(4);
+			var totalVal = (val2 - val1);
 			c.getComponent('result_phosphorus').setData(val1, val2, totalVal, obj.phosphorus);
 		}	
     	
     	if (obj.ethanol) {
 			var val1 = obj.ethanol.file1.sum * 0.09 / 1000000;
 			var val2 = obj.ethanol.file2.sum * 0.09 / 1000000;
-			var totalVal = (val2 - val1).toFixed(4);
+			var totalVal = (val2 - val1);
 			c.getComponent('result_ethanol').setData(val1, val2, totalVal, obj.ethanol);
 		}
 		
     	if (obj.pest) {
 			var val1 = obj.pest.file1.sum / obj.pest.file1.count;
 			var val2 = obj.pest.file2.sum / obj.pest.file2.count;
-			var totalVal = (val2 - val1).toFixed(4);
+			var totalVal = (val2 - val1);
 			c.getComponent('result_pest').setData(val1, val2, totalVal, obj.pest);
 		}	
     	
     	if (obj.pollinator) {
 			var val1 = obj.pollinator.file1.sum / (obj.pollinator.file1.count * obj.pollinator.max);
 			var val2 = obj.pollinator.file2.sum / (obj.pollinator.file1.count * obj.pollinator.max);
-			var totalVal = (val2 - val1).toFixed(4);
+			var totalVal = (val2 - val1);
 			c.getComponent('result_pollinators').setData(val1, val2, totalVal, obj.pollinator);
 		}	
 	
     	if (obj.nitrous_oxide) {
 			var val1 = obj.nitrous_oxide.file1.sum * 0.09 / 1000000;
 			var val2 = obj.nitrous_oxide.file2.sum * 0.09 / 1000000;
-			var totalVal = (val2 - val1).toFixed(4);
+			var totalVal = (val2 - val1);
 			c.getComponent('result_nitrous_oxide').setData(val1, val2, totalVal, obj.nitrous_oxide);
 		}	
     }

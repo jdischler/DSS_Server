@@ -34,17 +34,7 @@ Ext.define('MyApp.view.Report_Detail', {
         var me = this;
 	
         Ext.applyIf(me, {
-            items: [/*{
-			    itemId: 'Clear',
-			    xtype: 'button',
-			    x: 250,
-			    y: 320,
-			    text: 'Clear Fields',
-			    handler: function () {
-			    	this.up().clearFields();
-			    }
-			},*/
-			{
+            items: [{
 				xtype: 'container', 
 				itemId: 'results_container',
 				x: 0,
@@ -60,7 +50,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					itemId: 'result_habitat_index',
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'habitat_index',
-					DSS_UnitLabel: '-1 to 1',
+					DSS_UnitLabel: '0 to 1',
 					DSS_Label: 'Bird Habitat',
 					DSS_GraphTitle: 'Bird Habitat Index'
 				},{
@@ -88,7 +78,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					itemId: 'result_pollinators',
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'pollinator',
-					DSS_UnitLabel: '-1 to 1',
+					DSS_UnitLabel: '0 to 1',
 					DSS_Label: 'Pollinators',
 					DSS_GraphTitle: 'Key Pollinators'
 				},{
@@ -223,6 +213,9 @@ Ext.define('MyApp.view.Report_Detail', {
 		if (obj.soc) {
 			var val1 = obj.soc.file1.sum * 0.09 / 1000;
 			var val2 = obj.soc.file2.sum * 0.09 / 1000;
+			// This is for 1 year and other process is on server side
+			// Convert change from 20 years to 1 year
+			//var totalVal = ((val2 - val1) / 20);
 			var totalVal = (val2 - val1);
 			c.getComponent('result_soc').setData(val1, val2, totalVal, obj.soc);
 		}	

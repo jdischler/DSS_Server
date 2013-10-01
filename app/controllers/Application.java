@@ -503,6 +503,8 @@ Logger.info("   Model total time: " + Float.toString(timeSec) + "s");
 		String modelType = request.get("modelType").getTextValue();
 		List<ModelResult> results = null;
 		
+		boolean bAnalyzeAll = false;
+		
 		if (modelType.equals("yield")) {
 			Model_EthanolNetEnergyIncome_New ethanolEnergyIncome = new Model_EthanolNetEnergyIncome_New();
 			results = ethanolEnergyIncome.run(scenario.mNewRotation, width, height, "clientID");
@@ -518,6 +520,7 @@ Logger.info("   Model total time: " + Float.toString(timeSec) + "s");
 		else if (modelType.equals("pest_pol")) {
 			Model_PollinatorPestSuppression_New pp = new Model_PollinatorPestSuppression_New();
 			results = pp.run(scenario.mNewRotation, width, height, "clientID");
+			bAnalyzeAll = true;
 		}
 		else if (modelType.equals("nitrous")) {
 			Model_NitrousOxideEmissions_New n20 = new Model_NitrousOxideEmissions_New();
@@ -527,13 +530,20 @@ Logger.info("   Model total time: " + Float.toString(timeSec) + "s");
 		else {//(modelType.equals("habitat_index")) {
 			Model_HabitatIndex_New hi = new Model_HabitatIndex_New();
 			results = hi.run(scenario.mNewRotation, width, height, "clientID");
+			bAnalyzeAll = true;
 		}
 		
 		// SendBack to Client
 		ObjectNode sendBack  = JsonNodeFactory.instance.objectNode();
 		
 		if (results != null) {
-			Analyzer_Histogram histogram = new Analyzer_Histogram(scenario.mSelection);
+			Analyzer_Histogram histogram = null;
+			if (bAnalyzeAll) {
+				histogram = new Analyzer_Histogram(new Selection(width, height));
+			}
+			else {
+				histogram = new Analyzer_Histogram(scenario.mSelection);
+			}
 			
 			for (int i = 0; i < results.size(); i++) {
 				

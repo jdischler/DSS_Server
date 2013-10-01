@@ -89,35 +89,17 @@ public class Png {
 		trans.setPalletteAlpha(arrayOfAlphas);
 	}
 	
-	// FIXME: probably need to rethink this...?	probably only works for indexed?
 	//--------------------------------------------------------------------------
 	public void writeArray(int[][] imagePixels) {
 		
 		mPngWriter.writeRowsInt(imagePixels);
 		mPngWriter.end();
 	}
-	
-	// FIXME: probably need to rethink this...?	probably only works for indexed?
+
 	//--------------------------------------------------------------------------
-	public void writeResampledSelection(int sourceWidth, int sourceHeight, Selection selection) {
+	public void writeArray(byte[][] imagePixels) {
 		
-		float stepX = (float)mImageInfo.cols / sourceWidth;
-		float stepY = (float)mImageInfo.rows / sourceHeight;
-		
-		byte[][] temp = new byte[mImageInfo.rows][mImageInfo.cols];
-		
-		float fy = 0;
-		
-		for (int y = 0; y < sourceHeight; y++) {
-			float fx = 0;
-			for (int x = 0; x < sourceWidth; x++) {
-				temp[((int)fy)][((int)fx)] |= selection.mSelection[y][x];
-				fx += stepX;
-			}
-			fy += stepY;
-		}
-		
-		mPngWriter.writeRowsByte(temp);
+		mPngWriter.writeRowsByte(imagePixels);
 		mPngWriter.end();
 	}
 
@@ -302,12 +284,10 @@ long heatmapPngStart = 0, heatmapPngEnd = 0;
 			int height = hi.getHeight();
 			
 heatmapResampleStart = System.currentTimeMillis();
-			Downsampler downSample = new Downsampler(data, width, height);
-			
 			int newWidth = width/10;
 			int newHeight = height/10;
 			
-			float resampled[][] = downSample.generateAveraged(newWidth, newHeight);
+			float resampled[][] = Downsampler.generateAveraged(data, width, height, newWidth, newHeight);
 heatmapResampleEnd = System.currentTimeMillis();
 			
 heatmapPngStart = System.currentTimeMillis();
@@ -401,12 +381,10 @@ long heatmapPngStart = 0, heatmapPngEnd = 0;
 			}
 			
 heatmapResampleStart = System.currentTimeMillis();
-			Downsampler downSample = new Downsampler(data1, width, height);
-			
 			int newWidth = width/10;
 			int newHeight = height/10;
 			
-			float resampled[][] = downSample.generateMax(newWidth, newHeight);
+			float resampled[][] = Downsampler.generateMax(data1, width, height, newWidth, newHeight);
 heatmapResampleEnd = System.currentTimeMillis();
 			
 heatmapPngStart = System.currentTimeMillis();

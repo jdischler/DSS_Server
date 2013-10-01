@@ -12,12 +12,12 @@ Ext.define('MyApp.view.Report_DetailElement', {
     alias: 'widget.report_detail_item',
 
     requires : [
-    	    'MyApp.view.Report_GraphPopUp'
+    	'MyApp.view.Report_GraphPopUp'
     ],
     
-    height: 28,
     width: 500,
-        layout: {
+    height: 28,
+	layout: {
         type: 'absolute'
     },
 
@@ -25,6 +25,11 @@ Ext.define('MyApp.view.Report_DetailElement', {
     initComponent: function() {
         var me = this;
 	
+        // set's this as the default, ie, where is the data source? Delta? File1? File2?
+        this.DSS_FieldDataType = 'delta'; 
+        // set's this as the default, ie, how is the value displayed? Absolute? %?
+        this.DSS_FieldValueType = 'absolute';
+        
         Ext.applyIf(me, {
             items: [
             {
@@ -32,13 +37,13 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			    xtype: 'textfield',
 			    x: 0,
 			    y: 5,
-			    width: 195,
+			    width: 240,
 			    fieldLabel: me.DSS_Label,
-			    labelWidth: 85,
+			    labelWidth: 100,
 			    labelAlign: 'right'
 			},{
 				xtype: 'label',
-				x: 198,
+				x: 245,
 				y: 9,
 				text: me.DSS_UnitLabel ? me.DSS_UnitLabel : " ",
 				style: {
@@ -47,8 +52,9 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			},{
 			    itemId: 'graph_button',
 			    xtype: 'button',
-			    x: 248,
+			    x: 305,
 			    y: 5,
+			    width: 60,
 			    text: 'Graph',
 			    tooltip: {
 			    	text: 'View a histogram graph of the two result sets',
@@ -62,50 +68,24 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			},{
 			    itemId: 'heat_delta_button',
 			    xtype: 'button',
-			    x: 300,
+			    x: 375,
 			    y: 5,
+			    width: 60,
 			    enableToggle: true,
-			    text: 'Change',
+			    text: 'Map',
 			    tooltip: {
-			    	text: 'View a heatmap overlay calculated from the delta between the two result sets',
+			    	text: 'View a data / heatmap overlay calculated from the data sets',
 			    	showDelay: 100
 			    },
 			    handler: function(self) {
-			    	self.up().showHeatmap(self, 'delta');
-			    }
-			},{
-			    itemId: 'heat_file1_button',
-			    xtype: 'button',
-			    x: 353,
-			    y: 5,
-			    enableToggle: true,
-			    text: 'Result 1',
-			    tooltip: {
-			    	text: 'View a map overlay calculated from the results of what is typically the default result',
-			    	showDelay: 100
-			    },
-			    handler: function(self) {
-			    	self.up().showHeatmap(self, 'file1');
-			    }
-			},{
-			    itemId: 'heat_file2_button',
-			    xtype: 'button',
-			    x: 409,
-			    y: 5,
-			    enableToggle: true,
-			    text: 'Result 2',
-			    tooltip: {
-			    	text: 'View a map overlay calculated from the results of what is typically the transformed result',
-			    	showDelay: 100
-			    },
-			    handler: function(self) {
-			    	self.up().showHeatmap(self, 'file2');
+			    	me.showHeatmap(self, me.DSS_FieldDataType);
 			    }
 			},{
 			    itemId: 'information_button',
 			    xtype: 'button',
-			    x: 472,
+			    x: 445,
 			    y: 5,
+			    width: 30,
 			    text: '?',
 			    tooltip: {
 			    	text: 'View information about this model result',
@@ -135,8 +115,8 @@ Ext.define('MyApp.view.Report_DetailElement', {
 		this.getComponent('value_field').setFieldStyle(spinnerStyle);
 		this.getComponent('graph_button').disable();
 		this.getComponent('heat_delta_button').disable();
-		this.getComponent('heat_file1_button').disable();
-		this.getComponent('heat_file2_button').disable();
+//		this.getComponent('heat_file1_button').disable();
+//		this.getComponent('heat_file2_button').disable();
 	},
 	
     //--------------------------------------------------------------------------
@@ -147,8 +127,8 @@ Ext.define('MyApp.view.Report_DetailElement', {
 		this.getComponent('value_field').setFieldStyle(clearSpinnerStyle);
 		this.getComponent('graph_button').enable();
 		this.getComponent('heat_delta_button').enable();
-		this.getComponent('heat_file1_button').enable();
-		this.getComponent('heat_file2_button').enable();
+//		this.getComponent('heat_file1_button').enable();
+//		this.getComponent('heat_file2_button').enable();
 	},
 	
     //--------------------------------------------------------------------------
@@ -246,6 +226,50 @@ Ext.define('MyApp.view.Report_DetailElement', {
     },
     
     //--------------------------------------------------------------------------
+    setValueField: function() {
+    	
+    	if (!this.DSS_FieldData) {
+    		return;
+    	}
+    	
+    	var res = null;
+    	if (this.DSS_FieldDataType == 'file1') {
+    		res = this.DSS_FieldData.val1; // NOTE: set up in setData
+    	}
+    	else if (this.DSS_FieldDataType == 'file2') {
+    		res = this.DSS_FieldData.val2; // NOTE: set up in setData
+    	}
+    	else { // type is 'delta'
+			if (this.DSS_FieldValueType == 'absolute') {
+				res = this.DSS_FieldData.total; // NOTE: set up in setData
+			}
+			else { // type is '%'
+				// TODO: bring in or calc the right values....
+				// HELP ME AMIN!!!!
+				res = 1234; // << replace, just making sure the UI code works...
+			}
+    	}
+    	
+		this.getComponent('value_field').setValue(res.toFixed(4));
+    },
+  
+    // valid style types: 'file1', 'file2', 'delta'
+    //--------------------------------------------------------------------------
+    changeDataStyleType: function(newType) {
+    	
+    	this.DSS_FieldDataType = newType;
+    	this.setValueField();
+    },
+    
+    // valid style types: 'absolute', '%'
+    //--------------------------------------------------------------------------
+	changeValueStyleType: function(newType) {
+		
+		this.DSS_FieldValueType = newType;
+    	this.setValueField();
+    },
+
+    //--------------------------------------------------------------------------
 	// OBJ Data comes in with this format
 	// obj.*model_name*	// where model name is something like 'habitat_index', 'soc', 'nitrogen', etc.
 	//		.file1		// right now, Default, but could be any model run when arbitrary model compares are supported
@@ -261,9 +285,11 @@ Ext.define('MyApp.view.Report_DetailElement', {
     //--------------------------------------------------------------------------
     setData: function(val1, val2, totalVal, data) // send in something like: obj.habitat_index
     {
+    	this.DSS_FieldData = {val1: val1, val2: val2, total: totalVal};
+    	
 		this.clearWait();
 		Ext.getCmp('DSS_SpiderGraphPanel').setSpiderDataElement(val1, val2, this.DSS_FieldString);
-		this.getComponent('value_field').setValue(totalVal);
+		this.setValueField();
 		this.DSS_GraphData = data;
     }
 

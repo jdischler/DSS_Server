@@ -4,11 +4,15 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.report_spider',
 
-    height: 500,
+	requires: [
+		'MyApp.view.Report_SpiderHeader'
+	],
+	
+    height: 480,
     width: 500,
     title: 'Quick Summary',
 	icon: 'app/images/graph_icon.png',
-    layout: 'fit',
+    layout: 'absolute',
     id: 'DSS_SpiderGraphPanel',
 
     //------------------------------------------------------------------------------
@@ -36,17 +40,24 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
                     
         Ext.applyIf(me, {
             items: [{
+            	xtype: 'report_spider_header',
+            	x: 0,
+            	y: 0
+            	
+            },{
 				xtype: 'chart',
 				itemId: 'MyGraph_Spider',
-				//height: 250,
-				//width: 400,
+				x: -5,
+				y: 0,
+				height: 490,
+				width: 500,
 				animate: true,
 				store: this.graphstore,
 				insetPadding: 60,
 				legend: {
 					position: 'float',
-					x: -55,
-					y: -55
+					x: -53,
+					y: -30
 			    },
 				axes: [
 				{
@@ -122,8 +133,11 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
     		if (value2 > max) {
     			max = value2;
     		}
-			rec.set("Default", value1 / max);
-			rec.set("Transform", value2 / max);
+//			rec.set("Default", value1 / max);
+//			rec.set("Transform", value2 / max);
+			// FIXME: reversed because we don't know why the data is reversed...blah
+			rec.set("Default", value2 / max);
+			rec.set("Transform", value1 / max);
 			rec.commit();
     	}
     },

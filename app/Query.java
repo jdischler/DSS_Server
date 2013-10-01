@@ -48,24 +48,33 @@ public class Query {
 		// 8 bits per pixel, one channel (indexed), file path where the png is saved
 		// Since this is the file we are saving, it will be smaller than the actual
 		//	width/height by the sample factor.
-		Png png = new Png(mWidth / resampleFactor, mHeight / resampleFactor, 
+		int newWidth = mWidth / resampleFactor;
+		int newHeight = mHeight / resampleFactor;
+		Png png = new Png(newWidth, newHeight, 
 				8, 1, 
 				"." + partialPath);
 		
-		PngChunkPLTE palette = png.createPalette(2);
+		PngChunkPLTE palette = png.createPalette(5);
 		palette.setEntry(0, 0,0,0); // black
 		palette.setEntry(1, red, green, blue);
+		palette.setEntry(2, red, green, blue);
+		palette.setEntry(3, red, green, blue);
+		palette.setEntry(4, red, green, blue);
 		
-		// set index 0 (black) as transparent
-		png.setTransparentIndex(0);
+		int[] alpha = new int[5];
+		alpha[0] = 0; alpha[1] = 64; alpha[2] = 128; alpha[3] = 192; alpha[4] = 255;
+		
+		png.setTransparentArray(alpha);
 
 		// Set up to run the query...allocate memory...
 		Selection selection = execute(requestBody);
 		
-		// Pass the whole array at the full size...and let the writer do the resample
-		//	to convert this to the size the png will be written at
-		png.writeResampledSelection(mWidth, mHeight, selection);
-		
+		byte[][] temp = Downsampler.generateSelection(selection.mSelection, 
+								selection.getWidth(), selection.getHeight(),
+								5, // transform to 5 colors
+								newWidth, newHeight);
+		png.writeArray(temp);
+
 		// Get query statistics (number of selected pixels)
 		int count = selection.countSelectedPixels();	
 

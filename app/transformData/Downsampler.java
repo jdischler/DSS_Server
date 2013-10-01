@@ -7,47 +7,32 @@ import java.util.*;
 //------------------------------------------------------------------------------
 public class Downsampler
 {
-	private float[][] mData;
-	private int mWidth, mHeight;
-	
-	private float[][] mResampledData;
-	private int mTargetWidth, mTargetHeight;
-	
-	// Init with original data array and the sizes of that array. 
+	// FLOAT: Returns a transformed data array of the requested size. Sampling is done via averaging
 	//--------------------------------------------------------------------------
-	Downsampler(float[][] data, int width, int height) {
-		
-		mData = data;
-		mWidth = width;
-		mHeight = height;
-	}
+	static public float [][] generateAveraged(float[][] data, 
+								int dataWidth, int dataHeight, 
+								int newWidth, int newHeight) {
 	
-	// Returns a transformed data array of the requested size. Sampling is done via averaging
-	//--------------------------------------------------------------------------
-	float [][] generateAveraged(int newWidth, int newHeight) {
-	
-		mTargetWidth = newWidth;
-		mTargetHeight = newHeight;
-		mResampledData = new float[newHeight][newWidth];
+		float [][] resampledData = new float[newHeight][newWidth];
 		
-		float widthFactor = mWidth / mTargetWidth;
-		float heightFactor = mHeight / mTargetHeight;
+		float widthFactor = dataWidth / newWidth;
+		float heightFactor = dataHeight / newHeight;
 		
 		int upLeftX = 0, upLeftY = 0;
 		
-		for (int y = 0; y < mTargetHeight - 1; y++) {
+		for (int y = 0; y < newHeight - 1; y++) {
 			int lowRightY = Math.round((y + 1) * heightFactor);
 			
-			for (int x = 0; x < mTargetWidth - 1; x++) {
+			for (int x = 0; x < newWidth - 1; x++) {
 				int lowRightX = Math.round((x + 1) * widthFactor);
 				
-				// Calculate that ave value and stuff it into mResampledData[y][x]
+				// Calculate that ave value and stuff it into resampledData[y][x]
 				float sum = 0;
 				int ct = 0;
 				for (int yy = upLeftY; yy <= lowRightY; yy++) {
 					for (int xx = upLeftX; xx <= lowRightX; xx++) {
-						if (mData[yy][xx] > -9999.0f) {
-							sum += mData[yy][xx];
+						if (data[yy][xx] > -9999.0f) {
+							sum += data[yy][xx];
 							ct++;
 						}
 					}
@@ -57,41 +42,41 @@ public class Downsampler
 				if (ct > 0) {
 					ave = sum / ct;
 				}
-				mResampledData[y][x] = ave;
+				resampledData[y][x] = ave;
 				upLeftX = lowRightX;
 			}
 			upLeftY = lowRightY;
 		}
 		
-		return mResampledData;
+		return resampledData;
 	}
 	
-	// Returns a transformed data array of the requested size. Sampling is done via taking MAX
-	//	absolute value...
+	// FLOAT: Returns a transformed data array of the requested size. Sampling is done via 
+	//	taking MAX absolute value...
 	//--------------------------------------------------------------------------
-	float [][] generateMax(int newWidth, int newHeight) {
+	static public float [][] generateMax(float[][] data, 
+								int dataWidth, int dataHeight,
+								int newWidth, int newHeight) {
 	
-		mTargetWidth = newWidth;
-		mTargetHeight = newHeight;
-		mResampledData = new float[newHeight][newWidth];
+		float [][] resampledData = new float[newHeight][newWidth];
 		
-		float widthFactor = mWidth / mTargetWidth;
-		float heightFactor = mHeight / mTargetHeight;
+		float widthFactor = dataWidth / newWidth;
+		float heightFactor = dataHeight / newHeight;
 		
 		int upLeftX = 0, upLeftY = 0;
 		
-		for (int y = 0; y < mTargetHeight - 1; y++) {
+		for (int y = 0; y < newHeight - 1; y++) {
 			int lowRightY = Math.round((y + 1) * heightFactor);
 			
-			for (int x = 0; x < mTargetWidth - 1; x++) {
+			for (int x = 0; x < newWidth - 1; x++) {
 				int lowRightX = Math.round((x + 1) * widthFactor);
 				
-				// Find the max value and stuff it into mResampledData[y][x]
+				// Find the max value and stuff it into resampledData[y][x]
 				float max = -9999.0f;
 				boolean mbHasMax = false;
 				for (int yy = upLeftY; yy <= lowRightY; yy++) {
 					for (int xx = upLeftX; xx <= lowRightX; xx++) {
-						float result = mData[yy][xx];
+						float result = data[yy][xx];
 						if (result > -9999.0f) {
 							if (!mbHasMax) {
 								max = result;
@@ -106,13 +91,65 @@ public class Downsampler
 					}
 				}
 				
-				mResampledData[y][x] = max;
+				resampledData[y][x] = max;
 				upLeftX = lowRightX;
 			}
 			upLeftY = lowRightY;
 		}
 		
-		return mResampledData;
+		return resampledData;
 	}
+	
+	// FLOAT: Returns a transformed data array of the requested size. Sampler tracks percentage
+	//	of cells with a non-zero value...then converts that to the specified output range.
+	//	e.g., numOutputValues = 3, generates results values that are 0-2
+	//--------------------------------------------------------------------------
+	static public byte [][] generateSelection(byte [][] data, 
+								int dataWidth, int dataHeight,
+								int numOutputValues, 
+								int newWidth, int newHeight) {
+	
+		byte [][] resampledData = new byte[newHeight][newWidth];
+		
+		float widthFactor = dataWidth / newWidth;
+		float heightFactor = dataHeight / newHeight;
+		
+		int upLeftX = 0, upLeftY = 0;
+		
+		for (int y = 0; y < newHeight - 1; y++) {
+			int lowRightY = Math.round((y + 1) * heightFactor);
+			
+			for (int x = 0; x < newWidth - 1; x++) {
+				int lowRightX = Math.round((x + 1) * widthFactor);
+				
+				// Calculate a percent of selected cells and stuff it into resampledData[y][x]
+				int selectedCells = 0, totalCells = 0;
+				
+				for (int yy = upLeftY; yy <= lowRightY; yy++) {
+					for (int xx = upLeftX; xx <= lowRightX; xx++) {
+						if (data[yy][xx] > 0) {
+							selectedCells++;
+						}
+						totalCells++;
+					}
+				}
+				
+				float res = 0;
+				if (totalCells > 0) {
+					// round...
+					res = ((float)selectedCells / totalCells) * numOutputValues + 0.5f;
+					// clamp...
+					if (res < 0) res = 0;
+					else if (res > numOutputValues - 1) res = numOutputValues - 1;
+				}
+				resampledData[y][x] = (byte)res;
+				upLeftX = lowRightX;
+			}
+			upLeftY = lowRightY;
+		}
+		
+		return resampledData;
+	}
+
 }
 

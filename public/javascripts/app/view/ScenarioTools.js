@@ -76,7 +76,44 @@ var ScenarioGridStore = Ext.create('Ext.data.Store', {
         }
     }
 });
+
+//------------------------------------------------------------------------------
+var ClearScenarioGridStore = Ext.create('Ext.data.Store', {
+		
+    fields: ['Active', 'SelectionName', 'TransformText', 'ManagementText', 'Transform', 'Query'],
+    data: {
+        items: [{ 
+        	Active: true, 
+            SelectionName: 'undefined', 
+        	TransformText: 'To Perennial Grass',
+        	ManagementText: '<b><i>Management Options:</i></b></br>None',
+        	Transform: 9,
+        	Query: {
+        		clientID: 0,
+        		queryLayers: [{
+					name: 'rotation',
+					type: 'indexed',
+					matchValues: [1]
+        		}]
+        	}
+        }, {
+        	Active: false, 
+            SelectionName: 'undefined', 
+        	TransformText: 'To Continuous Corn',
+        	Transform: 1,
+        	Query: {}
+        }]
+    },
+    proxy: {
+        type: 'memory',
+        reader: {
+            type: 'json',
+            root: 'items'
+        }
+    }
+});
  
+
 // Scenario Summary....
 //------------------------------------------------------------------------------
 Ext.define('MyApp.view.ScenarioTools', {
@@ -101,7 +138,7 @@ Ext.define('MyApp.view.ScenarioTools', {
 	viewConfig: {
 		stripeRows: true
 	},
-    store: ScenarioGridStore,
+    store: ClearScenarioGridStore,
     
     enableColumnHide: false,
     enableColumnMove: false,

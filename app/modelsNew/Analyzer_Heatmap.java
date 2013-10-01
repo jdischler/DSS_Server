@@ -109,12 +109,10 @@ public class Analyzer_Heatmap {
 			}
 		}
 			
-		Downsampler downSample = new Downsampler(heatmap, width, height);
-		
 		int newWidth = width/downsampleFactor;
 		int newHeight = height/downsampleFactor;
 		
-		float resampled[][] = downSample.generateMax(newWidth, newHeight);
+		float resampled[][] = Downsampler.generateMax(heatmap, width, height, newWidth, newHeight);
 		float max = 0;
 		boolean mbHasMax = false;
 		
@@ -208,7 +206,7 @@ public class Analyzer_Heatmap {
 		// set index 4 as transparent
 		int[] alpha = new int[numPaletteEntries + 1];
 		alpha[0] = 255; alpha[1] = 255; alpha[2] = 255;
-		alpha[3] = 255;
+		alpha[3] = 100;
 		alpha[4] = 255; alpha[5] = 255; alpha[6] = 255;
 		alpha[7] = 0; // transparent color
 		png.setTransparentArray(alpha);
@@ -246,12 +244,10 @@ public class Analyzer_Heatmap {
 			}
 		}
 			
-		Downsampler downSample = new Downsampler(heatmap, width, height);
-		
 		int newWidth = width/downsampleFactor;
 		int newHeight = height/downsampleFactor;
 		
-		float resampled[][] = downSample.generateAveraged(newWidth, newHeight);
+		float resampled[][] = Downsampler.generateAveraged(heatmap, width, height, newWidth, newHeight);
 		float min = 0, max = 0;
 		boolean mbHasMinMax = false;
 		

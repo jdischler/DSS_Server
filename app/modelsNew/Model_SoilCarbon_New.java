@@ -108,7 +108,8 @@ Logger.info("  > Allocated memory for SOC");
 						adjFactor = 1.2f;
 					}
 					
-					soilCarbonData[y][x] = SOC[y][x] + SOC[y][x] * factor * adjFactor;
+					// Convert the change from 20 years to 1 year
+					soilCarbonData[y][x] = SOC[y][x] + (SOC[y][x] * factor * adjFactor) / 20.0f;
 				}
 			}
 		}

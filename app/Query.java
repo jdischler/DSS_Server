@@ -62,7 +62,9 @@ public class Query {
 		palette.setEntry(4, red, green, blue);
 		
 		int[] alpha = new int[5];
-		alpha[0] = 0; alpha[1] = 64; alpha[2] = 128; alpha[3] = 192; alpha[4] = 255;
+		// Reducing alpha's for sub-100% values since people seem to visuallly feel the selection
+		//	doesn't match the reported % of landscape selected...
+		alpha[0] = 0; alpha[1] = 50; alpha[2] = 100; alpha[3] = 150; alpha[4] = 255;
 		
 		png.setTransparentArray(alpha);
 

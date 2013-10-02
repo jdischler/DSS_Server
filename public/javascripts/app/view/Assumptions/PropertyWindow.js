@@ -20,32 +20,41 @@ Ext.define('MyApp.view.Assumptions.PropertyWindow', {
 			xtype: 'button',
 			icon: 'app/images/new_icon.png',
 			scale: 'medium',
-			disabled: true,
-			text: 'Defaults'
+			text: 'Restore Defaults',
+			handler: function(self) {
+				var win = self.up(). 	// go up to toolbar level (from the button level)
+								up();	// go up to the window level that the toolbar is in
+
+				// MAKE a COPY vs just setting the pointers, which does nothing to make a copy
+				//	like we really need...
+				Ext.suspendLayouts();
+				DSS_AssumptionsAdjustable = JSON.parse(JSON.stringify(DSS_AssumptionsDefaults));
+				win.getComponent('DSS_AssumptionCategories').removeAll(true); // destroy everything in it...
+				win.populateAssumptions(DSS_AssumptionsAdjustable.Assumptions);
+				Ext.resumeLayouts(true);
+			}
+		},
+		{
+			xtype: 'tbspacer', 
+			width: 7
 		},
 		{
 			xtype: 'button',
 			icon: 'app/images/save_icon.png',
 			scale: 'medium',
-			disabled: true,
-			text: 'Save'
-		},
-		{
-			xtype: 'button',
-			icon: 'app/images/load_icon.png',
-			scale: 'medium',
-			disabled: true,
-			text: 'Load'
-		},
-		{
-			xtype: 'tbspacer', 
-			width: 5
+			text: 'Save & Exit',
+			handler: function(self) {
+				// TODO: scrape settings out
+				self.up(). 	// go up to toolbar level (from the button level)
+					up().	// go up to the window level that the toolbar is in
+					doClose(); 
+			}
 		},
 		{
 			xtype: 'button',
 			icon: 'app/images/go_icon.png',
 			scale: 'medium',
-			text: 'Close',
+			text: 'Exit',
 			handler: function(self) {
 				self.up(). 	// go up to toolbar level (from the button level)
 					up().	// go up to the window level that the toolbar is in
@@ -78,23 +87,22 @@ Ext.define('MyApp.view.Assumptions.PropertyWindow', {
 
         me.callParent(arguments);
         
-        if (DSS_AssumptionsDefaults && DSS_AssumptionsDefaults.Assumptions) {
+        if (DSS_AssumptionsAdjustable && DSS_AssumptionsAdjustable.Assumptions) {
         	Ext.suspendLayouts();
-        	this.populateAssumptions(DSS_AssumptionsDefaults.Assumptions);
-			Ext.resumeLayouts(true);
-        }
+        	this.populateAssumptions(DSS_AssumptionsAdjustable.Assumptions);
+        	Ext.resumeLayouts(true);
+       }
     },
     
+    // Each array element should have these fields....
+	//	node.put("Category", category);
+	//	node.put("Icon", icon);
+	//	node.put("VariableName", variableName);
+	//	node.put("DisplayName", displayName);
+	//	node.put("DefaultValue", defaultValue);
     //--------------------------------------------------------------------------
     populateAssumptions: function(assumptionsArray) {
-
-/*      // Each array element should have these fields....
-		node.put("Category", category);
-		node.put("Icon", icon);
-		node.put("VariableName", variableName);
-		node.put("DisplayName", displayName);
-		node.put("DefaultValue", defaultValue);
-*/
+    	
 		// first find unique categories....
         var categories = {};
 		for (var idx = 0; idx < assumptionsArray.length; idx++) {

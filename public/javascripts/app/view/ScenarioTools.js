@@ -127,9 +127,9 @@ Ext.define('MyApp.view.ScenarioTools', {
     ],
     
     id: 'DSS_ScenarioSummary',
-    height: 250,
-    minHeight: 250,
-    maxHeight: 250,
+    height: 180,
+    minHeight: 180,
+    maxHeight: 180,
     width: 300,
 	dock: 'bottom',
     
@@ -220,7 +220,7 @@ Ext.define('MyApp.view.ScenarioTools', {
 					}
 				}
 				
-				chart.prepareModelRequest();
+				chart.buildModel_NEW();
 			}
 		}]
 	}],
@@ -373,12 +373,51 @@ Ext.define('MyApp.view.ScenarioTools', {
 	},
 	
 	//--------------------------------------------------------------------------
-	prepareModelRequest: function() {
+	buildModel: function() {
+	
+		var requestData = {
+			clientID: 12345, //temp
+			transforms: []
+		};
+		
+		var landUse = this.getStore().getAt(0).data.Transform;
+		if (landUse == null) {
+			landUse = 1; // blurf, set to corn....
+		}
+		
+		var transform = {
+			queryLayers: [],
+			newLandUse: landUse
+		};
+		
+		var haveQuery = false;
+		for (var i = 0; i < DSS_globalQueryableLayers.length; i++) {
+			
+			if (DSS_globalQueryableLayers[i].includeInQuery()) {
+				var queryComp = DSS_globalQueryableLayers[i].getSelectionCriteria();
+				transform.queryLayers.push(queryComp);
+				haveQuery = true;
+			}
+		}
+	
+		requestData.transforms.push(transform);
+		
+		console.log(requestData);
+		if (haveQuery) {
+			this.submitModel(requestData);
+		}
+		else {
+			alert("No query built - nothing to query");
+		}
+	},
+	
+	// TODO: use this variant instead
+	//--------------------------------------------------------------------------
+	buildModel_NEW: function() {
 	
 		var haveQuery = false;
 		var requestData = {
 			clientID: 12345, //temp
-			assumptions: DSS_AssumptionsAdjustable.Assumptions,
 			transforms: []
 		};
 		
@@ -404,6 +443,7 @@ Ext.define('MyApp.view.ScenarioTools', {
 		
 		console.log(requestData);
 		if (haveQuery) {
+			//this.submitModel(requestData);
 			this.createScenario(requestData);
 		}
 		else {
@@ -411,6 +451,45 @@ Ext.define('MyApp.view.ScenarioTools', {
 		}
 	},
 	
+    //--------------------------------------------------------------------------
+    submitModel: function(queryJson) {
+    	
+		var button = Ext.getCmp('DSS_runModelButton');
+		button.setIcon('app/images/spinner_16a.gif');
+		button.setDisabled(true);
+		
+		var obj = Ext.Ajax.request({
+			url: location.href + 'models',
+			jsonData: queryJson,
+			timeout: 10 * 60 * 1000, // minutes * seconds * (i.e. converted to) milliseconds
+			
+			success: function(response, opts) {
+				
+				try {
+					var obj= JSON.parse(response.responseText);
+					console.log("success: ");
+					console.log(obj);
+					Ext.getCmp('Model_Graph').SetData(obj);
+				}
+				catch(err) {
+					console.log(err);
+				}
+				var reportPanel = Ext.getCmp('DSS_report_panel');
+				if (reportPanel.getCollapsed() != false) {
+					reportPanel.expand();
+				}
+				button.setIcon('app/images/go_icon.png');
+				button.setDisabled(false);
+			},
+			
+			failure: function(respose, opts) {
+				button.setIcon('app/images/go_icon.png');
+				button.setDisabled(false);
+				alert("Model run failed, request timed out?");
+			}
+		});
+	},
+
     //--------------------------------------------------------------------------
 	createScenario: function(requestData) {
 		
@@ -428,7 +507,7 @@ Ext.define('MyApp.view.ScenarioTools', {
 					console.log(obj);
 					var newRequest = requestData;
 					newRequest.scenarioID = obj.scenarioID;
-					self.submitModel(newRequest);
+					self.submitModel_new(newRequest);
 				}
 				catch(err) {
 					console.log(err);
@@ -444,7 +523,7 @@ Ext.define('MyApp.view.ScenarioTools', {
 	},
 
     //--------------------------------------------------------------------------
-    submitModel: function(queryJson) {
+    submitModel_new: function(queryJson) {
     	
 		var button = Ext.getCmp('DSS_runModelButton');
 		button.setIcon('app/images/spinner_16a.gif');
@@ -455,9 +534,6 @@ Ext.define('MyApp.view.ScenarioTools', {
 		// NOTE: these strings MUST be synchronized with the server, or else the server will
 		//	not know which models to run. FIXME: should maybe set this up in a more robust fashion?? How?
 		var modelTypes = ['yield', 'n_p', 'pest_pol', 'soc', 'nitrous', 'habitat_index'];
-		
-		var requestCount = modelTypes.length;
-		
 		Ext.getCmp('DSS_ReportDetail').setWaitFields();
 		Ext.getCmp('DSS_SpiderGraphPanel').clearSpiderData(0);// set all fields to zero
 
@@ -485,19 +561,13 @@ Ext.define('MyApp.view.ScenarioTools', {
 					if (reportPanel.getCollapsed() != false) {
 						reportPanel.expand();
 					}
-					requestCount--;
-					if (requestCount <=0 ) {
-						button.setIcon('app/images/go_icon.png');
-						button.setDisabled(false);
-					}
+					button.setIcon('app/images/go_icon.png');
+					button.setDisabled(false);
 				},
 				
 				failure: function(respose, opts) {
-					requestCount--;
-					if (requestCount <=0 ) {
-						button.setIcon('app/images/go_icon.png');
-						button.setDisabled(false);
-					}
+					button.setIcon('app/images/go_icon.png');
+					button.setDisabled(false);
 					alert("Model run failed, request timed out?");
 				}
 			});

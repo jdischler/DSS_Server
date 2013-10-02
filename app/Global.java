@@ -34,9 +34,6 @@ public class Global extends GlobalSettings
 		conditionalCreateDefaultModelOutputs();		
 		cacheModelDefaults();
 		
-		// Create all of the assumptions the server knows about, these will be fed to clients
-		GlobalAssumptions.initAssumptions();
-		
 		systemReport("Data Layers Cached");
 	}
 

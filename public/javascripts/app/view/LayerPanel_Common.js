@@ -61,13 +61,11 @@ Ext.define('MyApp.view.LayerPanel_Common', {
 			var checkStyle = 'position: relative; top: -2px;';
 			var checkDisabled = false;
 			var makeChecked = c.DSS_Layer ? c.DSS_Layer.getVisibility() : false;
-			// NOTE: This was added to keep Selection layers from being toggled on/off...
-			//	maybe not the best idea so commetning it out...
-//			if (!c.DSS_Layer) {
-//				checkStyle += 'filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=15);' + 
-//					'opacity: 0.15;';
-//				checkDisabled = true;
-//			}
+			if (!c.DSS_Layer) {
+				checkStyle += 'filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=15);' + 
+					'opacity: 0.15;';
+				checkDisabled = true;
+			}
 			
 			// Layer visiblity check box...		
 			var chk = Ext.create('Ext.form.field.Checkbox', {

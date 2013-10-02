@@ -11,7 +11,6 @@ Ext.define('MyApp.view.LayerPanel_CurrentSelection', {
     DSS_noCollapseTool: false,
     DSS_noQueryTool: true,
     hideCollapseTool: true,
-    collapsed: false,
 
     header: {
     	style: {
@@ -66,19 +65,9 @@ Ext.define('MyApp.view.LayerPanel_CurrentSelection', {
 		var headerCheck = this.getHeader().getComponent('DSS_visibilityToggle');
 		headerCheck.setValue(true);
 		var headerSlider = this.getHeader().getComponent('DSS_opacitySlider');
-		this.DSS_Layer.setOpacity(headerSlider.getValue() / 100.0);
-
-		if (this.isHidden()) {
-			this.show();
-			// OK, I don't know why this panel doesn't size correctly. Seems wrong
-			//	to have to do a slightly delayed "jiggle" of the compents, but...blah...
-			Ext.defer(function() {
-				Ext.getCmp('DSS_LeftPanel').doComponentLayout();
-			}, 5, this);
-		}
-		else if (this.getCollapsed()) {
-			this.expand();
-		}
+		this.DSS_Layer.setOpacity(0.8);// FIXME; headerSlider.getValue() / 100.0);
+		
+		this.show();
 	},
 	
     //--------------------------------------------------------------------------

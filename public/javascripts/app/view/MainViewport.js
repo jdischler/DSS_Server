@@ -16,7 +16,8 @@ var DSS_LogoPanelHeight = 64;
 // boo
 var DSS_globalQueryableLayers = [];
 var DSS_globalCollapsibleLayers = [];
-var DSS_AssumptionsDefaults = null;
+var DSS_AssumptionsDefaults = null; // DON'T modify these - they come from the server...
+var DSS_AssumptionsAdjustable = null; // A copy!
 
 //------------------------------------------------------------------------------
 Ext.define('MyApp.view.MainViewport', {
@@ -634,6 +635,15 @@ Ext.define('MyApp.view.MainViewport', {
 				console.log("getAssumptions success: ");
 				console.log(obj);
 				DSS_AssumptionsDefaults = obj;
+				
+				// MAKE a COPY vs just setting the pointers, which does nothing to make a copy
+				//	like we really need...
+				DSS_AssumptionsAdjustable = JSON.parse(JSON.stringify(DSS_AssumptionsDefaults));
+				
+				console.log('Defaults');
+				console.log(DSS_AssumptionsDefaults);
+				console.log('Copy');
+				console.log(DSS_AssumptionsAdjustable);
 			},
 			
 			failure: function(respose, opts) {

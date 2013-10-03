@@ -15,8 +15,9 @@ public class Scenario
 	private long mCachedAtTime;
 	
 	public GlobalAssumptions mAssumptions;
+	public String mClientID;
 	public Selection mSelection; 
-	private String mOutputDir;
+	public String mOutputDir;
 	private JsonNode mConfiguration;
 	public int[][] mNewRotation; // copy of Rotation layer, but selection transformed
 	

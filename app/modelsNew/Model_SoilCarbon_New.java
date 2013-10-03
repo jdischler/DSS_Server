@@ -28,7 +28,7 @@ public class Model_SoilCarbon_New
 	static final float RSCCF_Alfalfa_Grass = 0.59f; // Continuous Grass to Alfalfa
 	
 	//--------------------------------------------------------------------------
-	public List<ModelResult> run(Scenario scenario, String destFolder) {
+	public List<ModelResult> run(Scenario scenario) {
 
 		int[][] rotationT_Data = scenario.mNewRotation;
 		int width = scenario.getWidth(), height = scenario.getHeight();
@@ -119,7 +119,7 @@ Logger.info("  > Allocated memory for SOC");
 		
 		List<ModelResult> results = new ArrayList<ModelResult>();
 		
-		results.add(new ModelResult("soc", destFolder, soilCarbonData, width, height));
+		results.add(new ModelResult("soc", scenario.mOutputDir, soilCarbonData, width, height));
 
 long timeEnd = System.currentTimeMillis();
 float timeSec = (timeEnd - timeStart) / 1000.0f;

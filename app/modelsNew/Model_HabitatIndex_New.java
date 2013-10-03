@@ -24,7 +24,7 @@ public class Model_HabitatIndex_New extends Model_Base
 	
 	// Define habitat index function
 	//--------------------------------------------------------------------------
-	public List<ModelResult> run(Scenario scenario, String destFolder) {
+	public List<ModelResult> run(Scenario scenario) {
 
 		int[][] rotationData = scenario.mNewRotation;
 		int width = scenario.getWidth(), height = scenario.getHeight();
@@ -60,7 +60,7 @@ Logger.info("  > Allocated memory for Habitat Index");
 		}		
 		
 		List<ModelResult> results = new ArrayList<ModelResult>();
-		results.add(new ModelResult("habitat_index", destFolder, habitatData, width, height));
+		results.add(new ModelResult("habitat_index", scenario.mOutputDir, habitatData, width, height));
 		
 long timeEnd = System.currentTimeMillis();
 float timeSec = (timeEnd - timeStart) / 1000.0f;

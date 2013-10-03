@@ -27,7 +27,7 @@ public class Model_EthanolNetEnergyIncome_New extends Model_Base
 	private static String mNetIncomeModelFile = "net_income";
 	
 	//--------------------------------------------------------------------------
-	public List<ModelResult> run(Scenario scenario, String destFolder) {
+	public List<ModelResult> run(Scenario scenario) {
 
 		int[][] rotationData = scenario.mNewRotation;
 		int width = scenario.getWidth(), height = scenario.getHeight();
@@ -186,10 +186,10 @@ Logger.info("  > Allocated memory for NetEnergy, NetIncom, Fuel");
 		
 		List<ModelResult> results = new ArrayList<ModelResult>();
 		
-//		results.add(new ModelResult("yeild", destFolder, calculatedYield, width, height));
-		results.add(new ModelResult("ethanol", destFolder, ethanolData, width, height));
-		results.add(new ModelResult("net_energy", destFolder, netEnergyData, width, height));
-		results.add(new ModelResult("net_income", destFolder, netIncomeData, width, height));
+//		results.add(new ModelResult("yeild", scenario.mOutputDir, calculatedYield, width, height));
+		results.add(new ModelResult("ethanol", scenario.mOutputDir, ethanolData, width, height));
+		results.add(new ModelResult("net_energy", scenario.mOutputDir, netEnergyData, width, height));
+		results.add(new ModelResult("net_income", scenario.mOutputDir, netIncomeData, width, height));
 
 long timeEnd = System.currentTimeMillis();
 float timeSec = (timeEnd - timeStart) / 1000.0f;

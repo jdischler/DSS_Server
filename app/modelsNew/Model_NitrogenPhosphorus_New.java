@@ -29,7 +29,7 @@ public class Model_NitrogenPhosphorus_New extends Model_Base
 	private static final int mNumWatersheds = 31;
 
 	//--------------------------------------------------------------------------
-	public List<ModelResult> run(Scenario scenario, String destFolder) {
+	public List<ModelResult> run(Scenario scenario) {
 
 		int[][] rotationData = scenario.mNewRotation;
 		int width = scenario.getWidth(), height = scenario.getHeight();
@@ -96,8 +96,8 @@ Logger.info("  > Allocated memory for Nitrogen / Phosphorus");
 		
 		List<ModelResult> results = new ArrayList<ModelResult>();
 		
-		results.add(new ModelResult("nitrogen", destFolder, nitrogenData, width, height));
-		results.add(new ModelResult("phosphorus", destFolder, phosphorusData, width, height));
+		results.add(new ModelResult("nitrogen", scenario.mOutputDir, nitrogenData, width, height));
+		results.add(new ModelResult("phosphorus", scenario.mOutputDir, phosphorusData, width, height));
 		
 long timeEnd = System.currentTimeMillis();
 float timeSec = (timeEnd - timeStart) / 1000.0f;

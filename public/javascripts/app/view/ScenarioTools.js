@@ -377,11 +377,19 @@ Ext.define('MyApp.view.ScenarioTools', {
 	
 		var haveQuery = false;
 		var requestData = {
-			clientID: 12345, //temp
+			clientID: 1234, //temp
 			assumptions: DSS_AssumptionsAdjustable.Assumptions,
 			transforms: []
 		};
 		
+		var clientID_cookie = Ext.util.Cookies.get('DSS_clientID');
+		if (clientID_cookie) {
+			requestData.clientID = clientID_cookie;
+		}
+		else {
+			console.log('WARNING: no client id cookie was found...');
+		}
+
 		var st = this.getStore();
 		for (var idx = 0; idx < st.getCount(); idx++) {
 			var rec = st.getAt(idx);
@@ -413,6 +421,10 @@ Ext.define('MyApp.view.ScenarioTools', {
 	
     //--------------------------------------------------------------------------
 	createScenario: function(requestData) {
+		
+		var button = Ext.getCmp('DSS_runModelButton');
+		button.setIcon('app/images/spinner_16a.gif');
+		button.setDisabled(true);
 		
 		var self = this;
 		var obj = Ext.Ajax.request({
@@ -446,10 +458,6 @@ Ext.define('MyApp.view.ScenarioTools', {
     //--------------------------------------------------------------------------
     submitModel: function(queryJson) {
     	
-		var button = Ext.getCmp('DSS_runModelButton');
-		button.setIcon('app/images/spinner_16a.gif');
-		button.setDisabled(true);
-		
 		console.log(queryJson);
 		
 		// NOTE: these strings MUST be synchronized with the server, or else the server will

@@ -20,7 +20,7 @@ import org.codehaus.jackson.node.*;
 public class Model_NitrousOxideEmissions_New
 {
 	//--------------------------------------------------------------------------
-	public List<ModelResult> run(Scenario scenario, String destFolder) {
+	public List<ModelResult> run(Scenario scenario) {
 
 		int[][] rotationData = scenario.mNewRotation;
 		int width = scenario.getWidth(), height = scenario.getHeight();
@@ -106,7 +106,7 @@ Logger.info("  > Allocated memory for N20");
 		
 		List<ModelResult> results = new ArrayList<ModelResult>();
 		
-		results.add(new ModelResult("nitrous_oxide", destFolder, nitrousOxideData, width, height));
+		results.add(new ModelResult("nitrous_oxide", scenario.mOutputDir, nitrousOxideData, width, height));
 
 long timeEnd = System.currentTimeMillis();
 float timeSec = (timeEnd - timeStart) / 1000.0f;

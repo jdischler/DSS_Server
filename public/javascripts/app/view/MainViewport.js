@@ -84,8 +84,28 @@ Ext.define('MyApp.view.MainViewport', {
 		this.addMapLayers(map);
 		this.addMapControls(map);	
 		this.getAssumptions();
+		this.checkAssignClientID();
 	},
 
+	//--------------------------------------------------------------------------
+	checkAssignClientID: function() {
+		
+		var res = Ext.util.Cookies.get('DSS_clientID');
+		if (!res) {
+			// TODO: hit the server for a clientID if we haven't got one...
+			console.log(' No cookies for you! (but that isnt always a problem...)');
+			Ext.util.Cookies.set('DSS_clientID', 1113);
+		}
+		var res = Ext.util.Cookies.get('DSS_clientID');
+		if (res) {
+			console.log(' Cookie is: ');
+			console.log(res);
+		}
+		else {
+			console.log(' Boo, still no cookie for u!!');
+		}
+	},
+	
 	// Controls wired up to DOM elements need some manner of delay other control
 	//	INIT will attempt to find the element which will not exist yet    
 	//--------------------------------------------------------------------------

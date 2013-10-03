@@ -127,12 +127,17 @@ public class Application extends Controller
 		Logger.info("----- Initializing scenario ----");
 		// Create a new scenario and get a transformed crop rotation layer from it...
 		JsonNode request = request().body().asJson();
+
+		int clientID = request.get("clientID").getIntValue();
+
+		String folder = "client_" + Integer.toString(clientID);
 		
 		Scenario scenario = new Scenario();
 		scenario.setAssumptions(request);
 		scenario.getTransformedRotation(request);
+		scenario.mOutputDir = folder;
 		
-		String cacheID = Scenario.cacheScenario(scenario, 12345); // FIXME: real clientID
+		String cacheID = Scenario.cacheScenario(scenario, clientID);
 
 		ObjectNode sendback = JsonNodeFactory.instance.objectNode();
 		sendback.put("scenarioID", cacheID);
@@ -154,6 +159,8 @@ public class Application extends Controller
 		
 		Scenario scenario = Scenario.getCachedScenario(request.get("scenarioID").getTextValue());
 		
+		// TODO: validate that a scenario was found?
+		
 		String modelType = request.get("modelType").getTextValue();
 		List<ModelResult> results = null;
 		
@@ -161,29 +168,29 @@ public class Application extends Controller
 		
 		if (modelType.equals("yield")) {
 			Model_EthanolNetEnergyIncome_New ethanolEnergyIncome = new Model_EthanolNetEnergyIncome_New();
-			results = ethanolEnergyIncome.run(scenario, "clientID");
+			results = ethanolEnergyIncome.run(scenario);
 		}
 		else if (modelType.equals("n_p")) {
 			Model_NitrogenPhosphorus_New np = new Model_NitrogenPhosphorus_New();
-			results = np.run(scenario, "clientID");
+			results = np.run(scenario);
 		}
 		else if (modelType.equals("soc")) {
 			Model_SoilCarbon_New soc = new Model_SoilCarbon_New();
-			results = soc.run(scenario, "clientID");
+			results = soc.run(scenario);
 		}
 		else if (modelType.equals("pest_pol")) {
 			Model_PollinatorPestSuppression_New pp = new Model_PollinatorPestSuppression_New();
-			results = pp.run(scenario, "clientID");
+			results = pp.run(scenario);
 			bAnalyzeAll = true;
 		}
 		else if (modelType.equals("nitrous")) {
 			Model_NitrousOxideEmissions_New n20 = new Model_NitrousOxideEmissions_New();
-			results = n20.run(scenario, "clientID");
+			results = n20.run(scenario);
 		}
 		
 		else {//(modelType.equals("habitat_index")) {
 			Model_HabitatIndex_New hi = new Model_HabitatIndex_New();
-			results = hi.run(scenario, "clientID");
+			results = hi.run(scenario);
 			bAnalyzeAll = true;
 		}
 		

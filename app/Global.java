@@ -175,21 +175,22 @@ public class Global extends GlobalSettings
 			scenario.mSelection = new Selection(width, height);
 	// FIXME: these assumptions don't seem to be set up correctly?
 			scenario.mAssumptions = new GlobalAssumptions();
+			scenario.mOutputDir = "default";
 			
 			List<ModelResult> results;
-			results = new Model_HabitatIndex_New().run(scenario, "default");
+			results = new Model_HabitatIndex_New().run(scenario);
 			QueuedWriter.queueResults(results);
 
-			results = new Model_EthanolNetEnergyIncome_New().run(scenario, "default");
+			results = new Model_EthanolNetEnergyIncome_New().run(scenario);
 			QueuedWriter.queueResults(results);
 			
-			results = new Model_PollinatorPestSuppression_New().run(scenario, "default");
+			results = new Model_PollinatorPestSuppression_New().run(scenario);
 			QueuedWriter.queueResults(results);
 			
-			results = new Model_NitrogenPhosphorus_New().run(scenario, "default");
+			results = new Model_NitrogenPhosphorus_New().run(scenario);
 			QueuedWriter.queueResults(results);
 
-			results = new Model_NitrousOxideEmissions_New().run(scenario, "default");
+			results = new Model_NitrousOxideEmissions_New().run(scenario);
 			QueuedWriter.queueResults(results);
 
 			// NOTE: SOC for the default is not in the model run because it is not a computed data layer like others...

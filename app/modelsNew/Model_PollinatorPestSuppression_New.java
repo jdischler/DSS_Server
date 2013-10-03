@@ -36,7 +36,7 @@ public class Model_PollinatorPestSuppression_New extends Model_Base
 	}
 	
 	//--------------------------------------------------------------------------
-	public List<ModelResult> run(Scenario scenario, String destFolder) {
+	public List<ModelResult> run(Scenario scenario) {
 
 		int[][] rotationData = scenario.mNewRotation;
 		int width = scenario.getWidth(), height = scenario.getHeight();
@@ -84,8 +84,8 @@ long timeStart = System.currentTimeMillis();
 		}		
 	
 		List<ModelResult> results = new ArrayList<ModelResult>();
-		results.add(new ModelResult("pest", destFolder, pestData, width, height));
-		results.add(new ModelResult("pollinator", destFolder, pollinatorData, width, height));
+		results.add(new ModelResult("pest", scenario.mOutputDir, pestData, width, height));
+		results.add(new ModelResult("pollinator", scenario.mOutputDir, pollinatorData, width, height));
 		
 long timeEnd = System.currentTimeMillis();
 float timeSec = (timeEnd - timeStart) / 1000.0f;

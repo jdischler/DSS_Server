@@ -47,20 +47,19 @@ Ext.define('MyApp.view.Report_Detail', {
 					xtype: 'report_detail_header'
 				},
 				{
-					itemId: 'result_habitat_index',
-					xtype: 'report_detail_item',
-					DSS_FieldString: 'habitat_index',
-					DSS_UnitLabelDelta: '-1 to 1',
-					DSS_UnitLabelFile: '0 to 1',
-					DSS_Label: 'Bird Habitat',
-					DSS_GraphTitle: 'Bird Habitat Index'
-				},{
 					itemId: 'result_soc',
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'soc',
 					DSS_Label: 'Soil Carbon',
 					DSS_UnitLabel: 'Mg',
 					DSS_GraphTitle: 'Soil Carbon'
+				},{
+					itemId: 'result_nitrous_oxide',
+					xtype: 'report_detail_item',
+					DSS_FieldString: 'nitrous_oxide',
+					DSS_UnitLabel: 'Tg',
+					DSS_Label: 'Nitrous Oxide',
+					DSS_GraphTitle: 'Nitrous Oxide Emissions'
 				},{
 					itemId: 'result_nitrogen',
 					xtype: 'report_detail_item',
@@ -76,6 +75,22 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_Label: 'Phosphorus',
 					DSS_GraphTitle: 'Phosphorus Runoff'
 				},{
+					itemId: 'result_habitat_index',
+					xtype: 'report_detail_item',
+					DSS_FieldString: 'habitat_index',
+					DSS_UnitLabelDelta: '-1 to 1',
+					DSS_UnitLabelFile: '0 to 1',
+					DSS_Label: 'Bird Habitat',
+					DSS_GraphTitle: 'Bird Habitat Index'
+				},{
+					itemId: 'result_pest',
+					xtype: 'report_detail_item',
+					DSS_FieldString: 'pest',
+					DSS_UnitLabelDelta: '-1 to 1',
+					DSS_UnitLabelFile: '0 to 1',
+					DSS_Label: 'Biocontrol',
+					DSS_GraphTitle: 'Biocontrol / Crop Pest Supression'
+				},{
 					itemId: 'result_pollinators',
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'pollinator',
@@ -83,6 +98,13 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_UnitLabelFile: '0 to 1',
 					DSS_Label: 'Pollinators',
 					DSS_GraphTitle: 'Key Pollinators'
+				},{
+					itemId: 'result_ethanol',
+					xtype: 'report_detail_item',
+					DSS_FieldString: 'ethanol',
+					DSS_UnitLabel: 'Gl',
+					DSS_Label: 'Biofuel',
+					DSS_GraphTitle: 'Biofuel Production'
 				},{
 					itemId: 'result_net_income',
 					xtype: 'report_detail_item',
@@ -97,28 +119,6 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_UnitLabel: 'TJ',
 					DSS_Label: 'Net Energy',
 					DSS_GraphTitle: 'Net Energy'
-				},{
-					itemId: 'result_pest',
-					xtype: 'report_detail_item',
-					DSS_FieldString: 'pest',
-					DSS_UnitLabelDelta: '-1 to 1',
-					DSS_UnitLabelFile: '0 to 1',
-					DSS_Label: 'Biocontrol',
-					DSS_GraphTitle: 'Biocontrol / Crop Pest Supression'
-				},{
-					itemId: 'result_ethanol',
-					xtype: 'report_detail_item',
-					DSS_FieldString: 'ethanol',
-					DSS_UnitLabel: 'Gl',
-					DSS_Label: 'Biofuel',
-					DSS_GraphTitle: 'Biofuel Production'
-				},{
-					itemId: 'result_nitrous_oxide',
-					xtype: 'report_detail_item',
-					DSS_FieldString: 'nitrous_oxide',
-					DSS_UnitLabel: 'Tg',
-					DSS_Label: 'Nitrous Oxide',
-					DSS_GraphTitle: 'Nitrous Oxide Emissions'
 				}]
 			},{
 				xtype: 'container',

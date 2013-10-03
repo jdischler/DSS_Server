@@ -40,12 +40,13 @@ long timeStart = System.currentTimeMillis();
 Logger.info("  > Allocated memory for SOC");
 
 		// Defining variables based on the selected layer
-		int Grass_Mask = 256; // 9
-		int Corn_Mask = 1; // 1	
-		int Soy_Mask = 2; // 2	
-		int Corn_Soy_Mask = 4; // 3
-		Corn_Mask = Corn_Mask | Corn_Soy_Mask;
-		int Alfalfa_Mask = 128; // 8
+		// Mask
+		Layer_Integer cdl = (Layer_Integer)Layer_Base.getLayer("cdl_2012"); 
+		int Grass_Mask = cdl.convertStringsToMask("grass");
+		int Corn_Mask = cdl.convertStringsToMask("corn");
+		int Soy_Mask = cdl.convertStringsToMask("soy");
+		int Alfalfa_Mask = cdl.convertStringsToMask("Alfalfa");
+		int TotalMask = Grass_Mask | Corn_Mask | Soy_Mask | Alfalfa_Mask;
 		float factor = 1.0f;
 		float adjFactor = 0;
 		

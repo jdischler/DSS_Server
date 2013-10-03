@@ -37,7 +37,9 @@ public class Model_NitrogenPhosphorus_New extends Model_Base
 Logger.info(">>> Computing Model Nitrogen / Phosphorus");
 long timeStart = System.currentTimeMillis();
 		
-		int Ag_Mask = 1 + 2 + 4 + 8 + 16 + 32 + 64 + 512; // 1, 2, 3, 4, 5, 6, 7, 10
+		// Mask
+		Layer_Integer cdl = (Layer_Integer)Layer_Base.getLayer("cdl_2012"); 
+		int Ag_Mask = 1 + 2 + 8 + 32768 + 131072 + 262144;
 		
 		int[] countCellsInWatershed = new int[mNumWatersheds];
 		int[] countAgCellsInWatershed = new int[mNumWatersheds];

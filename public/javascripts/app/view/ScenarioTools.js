@@ -12,7 +12,7 @@ var ScenarioGridStore = Ext.create('Ext.data.Store', {
             SelectionName: 'Unstable Crops', 
         	TransformText: 'To Perennial Grass',
         	ManagementText: '<b><i>Management Options:</i></b></br>None',
-        	Transform: 9,
+        	Transform: 6,
         	Query: {
         		clientID: 0,
         		queryLayers: [{
@@ -87,7 +87,7 @@ var ClearScenarioGridStore = Ext.create('Ext.data.Store', {
             SelectionName: 'undefined', 
         	TransformText: 'To Perennial Grass',
         	ManagementText: '<b><i>Management Options:</i></b></br>None',
-        	Transform: 9,
+        	Transform: 6,
         	Query: {
         		clientID: 0,
         		queryLayers: [{

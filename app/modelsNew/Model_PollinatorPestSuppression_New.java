@@ -43,8 +43,20 @@ public class Model_PollinatorPestSuppression_New extends Model_Base
 		
 Logger.info(">>> Computing Model Pest/ Pollinator");
 long timeStart = System.currentTimeMillis();
-		int Grass_Mask = 128 + 256; // 8 and 9
-
+		
+		// Mask
+		Layer_Integer cdl = (Layer_Integer)Layer_Base.getLayer("cdl_2012"); 
+		// Grass
+		int Grass_Mask = cdl.convertStringsToMask("grass");
+		int Alfalfa_Mask = cdl.convertStringsToMask("alfalfa");
+		int mGrassMask = Grass_Mask | Alfalfa_Mask;	
+		// Forest
+		int mForestMask = cdl.convertStringsToMask("woodland");
+		// Ag
+		int Corn_Mask = cdl.convertStringsToMask("corn");
+		int Soy_Mask = cdl.convertStringsToMask("soy");
+		int mAgMask = 1 + 2 + 8 + 32768 + 131072 + 262144;
+		
 		// full raster save process...
 		float [][] pestData = new float[height][width];
 		float [][] pollinatorData = new float[height][width];

@@ -28,17 +28,20 @@ public class Model_CropYield_New
 Logger.info(" >> Computing Yield");
 
 		// Defining variables based on the selected layer
-		int Grass_Mask = 256; // 9
-		int Corn_Mask = 1; // 1	
-		int Soy_Mask = 2; // 2	
-		int Corn_Soy_Mask = 4; // 3
-		int Alfalfa_Mask = 128; // 8	
-		int TotalMask = Grass_Mask | Corn_Mask | Soy_Mask | Alfalfa_Mask | Corn_Soy_Mask;
+		//int Grass_Mask = 256; // 9
+		//int Corn_Mask = 1; // 1	
+		//int Soy_Mask = 2; // 2	
+		//int Corn_Soy_Mask = 4; // 3
+		//int Alfalfa_Mask = 128; // 8	
+		//int TotalMask = Grass_Mask | Corn_Mask | Soy_Mask | Alfalfa_Mask | Corn_Soy_Mask;
 		
-		// ---TEST TEST
+		// Mask
 		Layer_Integer cdl = (Layer_Integer)Layer_Base.getLayer("cdl_2012"); 
-		int testAgMask = cdl.convertStringsToMask("corn","soy");
-		// ---TEST TEST
+		int Grass_Mask = cdl.convertStringsToMask("grass");
+		int Corn_Mask = cdl.convertStringsToMask("corn");
+		int Soy_Mask = cdl.convertStringsToMask("soy");
+		int Alfalfa_Mask = cdl.convertStringsToMask("Alfalfa");
+		int TotalMask = Grass_Mask | Corn_Mask | Soy_Mask | Alfalfa_Mask;
 		
 		// Corn and Grass Yield
 		float Corn_Y = 0;
@@ -92,7 +95,7 @@ Logger.info("  > Allocated memory for Yield");
 						// add residue
 						Yield = Soy_Y + Soy_Y * 1.5f;
 					}
-					else if ((rotationData[y][x] & Corn_Soy_Mask) > 0) {
+					/*else if ((rotationData[y][x] & Corn_Soy_Mask) > 0) {
 						// Bushels per Ac
 						Corn_Y = 22.000f - 1.05f * slope[y][x] + 0.190f * depth[y][x] + 0.817f * silt[y][x] + 1.32f * cec[y][x];
 						// Correct for techno advances
@@ -107,7 +110,7 @@ Logger.info("  > Allocated memory for Yield");
 						Soy_Y = Soy_Y * 0.0585f;
 						// add residue
 						Yield = ((Corn_Y * 0.053f) + (Soy_Y + Soy_Y * 1.5f)) / 2.0f;
-					}
+					}*/
 					else if ((rotationData[y][x] & Alfalfa_Mask) > 0) {
 						// Short tons per Acre
 						Alfalfa_Y = 1.26f - 0.045f * slope[y][x] + 0.007f * depth[y][x] + 0.027f * silt[y][x] + 0.041f * cec[y][x];

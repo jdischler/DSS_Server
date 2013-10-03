@@ -45,12 +45,13 @@ Logger.info("  > Allocated memory for NetEnergy, NetIncom, Fuel");
 		
 		float Net_Energy_C = 0;
 		float Net_Energy_S = 0;
-		int Grass_Mask = 256; // 9
-		int Corn_Mask = 1; // 1	
-		int Soy_Mask = 2; // 2	
-		int Corn_Soy_Mask = 4; // 3
-		int Alfalfa_Mask = 128; // 8	
-		int TotalMask = Grass_Mask | Corn_Mask | Soy_Mask | Alfalfa_Mask | Corn_Soy_Mask;
+		// Mask
+		Layer_Integer cdl = (Layer_Integer)Layer_Base.getLayer("cdl_2012"); 
+		int Grass_Mask = cdl.convertStringsToMask("grass");
+		int Corn_Mask = cdl.convertStringsToMask("corn");
+		int Soy_Mask = cdl.convertStringsToMask("soy");
+		int Alfalfa_Mask = cdl.convertStringsToMask("Alfalfa");
+		int TotalMask = Grass_Mask | Corn_Mask | Soy_Mask | Alfalfa_Mask;
 		
 		// Proportion of Stover 
 		float Prop_Stover_Harvest = 0.38f;
@@ -151,7 +152,7 @@ Logger.info("  > Allocated memory for NetEnergy, NetIncom, Fuel");
 						// Net Income $ per pixel
 						netIncome = returnAmount  - PS_Cost;
 					}
-					else if ((rotationData[y][x] & Corn_Soy_Mask) > 0) {
+					/*else if ((rotationData[y][x] & Corn_Soy_Mask) > 0) {
 						// Tonnes per pixel
 						ethanol = (yield * 0.5f * CEO_C + yield * 0.25f * CEO_CS + yield * CEO_S) / 2;
 						// MJ per Ha
@@ -160,7 +161,7 @@ Logger.info("  > Allocated memory for NetEnergy, NetIncom, Fuel");
 						returnAmount = P_Per_Corn * 0.5f * yield + P_Per_Stover * Prop_Stover_Harvest * 0.5f * yield + P_Per_Soy * yield;
 						// Net Income $ per hec
 						netIncome = returnAmount - PC_Cost - PCS_Cost - PS_Cost;
-					}
+					}*/
 					else if ((rotationData[y][x] & Alfalfa_Mask) > 0) {
 						// Tonnes per pixel
 						ethanol = yield * CEO_A;

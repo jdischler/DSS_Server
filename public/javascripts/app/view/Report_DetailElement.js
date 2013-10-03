@@ -104,7 +104,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
     //--------------------------------------------------------------------------
 	clearFields: function() {
 		
-		this.getComponent('value_field').setValue(null);
+		this.getComponent('DSS_ValueField').setValue(null);
 	},
 	
     //--------------------------------------------------------------------------
@@ -113,7 +113,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			"background-repeat":"no-repeat","background-position":"center center", 
 			"padding-left":"16px"};
 		
-		this.getComponent('value_field').setFieldStyle(spinnerStyle);
+		this.getComponent('DSS_ValueField').setFieldStyle(spinnerStyle);
 		this.getComponent('graph_button').disable();
 		this.getComponent('heat_delta_button').disable();
 	},
@@ -123,7 +123,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
 		
 		var clearSpinnerStyle = {"background-image":"none"};
 
-		this.getComponent('value_field').setFieldStyle(clearSpinnerStyle);
+		this.getComponent('DSS_ValueField').setFieldStyle(clearSpinnerStyle);
 		this.getComponent('graph_button').enable();
 		this.getComponent('heat_delta_button').enable();
 	},
@@ -244,7 +244,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
 				unitsLabel = this.DSS_UnitLabelDelta ? this.DSS_UnitLabelDelta : this.DSS_UnitLabel;
 			}
 			else { // type is '%'
-				res = (this.DSS_FieldData.val2 - this.DSS_FieldData.val1) / this.DSS_FieldData.val1;
+				res = (this.DSS_FieldData.val2 - this.DSS_FieldData.val1) * 100 / this.DSS_FieldData.val1;
 				unitsLabel = '%';
 			}
     	}

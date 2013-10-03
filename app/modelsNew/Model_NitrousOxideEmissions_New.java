@@ -31,12 +31,13 @@ long timeStart = System.currentTimeMillis();
 		float [][] nitrousOxideData = new float[height][width];
 Logger.info("  > Allocated memory for N20");
 		
-		int Grass_Mask = 256; // 9
-		int Corn_Mask = 1; // 1	
-		int Soy_Mask = 2; // 2	
-		int Corn_Soy_Mask = 4; // 3	
-		int Alfalfa_Mask = 128; // 8	
-		int Mask = Grass_Mask | Corn_Mask | Soy_Mask | Alfalfa_Mask | Corn_Soy_Mask;
+		// Mask
+		Layer_Integer cdl = (Layer_Integer)Layer_Base.getLayer("cdl_2012"); 
+		int Grass_Mask = cdl.convertStringsToMask("grass");
+		int Corn_Mask = cdl.convertStringsToMask("corn");
+		int Soy_Mask = cdl.convertStringsToMask("soy");
+		int Alfalfa_Mask = cdl.convertStringsToMask("Alfalfa");
+		int TotalMask = Grass_Mask | Corn_Mask | Soy_Mask | Alfalfa_Mask;
 		
 		// Input layers
 		float texture[][] = Layer_Base.getLayer("Texture").getFloatData();
@@ -75,17 +76,17 @@ Logger.info("  > Allocated memory for N20");
 					{
 						cropRotation = -1.023f;
 					}
-					else if ((rotationData[y][x] & Corn_Soy_Mask) > 0) // Corn_Soy
+					/*else if ((rotationData[y][x] & Corn_Soy_Mask) > 0) // Corn_Soy
 					{
 						cropRotation = -0.5115f;
 						fertRate = 84.0f;
-					}
+					}*/
 					else // OTHER crops
 					{
 						cropRotation = 0.0f;
 					}
 					
-					if ((rotationData[y][x] & Mask) > 0)
+					if ((rotationData[y][x] & TotalMask) > 0)
 					{
 						// Calculate Nitrous Oxide Emissions (Unit Kg/Ha per year)
 						nitrousOxideData[y][x] = (float)(Math.exp(0.414f + 0.825f + fertRate * 0.005f + cropRotation +

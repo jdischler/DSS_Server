@@ -244,7 +244,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
 				unitsLabel = this.DSS_UnitLabelDelta ? this.DSS_UnitLabelDelta : this.DSS_UnitLabel;
 			}
 			else { // type is '%'
-				res = (this.DSS_FieldData.val1 - this.DSS_FieldData.val2) / this.DSS_FieldData.val1;
+				res = (this.DSS_FieldData.val2 - this.DSS_FieldData.val1) / this.DSS_FieldData.val1;
 				unitsLabel = '%';
 			}
     	}

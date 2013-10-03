@@ -25,11 +25,24 @@ Ext.define('MyApp.view.Assumptions.PropertyContainer', {
     
     // {"Category","VariableName","DisplayName","DefaultValue"}
 	//--------------------------------------------------------------------------
-    addAssumptionElement: function(definition) {
+    addAssumptionElement: function(key, definition) {
     	
     	var element = Ext.create('MyApp.view.Assumptions.PropertyElement',
-    		{DSS_elementDefinition: definition});
+    		{DSS_variableKey: key, DSS_elementDefinition: definition});
     	this.add(element);
+    },
+    
+	//--------------------------------------------------------------------------
+    applyValue: function(assumptionsObject) {
+    	
+		for (var idx = 0; idx < this.items.getCount(); idx++) {
+			var comp = this.items.getAt(idx);
+			
+			// check if safe to call this function....
+			if (typeof(comp.applyValue) !== 'undefined' && typeof(comp.applyValue) === 'function') {
+				comp.applyValue(assumptionsObject);
+			}
+		}
     }
 
 });

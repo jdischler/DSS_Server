@@ -126,8 +126,11 @@ public class Application extends Controller
 	{
 		Logger.info("----- Initializing scenario ----");
 		// Create a new scenario and get a transformed crop rotation layer from it...
+		JsonNode request = request().body().asJson();
+		
 		Scenario scenario = new Scenario();
-		scenario.getTransformedRotation(request().body().asJson());
+		scenario.setAssumptions(request);
+		scenario.getTransformedRotation(request);
 		
 		String cacheID = Scenario.cacheScenario(scenario, 12345); // FIXME: real clientID
 
@@ -153,6 +156,10 @@ public class Application extends Controller
 		
 		String modelType = request.get("modelType").getTextValue();
 		List<ModelResult> results = null;
+		
+		float cornPrice = scenario.mAssumptions.getAssumptionFloat("p_corn");
+		
+		Logger.info(" Corn price from client = " + Float.toString(cornPrice) );
 		
 		boolean bAnalyzeAll = false;
 		

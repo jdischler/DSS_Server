@@ -14,6 +14,7 @@ public class Scenario
 	private static Map<String, Scenario>	mCachedScenarios;
 	private long mCachedAtTime;
 	
+	public GlobalAssumptions mAssumptions;
 	public Selection mSelection; 
 	private String mOutputDir;
 	private JsonNode mConfiguration;
@@ -45,6 +46,18 @@ public class Scenario
 			return mSelection.getHeight();
 		}
 		return 0;
+	}
+	
+	//--------------------------------------------------------------------------
+	public void setAssumptions(JsonNode clientAssumptions) {
+		
+		mAssumptions = new GlobalAssumptions();
+		try {
+			mAssumptions.setAssumptionsFromClient(clientAssumptions);
+		} 
+		catch (Exception e) {
+			Logger.info(e.toString());
+		}
 	}
 	
 	// Returns a cacheStringID, which should be saved and returned to free the scenario...

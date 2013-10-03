@@ -167,7 +167,7 @@ Logger.info("  > Allocated memory for NetEnergy, NetIncom, Fuel");
 		
 		List<ModelResult> results = new ArrayList<ModelResult>();
 		
-		results.add(new ModelResult("yeild", destFolder, calculatedYield, width, height));
+//		results.add(new ModelResult("yeild", destFolder, calculatedYield, width, height));
 		results.add(new ModelResult("ethanol", destFolder, ethanolData, width, height));
 		results.add(new ModelResult("net_energy", destFolder, netEnergyData, width, height));
 		results.add(new ModelResult("net_income", destFolder, netIncomeData, width, height));

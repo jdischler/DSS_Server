@@ -16,6 +16,7 @@ Ext.define('MyApp.view.Assumptions.PropertyElement', {
 
         Ext.applyIf(me, {
             items: [{
+            	itemId: 'valueField',
 				xtype: 'numberfield',
 				x: 0,
 				y: 2,
@@ -34,6 +35,25 @@ Ext.define('MyApp.view.Assumptions.PropertyElement', {
         });
 
         me.callParent(arguments);
+    },
+    
+    //--------------------------------------------------------------------------
+    applyValue: function(assumptionsObject) {
+
+		for (var key in assumptionsObject) {
+			if (key == this.DSS_variableKey) {
+				var field = this.getComponent('valueField');
+				// TODO: other data validation??
+				if (field.getValue()) {
+					// TODO: rename DefaultValue field? Not really accurate?
+					assumptionsObject[key].DefaultValue = field.getValue();
+					return;
+				}
+			}
+		}
+		
+		console.log('PropertyElement.js - applyValue error?');
+		console.log('Looking for: ' + this.DSS_elementDefinition.VariableName + ' but wasnt found');
     }
 
 });

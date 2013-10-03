@@ -36,7 +36,10 @@ public class Model_PollinatorPestSuppression_New extends Model_Base
 	}
 	
 	//--------------------------------------------------------------------------
-	public List<ModelResult> run(int[][] rotationData, int width, int height, String destFolder) {
+	public List<ModelResult> run(Scenario scenario, String destFolder) {
+
+		int[][] rotationData = scenario.mNewRotation;
+		int width = scenario.getWidth(), height = scenario.getHeight();
 		
 Logger.info(">>> Computing Model Pest/ Pollinator");
 long timeStart = System.currentTimeMillis();

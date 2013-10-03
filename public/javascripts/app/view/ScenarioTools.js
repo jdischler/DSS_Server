@@ -16,7 +16,7 @@ var ScenarioGridStore = Ext.create('Ext.data.Store', {
         	Query: {
         		clientID: 0,
         		queryLayers: [{
-					name: 'rotation',
+					name: 'cdl_2012',
 					type: 'indexed',
 					matchValues: [1,2,3]
         		},
@@ -45,7 +45,7 @@ var ScenarioGridStore = Ext.create('Ext.data.Store', {
         	Query:  {
         		clientID: 0,
         		queryLayers: [{
-					name: 'rotation',
+					name: 'cdl_2012',
 					type: 'indexed',
 					matchValues: [8,9]
         		},
@@ -91,7 +91,7 @@ var ClearScenarioGridStore = Ext.create('Ext.data.Store', {
         	Query: {
         		clientID: 0,
         		queryLayers: [{
-					name: 'rotation',
+					name: 'cdl_2012',
 					type: 'indexed',
 					matchValues: [1]
         		}]

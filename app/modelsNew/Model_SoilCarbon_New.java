@@ -28,7 +28,10 @@ public class Model_SoilCarbon_New
 	static final float RSCCF_Alfalfa_Grass = 0.59f; // Continuous Grass to Alfalfa
 	
 	//--------------------------------------------------------------------------
-	public List<ModelResult> run(int[][] rotationT_Data, int width, int height, String destFolder) {
+	public List<ModelResult> run(Scenario scenario, String destFolder) {
+
+		int[][] rotationT_Data = scenario.mNewRotation;
+		int width = scenario.getWidth(), height = scenario.getHeight();
 		
 Logger.info(">>> Computing Soil Carbon Index");
 long timeStart = System.currentTimeMillis();
@@ -46,7 +49,7 @@ Logger.info("  > Allocated memory for SOC");
 		float factor = 1.0f;
 		float adjFactor = 0;
 		
-		int [][] rotationD_Data = Layer_Base.getLayer("Rotation").getIntData();
+		int [][] rotationD_Data = Layer_Base.getLayer("cdl_2012").getIntData();
 		float[][] SOC = Layer_Base.getLayer("SOC").getFloatData();
 		
 		// Soil_Carbon

@@ -20,7 +20,10 @@ import org.codehaus.jackson.node.*;
 public class Model_NitrousOxideEmissions_New
 {
 	//--------------------------------------------------------------------------
-	public List<ModelResult> run(int[][] rotationT_Data, int width, int height, String destFolder) {
+	public List<ModelResult> run(Scenario scenario, String destFolder) {
+
+		int[][] rotationData = scenario.mNewRotation;
+		int width = scenario.getWidth(), height = scenario.getHeight();
 		
 Logger.info(">>> Computing Nitrous Oxide Index");
 long timeStart = System.currentTimeMillis();
@@ -54,25 +57,25 @@ Logger.info("  > Allocated memory for N20");
 				{
 					fertRate = 0.0f;
 					
-					if ((rotationT_Data[y][x] & Corn_Mask) > 0) // CORN
+					if ((rotationData[y][x] & Corn_Mask) > 0) // CORN
 					{
 						cropRotation = 0.0f;
 						fertRate = 168.0f;
 					}
-					else if ((rotationT_Data[y][x] & Grass_Mask) > 0) // GRASS
+					else if ((rotationData[y][x] & Grass_Mask) > 0) // GRASS
 					{
 						cropRotation = -1.268f;
 						fertRate = 56.0f;
 					}
-					else if ((rotationT_Data[y][x] & Soy_Mask) > 0) // SOY
+					else if ((rotationData[y][x] & Soy_Mask) > 0) // SOY
 					{
 						cropRotation = -1.023f;
 					}
-					else if ((rotationT_Data[y][x] & Alfalfa_Mask) > 0) // ALFALFA
+					else if ((rotationData[y][x] & Alfalfa_Mask) > 0) // ALFALFA
 					{
 						cropRotation = -1.023f;
 					}
-					else if ((rotationT_Data[y][x] & Corn_Soy_Mask) > 0) // Corn_Soy
+					else if ((rotationData[y][x] & Corn_Soy_Mask) > 0) // Corn_Soy
 					{
 						cropRotation = -0.5115f;
 						fertRate = 84.0f;
@@ -82,7 +85,7 @@ Logger.info("  > Allocated memory for N20");
 						cropRotation = 0.0f;
 					}
 					
-					if ((rotationT_Data[y][x] & Mask) > 0)
+					if ((rotationData[y][x] & Mask) > 0)
 					{
 						// Calculate Nitrous Oxide Emissions (Unit Kg/Ha per year)
 						nitrousOxideData[y][x] = (float)(Math.exp(0.414f + 0.825f + fertRate * 0.005f + cropRotation +

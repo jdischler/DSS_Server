@@ -27,13 +27,16 @@ public class Model_EthanolNetEnergyIncome_New extends Model_Base
 	private static String mNetIncomeModelFile = "net_income";
 	
 	//--------------------------------------------------------------------------
-	public List<ModelResult> run(int[][] rotationData, int width, int height, String destFolder) {
+	public List<ModelResult> run(Scenario scenario, String destFolder) {
 
+		int[][] rotationData = scenario.mNewRotation;
+		int width = scenario.getWidth(), height = scenario.getHeight();
+		
 Logger.info(">>> Computing Model Ethanol / Net Energy / Net Income");
 long timeStart = System.currentTimeMillis();
 		// Precompute yield....
 		Model_CropYield_New cropYield = new Model_CropYield_New();
-		float[][] calculatedYield = cropYield.run(rotationData, width, height);
+		float[][] calculatedYield = cropYield.run(scenario);
 
 		float [][] netEnergyData = new float[height][width];
 		float [][] netIncomeData = new float[height][width];
@@ -94,7 +97,23 @@ Logger.info("  > Allocated memory for NetEnergy, NetIncom, Fuel");
 		float P_Per_Grass = 107;
 		float P_Per_Soy = 249;
 		float P_Per_Alfalfa = 230;
+
+		// Get user changeable values from the client...
+		//----------------------------------------------------------------------
+		// NOTE: this is just a sample of how to do it
+		float cornPrice = P_Per_Corn;
 		
+		try {		
+			cornPrice = scenario.mAssumptions.getAssumptionFloat("p_corn");
+		}
+		catch (Exception e) {
+			Logger.info(e.toString());
+		}
+		
+		Logger.info(" Corn price from client = " + Float.toString(cornPrice) );
+		
+		//----------------------------------------------------------------------		
+
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				float yield = calculatedYield[y][x];

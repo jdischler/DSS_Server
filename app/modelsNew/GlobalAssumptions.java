@@ -62,6 +62,13 @@ public class GlobalAssumptions
 	}
 	
 	//--------------------------------------------------------------------------
+	public GlobalAssumptions() {
+		
+		// set to defaults...but can override with client values...
+		mClientSentAssumptions = mKnownAssumptions;
+	}
+	
+	//--------------------------------------------------------------------------
 	public void setAssumptionsFromClient(JsonNode clientSend) throws Exception {
 		
 		JsonNode res = clientSend.get("assumptions");

@@ -173,7 +173,7 @@ public class Scenario
 	
 		Logger.info("Current rotation duplicating...");
 		// uses clone to duplicate the data array
-		Layer_Base original = Layer_Base.getLayer("Rotation");//.getIntData().clone();
+		Layer_Base original = Layer_Base.getLayer("cdl_2012");//.getIntData().clone();
 		int [][] originalData = original.getIntData();
 		
 		int width = original.getWidth();

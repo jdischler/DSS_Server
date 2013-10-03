@@ -28,7 +28,7 @@ public class Query {
 		
 		// FIXME: can't base size off of a hardcoded layer? The expectation is that
 		//	all layers are of the same size....
-		Layer_Base tmp = Layer_Base.getLayer("rotation");
+		Layer_Base tmp = Layer_Base.getLayer("cdl_2012");
 		mWidth = tmp.getWidth();
 		mHeight = tmp.getHeight();
 		
@@ -100,7 +100,7 @@ public class Query {
 		
 		// FIXME: can't base size off of a hardcoded layer? The expectation is that
 		// all layers are of the same size....
-		Layer_Base tmp = Layer_Base.getLayer("rotation");
+		Layer_Base tmp = Layer_Base.getLayer("cdl_2012");
 		mWidth = tmp.getWidth();
 		mHeight = tmp.getHeight();
 		

@@ -148,8 +148,8 @@ public class Application extends Controller
 		JsonNode request = request().body().asJson();
 		
 		// Rotation
-		int[][] defaultRotation = Layer_Base.getLayer("Rotation").getIntData();
-		Layer_Base layer = Layer_Base.getLayer("Rotation");
+		Layer_Base layer = Layer_Base.getLayer("cdl_2012");
+		int[][] defaultRotation = layer.getIntData();
 		int width = layer.getWidth(), height = layer.getHeight();
 		
 		Scenario scenario = Scenario.getCachedScenario(request.get("scenarioID").getTextValue());
@@ -157,37 +157,33 @@ public class Application extends Controller
 		String modelType = request.get("modelType").getTextValue();
 		List<ModelResult> results = null;
 		
-		float cornPrice = scenario.mAssumptions.getAssumptionFloat("p_corn");
-		
-		Logger.info(" Corn price from client = " + Float.toString(cornPrice) );
-		
 		boolean bAnalyzeAll = false;
 		
 		if (modelType.equals("yield")) {
 			Model_EthanolNetEnergyIncome_New ethanolEnergyIncome = new Model_EthanolNetEnergyIncome_New();
-			results = ethanolEnergyIncome.run(scenario.mNewRotation, width, height, "clientID");
+			results = ethanolEnergyIncome.run(scenario, "clientID");
 		}
 		else if (modelType.equals("n_p")) {
 			Model_NitrogenPhosphorus_New np = new Model_NitrogenPhosphorus_New();
-			results = np.run(scenario.mNewRotation, width, height, "clientID");
+			results = np.run(scenario, "clientID");
 		}
 		else if (modelType.equals("soc")) {
 			Model_SoilCarbon_New soc = new Model_SoilCarbon_New();
-			results = soc.run(scenario.mNewRotation, width, height, "clientID");
+			results = soc.run(scenario, "clientID");
 		}
 		else if (modelType.equals("pest_pol")) {
 			Model_PollinatorPestSuppression_New pp = new Model_PollinatorPestSuppression_New();
-			results = pp.run(scenario.mNewRotation, width, height, "clientID");
+			results = pp.run(scenario, "clientID");
 			bAnalyzeAll = true;
 		}
 		else if (modelType.equals("nitrous")) {
 			Model_NitrousOxideEmissions_New n20 = new Model_NitrousOxideEmissions_New();
-			results = n20.run(scenario.mNewRotation, width, height, "clientID");
+			results = n20.run(scenario, "clientID");
 		}
 		
 		else {//(modelType.equals("habitat_index")) {
 			Model_HabitatIndex_New hi = new Model_HabitatIndex_New();
-			results = hi.run(scenario.mNewRotation, width, height, "clientID");
+			results = hi.run(scenario, "clientID");
 			bAnalyzeAll = true;
 		}
 		

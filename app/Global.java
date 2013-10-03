@@ -100,7 +100,7 @@ public class Global extends GlobalSettings
 				Logger.info("Loading all layers");
 			}
 			
-			layer = new Layer_Integer("rotation"); layer.init();
+			layer = new Layer_Integer("cdl_2012"); layer.init();
 			layer = new Layer_Float("slope"); layer.init();
 			layer = new Layer_Float("cec"); layer.init();
 			layer = new Layer_Float("depth"); layer.init();
@@ -166,25 +166,30 @@ public class Global extends GlobalSettings
 			
 			Logger.info("Default scenario folder does not exist, creating it and default model files!");
 			// Rotation
-			Layer_Base layer = Layer_Base.getLayer("Rotation");
+			Layer_Base layer = Layer_Base.getLayer("cdl_2012");
 			int width = layer.getWidth();
 			int height = layer.getHeight();
-			int[][] defaultRotation = Layer_Base.getLayer("Rotation").getIntData();
+			
+			Scenario scenario = new Scenario();
+			scenario.mNewRotation = layer.getIntData();
+			scenario.mSelection = new Selection(width, height);
+	// FIXME: these assumptions don't seem to be set up correctly?
+			scenario.mAssumptions = new GlobalAssumptions();
 			
 			List<ModelResult> results;
-			results = new Model_HabitatIndex_New().run(defaultRotation, width, height, "default");
+			results = new Model_HabitatIndex_New().run(scenario, "default");
 			QueuedWriter.queueResults(results);
 
-			results = new Model_EthanolNetEnergyIncome_New().run(defaultRotation, width, height, "default");
+			results = new Model_EthanolNetEnergyIncome_New().run(scenario, "default");
 			QueuedWriter.queueResults(results);
 			
-			results = new Model_PollinatorPestSuppression_New().run(defaultRotation, width, height, "default");
+			results = new Model_PollinatorPestSuppression_New().run(scenario, "default");
 			QueuedWriter.queueResults(results);
 			
-			results = new Model_NitrogenPhosphorus_New().run(defaultRotation, width, height, "default");
+			results = new Model_NitrogenPhosphorus_New().run(scenario, "default");
 			QueuedWriter.queueResults(results);
 
-			results = new Model_NitrousOxideEmissions_New().run(defaultRotation, width, height, "default");
+			results = new Model_NitrousOxideEmissions_New().run(scenario, "default");
 			QueuedWriter.queueResults(results);
 
 			// NOTE: SOC for the default is not in the model run because it is not a computed data layer like others...

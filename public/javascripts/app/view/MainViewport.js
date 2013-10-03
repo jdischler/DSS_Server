@@ -260,7 +260,7 @@ Ext.define('MyApp.view.MainViewport', {
 		);
 		
 		//------------------------------------------------
-		var wmsCDL = new OpenLayers.Layer.WMS("rotation", 
+		var wmsCDL = new OpenLayers.Layer.WMS('cdl_2012', 
 			this.getGeoserverURL('raster'),
 			{
 				layers: 'Raster:Rotation',
@@ -298,7 +298,7 @@ Ext.define('MyApp.view.MainViewport', {
 			DSS_Layer: wmsCDL,
 			minHeight: 90,
 			maxHeight: 400,
-			DSS_QueryTable: 'rotation',
+			DSS_QueryTable: 'cdl_2012',
 			collapsed: true
 		});
 		

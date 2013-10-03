@@ -19,7 +19,11 @@ import org.codehaus.jackson.node.*;
 //------------------------------------------------------------------------------
 public class Model_CropYield_New
 {
-	public float[][] run(int[][] rotationData, int width, int height) {
+	//--------------------------------------------------------------------------
+	public float[][] run(Scenario scenario) {
+
+		int[][] rotationData = scenario.mNewRotation;
+		int width = scenario.getWidth(), height = scenario.getHeight();
 		
 Logger.info(" >> Computing Yield");
 

@@ -21,8 +21,8 @@ public class Layer_Integer extends Layer_Base
 	//--------------------------------------------------------------------------
 	protected class Layer_Key {
 		
-		private int mIndex;
-		private String mLabel, mHexColor;
+		public int mIndex;
+		public String mLabel, mHexColor;
 		
 		public Layer_Key(int index, String label, String hexColor) {
 			mIndex = index;
@@ -233,6 +233,26 @@ public class Layer_Integer extends Layer_Base
 		int result = 0;
 		for (int i=0; i < indicesList.length; i++) {
 			result |= convertIndexToMask(indicesList[i]);
+		}
+		
+		return result;
+	}
+
+	// Takes a variable number of String arguments...can be called like these: 
+	//	int mask1 = Layer_Indexed.convertStringsToMask("corn","soy","woodland");
+	//	int mask2 = Layer_Indexed.convertStringsToMask("corn");
+	//--------------------------------------------------------------------------
+	public int convertStringsToMask(String... nameList) {
+		
+		int result = 0;
+		for (int i=0; i < nameList.length; i++) {
+			for (int t=0; t < mLayerKey.size(); t++) {
+				Layer_Key key = mLayerKey.get(t);
+				if (key != null && key.mLabel.equalsIgnoreCase(nameList[i])) {
+					result |= convertIndexToMask(key.mIndex);
+					break;
+				}
+			}
 		}
 		
 		return result;

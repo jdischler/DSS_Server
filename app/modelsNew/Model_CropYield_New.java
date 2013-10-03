@@ -35,6 +35,11 @@ Logger.info(" >> Computing Yield");
 		int Alfalfa_Mask = 128; // 8	
 		int TotalMask = Grass_Mask | Corn_Mask | Soy_Mask | Alfalfa_Mask | Corn_Soy_Mask;
 		
+		// ---TEST TEST
+		Layer_Integer cdl = (Layer_Integer)Layer_Base.getLayer("cdl_2012"); 
+		int testAgMask = cdl.convertStringsToMask("corn","soy");
+		// ---TEST TEST
+		
 		// Corn and Grass Yield
 		float Corn_Y = 0;
 		float Grass_Y = 0;

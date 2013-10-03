@@ -28,6 +28,7 @@ Ext.define('MyApp.view.Report_DetailHeader', {
         Ext.applyIf(me, {
             items: [{
 				xtype: 'radiogroup',
+				id: 'DSS_ValueStyleRadioGroup',
 				x: 60,
 				y: 4,
 				fieldLabel: 'Values',
@@ -80,6 +81,7 @@ Ext.define('MyApp.view.Report_DetailHeader', {
 					handler: function(radio, checked) {
 						if (checked) {
 							Ext.getCmp('DSS_ReportDetail').setDataStyle('delta');
+							Ext.getCmp('DSS_ValueStyleRadioGroup').setDisabled(false);
 						}
 					},
 					style: {
@@ -92,6 +94,7 @@ Ext.define('MyApp.view.Report_DetailHeader', {
 					handler: function(radio, checked) {
 						if (checked) {
 							Ext.getCmp('DSS_ReportDetail').setDataStyle('file1');
+							Ext.getCmp('DSS_ValueStyleRadioGroup').setDisabled(true);
 						}
 					},
 					style: {
@@ -104,6 +107,7 @@ Ext.define('MyApp.view.Report_DetailHeader', {
 					handler: function(radio, checked) {
 						if (checked) {
 							Ext.getCmp('DSS_ReportDetail').setDataStyle('file2');
+							Ext.getCmp('DSS_ValueStyleRadioGroup').setDisabled(true);
 						}
 					},
 					style: {

@@ -50,7 +50,8 @@ Ext.define('MyApp.view.Report_Detail', {
 					itemId: 'result_habitat_index',
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'habitat_index',
-					DSS_UnitLabel: '0 to 1',
+					DSS_UnitLabelDelta: '-1 to 1',
+					DSS_UnitLabelFile: '0 to 1',
 					DSS_Label: 'Bird Habitat',
 					DSS_GraphTitle: 'Bird Habitat Index'
 				},{
@@ -78,7 +79,8 @@ Ext.define('MyApp.view.Report_Detail', {
 					itemId: 'result_pollinators',
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'pollinator',
-					DSS_UnitLabel: '0 to 1',
+					DSS_UnitLabelDelta: '-1 to 1',
+					DSS_UnitLabelFile: '0 to 1',
 					DSS_Label: 'Pollinators',
 					DSS_GraphTitle: 'Key Pollinators'
 				},{
@@ -99,7 +101,8 @@ Ext.define('MyApp.view.Report_Detail', {
 					itemId: 'result_pest',
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'pest',
-					DSS_UnitLabel: '-1 to 1',
+					DSS_UnitLabelDelta: '-1 to 1',
+					DSS_UnitLabelFile: '0 to 1',
 					DSS_Label: 'Biocontrol',
 					DSS_GraphTitle: 'Biocontrol / Crop Pest Supression'
 				},{

@@ -33,7 +33,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
         Ext.applyIf(me, {
             items: [
             {
-			    itemId: 'value_field',  
+			    itemId: 'DSS_ValueField',  
 			    xtype: 'textfield',
 			    x: 0,
 			    y: 5,
@@ -43,9 +43,10 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			    labelAlign: 'right'
 			},{
 				xtype: 'label',
+				itemId: 'DSS_UnitsLabel',
 				x: 245,
 				y: 9,
-				text: me.DSS_UnitLabel ? me.DSS_UnitLabel : " ",
+				text: me.DSS_UnitLabelDelta ? me.DSS_UnitLabelDelta : me.DSS_UnitLabel,
 				style: {
 					color: '#888'
 				}
@@ -115,8 +116,6 @@ Ext.define('MyApp.view.Report_DetailElement', {
 		this.getComponent('value_field').setFieldStyle(spinnerStyle);
 		this.getComponent('graph_button').disable();
 		this.getComponent('heat_delta_button').disable();
-//		this.getComponent('heat_file1_button').disable();
-//		this.getComponent('heat_file2_button').disable();
 	},
 	
     //--------------------------------------------------------------------------
@@ -127,8 +126,6 @@ Ext.define('MyApp.view.Report_DetailElement', {
 		this.getComponent('value_field').setFieldStyle(clearSpinnerStyle);
 		this.getComponent('graph_button').enable();
 		this.getComponent('heat_delta_button').enable();
-//		this.getComponent('heat_file1_button').enable();
-//		this.getComponent('heat_file2_button').enable();
 	},
 	
     //--------------------------------------------------------------------------
@@ -233,6 +230,8 @@ Ext.define('MyApp.view.Report_DetailElement', {
     	}
     	
     	var res = null;
+    	var unitsLabel = this.DSS_UnitLabelFile ? this.DSS_UnitLabelFile : this.DSS_UnitLabel;
+    	
     	if (this.DSS_FieldDataType == 'file1') {
     		res = this.DSS_FieldData.val1; // NOTE: set up in setData
     	}
@@ -242,15 +241,16 @@ Ext.define('MyApp.view.Report_DetailElement', {
     	else { // type is 'delta'
 			if (this.DSS_FieldValueType == 'absolute') {
 				res = this.DSS_FieldData.total; // NOTE: set up in setData
+				unitsLabel = this.DSS_UnitLabelDelta ? this.DSS_UnitLabelDelta : this.DSS_UnitLabel;
 			}
 			else { // type is '%'
-				// TODO: bring in or calc the right values....
-				// HELP ME AMIN!!!!
-				res = 1234; // << replace, just making sure the UI code works...
+				res = (this.DSS_FieldData.val1 - this.DSS_FieldData.val2) / this.DSS_FieldData.val1;
+				unitsLabel = '%';
 			}
     	}
     	
-		this.getComponent('value_field').setValue(res.toFixed(4));
+		this.getComponent('DSS_ValueField').setValue(res.toFixed(4));
+		this.getComponent('DSS_UnitsLabel').setText(unitsLabel);
     },
   
     // valid style types: 'file1', 'file2', 'delta'

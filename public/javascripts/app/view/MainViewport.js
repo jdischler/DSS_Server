@@ -263,7 +263,7 @@ Ext.define('MyApp.view.MainViewport', {
 		var wmsCDL = new OpenLayers.Layer.WMS('cdl_2012', 
 			this.getGeoserverURL('raster'),
 			{
-				layers: 'Raster:Rotation',
+				layers: 'Raster:CDL_2012',
 				format: imgFormat,
 				transparent: true,
 				tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom

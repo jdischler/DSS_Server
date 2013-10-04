@@ -166,11 +166,21 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			button.DSS_Layer = null;
 		}
 		else {
+			var clientID = '1234';
+			var clientID_cookie = Ext.util.Cookies.get('DSS_clientID');
+			if (clientID_cookie) {
+				clientID = clientID_cookie;
+			}
+			else {
+				console.log('WARNING: no client id cookie was found...');
+			}
+			
 			var obj = Ext.Ajax.request({
 				url: location.href + 'getHeatmap',
 				jsonData: {
-					'model': me.DSS_FieldString,
-					'type': type
+					model: me.DSS_FieldString,
+					clientID: clientID,
+					type: type
 				},
 				timeout: 10 * 60 * 1000, // minutes * seconds * (i.e. converted to) milliseconds
 				

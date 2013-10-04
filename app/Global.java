@@ -14,7 +14,7 @@ public class Global extends GlobalSettings
 {
 	// If the play server is started in DEV mode, should we skip loading certain layers
 	//	to get a faster server startup time and use less memory?
-	private static final boolean LOAD_ALL_LAYERS_FOR_DEV = false;
+	private static final boolean LOAD_ALL_LAYERS_FOR_DEV = true;
 	private static final boolean LOAD_DEFAULT_DATA = true;
 	
 	//--------------------------------------------------------------------------

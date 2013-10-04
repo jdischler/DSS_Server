@@ -459,6 +459,7 @@ Ext.define('MyApp.view.ScenarioTools', {
     submitModel: function(queryJson) {
     	
 		console.log(queryJson);
+		var button = Ext.getCmp('DSS_runModelButton');
 		
 		// NOTE: these strings MUST be synchronized with the server, or else the server will
 		//	not know which models to run. FIXME: should maybe set this up in a more robust fashion?? How?

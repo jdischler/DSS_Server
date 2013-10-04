@@ -88,21 +88,47 @@ Ext.define('MyApp.view.MainViewport', {
 	},
 
 	//--------------------------------------------------------------------------
-	checkAssignClientID: function() {
+	checkAssignClientID: function(tryCount) {
 		
+		if (!tryCount) tryCount = 0;
+		
+		var me = this;
 		var res = Ext.util.Cookies.get('DSS_clientID');
 		if (!res) {
-			// TODO: hit the server for a clientID if we haven't got one...
 			console.log(' No cookies for you! (but that isnt always a problem...)');
-			Ext.util.Cookies.set('DSS_clientID', 1113);
-		}
-		var res = Ext.util.Cookies.get('DSS_clientID');
-		if (res) {
-			console.log(' Cookie is: ');
-			console.log(res);
-		}
-		else {
-			console.log(' Boo, still no cookie for u!!');
+			//--------
+			var obj = Ext.Ajax.request({
+				url: location.href + 'getClientID',
+				method: 'POST',
+				timeout: 10 * 1000, // seconds * (i.e. converted to) milliseconds
+				
+				success: function(response, opts) {
+					var obj = JSON.parse(response.responseText);
+					console.log("getClientID success: ");
+					console.log(obj);
+					Ext.util.Cookies.set('DSS_clientID', obj.DSS_clientID);
+					var res = Ext.util.Cookies.get('DSS_clientID');
+					if (res) {
+						console.log(' Cookie is: ');
+						console.log(res);
+					}
+					else {
+						console.log(' Boo, still no cookie for u!!');
+						Ext.util.Cookies.set('DSS_clientID', 'Fixme_NoID');
+					}
+					return;
+				},
+				
+				failure: function(respose, opts) {
+					tryCount++;
+					if (tryCount < 6) {
+						me.CheckAssignClientID(tryCount);
+					}
+					else {
+						alert("GetClientID call failed, request timed out?");
+					}
+				}
+			});
 		}
 	},
 	

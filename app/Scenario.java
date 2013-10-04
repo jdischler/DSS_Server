@@ -63,7 +63,7 @@ public class Scenario
 	
 	// Returns a cacheStringID, which should be saved and returned to free the scenario...
 	//--------------------------------------------------------------------------
-	public static final String cacheScenario(Scenario theScenario, int clientID) {
+	public static final String cacheScenario(Scenario theScenario, String clientID) {
 		
 		if (mCachedScenarios == null) {
 			mCachedScenarios = new HashMap<String, Scenario>();
@@ -73,7 +73,7 @@ public class Scenario
 		int tryCount = 0;
 		while(tryCount < 1000) {
 			String scenarioCacheID = uniqueID.get(5) + 
-						Integer.toString(clientID) + 
+						clientID + 
 						((tryCount > 0) ? Integer.toString(tryCount) : "");
 			if (!mCachedScenarios.containsKey(scenarioCacheID)) {
 				mCachedScenarios.put(scenarioCacheID, theScenario);

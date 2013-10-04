@@ -122,15 +122,23 @@ public class Application extends Controller
 	}
 
 	//----------------------------------------------------------------------
+	public static Result getClientID() throws Exception 
+	{
+		ObjectNode sendback = JsonNodeFactory.instance.objectNode();
+		sendback.put("DSS_clientID", RandomString.get(6));
+		
+		return ok(sendback);
+	}
+	
+	//----------------------------------------------------------------------
 	public static Result setUpScenario() throws Exception
 	{
 		Logger.info("----- Initializing scenario ----");
 		// Create a new scenario and get a transformed crop rotation layer from it...
 		JsonNode request = request().body().asJson();
 
-		int clientID = request.get("clientID").getIntValue();
-
-		String folder = "client_" + Integer.toString(clientID);
+		String clientID = request.get("clientID").getTextValue();
+		String folder = "client_" + clientID;
 		
 		Scenario scenario = new Scenario();
 		scenario.setAssumptions(request);
@@ -275,8 +283,11 @@ public class Application extends Controller
 			type = "delta";
 		}
 		
+		String clientID = request.get("clientID").getTextValue();
+		String folder = "client_" + clientID;
+
 		String path1 = "./layerData/default/" + model + ".dss";
-		String path2 = "./layerData/clientID/" + model + ".dss";
+		String path2 = "./layerData/" + folder + "/" + model + ".dss";
 		
 		// BLURF, crutching up for SOC layer being handled/stored kind of differntly...
 		if (model.equals("soc")) {

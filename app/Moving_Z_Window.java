@@ -79,7 +79,7 @@ public final class Moving_Z_Window
 		//mAgMask = 1 + 2 + 4 + 8 + 16 + 32 + 64 + 512; // 1, 2, 3, 4, 5, 6, 7, 10
 		//mForestMask = 1024; // 11
 		//mGrassMask = 128 + 256; // 8 and 9
-		
+
 		// Mask
 		Layer_Integer cdl = (Layer_Integer)Layer_Base.getLayer("cdl_2012"); 
 		// Grass
@@ -91,7 +91,9 @@ public final class Moving_Z_Window
 		// Ag
 		int Corn_Mask = cdl.convertStringsToMask("corn");
 		int Soy_Mask = cdl.convertStringsToMask("soy");
-		mAgMask = 1 + 2 + 8 + 32768 + 131072 + 262144;
+		mAgMask = 1 + 2 + 4 + 8 + 16384 + 32768 + 131072 + 262144;
+		// Total Mask
+		int TotalMask = mAgMask | mGrassMask;
 		
 		mPoint = new Z_WindowPoint(mAt_X, mAt_Y);
 		

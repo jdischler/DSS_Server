@@ -39,7 +39,7 @@ long timeStart = System.currentTimeMillis();
 		
 		// Mask
 		Layer_Integer cdl = (Layer_Integer)Layer_Base.getLayer("cdl_2012"); 
-		int Ag_Mask = 1 + 2 + 8 + 32768 + 131072 + 262144;
+		int Ag_Mask = 1 + 2 + 4 + 16384 + 32768 + 131072 + 262144;
 		
 		int[] countCellsInWatershed = new int[mNumWatersheds];
 		int[] countAgCellsInWatershed = new int[mNumWatersheds];

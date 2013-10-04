@@ -38,6 +38,27 @@ public class Global extends GlobalSettings
 		GlobalAssumptions.initAssumptions();
 		
 		systemReport("Data Layers Cached");
+		
+		// Mask
+		//Layer_Integer cdl = (Layer_Integer)Layer_Base.getLayer("cdl_2012"); 
+		// Grass
+		//int Grass_Mask = cdl.convertStringsToMask("grass");
+		//int Alfalfa_Mask = cdl.convertStringsToMask("alfalfa");
+		//int mGrassMask = Grass_Mask | Alfalfa_Mask;	
+		// Forest
+		//int mForestMask = cdl.convertStringsToMask("woodland");
+		// Ag
+		//int Corn_Mask = cdl.convertStringsToMask("corn");
+		//int Soy_Mask = cdl.convertStringsToMask("soy");
+		//int mAgMask = 1 + 2 + 4 + 8 + 16384 + 32768 + 131072 + 262144;
+		// Total Mask
+		//int TotalMask = mAgMask | mGrassMask;
+		
+		//Logger.info("Grass_Mask: " + Integer.toString(Grass_Mask) + "Alfalfa_Mask: " + Integer.toString(Alfalfa_Mask) + "mForestMask: " + Integer.toString(mForestMask));
+		//Logger.info("Corn_Mask: " + Integer.toString(Corn_Mask) + "Soy_Mask: " + Integer.toString(Soy_Mask));
+		//Logger.info("mAgMask: " + Integer.toString(mAgMask) + "mGrassMask: " + Integer.toString(mGrassMask) + "TotalMask: " + Integer.toString(TotalMask));
+		
+		
 	}
 
 	//--------------------------------------------------------------------------

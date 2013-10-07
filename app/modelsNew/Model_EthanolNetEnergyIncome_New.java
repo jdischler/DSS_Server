@@ -102,16 +102,24 @@ Logger.info("  > Allocated memory for NetEnergy, NetIncom, Fuel");
 		// Get user changeable values from the client...
 		//----------------------------------------------------------------------
 		// NOTE: this is just a sample of how to do it
-		float cornPrice = P_Per_Corn;
+		//float cornPrice = P_Per_Corn;
 		
 		try {		
-			cornPrice = scenario.mAssumptions.getAssumptionFloat("p_corn");
+			P_Per_Corn = scenario.mAssumptions.getAssumptionFloat("p_corn");
+			P_Per_Stover = scenario.mAssumptions.getAssumptionFloat("p_stover");
+			P_Per_Grass = scenario.mAssumptions.getAssumptionFloat("p_grass");
+			P_Per_Soy = scenario.mAssumptions.getAssumptionFloat("p_soy");
+			P_Per_Alfalfa = scenario.mAssumptions.getAssumptionFloat("p_alfalfa");
 		}
 		catch (Exception e) {
 			Logger.info(e.toString());
 		}
 		
-		Logger.info(" Corn price from client = " + Float.toString(cornPrice) );
+		Logger.info(" Corn price from client = " + Float.toString(P_Per_Corn) );
+		Logger.info(" Stover price from client = " + Float.toString(P_Per_Stover) );
+		Logger.info(" Grass price from client = " + Float.toString(P_Per_Grass) );
+		Logger.info(" Soy price from client = " + Float.toString(P_Per_Soy) );
+		Logger.info(" Alfalfa price from client = " + Float.toString(P_Per_Alfalfa) );
 		
 		//----------------------------------------------------------------------		
 

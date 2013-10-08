@@ -93,7 +93,10 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			    	showDelay: 100
 			    },
 			    handler: function(self) {
-			    	
+			    	var mypopup = Ext.create("MyApp.view.Info_PopUp_HTML", {
+			    		title: me.DSS_GraphTitle, 
+			    		DSS_InfoHTML: me.DSS_InfoHTML});
+					mypopup.show();
 			    }
 			}
 	    ]});

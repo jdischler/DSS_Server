@@ -123,13 +123,10 @@ Ext.define('MyApp.view.Report_Detail', {
 			},{
 				xtype: 'container',
 				id: 'DSS_heatmap_legend',
-				x: 25,
+				x: -1,
 				y: 310,
 				
-				style: {
-					border: '1px solid #f0f0f0'
-				},
-				width: 450,
+				width: 502,
 				height: 40,
 				layout: {
 					type: 'hbox'
@@ -174,6 +171,17 @@ Ext.define('MyApp.view.Report_Detail', {
 		for (var idx = 0; idx < c.items.getCount(); idx++) {
 			var comp = c.items.getAt(idx);
 			comp.changeDataStyleType(newStyle);
+		}
+	},
+
+	// valid substyle values: 'quantile', 'equal'
+    //--------------------------------------------------------------------------
+	changeDataSubStyle: function(subtype) {
+		
+		var c = this.getComponent('results_container');
+		for (var idx = 0; idx < c.items.getCount(); idx++) {
+			var comp = c.items.getAt(idx);
+			comp.changeDataSubStyle(subtype);
 		}
 	},
 

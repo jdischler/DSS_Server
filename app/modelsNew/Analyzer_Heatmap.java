@@ -14,6 +14,14 @@ import ar.com.hjg.pngj.chunks.*;
 //------------------------------------------------------------------------------
 public class Analyzer_Heatmap {
 	
+	public static class MinMax {
+		
+		public float mMin, mMax;
+		public MinMax(float min, float max) {
+			mMin = min; mMax = max;
+		}
+	}
+	
 	//--------------------------------------------------------------------------
 	private static ObjectNode copyPaletteForClient(PngChunkPLTE palette, int numColors, ObjectNode sendBack) {
 		
@@ -40,22 +48,38 @@ public class Analyzer_Heatmap {
 	}
 
 	//--------------------------------------------------------------------------
-	private static ObjectNode copyValuesForClient(float max, int entries, ObjectNode sendBack) {
-		
+	private static ObjectNode copyQuantizedValuesForClient(float min, float max,
+								int [] quantiledBins, int quantileBinCt,
+								int entries, ObjectNode sendBack) {
+
 		ArrayNode valueArray = JsonNodeFactory.instance.arrayNode();
+
+		// we'll start at the min value and step along by the addPerBin.
+		float addPerBin = (max - min) / quantileBinCt;
 		
-		int mid = entries / 2;
-		for (int i=0; i < entries; i++) {
-			float value = (float)(i - mid) / (float)mid * max;
-			valueArray.add(value);
+		// Once the palIndex increases in the quantiledBin, we know we've hit a transition point, so dump
+		//	the running value out to the array
+		int palIndex = 0;
+
+		valueArray.add(min);
+		
+		for (int idx=0; idx < quantileBinCt; idx++) {
+			if (quantiledBins[idx] > palIndex) {
+				valueArray.add(min + addPerBin * idx);
+				palIndex = quantiledBins[idx];
+			}
 		}
+		
+		valueArray.add(max);
 		
 		sendBack.put("values", valueArray);
 		return sendBack;
 	}
 
 	//--------------------------------------------------------------------------
-	private static ObjectNode copyAbsoluteValuesForClient(float min, float max, int entries, ObjectNode sendBack) {
+	private static ObjectNode copyValuesForClient(MinMax mm, int entries, ObjectNode sendBack) {
+		
+		float min = mm.mMin, max = mm.mMax;
 		
 		ArrayNode valueArray = JsonNodeFactory.instance.arrayNode();
 		
@@ -63,6 +87,8 @@ public class Analyzer_Heatmap {
 			float value = (float)(min + i * ((max - min) / entries));
 			valueArray.add(value);
 		}
+		
+		valueArray.add(max);
 		
 		sendBack.put("values", valueArray);
 		return sendBack;
@@ -72,7 +98,148 @@ public class Analyzer_Heatmap {
 	// downsampleFactor: how much to scale the image down, e.g. 10 generates an image of:
 	//	sourceWidth/10, sourceHeight/10
 	//--------------------------------------------------------------------------
-	public static ObjectNode run(File file1, File file2, File outputFile, int downsampleFactor) {
+	public static ObjectNode runEqualInterval(File file1, File file2, File outputFile, int downsampleFactor) {
+		
+		final int numPaletteEntries = 7;
+		
+		Binary_Reader fileReader_1 = new Binary_Reader(file1);
+		Binary_Reader fileReader_2 = new Binary_Reader(file2);
+		if (!fileReader_1.readHeader() || !fileReader_2.readHeader()) {
+			Logger.info("Heatmap generation unable to open one or the other files, and/or read the header");
+			return null;
+		}
+		
+		int width = fileReader_1.getWidth(), height = fileReader_1.getHeight();
+		if (width != fileReader_2.getWidth() || height != fileReader_2.getHeight()) {
+			Logger.info("Heatmap generation failed because the width and/or height" + 
+					" of the input files does not match!");
+			return null;
+		}
+		
+		float heatmap[][] = new float[height][width];
+		
+		for (int y=0; y < height; y++) {
+			ByteBuffer buff_1 = fileReader_1.readLine();
+			ByteBuffer buff_2 = fileReader_2.readLine();
+			if (buff_1 != null && buff_2 != null) {
+				for (int x=0; x < width; x++) {
+					float data_1 = buff_1.getFloat(x * 4),
+							data_2 = buff_2.getFloat(x * 4);
+					if (data_1 > -9999.0f && data_2 > -9999.0f) {
+						heatmap[y][x] = data_2 - data_1;
+					}
+					else {
+						heatmap[y][x] = -9999.0f;
+					}
+				}
+			}
+		}
+			
+		int newWidth = width/downsampleFactor;
+		int newHeight = height/downsampleFactor;
+		
+		float resampled[][] = Downsampler.generateAveraged(heatmap, width, height, newWidth, newHeight);
+		MinMax minMax = getMinMax(resampled, newWidth, newHeight);
+		float min = minMax.mMin, max = minMax.mMax;
+		
+		byte[][] idx = convertToIndexed(resampled, newWidth, newHeight, minMax, numPaletteEntries);
+	
+		Logger.info("Creating png");
+		Png png = new Png(newWidth, newHeight, 8, 1, outputFile.getPath());
+	
+		ObjectNode sendBack = JsonNodeFactory.instance.objectNode();
+		sendBack = copyValuesForClient(minMax, numPaletteEntries, sendBack);
+		sendBack = createPalette(png, numPaletteEntries, minMax, sendBack);
+		
+		png.mPngWriter.writeRowsByte(idx);
+		png.mPngWriter.end();
+		
+		return sendBack;
+	}
+
+	// ONE FILE ABSOLUTE STYLE MAP
+	// downsampleFactor: how much to scale the image down, e.g. 10 generates an image of:
+	//	sourceWidth/10, sourceHeight/10
+	//--------------------------------------------------------------------------
+	public static ObjectNode runAbsolute(File file, File outputFile, int downsampleFactor) {
+		
+		final int numPaletteEntries = 7;
+		
+		Binary_Reader fileReader = new Binary_Reader(file);
+		if (!fileReader.readHeader()) {
+			Logger.info("Heatmap generation unable to open the file and/or read the header");
+			return null;
+		}
+		
+		int width = fileReader.getWidth(), height = fileReader.getHeight();
+		
+		float heatmap[][] = new float[height][width];
+		
+		for (int y=0; y < height; y++) {
+			ByteBuffer buff = fileReader.readLine();
+			if (buff != null) {
+				for (int x=0; x < width; x++) {
+					heatmap[y][x] = buff.getFloat(x * 4);
+				}
+			}
+		}
+			
+		int newWidth = width/downsampleFactor;
+		int newHeight = height/downsampleFactor;
+		
+		float resampled[][] = Downsampler.generateAveraged(heatmap, width, height, newWidth, newHeight);
+		MinMax minMax = getMinMax(resampled, newWidth, newHeight);
+		float min = minMax.mMin, max = minMax.mMax;
+		
+		byte[][] idx = convertToIndexed(resampled, newWidth, newHeight, minMax, numPaletteEntries);
+	
+		Logger.info("Creating png");
+		Png png = new Png(newWidth, newHeight, 8, 1, outputFile.getPath());
+	
+		Logger.info("Creating palette");
+		PngChunkPLTE palette = null;
+		try {
+			palette = png.createPalette(numPaletteEntries + 1); // +1 for transparent color
+		}
+		catch(Exception e) {
+			Logger.info(e.toString());
+		}
+		
+		Logger.info("Setting palette entries");
+		palette.setEntry(0, 255, 210, 170);	// orangish
+		Png.interpolatePaletteEntries(palette, 
+				1, 255, 255, 204,			// yellowish
+				3, 160, 218, 180);			// greenish
+		palette.setEntry(4, 65, 182, 196); 	// greenish blue
+		palette.setEntry(5, 34, 94, 168); 	// blueish
+		palette.setEntry(6, 106, 21, 160);	// blueish purple
+		palette.setEntry(7, 255, 0, 0);		// red, but transparent
+
+		Logger.info(" Setting transparent");
+		int[] alpha = new int[numPaletteEntries + 1];
+		
+		for (int i=0; i < numPaletteEntries; i++) {
+			alpha[i] = 255;
+		}
+		// last color is always transparent
+		alpha[numPaletteEntries] = 0;
+		png.setTransparentArray(alpha);
+		
+		ObjectNode sendBack = JsonNodeFactory.instance.objectNode();
+		sendBack = copyPaletteForClient(palette, numPaletteEntries, sendBack);
+		sendBack = copyValuesForClient(minMax, numPaletteEntries, sendBack);
+		
+		png.mPngWriter.writeRowsByte(idx);
+		png.mPngWriter.end();
+		
+		return sendBack;
+	}
+
+	// TWO FILE DELTA STYLE MAP -- QUANTILED
+	// downsampleFactor: how much to scale the image down, e.g. 10 generates an image of:
+	//	sourceWidth/10, sourceHeight/10
+	//--------------------------------------------------------------------------
+	public static ObjectNode runQuantile(File file1, File file2, File outputFile, int downsampleFactor) {
 		
 		final int numPaletteEntries = 7;
 		
@@ -113,226 +280,236 @@ public class Analyzer_Heatmap {
 		int newHeight = height/downsampleFactor;
 		
 		float resampled[][] = Downsampler.generateMax(heatmap, width, height, newWidth, newHeight);
-		float max = 0;
-		boolean mbHasMax = false;
+		MinMax minMax = getMinMax(resampled, newWidth, newHeight);
+		float min = minMax.mMin, max = minMax.mMax;
 		
-		for (int y = 0; y < newHeight; y++) {
-			for (int x = 0; x < newWidth; x++) {
+		Logger.info(" ...Calculating Quantile...");
+		int binCount = 200; // higher values should (theoretically) yield more accurate divisions...
+		
+		// create and zero bins...
+		int [] bins = new int[binCount]; 
+		int totalCells = 0;
+		
+		for (int i=0; i < binCount; i++) {
+			bins[i] = 0;
+		}
+		// count values for each bin so we get a histogram...
+		for (int y=0; y < newHeight; y++) {
+			for (int x=0; x < newWidth; x++) {
 				float data = resampled[y][x];
-				if (data > -9999.0f) {
-					if (!mbHasMax) {
-						max = data;
-						mbHasMax = true;
-					}
-					if (Math.abs(data) > max) {
-						max = Math.abs(data);
-					}
+				if (data > -9999.0f) { // FIXME: NoData check...
+					int binIndex = (int)((data - min)/(max - min) * binCount);
+					if (binIndex > binCount - 1) binIndex = binCount - 1;
+					bins[binIndex]++;
+					totalCells++;
 				}
 			}
 		}
+
+		// What is an even distribution?..divide and round...
+		int desiredCountPerQuantile = (int)((float)totalCells / numPaletteEntries + 0.5f);
 		
-		Logger.info(" Max: " + Float.toString(max));
-		Logger.info("Generating IDX array");
+		// Now clump our bins together so the sum of a string of adjacent bins will be 
+		//	roughly equal to our even distribution..
+		// stuff a remapped index to a color palette as we go so we can easily figure out color assignments...
+		int countTracker = 0;
+		int indexRemapperTracker = 0;
+		for (int i=0; i < binCount; i++) {
+			countTracker += bins[i];
+			bins[i] = indexRemapperTracker;// overwrite the count in the bin, reusing it to store a palette index remapper
+			// does the current running count for bins put us where we need to be?
+			// we should also check if adding the next bin will put us over by too far...
+			// We do a look-ahead by one bin so we don't get stuck adding way too many counts in case that
+			//	next bin were much bigger than normal...
+			if (countTracker >= desiredCountPerQuantile ||  
+				(i < binCount - 1 && countTracker + bins[i+1] / 2 > desiredCountPerQuantile)) {
+					// step to next index for the remapper...
+					indexRemapperTracker++;
+					countTracker -= desiredCountPerQuantile; // track leftovers/remainders..
+			}
+		}
+
+		Logger.info(" ...Generating IDX array");
 
 		byte[][] idx = new byte[newHeight][newWidth];
 
 		// Now generate the heatmap image
 		for (int y = 0; y < newHeight; y++) {
 			for (int x = 0; x < newWidth; x++) {
-				if (resampled[y][x] > -9999.0f) {
-					float delta = (resampled[y][x] / max) * 3.0f + 3.5f; // round
-					if (delta < 0) delta = 0;
-					else if (delta > 6) delta = 6;
-					idx[y][x] = (byte)(delta);
+				float data = resampled[y][x];
+				if (data > -9999.0f) {
+					int index = (int)((data - min)/(max - min) * binCount);
+					if (index > binCount - 1) index = binCount - 1;
+					int palIndex = bins[index];
+					if (palIndex < 0) palIndex = 0;
+					else if (palIndex > numPaletteEntries - 1) palIndex = numPaletteEntries - 1; 
+					idx[y][x] = (byte)(palIndex);
 				}
 				else {
 					idx[y][x] = numPaletteEntries; // last color is transparent color
 				}
 			}
 		}
-	
+
+
 		Logger.info("Creating png");
-//		File path = new File(outputFile.getPath());
-//		path.mkdirs(); // make any necessary directories...
 		Png png = new Png(newWidth, newHeight, 8, 1, outputFile.getPath());
 	
-		Logger.info("Creating palette");
-		PngChunkPLTE palette = null;
-		try {
-			palette = png.createPalette(numPaletteEntries + 1); // extra one for the transparent color
-		}
-		catch(Exception e) {
-			Logger.info(e.toString());
-		}
-		Logger.info("Setting palette entries");
-		
-		/*Png.interpolatePaletteEntries(palette, 
-				0, 0, 102, 190,		// aqua blue
-				3, 255, 255, 255);	// white
-		Png.interpolatePaletteEntries(palette, 
-				3, 255, 255, 255,	// white
-				6, 190, 81, 10);	// brown
-		*/
-		palette.setEntry(0, 240, 16, 116); // magenta
-		palette.setEntry(1, 255, 136, 187);
-		palette.setEntry(2, 255, 210, 229);
-		palette.setEntry(3, 255, 255, 255); // white
-		palette.setEntry(4, 212, 255, 164);
-		palette.setEntry(5, 155, 245, 90);
-		palette.setEntry(6, 90, 178, 0); // lime green
-		palette.setEntry(7, 255, 0, 0); // transparent color
-/*		Png.interpolatePaletteEntries(palette, 
-				3, 255, 255, 255,	// white
-				6, 128, 255, 32);	// limey-green
-/
-/*		Png.interpolatePaletteEntries(palette, 
-			0, 128, 0, 255,		// purple
-			2, 255, 0, 0);		// red
-		Png.interpolatePaletteEntries(palette, 
-			2, 255, 0, 0,		// red
-			4, 255, 255, 0);	// yellow
-		Png.interpolatePaletteEntries(palette, 
-			3, 255, 255, 0,		// yellow
-			4, 0, 255, 0);		// green
-		Png.interpolatePaletteEntries(palette, 
-			4, 0, 255, 0,		// green
-			6, 0, 64, 255);		// blue
-*/
 		ObjectNode sendBack = JsonNodeFactory.instance.objectNode();
-		sendBack = copyPaletteForClient(palette, numPaletteEntries, sendBack);
-		sendBack = copyValuesForClient(max, numPaletteEntries, sendBack);
-		
-		Logger.info("Setting transparent");
-		// set index 4 as transparent
-		int[] alpha = new int[numPaletteEntries + 1];
-		alpha[0] = 255; alpha[1] = 255; alpha[2] = 255;
-		alpha[3] = 100;
-		alpha[4] = 255; alpha[5] = 255; alpha[6] = 255;
-		alpha[7] = 0; // transparent color
-		png.setTransparentArray(alpha);
-		
+		sendBack = copyQuantizedValuesForClient(min, max, bins, binCount, numPaletteEntries, sendBack);
+		sendBack = createPalette(png, numPaletteEntries, minMax, sendBack);
+	
 		png.mPngWriter.writeRowsByte(idx);
 		png.mPngWriter.end();
 		
 		return sendBack;
 	}
 
-	// ONE FILE ABSOLUTE STYLE MAP
-	// downsampleFactor: how much to scale the image down, e.g. 10 generates an image of:
-	//	sourceWidth/10, sourceHeight/10
 	//--------------------------------------------------------------------------
-	public static ObjectNode run(File file, File outputFile, int downsampleFactor) {
+	private static MinMax getMinMax(float data[][], int width, int height) {
+	
+		MinMax minMax = new MinMax(0,0);
+		boolean bHasMinMax = false;
 		
-		final int numPaletteEntries = 7;
-		
-		Binary_Reader fileReader = new Binary_Reader(file);
-		if (!fileReader.readHeader()) {
-			Logger.info("Heatmap generation unable to open the file and/or read the header");
-			return null;
-		}
-		
-		int width = fileReader.getWidth(), height = fileReader.getHeight();
-		
-		float heatmap[][] = new float[height][width];
-		
-		for (int y=0; y < height; y++) {
-			ByteBuffer buff = fileReader.readLine();
-			if (buff != null) {
-				for (int x=0; x < width; x++) {
-					heatmap[y][x] = buff.getFloat(x * 4);
-				}
-			}
-		}
-			
-		int newWidth = width/downsampleFactor;
-		int newHeight = height/downsampleFactor;
-		
-		float resampled[][] = Downsampler.generateAveraged(heatmap, width, height, newWidth, newHeight);
-		float min = 0, max = 0;
-		boolean mbHasMinMax = false;
-		
-		for (int y = 0; y < newHeight; y++) {
-			for (int x = 0; x < newWidth; x++) {
-				float data = resampled[y][x];
-				if (data > -9999.0f) {
-					if (!mbHasMinMax) {
-						mbHasMinMax = true;
-						max = data;
-						min = data;
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				float val = data[y][x];
+				if (val > -9999.0f) {
+					if (!bHasMinMax) {
+						bHasMinMax = true;
+						minMax.mMax = val;
+						minMax.mMin = val;
 					}
-					if (data > max) {
-						max = data;
+					if (val > minMax.mMax) {
+						minMax.mMax = val;
 					}
-					else if (data < min) {
-						min = data;
+					else if (val < minMax.mMin) {
+						minMax.mMin = val;
 					}
 				}
 			}
 		}
 		
-		Logger.info(" Min: " + Float.toString(min) + "   Max: " + Float.toString(max));
+		Logger.info(" Min: " + Float.toString(minMax.mMin) + " Max: " + Float.toString(minMax.mMax));
+		return minMax;
+	}
+	
+	//--------------------------------------------------------------------------
+	private static byte[][] convertToIndexed(float data[][], int width, int height, MinMax mm, int numVals) {
+		
 		Logger.info("Generating IDX array");
-
-		byte[][] idx = new byte[newHeight][newWidth];
-
+		
+		byte[][] idxs = new byte[height][width];
+		float min = mm.mMin, max = mm.mMax;
+		
 		// Now generate the heatmap image
-		for (int y = 0; y < newHeight; y++) {
-			for (int x = 0; x < newWidth; x++) {
-				float data = resampled[y][x];
-				if (data > -9999.0f) {
-					float delta = (data - min) / (max - min) * (numPaletteEntries - 1);
-					if (delta < 0) delta = 0;
-					else if (delta > numPaletteEntries - 1) delta = numPaletteEntries - 1;
-					idx[y][x] = (byte)(delta);
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				float val = data[y][x];
+				if (val > -9999.0f) {
+					int bin = (int)((val - min) / (max - min) * numVals);
+					if (bin < 0) bin = 0;
+					else if (bin > numVals - 1) bin = numVals - 1;
+					idxs[y][x] = (byte)(bin);
 				}
 				else {
-					idx[y][x] = numPaletteEntries; // transparent
+					idxs[y][x] = (byte)numVals; // transparent
 				}
 			}
 		}
-	
-		Logger.info("Creating png");
-//		File path = new File(outputFile.getPath());
-//		path.mkdirs(); // make any necessary directories...
-		Png png = new Png(newWidth, newHeight, 8, 1, outputFile.getPath());
-	
+		
+		return idxs;
+	}
+
+	//--------------------------------------------------------------------------
+	private static ObjectNode createPalette(Png png, int numColors, MinMax minMax, ObjectNode sendBack) {
+		
 		Logger.info("Creating palette");
 		PngChunkPLTE palette = null;
 		try {
-			palette = png.createPalette(numPaletteEntries + 1); // +1 for transparent color
+			palette = png.createPalette(numColors + 1); // extra one for the transparent color
 		}
 		catch(Exception e) {
 			Logger.info(e.toString());
 		}
 		Logger.info("Setting palette entries");
 		
-		palette.setEntry(0, 255, 210, 170);	// orangish
-		Png.interpolatePaletteEntries(palette, 
-				1, 255, 255, 204,	// yellowish
-				3, 160, 218, 180);	// greenish
-		palette.setEntry(4, 65, 182, 196); // greenish blue
-		palette.setEntry(5, 34, 94, 168); // blueish
-		palette.setEntry(6, 106, 21, 160);//blueish purple
-		palette.setEntry(7, 255, 0, 0);// red, but transparent
+		if (minMax.mMax < 0.1f) {		// entire value range negative?
+			palette.setEntry(0, 60, 0, 22); // dark magenta
+			palette.setEntry(1, 100, 8, 50); 
+			palette.setEntry(2, 170, 12, 88); // magenta
+			palette.setEntry(3, 240, 32, 116); 
+			palette.setEntry(4, 255, 136, 187); // pink
+			palette.setEntry(5, 255, 200, 220);
+			palette.setEntry(6, 255, 255, 255); // white
+		}
+		else if (minMax.mMin > -0.1f) {	// entire value range positive?
+			palette.setEntry(0, 255, 255, 255); // white
+			palette.setEntry(1, 210, 255, 160);
+			palette.setEntry(2, 145, 235, 80); // lime green
+			palette.setEntry(3, 90, 178, 10); 
+			palette.setEntry(4, 50, 110, 10); // green
+			palette.setEntry(5, 30, 70, 40); 
+			palette.setEntry(6, 15, 30, 90); // dark blue
+		}
+		else {
+			Png.RGB [] colors = new Png.RGB[13]; 
+			int whiteIndex = 6;
+			int zeroIndex = 0; // bin where the zero value hides...
+			JsonNode node = sendBack.get("values");
+			if (!node.isArray()) {
+				Logger.info("blah, fixme....");
+			}
+			ArrayNode array = (ArrayNode)node;
+			for (int i=0; i < array.size(); i++) {
+				zeroIndex = i;
+				double res1 = array.get(i).getValueAsDouble();
+				if (res1 >= 0) {
+					break;
+				}
+				if (i < array.size() - 1) {
+					double res2 = array.get(i+1).getValueAsDouble();
+					if (res2 > 0) {
+						break;
+					}
+				}
+			}
+			
+			colors[0] = new Png.RGB(60, 0, 22); // dark magenta
+			colors[1] = new Png.RGB(100, 8, 50); 
+			colors[2] = new Png.RGB(170, 12, 88); // magenta
+			colors[3] = new Png.RGB(240, 32, 116); 
+			colors[4] = new Png.RGB(255, 136, 187); // pink
+			colors[5] = new Png.RGB(255, 200, 220);
+			colors[whiteIndex] = new Png.RGB(255, 255, 255); // white
+			colors[7] = new Png.RGB(210, 255, 160);
+			colors[8] = new Png.RGB(145, 235, 80); // lime green
+			colors[9] = new Png.RGB(90, 178, 10); 
+			colors[10] = new Png.RGB(50, 110, 10); // green
+			colors[11] = new Png.RGB(30, 70, 40); 
+			colors[12] = new Png.RGB(15, 30, 90); // dark blue
+			
+			for (int i=0; i < numColors; i++) {
+				png.setColor(palette, i, colors[i + (whiteIndex - zeroIndex)]);
+			}
+		}
 
-		Logger.info("Setting transparent");
-		// set index 4 as transparent
-		int[] alpha = new int[numPaletteEntries + 1];
-		alpha[0] = 255; alpha[1] = 255; alpha[2] = 255;
-		alpha[3] = 255;
-		alpha[4] = 255; alpha[5] = 255; alpha[6] = 255;
-		alpha[7] = 0; // transparent color
+		// last color is always transparent color...doesn't matter what color here, we set alpha zero below...
+		palette.setEntry(numColors, 255, 0, 0);
+		sendBack = copyPaletteForClient(palette, numColors, sendBack);
+		
+		Logger.info(" Setting transparent");
+		int[] alpha = new int[numColors + 1];
+		
+		for (int i=0; i < numColors; i++) {
+			alpha[i] = 255;
+		}
+		// last color is always transparent
+		alpha[numColors] = 0;
 		png.setTransparentArray(alpha);
-		
-		ObjectNode sendBack = JsonNodeFactory.instance.objectNode();
-		sendBack = copyPaletteForClient(palette, numPaletteEntries, sendBack);
-		sendBack = copyAbsoluteValuesForClient(min, max, numPaletteEntries, sendBack);
-		
-		png.mPngWriter.writeRowsByte(idx);
-		png.mPngWriter.end();
 		
 		return sendBack;
 	}
-	
+
 }
 

@@ -277,6 +277,10 @@ public class Application extends Controller
 		//	file1 - shows file1 as an absolute map
 		//	file2 - shows file2 as an absolute map		
 		String type = request.get("type").getTextValue();
+		// subtype can be:
+		//	equal - equal interval map
+		//	quantile - quantiled...
+		String subtype = request.get("subtype").getTextValue();
 
 		if (type == null) {
 			Logger.info("Tried to find a heatmap 'type' key but didn't. Assuming 'delta'");
@@ -334,17 +338,24 @@ public class Application extends Controller
 		ObjectNode sendBack = null;
 		
 		if (type.equals("delta")) { // TWO file heatmap
-			sendBack = Analyzer_Heatmap.run(file1, file2, 
+			if (subtype.equals("equal")) {
+				sendBack = Analyzer_Heatmap.runEqualInterval(file1, file2, 
 							outputFile, 
 							10);
+			}
+			else {
+				sendBack = Analyzer_Heatmap.runQuantile(file1, file2, 
+							outputFile, 
+							10);
+			}
 		}
 		else if (type.equals("file1")) { // ONE file absolute map
-			sendBack = Analyzer_Heatmap.run(file1, 
+			sendBack = Analyzer_Heatmap.runAbsolute(file1, 
 							outputFile, 
 							10);
 		}
 		else if (type.equals("file2")) { // ONE file absolute map
-			sendBack = Analyzer_Heatmap.run(file2, 
+			sendBack = Analyzer_Heatmap.runAbsolute(file2, 
 							outputFile, 
 							10);
 		}

@@ -30,6 +30,8 @@ Ext.define('MyApp.view.Report_DetailElement', {
         // set's this as the default, ie, how is the value displayed? Absolute? %?
         this.DSS_FieldValueType = 'absolute';
         
+        this.DSS_SubStyleType = 'quantile';
+        
         Ext.applyIf(me, {
             items: [
             {
@@ -79,7 +81,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			    	showDelay: 100
 			    },
 			    handler: function(self) {
-			    	me.showHeatmap(self, me.DSS_FieldDataType);
+			    	me.showHeatmap(self, me.DSS_FieldDataType, me.DSS_SubStyleType);
 			    }
 			},{
 			    itemId: 'information_button',
@@ -141,11 +143,15 @@ Ext.define('MyApp.view.Report_DetailElement', {
 		legendContainer.removeAll();
 		
 		for (var idx = 0; idx < serverData.palette.length; idx++) {
-			var element = Ext.create('MyApp.view.Legend_HeatmapColor', {	
-						DSS_ElementColor: serverData.palette[idx],
-						DSS_ElementValue: serverData.values[idx]}
-			);
+			var obj = {
+				DSS_ElementColor: serverData.palette[idx],
+				DSS_ElementValue: serverData.values[idx],
+			};
+			if (idx == serverData.palette.length - 1) {
+				obj.DSS_ElementValueLast = serverData.values[idx+1];
+			}
 			
+			var element = Ext.create('MyApp.view.Legend_HeatmapColor', obj);
 			legendContainer.add(element);
 		}
 		// Layouts were disabled...must turn them back on!!
@@ -156,8 +162,11 @@ Ext.define('MyApp.view.Report_DetailElement', {
 	//	delta - shows change between file1 and file2
 	//	file1 - shows file1 as an absolute map
 	//	file2 - shows file2 as an absolute map
+	// subtype can be:
+	//	equal - equal interval
+	//	quantile - quantiled..
     //--------------------------------------------------------------------------
-    showHeatmap: function(button, type) {
+    showHeatmap: function(button, type, subtype) {
 
     	var me = this;
     	
@@ -180,7 +189,8 @@ Ext.define('MyApp.view.Report_DetailElement', {
 				jsonData: {
 					model: me.DSS_FieldString,
 					clientID: clientID,
-					type: type
+					type: type,
+					subtype: subtype
 				},
 				timeout: 10 * 60 * 1000, // minutes * seconds * (i.e. converted to) milliseconds
 				
@@ -269,6 +279,13 @@ Ext.define('MyApp.view.Report_DetailElement', {
     	
     	this.DSS_FieldDataType = newType;
     	this.setValueField();
+    },
+    
+    // valid substyle: 'equal', 'quantile'
+    //--------------------------------------------------------------------------
+    changeDataSubStyle: function(substyle) {
+    	
+    	this.DSS_SubStyleType = substyle;
     },
     
     // valid style types: 'absolute', '%'

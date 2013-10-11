@@ -65,7 +65,7 @@ Ext.define('MyApp.view.Report_DetailHeader', {
 				}]
 			},{
 				xtype: 'radiogroup',
-				x: 280,
+				x: 250,
 				y: 4,
 				fieldLabel: 'Data',
 				labelWidth: 35,
@@ -114,6 +114,22 @@ Ext.define('MyApp.view.Report_DetailHeader', {
 						'color': '#000'
 					}
 				}]
+			}, {
+				xtype: 'checkbox',
+				x: 450,
+				y: 4,
+				fieldLabel: 'EI',
+				labelWidth: 20,
+				style: {
+					'color': '#777'
+				},
+				handler: function(checkbox, checked) {
+					var subtype = 'quantile';
+					if (checked) {
+						subtype = 'equal';
+					}
+					Ext.getCmp('DSS_ReportDetail').changeDataSubStyle(subtype);
+				}
 			}]
 	    });
         
@@ -128,6 +144,9 @@ Ext.define('MyApp.view.Report_DetailHeader', {
     },
     
     changeValueStyleType: function(newType) {
+    },
+    
+    changeDataSubStyle: function(subtype) {
     },
     
     clearFields: function() {

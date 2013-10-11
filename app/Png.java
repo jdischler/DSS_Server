@@ -12,7 +12,18 @@ import ar.com.hjg.pngj.chunks.*;
 // Provides a wrapper and helpers around the PNGJ library
 //------------------------------------------------------------------------------
 public class Png {
-	
+
+	//------------------------	
+	public static class RGB {
+		public int mR, mG, mB;
+		
+		public RGB(int r, int g, int b) {
+			mR = r;
+			mG = g;
+			mB = b;
+		}
+	}
+
 	protected ImageInfo mImageInfo;
 	protected PngWriter mPngWriter;
 	
@@ -103,6 +114,12 @@ public class Png {
 		mPngWriter.end();
 	}
 
+	//--------------------------------------------------------------------------
+	public void setColor(PngChunkPLTE palette, int index, Png.RGB color) {
+		
+		palette.setEntry(index, color.mR, color.mG, color.mB);
+	}
+	
 	//--------------------------------------------------------------------------
 	private static int interpolateElement(int startIdx, int endIdx, int curIdx, int startClrVal, int endClrVal) {
 		

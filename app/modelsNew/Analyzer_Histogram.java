@@ -23,7 +23,7 @@ import org.codehaus.jackson.node.*;
 //------------------------------------------------------------------------------
 public class Analyzer_Histogram
 {
-	private final static int DEFAULT_histogramSize = 10;
+	private final static int DEFAULT_histogramSize = 15;
 	private int mHistogramSize;
 	private int [] mFile1_Histogram, mFile2_Histogram;
 	
@@ -107,8 +107,8 @@ public class Analyzer_Histogram
 						if (mSelection.mSelection[y][x] >= 1 && data > -9999.0f) { // FIXME: NoData check...
 							min = min(min, data);
 							max = max(max, data);
-							rasterData[y][x] = data;
 						}
+						rasterData[y][x] = data;
 					}
 				}
 			}
@@ -130,7 +130,11 @@ public class Analyzer_Histogram
 				float data = rasterData[y][x];
 				if (mSelection.mSelection[y][x] >= 1 && data > -9999.0f) { // FIXME: NoData check...
 					totalFile += data;
-					int binIndex = (int)((data - min)/(max - min) * (mHistogramSize - 1));
+					int binIndex = (int)((data - min)/(max - min) * mHistogramSize);
+					// handle custom, but usually rare, case of data being MAX in the above formula
+					if (binIndex > mHistogramSize - 1) { 
+						binIndex = mHistogramSize - 1; // clamp index to max to prevent overflow
+					}
 					histogram[binIndex]++;
 					totalCountFile++;
 				}

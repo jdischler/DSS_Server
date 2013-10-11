@@ -100,8 +100,8 @@ Ext.define('MyApp.view.Report_GraphPopUp', {
 		var array = [];
 		for (var i = 0; i < data1.length; i++)
 		{
-			array.push({ 	Freq_Default: data1[i]*900/1000000, 
-							Freq_Transform: data2[i]*900/1000000, 
+			array.push({ 	Freq_Default: data1[i] * 900 / 1000000, 
+							Freq_Transform: data2[i] * 900 / 1000000, 
 							Bin: (max-min)/(data1.length) * i + min });
 		}
 		

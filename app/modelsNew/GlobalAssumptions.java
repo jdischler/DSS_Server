@@ -39,18 +39,21 @@ public class GlobalAssumptions
 		// NOTE: these are ALL temp and placeholder...rename them, change values, etc!
 		// NOTE: only one icon definition is probably needed per category? double check...
 		// NOTE: we also put based on the variable name to make lookups trivial in later code...
-		results.put("p_corn", createAssumption("Economic", "", "Corn Price", 120.0f));
-		results.put("p_grass", createAssumption("Economic", "", "Grass Price", 100.0f));
-		results.put("p_eth", createAssumption("Economic", "economic_icon.png", "Ethanol Price", 300.0f));
+		results.put("p_corn", createAssumption("Economic", "", "Corn Price", 274.0f));
+		results.put("p_stover", createAssumption("Economic", "", "Stover Price", 70.0f));
+		results.put("p_grass", createAssumption("Economic", "", "Grass Price", 107.0f));
+		results.put("p_soy", createAssumption("Economic", "", "Soy Price", 249.0f));
+		results.put("p_alfalfa", createAssumption("Economic", "economic_icon.png", "Alfalfa Price", 230.0f));
+		//results.put("p_eth", createAssumption("Economic", "economic_icon.png", "Ethanol Price", 300.0f));
 		
-		results.put("conv_corn", createAssumption("Conversion Rates", "", "Corn Grain", 1.8f));
-		results.put("conv_stover", createAssumption("Conversion Rates", "", "Stover", 1.4f));
-		results.put("conv_grass", createAssumption("Conversion Rates", "scenario_icon.png", "Grass", 1.2f));
+		//results.put("conv_corn", createAssumption("Conversion Rates", "", "Corn Grain", 1.8f));
+		//results.put("conv_stover", createAssumption("Conversion Rates", "", "Stover", 1.4f));
+		//results.put("conv_grass", createAssumption("Conversion Rates", "scenario_icon.png", "Grass", 1.2f));
 		
-		results.put("av_temp", createAssumption("Climate", "", "Average Temperature", 76.1f));
-		results.put("av_rain", createAssumption("Climate", "climate_icon.png", "Average Rainfall", 19.2f));
+		//results.put("av_temp", createAssumption("Climate", "", "Average Temperature", 76.1f));
+		//results.put("av_rain", createAssumption("Climate", "climate_icon.png", "Average Rainfall", 19.2f));
 		
-		results.put("temp", createAssumption("Other", "policy_icon.png", "Dunno", 1));
+		//results.put("temp", createAssumption("Other", "policy_icon.png", "Dunno", 1));
 
 		mKnownAssumptions = results;
 	}

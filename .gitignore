@@ -36,3 +36,5 @@ dist
 *.nit
 *.aux.xml
 *.dir
+
+*.xlsx

@@ -27,7 +27,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
             items: [{
 				xtype: 'label',
 				x: 0,
-				y: 10,
+				y: -2,
 				html: label,
 				width: 60
 			},{

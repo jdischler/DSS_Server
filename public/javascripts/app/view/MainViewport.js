@@ -438,7 +438,6 @@ Ext.define('MyApp.view.MainViewport', {
 		// 	elements are added...		
 		Ext.suspendLayouts();
 		var dssLeftPanel = Ext.getCmp('DSS_LeftPanel');
-		dssLeftPanel.insert(0,lpGoog);
 		dssLeftPanel.insert(0,lpSOC);
 		dssLeftPanel.insert(0,lpLCS);
 		dssLeftPanel.insert(0,lpLCC);
@@ -447,6 +446,7 @@ Ext.define('MyApp.view.MainViewport', {
 //		dssLeftPanel.insert(0,lpRoad);
 		dssLeftPanel.insert(0,lpRiver);
 		dssLeftPanel.insert(0,lpCDL);
+		dssLeftPanel.insert(0,lpGoog);
 		Ext.resumeLayouts(true);
 		
 		// BOO - FIXME

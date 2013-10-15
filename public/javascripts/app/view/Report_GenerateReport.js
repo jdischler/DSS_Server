@@ -12,13 +12,13 @@ Ext.define('MyApp.view.Report_GenerateReport', {
 	icon: 'app/images/new_icon.png',
     activeTab: 0,
 
-    tools:[{
+ /*   tools:[{
 		type: 'help',
 		qtip: 'Report Help',
 		handler: function(event, target, owner, tool) {
 			var help = Ext.create('MyApp.view.LayerHelpWindow').show();
 		}
-    }],
+    }],*/
     
     initComponent: function() {
         var me = this;

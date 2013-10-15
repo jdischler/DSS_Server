@@ -3,90 +3,15 @@
  */
 
 //------------------------------------------------------------------------------
-var ScenarioGridStore = Ext.create('Ext.data.Store', {
-		
-    fields: ['Active', 'SelectionName', 'TransformText', 'ManagementText', 'Transform', 'Query'],
-    data: {
-        items: [{ 
-        	Active: true, 
-            SelectionName: 'Unstable Crops', 
-        	TransformText: 'To Perennial Grass',
-        	ManagementText: '<b><i>Management Options:</i></b></br>None',
-        	Transform: 6,
-        	Query: {
-        		clientID: 0,
-        		queryLayers: [{
-					name: 'cdl_2012',
-					type: 'indexed',
-					matchValues: [1,2,3]
-        		},
-        		{
-        			greaterThanTest: '>=',
-        			greaterThanValue: 3,
-        			lessThanTest: '<=',
-        			lessThanValue: null,
-        			name: 'slope',
-        			type: 'continuous'
-        		},
-        		{
-        			greaterThanTest: '>=',
-        			greaterThanValue: null,
-        			lessThanTest: '<=',
-        			lessThanValue: 500,
-        			name: 'rivers',
-        			type: 'continuous'
-        		}]
-        	}
-        }, {
-        	Active: false, 
-            SelectionName: 'Stable Grasses', 
-        	TransformText: 'To Continuous Corn',
-        	Transform: 1,
-        	Query:  {
-        		clientID: 0,
-        		queryLayers: [{
-					name: 'cdl_2012',
-					type: 'indexed',
-					matchValues: [8,9]
-        		},
-        		{
-        			greaterThanTest: '>=',
-        			greaterThanValue: null,
-        			lessThanTest: '<',
-        			lessThanValue: 4,
-        			name: 'slope',
-        			type: 'continuous'
-        		},
-        		{
-        			greaterThanTest: '>=',
-        			greaterThanValue: 500,
-        			lessThanTest: '<=',
-        			lessThanValue: null,
-        			name: 'rivers',
-        			type: 'continuous'
-        		}]
-        	}
-        }]
-    },
-    proxy: {
-        type: 'memory',
-        reader: {
-            type: 'json',
-            root: 'items'
-        }
-    }
-});
-
-//------------------------------------------------------------------------------
 var ClearScenarioGridStore = Ext.create('Ext.data.Store', {
 		
     fields: ['Active', 'SelectionName', 'TransformText', 'ManagementText', 'Transform', 'Query'],
     data: {
         items: [{ 
         	Active: true, 
-            SelectionName: 'undefined', 
+            SelectionName: 'Corn to Grass', 
         	TransformText: 'To Perennial Grass',
-        	ManagementText: '<b><i>Management Options:</i></b></br>None',
+        	ManagementText: '<b><i>Management Options:</i></b></br><b>Fertilizer:</b> Low, Manure',
         	Transform: 6,
         	Query: {
         		clientID: 0,
@@ -99,7 +24,8 @@ var ClearScenarioGridStore = Ext.create('Ext.data.Store', {
         }, {
         	Active: false, 
             SelectionName: 'undefined', 
-        	TransformText: 'To Continuous Corn',
+        	TransformText: 'To Corn',
+        	ManagementText: '<b><i>Management Options:</i></b></br><b>Tillage:</b> Conventional</br><b>Fertilizer:</b> Low, Manure',
         	Transform: 1,
         	Query: {}
         }]
@@ -110,6 +36,14 @@ var ClearScenarioGridStore = Ext.create('Ext.data.Store', {
             type: 'json',
             root: 'items'
         }
+    },
+    listeners: {
+    	// blah, just force the commit to happen, no reason not to save it right away IMHO
+    	update: function(store, record, operation, eOps) {
+    		if (operation == Ext.data.Model.EDIT) {
+    			store.commitChanges();
+    		}
+    	}
     }
 });
  
@@ -133,19 +67,36 @@ Ext.define('MyApp.view.ScenarioTools', {
     width: 300,
 	dock: 'bottom',
     
-//    header: true,
     title: 'Scenario Management',
 	viewConfig: {
 		stripeRows: true
 	},
+    bodyStyle: {'background-color': '#fafcff'},
+	icon: 'app/images/magnify_icon.png',
+	
     store: ClearScenarioGridStore,
-    
     enableColumnHide: false,
     enableColumnMove: false,
     sortableColumns: false,
+    columnLines: true,
     
-    bodyStyle: {'background-color': '#fafcff'},
-	icon: 'app/images/magnify_icon.png',
+    tools: [{
+    	type: 'plus',
+		tooltip: {
+			text: 'Add a new query and transform to this scenario',
+			showDelay: 100
+		},
+        handler: function(evt, toolEl, owner, self) {
+            owner.up().getStore().add({
+				Active: true, 
+				SelectionName: 'undefined', 
+				TransformText: 'To Corn',
+				ManagementText: '<b><i>Management Options:</i></b></br><b>Tillage:</b> Conventional</br><b>Fertilizer:</b> Low, Manure',
+				Transform: 1,
+				Query: {}
+			});
+        }
+    }],
     
 	dockedItems: [{
 		xtype: 'toolbar',
@@ -247,18 +198,24 @@ Ext.define('MyApp.view.ScenarioTools', {
 			if (c == false) {
 				return 'dss-greyed';
 			}
+		},
+		plugins: {
+			ptype: 'gridviewdragdrop',
+			dragText: 'Drag and drop transforms to reorder them'
 		}
 	},
 	
 	listeners: {
 		celldblclick: function(me, td, cellIndex, record, tr, rowIndex, e, eOpts) {
 			
-			if (cellIndex == 3) {
+		/*	if (cellIndex == 3) {
 				record.set('Active', !record.get('Active')); // Toggle active field
 				record.commit();
 			}
-			else if (cellIndex == 1) {
-				me.up().showTransformPopup(me, rowIndex);
+			else*/ 
+			if (cellIndex == 1) {
+				var rectOfClicked = e.target.getBoundingClientRect();
+				me.up().showTransformPopup(me, rowIndex, rectOfClicked);
 			}
 		},
 		beforeselect: function(me, record, index, eOpts) {
@@ -289,8 +246,8 @@ Ext.define('MyApp.view.ScenarioTools', {
 	columns: {
 		items:[{
 			dataIndex: 'SelectionName',
-			text: 'Selection',
-			width: 115,
+			text: 'User-Named Selection',
+			width: 140,
 			resizable: false,
 			editor: {
 				xtype: 'textfield',
@@ -300,8 +257,8 @@ Ext.define('MyApp.view.ScenarioTools', {
 		},
 		{
 			dataIndex: 'TransformText',
-			text: 'Transforms To & Managment Options',
-			width: 220,
+			text: 'Transforms & Managment',
+			width: 170,
 			resizable: false,
 			tdCls: 'dss-grey-scenario-grid',
 			renderer: function(value, meta, record) {
@@ -310,8 +267,16 @@ Ext.define('MyApp.view.ScenarioTools', {
 			}
 		},
 		{
+			xtype: 'checkcolumn',
+			dataIndex: 'Active',
+			text: 'Active',
+			width: 42,
+			resizable: false,
+			tdCls: 'dss-grey-scenario-grid'
+		},
+		{
 			xtype: 'actioncolumn',
-			width: 20,
+			width: 23,
 			resizable: false,
 			icon: 'app/images/eye_icon.png',
 			tooltip: 'View selection for this tranform',
@@ -325,12 +290,27 @@ Ext.define('MyApp.view.ScenarioTools', {
 			}
 		},
 		{
-			dataIndex: 'Active',
-			text: 'Active',
-		//	xtype: 'checkcolumn',
-			width: 43,
+			xtype: 'actioncolumn',
+			width: 23,
 			resizable: false,
-			tdCls: 'dss-grey-scenario-grid'
+			icon: 'app/images/delete_icon.png',
+			tooltip: 'Remove this transform',
+			handler: function(grid, rowIndex, colIndex) {
+				Ext.Msg.show({
+					 title: 'Confirm Transform Delete',
+					 msg: 'Are you sure you want to delete this transform?',
+					 buttons: Ext.Msg.YESNO,
+					 icon: Ext.Msg.QUESTION,
+					 fn: function(btn) {
+					 	 if (btn == 'yes') {
+							var record = grid.getStore().getAt(rowIndex);
+							grid.getStore().remove(record);
+							record.commit();
+							grid.getSelectionModel().select(0);
+					 	 }
+					 }
+				});
+			}
 		}]
 	},
 
@@ -345,7 +325,7 @@ Ext.define('MyApp.view.ScenarioTools', {
     },
 
 	//--------------------------------------------------------------------------
-	showTransformPopup: function(grid,rowIndex) {
+	showTransformPopup: function(grid,rowIndex, rectOfClicked) {
 		
 		var record = grid.getStore().getAt(rowIndex);
 		var transform = record.get('Transform');
@@ -363,12 +343,9 @@ Ext.define('MyApp.view.ScenarioTools', {
 					}
 				}
 			}});
-		var pos = grid.getPosition(true);
-		console.log(pos);
 		window.show();
-		// eh, just move it down some relative to the rowIndex clicked...
-		window.setPosition(pos[0] + grid.width,
-							(pos[1] - window.getSize().height),
+		window.setPosition(rectOfClicked.left,
+							(rectOfClicked.top - window.getSize().height),
 							false);
 	},
 	

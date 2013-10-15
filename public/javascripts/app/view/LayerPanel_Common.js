@@ -44,9 +44,9 @@ Ext.define('MyApp.view.LayerPanel_Common', {
 					handler: function(evt, toolEl, owner, tool) {
 						console.log('Clicked panel tool');
 						if (tool.type == 'plus') {
-							owner.expand();
+							c.expand();
 						} else {
-							owner.collapse();
+							c.collapse();
 						}
 					}
 				});

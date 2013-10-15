@@ -82,7 +82,7 @@ Ext.define('MyApp.view.LayerPanel_Google', {
             items: [{
 				xtype: 'label',
 				x: 0,
-				y: 8,
+				y: -4,
 				html: '<p style="text-align:right">Show</p>',
 				width: 60
 			},		

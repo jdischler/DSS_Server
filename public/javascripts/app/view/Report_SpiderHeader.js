@@ -22,8 +22,8 @@ Ext.define('MyApp.view.Report_SpiderHeader', {
             items: [{
 				xtype: 'label',
 				x: 0,
-				y: 6,
-				html: '<p style="text-align:right">ToDo Finish this header block....</p>',
+				y: -6,
+//				html: '<p style="text-align:right">ToDo Finish this header block....</p>',
 				style: {
 					'color': '#777'
 				}//,

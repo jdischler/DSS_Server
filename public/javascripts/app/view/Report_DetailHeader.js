@@ -29,16 +29,15 @@ Ext.define('MyApp.view.Report_DetailHeader', {
             items: [{
 				xtype: 'radiogroup',
 				id: 'DSS_ValueStyleRadioGroup',
-				x: 60,
+				x: 20,
 				y: 4,
 				fieldLabel: 'Values',
 				labelWidth: 42,
-				style: {
-					'color': '#777'
-				},
-				layout: 'absolute',
+				width: 200,
+				labelPad: 5,
+				labelAlign: 'left',
+				labelStyle: 'color:#777;',
 				items: [{
-					x: 5, y: 0,
 					boxLabel: 'Absolute',
 					name: 'valueStyle',
 					checked: true,
@@ -46,35 +45,25 @@ Ext.define('MyApp.view.Report_DetailHeader', {
 						if (checked) {
 							Ext.getCmp('DSS_ReportDetail').setValueStyle('absolute');
 						}
-					},
-					style: {
-						'color': '#000'
 					}
 				},{
-					x: 80, y: 0,
 					boxLabel: '%',
 					name: 'valueStyle',
 					handler: function(radio, checked) {
 						if (checked) {
 							Ext.getCmp('DSS_ReportDetail').setValueStyle('%');
 						}
-					},
-					style: {
-						'color': '#000'
 					}
 				}]
 			},{
 				xtype: 'radiogroup',
-				x: 250,
+				x: 210,
 				y: 4,
 				fieldLabel: 'Data',
-				labelWidth: 35,
-				style: {
-					'color': '#777'
-				},
-				layout: 'absolute',
+				labelWidth: 30,
+				width: 190,
+				labelStyle: 'color:#777;',
 				items: [{
-					x: 0, y: 0,
 					boxLabel: 'Delta',
 					name: 'dataStyle',
 					checked: true,
@@ -83,12 +72,8 @@ Ext.define('MyApp.view.Report_DetailHeader', {
 							Ext.getCmp('DSS_ReportDetail').setDataStyle('delta');
 							Ext.getCmp('DSS_ValueStyleRadioGroup').setDisabled(false);
 						}
-					},
-					style: {
-						'color': '#000'
 					}
 				},{
-					x: 55, y: 0,
 					boxLabel: 'File1',
 					name: 'dataStyle',
 					handler: function(radio, checked) {
@@ -96,12 +81,8 @@ Ext.define('MyApp.view.Report_DetailHeader', {
 							Ext.getCmp('DSS_ReportDetail').setDataStyle('file1');
 							Ext.getCmp('DSS_ValueStyleRadioGroup').setDisabled(true);
 						}
-					},
-					style: {
-						'color': '#000'
 					}
 				},{
-					x: 110, y: 0,
 					boxLabel: 'File2',
 					name: 'dataStyle',
 					handler: function(radio, checked) {
@@ -109,20 +90,14 @@ Ext.define('MyApp.view.Report_DetailHeader', {
 							Ext.getCmp('DSS_ReportDetail').setDataStyle('file2');
 							Ext.getCmp('DSS_ValueStyleRadioGroup').setDisabled(true);
 						}
-					},
-					style: {
-						'color': '#000'
 					}
 				}]
 			}, {
 				xtype: 'checkbox',
-				x: 450,
+				x: 420,
 				y: 4,
-				fieldLabel: 'EI',
-				labelWidth: 20,
-				style: {
-					'color': '#777'
-				},
+				fieldLabel: 'EqInt',
+				labelWidth: 35,
 				handler: function(checkbox, checked) {
 					var subtype = 'quantile';
 					if (checked) {

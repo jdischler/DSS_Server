@@ -21,13 +21,13 @@ Ext.define('MyApp.view.Report_Detail', {
     	    'MyApp.view.Report_GraphPopUp'
     ],
     
-    tools:[{
+ /*   tools:[{
 		type: 'help',
 		qtip: 'Simulation Results Help',
 		handler: function(event, target, owner, tool) {
 			var help = Ext.create('MyApp.view.LayerHelpWindow').show();
 		}
-    }],
+    }],*/
     
     //--------------------------------------------------------------------------
     initComponent: function() {

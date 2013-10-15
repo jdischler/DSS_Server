@@ -165,6 +165,7 @@ Ext.define('MyApp.view.TransformPopup', {
     			managementOptions = 'None';
     		}
     		this.DSS_Transform.Management += managementOptions;
+//    		console.log(this.DSS_Transform.Management);
     	}
     	else {
     		this.DSS_Transform = null;

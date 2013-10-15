@@ -11,7 +11,7 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
     height: 480,
     width: 500,
     title: 'Quick Summary',
-	icon: 'app/images/graph_icon.png',
+	icon: 'app/images/fast_icon.png',
     layout: 'absolute',
     id: 'DSS_SpiderGraphPanel',
 

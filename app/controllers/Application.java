@@ -233,15 +233,17 @@ public class Application extends Controller
 					// No layer data, try compare as a file...
 					// TODO: Add crutching up for SOC comparisons? will not be in /default....!
 					File compareTo = new File("./layerData/default/" + res.mName + ".dss");
+					Logger.info("Layer was null: " + compareTo.toString());
 					sendBack.put(res.mName, histogram.run(compareTo, res.mWidth, res.mHeight, res.mRasterData));
 				}
 				else {
-					// other ayer should be in memory, try to compare with that.
+					// other layer should be in memory, try to compare with that.
 					float[][] data1 = layer.getFloatData();
 					if (data1 == null) {
 						Logger.info("could not get layer in runModelCluster");
 					}
 					else {
+						Logger.info("Layer was normal: ");
 						sendBack.put(res.mName, histogram.run(res.mWidth, res.mHeight, data1, res.mRasterData));
 					}
 				}

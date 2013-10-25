@@ -66,9 +66,6 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 					type: 'Radial',
 					position: 'radial',
 					maximum: 1,
-					label: {
-						display: true
-					},
 					fields: ['Bin']
 				}],
 				series: [{

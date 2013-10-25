@@ -15,5 +15,6 @@ POST	/getHeatmap				controllers.Application.getHeatmap()
 
 # Map static resources from the /public folder to the /assets URL path
 GET		/app/file/*file			controllers.Assets.at(path="/public/file", file)
+GET		/app/stylesheets/*file	controllers.Assets.at(path="/public/stylesheets", file)
 GET		/app/*file				controllers.Assets.at(path="/public/javascripts/app", file)
-GET		/app/stylesheets		controllers.Assets.at(path="/public/stylesheets", file)
+

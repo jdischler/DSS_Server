@@ -5,7 +5,7 @@ Ext.define('MyApp.view.LegendElement', {
     alias: 'widget.legendelement',
 
     height: 24,
-    width: 178,
+    width: 172,
     layout: {
         type: 'absolute'
     },
@@ -16,14 +16,19 @@ Ext.define('MyApp.view.LegendElement', {
         var me = this;
         var pattern = (this.DSS_LegendElementIndex & 0x3);
         var BGcolor = (pattern == 0 || pattern == 1) ? '#ffffff' : '#f7faff';
+        me.DSS_GreyColor = '#ecf3f6';
+        me.DSS_LegendElementColor = me.color;
+        me.DSS_LegendElementType = me.label;
         
         Ext.applyIf(me, {
             style: {
                 'background-color': BGcolor,
-                border: '1px solid #f7f7f7'
+                border: '1px solid #eef',
+                'border-bottom': '1px solid #cde'
             },
             items: [{
 				xtype: 'container',
+				itemId: 'DSS_ColorChip',
 				x: 5,
 				y: 1,
 				frame: false,
@@ -31,7 +36,7 @@ Ext.define('MyApp.view.LegendElement', {
 				width: 20,
 				html: '',
 				style: {
-					'background-color': me.color,//DSS_LegendElementColor,
+					'background-color': me.DSS_GreyColor,//DSS_LegendElementColor,
 					border: '1px dotted #BBBBBB'
 				}
 			},
@@ -39,7 +44,7 @@ Ext.define('MyApp.view.LegendElement', {
 				xtype: 'label',
 				x: 30,
 				y: 2,
-				text: me.label,//DSS_LegendElementType
+				text: me.DSS_LegendElementType
 			},
 			{
 				xtype: 'checkboxfield',
@@ -59,6 +64,20 @@ Ext.define('MyApp.view.LegendElement', {
     	
     	var comp = this.getComponent('DSS_queryCheck');
     	return comp.getValue();
+    },
+    
+    //--------------------------------------------------------------------------
+    showColorChip: function() {
+    	
+    	var chip = this.getComponent('DSS_ColorChip');
+    	chip.el.setStyle({'background-color': this.DSS_LegendElementColor});
+    },
+    
+    //--------------------------------------------------------------------------
+    hideColorChip: function() {
+    	
+    	var chip = this.getComponent('DSS_ColorChip');
+    	chip.el.setStyle({'background-color': this.DSS_GreyColor});
     },
     
     //--------------------------------------------------------------------------

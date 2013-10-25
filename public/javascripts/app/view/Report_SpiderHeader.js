@@ -20,42 +20,38 @@ Ext.define('MyApp.view.Report_SpiderHeader', {
 	
         Ext.applyIf(me, {
             items: [{
-				xtype: 'label',
-				x: 0,
-				y: -6,
-//				html: '<p style="text-align:right">ToDo Finish this header block....</p>',
-				style: {
-					'color': '#777'
-				}//,
-				//width: 85
-			}/*,		
-			{
-				xtype: 'radiofield',
-				x: 94,
-				y: 3,
-				name: 'spiderStyle',
-				boxLabel: 'Def',
-				checked: true,
-				value: true,
-				handler: function(checkbox, checked) {
-					if (!checked) {
+				xtype: 'radiogroup',
+				x: 100,
+				y: 2,
+				fieldLabel: 'Value Display',
+				labelWidth: 82,
+				width: 280,
+				labelPad: 5,
+				labelAlign: 'left',
+				labelStyle: 'color:#777;',
+				items: [{
+					boxLabel: 'Absolute',
+					name: 'valueStyle',
+					checked: true,
+					handler: function(radio, checked) {
+						if (checked) {
+							Ext.getCmp('DSS_ReportDetail').setValueStyle('absolute');
+						}
 					}
-				}
-			},
-			{
-				xtype: 'radiofield',
-				x: 166,
-				y: 3,
-				name: 'spiderStyle',
-				boxLabel: 'Other',
-				handler: function(checkbox, checked) {
-					if (!checked) {
+				},{
+					boxLabel: 'Normalized',
+					name: 'valueStyle',
+					handler: function(radio, checked) {
+						if (checked) {
+							Ext.getCmp('DSS_ReportDetail').setValueStyle('%');
+						}
 					}
-				}
-			}*/]
+				}]
+			}]
 	    });
         
         me.callParent(arguments);
     }
+    
 });
 

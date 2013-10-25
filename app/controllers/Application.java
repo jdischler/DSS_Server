@@ -175,29 +175,29 @@ public class Application extends Controller
 		boolean bAnalyzeAll = false;
 		
 		if (modelType.equals("yield")) {
-			Model_EthanolNetEnergyIncome_New ethanolEnergyIncome = new Model_EthanolNetEnergyIncome_New();
+			Model_EthanolNetEnergyIncome ethanolEnergyIncome = new Model_EthanolNetEnergyIncome();
 			results = ethanolEnergyIncome.run(scenario);
 		}
 		else if (modelType.equals("n_p")) {
-			Model_NitrogenPhosphorus_New np = new Model_NitrogenPhosphorus_New();
+			Model_NitrogenPhosphorus np = new Model_NitrogenPhosphorus();
 			results = np.run(scenario);
 		}
 		else if (modelType.equals("soc")) {
-			Model_SoilCarbon_New soc = new Model_SoilCarbon_New();
+			Model_SoilCarbon soc = new Model_SoilCarbon();
 			results = soc.run(scenario);
 		}
 		else if (modelType.equals("pest_pol")) {
-			Model_PollinatorPestSuppression_New pp = new Model_PollinatorPestSuppression_New();
+			Model_PollinatorPestSuppression pp = new Model_PollinatorPestSuppression();
 			results = pp.run(scenario);
 			bAnalyzeAll = true;
 		}
 		else if (modelType.equals("nitrous")) {
-			Model_NitrousOxideEmissions_New n20 = new Model_NitrousOxideEmissions_New();
+			Model_NitrousOxideEmissions n20 = new Model_NitrousOxideEmissions();
 			results = n20.run(scenario);
 		}
 		
 		else {//(modelType.equals("habitat_index")) {
-			Model_HabitatIndex_New hi = new Model_HabitatIndex_New();
+			Model_HabitatIndex hi = new Model_HabitatIndex();
 			results = hi.run(scenario);
 			bAnalyzeAll = true;
 		}

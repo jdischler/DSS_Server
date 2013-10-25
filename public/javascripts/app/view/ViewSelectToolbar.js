@@ -21,63 +21,33 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
         DSS_ViewSelectToolbar = this;
         
         Ext.applyIf(me, {
-			items: [
-			{	
+			items: [{
 				xtype: 'button',
-				scale: 'small',
-				text: 'Expand Queried',
-				enableToggle: true,
-				pressed: DSS_DoExpandQueried,
+				scale: 'medium',
+				text: 'Reset Selection Criteria',
+				icon: 'app/images/revert_icon.png',
 				tooltip: {
-					text: 'Expand only queried layers',
+					text: 'Clears all selection criteria',
 					showDelay: 100
 				},
 				border: 1,
 				handler: function(button) {
-					DSS_DoExpandQueried = button.pressed;
-					if (DSS_DoExpandQueried) {
-						button.up().tryExpandQueried();
-					}
-				}
-			},
-			{	
-				xtype: 'button',
-				scale: 'small',
-				text: 'Expand All',
-				tooltip: {
-					text: 'Expand all query groups',
-					showDelay: 100
-				},
-				border: 1,
-				handler: function(button) {
-					button.up().tryExpandAll();
-				}
-			},
-			{	
-				xtype: 'button',
-				scale: 'small',
-				text: 'Collapse',
-				tooltip: {
-					text: 'Collapse all query groups',
-					showDelay: 100
-				},
-				border: 1,
-				handler: function(button) {
-					button.up().tryCollapseAll();
+					button.up().resetAllLayers();
 				}
 			},
 			{
 				xtype: 'tbspacer', 
-				width: 84
+				width: 174
 			},
 			{
 				xtype: 'button',
 				itemId: 'DSS_queryButton',
-				scale: 'small',
-				text: 'Run Query',
-				icon: 'app/images/go_icon_small.png',
+				scale: 'medium',
+				text: 'View Selection',
+				icon: 'app/images/eye_icon.png',
+				iconAlign: 'right',
 				tooltip: {
-					text: 'Run the current query and show selection results',
+					text: 'Show the combined selection results for the specified criteria',
 					showDelay: 100
 				},
 				border: 1,
@@ -141,6 +111,7 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
     //--------------------------------------------------------------------------
     submitQuery: function(queryJson) {
     	
+    	var me = this;
 		var button = this.getComponent('DSS_queryButton');
 		button.setIcon('app/images/spinner_16a.gif');
 		button.setDisabled(true);
@@ -155,56 +126,103 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 				var obj = JSON.parse(response.responseText);
 				console.log("success: ");
 				console.log(obj);
-				
-				// TODO: not 100% sure a delay is needed here? Was added to give server
-				//	time to finish writing out file...but if the OK response comes back from the server
-				//	...that is AFTER the file write process so the file should be ready?
-				// Still, sometimes the file fails to be found if we request the image too fast...
-				//	as if the server is still finishing writing it out?
-				Ext.defer(function(response) {
-					// FIXME: bounds should probably be computed by the server and passed back!!!
-					var bounds = new OpenLayers.Bounds(
-						-10062652.65061, 5278060.469521415,
-						-9878152.65061, 5415259.640662575
-					);
-					var imgTest = new OpenLayers.Layer.Image(
-						'Selection',
-						obj.url,
-						bounds,
-						new OpenLayers.Size(2113.0,-2113.0),
-						{
-							buffer: 0,
-							opacity: 1.0,
-							isBaseLayer: false,
-							displayInLayerSwitcher: false,
-							transitionEffect: "resize",
-							visibility: true,
-							maxResolution: "auto",
-							projection: globalMap.getProjectionObject(),
-							numZoomLevels: 19
-						}
-					);
-					
-					var selectionPanel = Ext.getCmp('CurrentSelectionLayer');
-					selectionPanel.setSelectionLayer(imgTest)
-					selectionPanel.setNumSelectedPixels(obj.selectedPixels, obj.totalPixels);
-			
-					var summaryPanel = Ext.getCmp('DSS_ScenarioSummary');
-					summaryPanel.expand(true);
-					
-					button.setIcon('app/images/go_icon_small.png');
-					button.setDisabled(false);
-					
-				}, 1000, this, [response]);
-	
+
+				me.tryCreateSelectionLayer(obj, 0);			
 			},
 			
 			failure: function(respose, opts) {
-				button.setIcon('app/images/go_icon_small.png');
+				button.setIcon('app/images/eye_icon.png');
 				button.setDisabled(false);
 				alert("Query failed, request timed out?");
 			}
 		});
+	},
+	
+	// NOTE: This got kinda messy...basically the problem is that the server could signal back
+	//	that the selection image has been created but the file system might still be saving it at that point??
+	// Just guessing...but the file doesn't always appear to be ready when it ought to be.
+	//	so I delay the attempt to use it...and even try to validate that it could be used
+	//	before actually doing so...hope this fixes the problem. It's possible this could even be
+	//	simplified...?
+	//--------------------------------------------------------------------------
+	tryCreateSelectionLayer: function(json, tryCount) {
+		
+    	var me = this;
+		var button = this.getComponent('DSS_queryButton');
+		
+		console.log('Doing a try create selection layer');
+		
+		// waits a small amount of time...then checks to see if they image could load...
+		Ext.defer(function() {
+				
+			var tester = new Image();
+			
+			// Set up a SUCCESS handler...
+			//----------------------------
+			tester.onload = function() {
+				// FIXME: bounds should probably be computed by the server and passed back!!!
+				var bounds = new OpenLayers.Bounds(
+					-10062652.65061, 5278060.469521415,
+					-9878152.65061, 5415259.640662575
+				);
+				var imgTest = new OpenLayers.Layer.Image(
+					'Selection',
+					json.url,
+					bounds,
+					new OpenLayers.Size(2113.0,-2113.0),
+					{
+						buffer: 0,
+						opacity: 1.0,
+						isBaseLayer: false,
+						displayInLayerSwitcher: false,
+						transitionEffect: "resize",
+						visibility: true,
+						maxResolution: "auto",
+						projection: globalMap.getProjectionObject(),
+						numZoomLevels: 19
+					}
+				);
+				
+				var selectionPanel = Ext.getCmp('DSS_CurrentSelectionLayer');
+				selectionPanel.setSelectionLayer(imgTest)
+				selectionPanel.setNumSelectedPixels(json.selectedPixels, json.totalPixels);
+		
+				var summaryPanel = Ext.getCmp('DSS_ScenarioSummary');
+				summaryPanel.expand(true);
+				
+				button.setIcon('app/images/eye_icon.png');
+				button.setDisabled(false);
+				
+			};
+			// Set up a failure handler...
+			//-----------------------
+			tester.onerror = function() {
+				tryCount++;
+				if (tryCount < 10) {
+					me.tryCreateSelectionLayer(json, tryCount);
+				}
+				else {
+					console.log(' Image not ready yet...and lets give up...');
+					button.setIcon('app/images/eye_icon.png');
+					button.setDisabled(false);
+				}
+			};
+			
+			tester.src = json.url;
+			
+		}, 50 + tryCount * 100, this);
+	},
+	
+	//--------------------------------------------------------------------------
+	resetAllLayers: function() {
+		
+		Ext.suspendLayouts();
+    	for (var i = 0; i < DSS_globalQueryableLayers.length; i++) {
+    		
+    		var layer = DSS_globalQueryableLayers[i];
+			layer.resetLayer();
+		}
+		Ext.resumeLayouts(true);
 	},
 	
 	//--------------------------------------------------------------------------

@@ -20,7 +20,7 @@ import java.lang.reflect.Array;
 // Version 08/20/2013
 //
 //------------------------------------------------------------------------------
-public class Model_EthanolNetEnergyIncome_New extends Model_Base
+public class Model_EthanolNetEnergyIncome extends Model_Base
 {
 	private static String mEthanolModelFile = "ethanol";
 	private static String mNetEnergyModelFile = "net_energy";
@@ -35,7 +35,7 @@ public class Model_EthanolNetEnergyIncome_New extends Model_Base
 Logger.info(">>> Computing Model Ethanol / Net Energy / Net Income");
 long timeStart = System.currentTimeMillis();
 		// Precompute yield....
-		Model_CropYield_New cropYield = new Model_CropYield_New();
+		Model_CropYield cropYield = new Model_CropYield();
 		float[][] calculatedYield = cropYield.run(scenario);
 
 		float [][] netEnergyData = new float[height][width];
@@ -101,10 +101,7 @@ Logger.info("  > Allocated memory for NetEnergy, NetIncom, Fuel");
 
 		// Get user changeable values from the client...
 		//----------------------------------------------------------------------
-		// NOTE: this is just a sample of how to do it
-		//float cornPrice = P_Per_Corn;
-		
-		try {		
+		try {	
 			P_Per_Corn = scenario.mAssumptions.getAssumptionFloat("p_corn");
 			P_Per_Stover = scenario.mAssumptions.getAssumptionFloat("p_stover");
 			P_Per_Grass = scenario.mAssumptions.getAssumptionFloat("p_grass");
@@ -120,7 +117,6 @@ Logger.info("  > Allocated memory for NetEnergy, NetIncom, Fuel");
 		Logger.info(" Grass price from client = " + Float.toString(P_Per_Grass) );
 		Logger.info(" Soy price from client = " + Float.toString(P_Per_Soy) );
 		Logger.info(" Alfalfa price from client = " + Float.toString(P_Per_Alfalfa) );
-		
 		//----------------------------------------------------------------------		
 
 		for (int y = 0; y < height; y++) {

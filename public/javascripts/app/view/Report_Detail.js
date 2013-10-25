@@ -6,19 +6,18 @@ Ext.define('MyApp.view.Report_Detail', {
     
     id: "DSS_ReportDetail",
     
-    height: 380,
+ //   height: 380,
     width: 500,
-        layout: {
-        type: 'absolute'
-    },
+    layout: 'vbox',
     title: 'Simulation Detail',
 	icon: 'app/images/magnify_icon.png',
     activeTab: 0,
 
     requires : [
-    	    'MyApp.view.Report_DetailHeader',
-    	    'MyApp.view.Report_DetailElement',
-    	    'MyApp.view.Report_GraphPopUp'
+    	'MyApp.view.Report_ValueTypePopup',
+		'MyApp.view.Report_DetailHeader',
+		'MyApp.view.Report_DetailElement',
+		'MyApp.view.Report_GraphPopUp'
     ],
     
  /*   tools:[{
@@ -44,7 +43,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					type: 'vbox'
 				},
 				items: [{
-					xtype: 'report_detail_header'
+					xtype: 'report_value_popup'
 				},
 				{
 					itemId: 'result_soc',
@@ -53,7 +52,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_Label: 'Soil Carbon',
 					DSS_UnitLabel: 'Mg',
 					DSS_GraphTitle: 'Soil Carbon',
-					DSS_InfoHTML: 'app/images/Test.htm'
+					DSS_InfoHTML: 'http://www.epa.gov/airquality/modeling.html'
 				},{
 					itemId: 'result_nitrous_oxide',
 					xtype: 'report_detail_item',
@@ -61,7 +60,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_UnitLabel: 'Tg',
 					DSS_Label: 'Nitrous Oxide',
 					DSS_GraphTitle: 'Nitrous Oxide Emissions',
-					DSS_InfoHTML: 'app/images/Test.htm'
+					DSS_InfoHTML: 'http://www.epa.gov/airquality/modeling.html'
 				},{
 					itemId: 'result_nitrogen',
 					xtype: 'report_detail_item',
@@ -69,7 +68,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_UnitLabel: 'mg/l',
 					DSS_Label: 'Nitrogen',
 					DSS_GraphTitle: 'Nitrogen Runoff',
-					DSS_InfoHTML: 'app/images/Test.htm'
+					DSS_InfoHTML: 'http://water.epa.gov/scitech/datait/models/index.cfm'
 				},{
 					itemId: 'result_phosphorus',
 					xtype: 'report_detail_item',
@@ -77,7 +76,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_UnitLabel: 'mg/l',
 					DSS_Label: 'Phosphorus',
 					DSS_GraphTitle: 'Phosphorus Runoff',
-					DSS_InfoHTML: 'app/images/Test.htm'
+					DSS_InfoHTML: 'http://water.epa.gov/scitech/datait/models/index.cfm'
 				},{
 					itemId: 'result_habitat_index',
 					xtype: 'report_detail_item',
@@ -86,7 +85,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_UnitLabelFile: '0 to 1',
 					DSS_Label: 'Bird Habitat',
 					DSS_GraphTitle: 'Bird Habitat Index',
-					DSS_InfoHTML: 'app/images/Test.htm'
+					DSS_InfoHTML: 'http://www.chjv.org/chjv_forest_bird_hsi_modeling_p.html'
 				},{
 					itemId: 'result_pest',
 					xtype: 'report_detail_item',
@@ -95,7 +94,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_UnitLabelFile: '0 to 1',
 					DSS_Label: 'Biocontrol',
 					DSS_GraphTitle: 'Biocontrol / Crop Pest Supression',
-					DSS_InfoHTML: 'app/images/Test.htm'
+					DSS_InfoHTML: 'http://ncp-dev.stanford.edu/~dataportal/invest-releases/documentation/current_release/croppollination.html'
 				},{
 					itemId: 'result_pollinators',
 					xtype: 'report_detail_item',
@@ -104,7 +103,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_UnitLabelFile: '0 to 1',
 					DSS_Label: 'Pollinators',
 					DSS_GraphTitle: 'Key Pollinators',
-					DSS_InfoHTML: 'app/images/Test.htm'
+					DSS_InfoHTML: 'http://ncp-dev.stanford.edu/~dataportal/invest-releases/documentation/current_release/croppollination.html'
 				},{
 					itemId: 'result_ethanol',
 					xtype: 'report_detail_item',
@@ -112,7 +111,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_UnitLabel: 'Gl',
 					DSS_Label: 'Biofuel',
 					DSS_GraphTitle: 'Biofuel Production',
-					DSS_InfoHTML: 'app/images/Test.htm'
+					DSS_InfoHTML: 'http://www.sciencedirect.com/science/article/pii/S0305750X11000933'
 				},{
 					itemId: 'result_net_income',
 					xtype: 'report_detail_item',
@@ -120,7 +119,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_UnitLabel: '$ million',
 					DSS_Label: 'Net Income',
 					DSS_GraphTitle: 'Net Income',
-					DSS_InfoHTML: 'app/images/Test.htm'
+					DSS_InfoHTML: 'http://www.sciencedirect.com/science/article/pii/S0305750X11000933'
 				},{
 					itemId: 'result_net_energy',
 					xtype: 'report_detail_item',
@@ -128,7 +127,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_UnitLabel: 'TJ',
 					DSS_Label: 'Net Energy',
 					DSS_GraphTitle: 'Net Energy',
-					DSS_InfoHTML: 'app/images/Test.htm'
+					DSS_InfoHTML: 'http://www.sciencedirect.com/science/article/pii/S0305750X11000933'
 				}]
 			},{
 				xtype: 'container',

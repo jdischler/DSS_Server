@@ -21,9 +21,10 @@ public class Global extends GlobalSettings
 	@Override
 	public void onStart(play.Application app) 
 	{
-//		convertFolderBinariesToASC("./layerData/default/", "./layerData/defaultConverted/");
-		
 		systemReport("Application has started");
+		
+		// Create all of the assumptions the server knows about, these will be fed to clients
+		GlobalAssumptions.initAssumptions();
 		
 		// create any computed layers (currently don't have any in here?)
 		computeLayers();
@@ -34,31 +35,7 @@ public class Global extends GlobalSettings
 		conditionalCreateDefaultModelOutputs();		
 		cacheModelDefaults();
 		
-		// Create all of the assumptions the server knows about, these will be fed to clients
-		GlobalAssumptions.initAssumptions();
-		
 		systemReport("Data Layers Cached");
-		
-		// Mask
-		//Layer_Integer cdl = (Layer_Integer)Layer_Base.getLayer("cdl_2012"); 
-		// Grass
-		//int Grass_Mask = cdl.convertStringsToMask("grass");
-		//int Alfalfa_Mask = cdl.convertStringsToMask("alfalfa");
-		//int mGrassMask = Grass_Mask | Alfalfa_Mask;	
-		// Forest
-		//int mForestMask = cdl.convertStringsToMask("woodland");
-		// Ag
-		//int Corn_Mask = cdl.convertStringsToMask("corn");
-		//int Soy_Mask = cdl.convertStringsToMask("soy");
-		//int mAgMask = 1 + 2 + 4 + 8 + 16384 + 32768 + 131072 + 262144;
-		// Total Mask
-		//int TotalMask = mAgMask | mGrassMask;
-		
-		//Logger.info("Grass_Mask: " + Integer.toString(Grass_Mask) + "Alfalfa_Mask: " + Integer.toString(Alfalfa_Mask) + "mForestMask: " + Integer.toString(mForestMask));
-		//Logger.info("Corn_Mask: " + Integer.toString(Corn_Mask) + "Soy_Mask: " + Integer.toString(Soy_Mask));
-		//Logger.info("mAgMask: " + Integer.toString(mAgMask) + "mGrassMask: " + Integer.toString(mGrassMask) + "TotalMask: " + Integer.toString(TotalMask));
-		
-		
 	}
 
 	//--------------------------------------------------------------------------
@@ -194,24 +171,23 @@ public class Global extends GlobalSettings
 			Scenario scenario = new Scenario();
 			scenario.mNewRotation = layer.getIntData();
 			scenario.mSelection = new Selection(width, height);
-	// FIXME: these assumptions don't seem to be set up correctly?
 			scenario.mAssumptions = new GlobalAssumptions();
 			scenario.mOutputDir = "default";
 			
 			List<ModelResult> results;
-			results = new Model_HabitatIndex_New().run(scenario);
+			results = new Model_HabitatIndex().run(scenario);
 			QueuedWriter.queueResults(results);
 
-			results = new Model_EthanolNetEnergyIncome_New().run(scenario);
+			results = new Model_EthanolNetEnergyIncome().run(scenario);
 			QueuedWriter.queueResults(results);
 			
-			results = new Model_PollinatorPestSuppression_New().run(scenario);
+			results = new Model_PollinatorPestSuppression().run(scenario);
 			QueuedWriter.queueResults(results);
 			
-			results = new Model_NitrogenPhosphorus_New().run(scenario);
+			results = new Model_NitrogenPhosphorus().run(scenario);
 			QueuedWriter.queueResults(results);
 
-			results = new Model_NitrousOxideEmissions_New().run(scenario);
+			results = new Model_NitrousOxideEmissions().run(scenario);
 			QueuedWriter.queueResults(results);
 
 			// NOTE: SOC for the default is not in the model run because it is not a computed data layer like others...

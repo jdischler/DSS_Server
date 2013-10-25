@@ -10,14 +10,14 @@ import org.codehaus.jackson.*;
 import org.codehaus.jackson.node.*;
 
 //------------------------------------------------------------------------------
-public class Model_HabitatIndex_New extends Model_Base
+public class Model_HabitatIndex extends Model_Base
 {
 	private static int mWindowSizeMeters = 390;
 	private static int mWindowSizeInCells;
 	private static String mModelFile = "habitat_index";
 	
 	//--------------------------------------------------------------------------
-	public Model_HabitatIndex_New() {
+	public Model_HabitatIndex() {
 		
 		mWindowSizeInCells = mWindowSizeMeters / 30; // Number of Cells in Raster Map
 	}

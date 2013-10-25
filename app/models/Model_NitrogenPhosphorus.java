@@ -20,7 +20,7 @@ import org.codehaus.jackson.node.*;
 // Version 08/20/2013
 //
 //------------------------------------------------------------------------------
-public class Model_NitrogenPhosphorus_New extends Model_Base
+public class Model_NitrogenPhosphorus extends Model_Base
 {
 	private static final String mNitrogenModelFile = "nitrogen";
 	private static final String mPhosphorusModelFile = "phosphorus";

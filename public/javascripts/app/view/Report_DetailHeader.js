@@ -30,7 +30,7 @@ Ext.define('MyApp.view.Report_DetailHeader', {
 				xtype: 'radiogroup',
 				id: 'DSS_ValueStyleRadioGroup',
 				x: 20,
-				y: 4,
+				y: 2,
 				fieldLabel: 'Values',
 				labelWidth: 42,
 				width: 200,
@@ -58,7 +58,7 @@ Ext.define('MyApp.view.Report_DetailHeader', {
 			},{
 				xtype: 'radiogroup',
 				x: 210,
-				y: 4,
+				y: 2,
 				fieldLabel: 'Data',
 				labelWidth: 30,
 				width: 190,
@@ -95,7 +95,7 @@ Ext.define('MyApp.view.Report_DetailHeader', {
 			}, {
 				xtype: 'checkbox',
 				x: 420,
-				y: 4,
+				y: 2,
 				fieldLabel: 'EqInt',
 				labelWidth: 35,
 				handler: function(checkbox, checked) {

@@ -21,7 +21,7 @@ import org.codehaus.jackson.node.*;
 // Version 08/20/2013
 //
 //------------------------------------------------------------------------------
-public class Model_PollinatorPestSuppression_New extends Model_Base
+public class Model_PollinatorPestSuppression extends Model_Base
 {
 	private static int mWindowSizeMeters = 990;
 	private static int mWindowSizeInCells;
@@ -30,7 +30,7 @@ public class Model_PollinatorPestSuppression_New extends Model_Base
 	private static String mPestModelFile = "pest";
 	
 	//--------------------------------------------------------------------------
-	public Model_PollinatorPestSuppression_New() {
+	public Model_PollinatorPestSuppression() {
 
 		mWindowSizeInCells = mWindowSizeMeters / 30; // Number of Cells in Raster Map
 	}

@@ -7,12 +7,10 @@ var DSS_TransformTypes = Ext.create('Ext.data.Store', {
 		{ 'index': 1, 'name': 'Corn', 	'controls': ['Tillage','Fertilizer'] },
 		{ 'index': 16, 'name': 'Soy', 	'controls': ['Tillage','Fertilizer'] },
 		{ 'index': 17, 'name': 'Alfalfa', 'controls': ['Tillage','Fertilizer'] },
-		{ 'index': 3, 'name': 'Veggies', 			'controls': ['Tillage','Fertilizer'] },
-//		{ 'index': 97, 'name': 'Corn Alfalfa', 		'controls': ['Tillage','Fertilizer'] }, // TODO: get an index?
-		{ 'index': 6, 'name': 'Perennial Grass', 	'controls': ['Fertilizer'] }, // TODO: get an index?
-//		{ 'index': 98, 'name': 'Miscanthus', 		'controls': ['Fertilizer'] }, // TODO: get an index?
-//		{ 'index': 99, 'name': 'Poplar', 			'controls': ['Fertilizer'] }, // TODO: get an index?
-		{ 'index': 7,'name': 'Woodland' }
+//		{ 'index': 3, 'name': 'Veggies', 			'controls': ['Tillage','Fertilizer'] },
+		{ 'index': 6, 'name': 'Grass', 	'controls': ['Fertilizer'] },
+		{ 'index': 10, 'name': 'Suburban' }
+//		{ 'index': 7,'name': 'Woodland' }
 	]
 });
 

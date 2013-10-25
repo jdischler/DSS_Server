@@ -17,7 +17,7 @@ import org.codehaus.jackson.node.*;
 // Version 08/20/2013
 //
 //------------------------------------------------------------------------------
-public class Model_NitrousOxideEmissions_New
+public class Model_NitrousOxideEmissions
 {
 	//--------------------------------------------------------------------------
 	public List<ModelResult> run(Scenario scenario) {

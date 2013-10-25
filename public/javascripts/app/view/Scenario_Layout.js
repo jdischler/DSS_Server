@@ -9,8 +9,8 @@ var ClearScenarioGridStore = Ext.create('Ext.data.Store', {
     data: {
         items: [{ 
         	Active: true, 
-            SelectionName: 'Corn to Grass', 
-        	TransformText: 'To Perennial Grass',
+            SelectionName: 'Default-Corn to Grass', 
+        	TransformText: 'To Grass',
         	ManagementText: '<b><i>Management Options:</i></b></br><b>Fertilizer:</b> Low, Manure',
         	Transform: 6,
         	Query: {
@@ -21,13 +21,6 @@ var ClearScenarioGridStore = Ext.create('Ext.data.Store', {
 					matchValues: [1]
         		}]
         	}
-        }, {
-        	Active: false, 
-            SelectionName: 'undefined', 
-        	TransformText: 'To Corn',
-        	ManagementText: '<b><i>Management Options:</i></b></br><b>Tillage:</b> Conventional</br><b>Fertilizer:</b> Low, Manure',
-        	Transform: 1,
-        	Query: {}
         }]
     },
     proxy: {
@@ -50,16 +43,18 @@ var ClearScenarioGridStore = Ext.create('Ext.data.Store', {
 
 // Scenario Summary....
 //------------------------------------------------------------------------------
-Ext.define('MyApp.view.ScenarioTools', {
+Ext.define('MyApp.view.Scenario_Layout', {
 		
     extend: 'Ext.grid.Panel',
-    alias: 'widget.scenariotools',
+    alias: 'widget.scenario_layout',
 
     requires: [
     	'MyApp.view.Assumptions.PropertyWindow',
     	'MyApp.view.TransformPopup'
     ],
-    
+  
+	autoScroll: true,
+ 
     id: 'DSS_ScenarioSummary',
     height: 250,
     minHeight: 250,
@@ -67,7 +62,7 @@ Ext.define('MyApp.view.ScenarioTools', {
     width: 300,
 	dock: 'bottom',
     
-    title: 'Scenario Management',
+	title: 'Scenario Management',
 	viewConfig: {
 		stripeRows: true
 	},
@@ -80,24 +75,6 @@ Ext.define('MyApp.view.ScenarioTools', {
     sortableColumns: false,
     columnLines: true,
     
-    tools: [{
-    	type: 'plus',
-		tooltip: {
-			text: 'Add a new query and transform to this scenario',
-			showDelay: 100
-		},
-        handler: function(evt, toolEl, owner, self) {
-            owner.up().getStore().add({
-				Active: true, 
-				SelectionName: 'undefined', 
-				TransformText: 'To Corn',
-				ManagementText: '<b><i>Management Options:</i></b></br><b>Tillage:</b> Conventional</br><b>Fertilizer:</b> Low, Manure',
-				Transform: 1,
-				Query: {}
-			});
-        }
-    }],
-    
 	dockedItems: [{
 		xtype: 'toolbar',
 		dock: 'bottom',
@@ -105,28 +82,77 @@ Ext.define('MyApp.view.ScenarioTools', {
 			xtype: 'button',
 			icon: 'app/images/new_icon.png',
 			scale: 'medium',
-			text: 'New',
-			disabled: true
+			text: 'Reset Scenario',
+			tooltip: {
+				text: 'Specify any assumptions for this scenario',
+				showDelay: 100,
+				mouseOffset: [15,-40] // make it pop up at a lower Y value than normal (18)
+			},
+			handler: function(self) {
+				Ext.Msg.show({
+					 title: 'Confirm New Scenario',
+					 msg: 'Are you sure you want to remove this scenario?',
+					 buttons: Ext.Msg.YESNO,
+					 icon: Ext.Msg.QUESTION,
+					 style: {
+					 	 'background-color': '#ffffff'
+					 },
+					 fn: function(btn) {
+					 	 if (btn == 'yes') {
+							var store =	self.up(). // goes up to the toolbar level...
+								up(). // goes up to the panel level....
+								getStore(); 
+							store.removeAll();
+							store.add({
+									Active: true, 
+									SelectionName: 'Default-Corn to Grass', 
+									TransformText: 'To Grass',
+									ManagementText: '<b><i>Management Options:</i></b></br><b>Tillage:</b> Conventional</br><b>Fertilizer:</b> Low, Manure',
+									Transform: 1,
+									Query: {
+										clientID: 0,
+										queryLayers: [{
+											name: 'cdl_2012',
+											type: 'indexed',
+											matchValues: [1]
+										}]
+									}
+							});
+							var selModel = self.up().up().getSelectionModel();
+							selModel.select(0);
+					 	 }
+					 }
+				});
+			}
 		},
 		{
 			xtype: 'button',
-			icon: 'app/images/save_icon.png',
+			icon: 'app/images/add_icon.png',
 			scale: 'medium',
-			text: 'Save',
-			disabled: true
-		},
-		{
-			xtype: 'button',
-			icon: 'app/images/load_icon.png',
-			scale: 'medium',
-			text: 'Load',
-			disabled: true
+			text: 'Add Transform',
+			tooltip: {
+				text: 'Add a new selection and transformation group to this scenario',
+				showDelay: 100,
+				mouseOffset: [15,-40] // make it pop up at a lower Y value than normal (18)
+			},
+			handler: function(self) {
+				self.up(). // goes to toolbar level...
+					up(). // goes to panel level, where the functions are...
+					getStore().add({
+						Active: true, 
+						SelectionName: 'undefined', 
+						TransformText: 'To Corn',
+						ManagementText: '<b><i>Management Options:</i></b></br><b>Tillage:</b> Conventional</br><b>Fertilizer:</b> Low, Manure',
+						Transform: 1,
+						Query: {}
+				});
+			}
 		},
 		{
 			xtype: 'button',
 			icon: 'app/images/globe_icon.png',
 			scale: 'medium',
-			text: 'Global Assumptions',
+			text: 'Set Assumptions',
 			tooltip: {
 				text: 'Specify any global assumptions for this scenario',
 				showDelay: 100,
@@ -149,8 +175,9 @@ Ext.define('MyApp.view.ScenarioTools', {
 			xtype: 'button',
 			id: 'DSS_runModelButton', // must be unique
 			icon: 'app/images/go_icon.png',
+			iconAlign: 'right',
 			scale: 'medium',
-			text: 'Run',
+			text: 'Run Models',
 			tooltip: {
 				text: 'Run the Model using the current scenario',
 				showDelay: 100,
@@ -232,7 +259,6 @@ Ext.define('MyApp.view.ScenarioTools', {
 		select: function(me, record, index, eOpts) {
 			console.log('Calling into select...setting up a query');
 			var query = record.get('Query');
-			console.log(query);
 			DSS_ViewSelectToolbar.setUpSelectionFromQuery(query);
 			var dssLeftPanel = Ext.getCmp('DSS_LeftPanel');
 			dssLeftPanel.up().DSS_SetTitle(record.get('SelectionName'));
@@ -247,7 +273,7 @@ Ext.define('MyApp.view.ScenarioTools', {
 		items:[{
 			dataIndex: 'SelectionName',
 			text: 'User-Named Selection',
-			width: 140,
+			width: 170,
 			resizable: false,
 			editor: {
 				xtype: 'textfield',
@@ -258,7 +284,7 @@ Ext.define('MyApp.view.ScenarioTools', {
 		{
 			dataIndex: 'TransformText',
 			text: 'Transforms & Managment',
-			width: 170,
+			width: 190,
 			resizable: false,
 			tdCls: 'dss-grey-scenario-grid',
 			renderer: function(value, meta, record) {
@@ -306,7 +332,10 @@ Ext.define('MyApp.view.ScenarioTools', {
 							var record = grid.getStore().getAt(rowIndex);
 							grid.getStore().remove(record);
 							record.commit();
-							grid.getSelectionModel().select(0);
+							var selModel = grid.getSelectionModel();
+							if (selModel.selected.getCount() < 1) {
+								selModel.select(0);
+							}
 					 	 }
 					 }
 				});

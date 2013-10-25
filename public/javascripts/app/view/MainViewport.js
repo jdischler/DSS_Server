@@ -27,15 +27,13 @@ Ext.define('MyApp.view.MainViewport', {
 	requires: [
 		'MyApp.view.InfoToolbar',
 		'GeoExt.panel.Map',
-		'MyApp.view.ScenarioTools',
-		'MyApp.view.LayerPanel_Google',
-        'MyApp.view.LayerPanel_Indexed',
-        'MyApp.view.LayerPanel_Continuous',
-        'MyApp.view.LayerPanel_CurrentSelection',
-        'MyApp.view.LayerPanel_Watershed',
+		'MyApp.view.NewLayerPanel_Google',
+        'MyApp.view.NewLayerPanel_Indexed',
+        'MyApp.view.NewLayerPanel_Continuous',
+        'MyApp.view.NewLayerPanel_Watershed',
         'MyApp.view.LogoPanel',
         'MyApp.view.ViewSelectToolbar',
-        'MyApp.view.ScenarioMasterLayout',        
+		'MyApp.view.Scenario_Layout',
         'MyApp.view.Report_MasterLayout'        
 	],
 	
@@ -66,13 +64,19 @@ Ext.define('MyApp.view.MainViewport', {
 			-10062652.65061, 5278060.469521415,
 			-9878152.65061, 5415259.640662575
 		);
+		function zoomEvent(event) {
+			console.log('Zoom Event object...');
+			console.log(event);
+		}
+		
 		var options = {
 			controls: [],
 			maxExtent: bounds,
 			restrictedExtent: bounds.scale(1.25),
 			maxResolution: 305.74811309814453,
 			projection: projectionType,
-			units: 'm'
+			units: 'm',
+			eventListeners: { "zoomstart": zoomEvent}
 		};
 		
 		globalMap = new OpenLayers.Map('map', options)
@@ -137,9 +141,9 @@ Ext.define('MyApp.view.MainViewport', {
 	//--------------------------------------------------------------------------
 	addControlsNeedingLayout: function() {
 		
-		globalMap.addControl(new OpenLayers.Control.Scale($('DSS_scale_tag')));
+/*		globalMap.addControl(new OpenLayers.Control.Scale($('DSS_scale_tag')));
 		Ext.getCmp('DSS_scale_tag').updateLayout();
-		
+*/		
 		globalMap.zoomTo(1);
 		globalMap.pan(1,1); // FIXME: lame workaround for google map zoom level not starting out correctly?
 	},
@@ -157,7 +161,7 @@ Ext.define('MyApp.view.MainViewport', {
 			}
 		}));
 		
-		var overviewMap = new OpenLayers.Control.OverviewMap({minRatio: 32, maxRatio:64, 
+/*		var overviewMap = new OpenLayers.Control.OverviewMap({minRatio: 32, maxRatio:64, 
 			autoPan:true,
 			size: {w: 270, h: 120},
 			maximized: false
@@ -167,8 +171,10 @@ Ext.define('MyApp.view.MainViewport', {
 				target: overviewMap.maximizeDiv,
 				html: 'Open Overview Map'
 		});
-		
-		map.addControl(new OpenLayers.Control.PanZoomBar({zoomWorldIcon: true}));
+*/		
+		map.addControl(new OpenLayers.Control.Zoom());
+//		map.addControl(new OpenLayers.Control.ZoomPanel());
+//		map.addControl(new OpenLayers.Control.PanZoomBar({zoomWorldIcon: true}));
 		map.addControl(new OpenLayers.Control.ArgParser());
 		
 		var scaleLine = new OpenLayers.Control.ScaleLine({maxWidth: 200,         					
@@ -339,7 +345,7 @@ Ext.define('MyApp.view.MainViewport', {
 			wmsRivers
 			]);
 		
-		var lpCDL = Ext.create('MyApp.view.LayerPanel_Indexed', {
+		var lpCDL = Ext.create('MyApp.view.NewLayerPanel_Indexed', {
 			title: 'Cropland Data',
 			DSS_Layer: wmsCDL,
 			minHeight: 90,
@@ -348,8 +354,8 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 		
-		var lpLCC = Ext.create('MyApp.view.LayerPanel_Indexed', {
-			title: 'LCC (Land Capability Class)',
+		var lpLCC = Ext.create('MyApp.view.NewLayerPanel_Indexed', {
+			title: 'Land Capability Class',
 			DSS_ShortTitle: 'LCC',
 			DSS_AutoSwapTitles: true,
 			DSS_Layer: wmsLCC,
@@ -359,8 +365,8 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 		
-		var lpLCS = Ext.create('MyApp.view.LayerPanel_Indexed', {
-			title: 'LCS (Land Capability Subclass)',
+		var lpLCS = Ext.create('MyApp.view.NewLayerPanel_Indexed', {
+			title: 'Land Capability Subclass',
 			DSS_ShortTitle: 'LCS',
 			DSS_AutoSwapTitles: true,
 			DSS_Layer: wmsLCC,
@@ -371,25 +377,26 @@ Ext.define('MyApp.view.MainViewport', {
 		});
 		
 		// Slope is greater than or equal to 10.2 degrees and less than or equal to 20.3 degrees
-		var lpSlope = Ext.create('MyApp.view.LayerPanel_Continuous', {
+		var lpSlope = Ext.create('MyApp.view.NewLayerPanel_Continuous', {
 			title: 'Slope',
 			DSS_Layer: wmsSlope,
 			DSS_LayerUnit: '%',//'\xb0',
 			DSS_LayerRangeMin: 0,
 			DSS_LayerRangeMax: 45.5,
-			DSS_ValueDefaultGreater: 10,
+			DSS_ValueDefaultGreater: 5,
+			DSS_ValueStep: 1,
 			DSS_QueryTable: 'slope',
 			collapsed: true
 		});
 
-		var lpWatershed = Ext.create('MyApp.view.LayerPanel_Watershed', {
+		var lpWatershed = Ext.create('MyApp.view.NewLayerPanel_Watershed', {
 			title: 'Watershed',
 			DSS_Layer: wmsWatershed,
 			DSS_QueryTable: 'watersheds',
 			collapsed: true
 		});
 
-		var lpRiver = Ext.create('MyApp.view.LayerPanel_Continuous', {
+		var lpRiver = Ext.create('MyApp.view.NewLayerPanel_Continuous', {
 			title: 'Distance to River',
 			DSS_ShortTitle: 'River',
 			DSS_AutoSwapTitles: false,
@@ -398,11 +405,12 @@ Ext.define('MyApp.view.MainViewport', {
 			DSS_LayerRangeMin: 0,
 			DSS_LayerRangeMax: 915.5,
 			DSS_ValueDefaultLess: 120,
+			DSS_ValueStep: 15,
 			DSS_QueryTable: 'rivers',
 			collapsed: true
 		});
 
-/*		var lpRoad = Ext.create('MyApp.view.LayerPanel_Continuous', {
+/*		var lpRoad = Ext.create('MyApp.view.NewLayerPanel_Continuous', {
 			title: 'Distance to Road',
 			DSS_ShortTitle: 'Road',
 			DSS_AutoSwapTitles: false,
@@ -416,8 +424,8 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 */		
-		var lpSOC = Ext.create('MyApp.view.LayerPanel_Continuous', {
-			title: 'SOC (Soil Organic Carbon)',
+		var lpSOC = Ext.create('MyApp.view.NewLayerPanel_Continuous', {
+			title: 'Soil Organic Carbon',
 			DSS_ShortTitle: 'SOC',
 			DSS_AutoSwapTitles: true,
 			DSS_Layer: wmsSOC,
@@ -425,13 +433,15 @@ Ext.define('MyApp.view.MainViewport', {
 			DSS_LayerRangeMin: 0,
 			DSS_LayerRangeMax: 1300,
 			DSS_ValueDefaultLess: 300,
+			DSS_ValueStep: 20,
 			DSS_QueryTable: 'soc',
 			collapsed: true
 		});
 		
-		var lpGoog = Ext.create('MyApp.view.LayerPanel_Google', {
+		var lpGoog = Ext.create('MyApp.view.NewLayerPanel_Google', {
 			DSS_LayerSatellite: googTerrain,
-			DSS_LayerHybrid: googHybrid
+			DSS_LayerHybrid: googHybrid,
+			dock: 'bottom'
 		});
 
 		// Speed up the insertion process a bit by suspending the layout engine until the new
@@ -446,7 +456,7 @@ Ext.define('MyApp.view.MainViewport', {
 //		dssLeftPanel.insert(0,lpRoad);
 		dssLeftPanel.insert(0,lpRiver);
 		dssLeftPanel.insert(0,lpCDL);
-		dssLeftPanel.insert(0,lpGoog);
+		dssLeftPanel.up().addDocked(lpGoog);
 		Ext.resumeLayouts(true);
 		
 		// BOO - FIXME
@@ -468,13 +478,6 @@ Ext.define('MyApp.view.MainViewport', {
 //		DSS_globalCollapsibleLayers.push(lpRoad);
 		DSS_globalCollapsibleLayers.push(lpRiver);
 		DSS_globalCollapsibleLayers.push(lpCDL);
-		
-		var lpSel = Ext.create('MyApp.view.LayerPanel_CurrentSelection', {
-			hidden: true//,
-//			DSS_Layer: wmsSlope // NOTE: dummy layer
-		});
-		dssLeftPanel.insert(0,lpSel);
-//		DSS_globalCollapsibleLayers.push(lpSel);
 		
 		this.addFeatureClickControl(map);
 	},
@@ -581,23 +584,23 @@ Ext.define('MyApp.view.MainViewport', {
 								panel.setSize(undefined, DSS_LogoPanelHeight);
 								this.setType('up');
 							}
-							panel = Ext.getCmp('DSS_ScenarioPanel');
-							panel.setSize(undefined,300);//doComponentLayout();
+							panel = Ext.getCmp('DSS_ScenarioSummary');
+							panel.setSize(undefined,250);//doComponentLayout();
 							
 						}
 					}]
 				}],
 				dockedItems: [{
 					xtype: 'logo_panel', // docked top
-				},
+				}/*,
 				{
 					xtype: 'infotoolbar' // docked bottom
 					, hidden: true
-				},
+				}*/,
 				{
 					xtype: 'panel',
 					dock: 'left',
-					width: 400,
+					width: 450,
 					autoScroll: true,
 					collapseDirection: 'left',
 //					animCollapse: false,
@@ -609,24 +612,24 @@ Ext.define('MyApp.view.MainViewport', {
 						icon: 'app/images/magnify_icon.png',
 					},
 					manageHeight: false,
-					title: 'View / Select',
+					title: 'Select Landscape',
 					DSS_NamedQuery: 'Untitled',
 					listeners: {
 						collapse: function(p, eOpts) { 
-							p.setTitle('View / Select / Scenario Tools - "' + p.DSS_NamedQuery + '"');
+							p.setTitle('Select Landscape / Scenario Tools - "' + p.DSS_NamedQuery + '"');
 						},
 						beforeexpand: function(p, animated, eOpts) {
-							p.setTitle('View / Select - "' + p.DSS_NamedQuery + '"');
+							p.setTitle('Select Landscape - "' + p.DSS_NamedQuery + '"');
 						},
 					},
 
 					DSS_SetTitle: function(queryName) {
 						this.DSS_NamedQuery = queryName;
 						if (this.getCollapsed()) {
-							this.setTitle('View / Select / Scenario Tools - "' + this.DSS_NamedQuery + '"');
+							this.setTitle('Select Landscape / Scenario Tools - "' + this.DSS_NamedQuery + '"');
 						}
 						else {
-							this.setTitle('View / Select - "' + this.DSS_NamedQuery + '"');
+							this.setTitle('Select Landscape - "' + this.DSS_NamedQuery + '"');
 						}
 					},
 					layout: {
@@ -639,7 +642,7 @@ Ext.define('MyApp.view.MainViewport', {
 						id: 'DSS_LeftPanel',
 						layout: {
 							type: 'accordion',
-							animate: false,
+						//	animate: false,
 							multi: true,
 							titleCollapse: false
 						},
@@ -654,7 +657,7 @@ Ext.define('MyApp.view.MainViewport', {
 						xtype: 'view_select_toolbar' // docked top left
 					},
 					{
-						xtype: 'scenariotools'//'scenario_master_layout' // docked bottom left
+						xtype: 'scenario_layout' // docked bottom
 					}]
 				},
 				{

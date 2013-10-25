@@ -17,7 +17,7 @@ import org.codehaus.jackson.node.*;
 // Version 08/20/2013
 //
 //------------------------------------------------------------------------------
-public class Model_CropYield_New
+public class Model_CropYield
 {
 	//--------------------------------------------------------------------------
 	public float[][] run(Scenario scenario) {

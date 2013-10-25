@@ -12,7 +12,8 @@ Ext.define('MyApp.view.Report_DetailElement', {
     alias: 'widget.report_detail_item',
 
     requires : [
-    	'MyApp.view.Report_GraphPopUp'
+    	'MyApp.view.Report_GraphPopUp',
+    	'MyApp.view.Info_PopUp_HTML'
     ],
     
     width: 500,
@@ -37,7 +38,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
             {
 			    itemId: 'DSS_ValueField',  
 			    xtype: 'textfield',
-			    x: 0,
+			    x: 30,
 			    y: 5,
 			    width: 240,
 			    fieldLabel: me.DSS_Label,
@@ -46,7 +47,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			},{
 				xtype: 'label',
 				itemId: 'DSS_UnitsLabel',
-				x: 245,
+				x: 275,
 				y: 9,
 				text: me.DSS_UnitLabelDelta ? me.DSS_UnitLabelDelta : me.DSS_UnitLabel,
 				style: {
@@ -55,10 +56,10 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			},{
 			    itemId: 'graph_button',
 			    xtype: 'button',
-			    x: 305,
-			    y: 5,
-			    width: 60,
-			    text: 'Graph',
+			    x: 335,
+			    y: 3,
+			    width: 30,
+				html: '<img src="app/images/graph_icon.png" align="middle">',
 			    tooltip: {
 			    	text: 'View a histogram graph of the two result sets',
 			    	showDelay: 100
@@ -71,11 +72,11 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			},{
 			    itemId: 'heat_delta_button',
 			    xtype: 'button',
-			    x: 375,
-			    y: 5,
-			    width: 60,
+			    x: 370,
+			    y: 3,
+			    width: 30,
 			    enableToggle: true,
-			    text: 'Map',
+				html: '<img src="app/images/map_small_icon.png" align="middle">',
 			    tooltip: {
 			    	text: 'View a data / heatmap overlay calculated from the data sets',
 			    	showDelay: 100
@@ -86,7 +87,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			},{
 			    itemId: 'information_button',
 			    xtype: 'button',
-			    x: 445,
+			    x: 415,
 			    y: 5,
 			    width: 30,
 			    text: '?',
@@ -95,7 +96,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			    	showDelay: 100
 			    },
 			    handler: function(self) {
-			    	var mypopup = Ext.create("MyApp.view.Info_PopUp_HTML", {
+			    	var mypopup = Ext.create('MyApp.view.Info_PopUp_HTML', {
 			    		title: me.DSS_GraphTitle, 
 			    		DSS_InfoHTML: me.DSS_InfoHTML});
 					mypopup.show();

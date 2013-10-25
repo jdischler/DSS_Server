@@ -18,7 +18,7 @@ import java.lang.reflect.Array;
 // Version 08/20/2013
 //
 //------------------------------------------------------------------------------
-public class Model_SoilCarbon_New
+public class Model_SoilCarbon
 {
 	// Raw Soil Carbon Change Factor (RSCCF) 
 	static final float RSCCF_Corn_Grass = 0.63f; // Continuous Corn to Grass

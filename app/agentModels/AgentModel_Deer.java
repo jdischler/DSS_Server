@@ -9,7 +9,6 @@ import org.codehaus.jackson.node.*;
 //------------------------------------------------------------------------------
 public class AgentModel_Deer
 {
-	private static 
 	private int mAtX, mAtY;
 	private int mAge;
 	private float mFitness;

@@ -24,7 +24,7 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 			items: [{
 				xtype: 'button',
 				scale: 'medium',
-				text: 'Reset Selection Criteria',
+				text: 'Reset Selection',
 				icon: 'app/images/revert_icon.png',
 				tooltip: {
 					text: 'Clears all selection criteria',
@@ -37,7 +37,7 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 			},
 			{
 				xtype: 'tbspacer', 
-				width: 174
+				width: 214
 			},
 			{
 				xtype: 'button',
@@ -222,6 +222,13 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
     		var layer = DSS_globalQueryableLayers[i];
 			layer.resetLayer();
 		}
+		// Hide the selection layer...
+		var selContainer = Ext.getCmp('DSS_CurrentSelectionLayer');
+		if (selContainer.DSS_Layer) {
+			selContainer.DSS_Layer.setVisibility(false);
+		}
+		selContainer.setHeight(0);
+		
 		Ext.resumeLayouts(true);
 	},
 	

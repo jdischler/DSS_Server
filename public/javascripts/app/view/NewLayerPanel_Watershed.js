@@ -35,8 +35,7 @@ Ext.define('MyApp.view.NewLayerPanel_Watershed', {
 				height: 28,
 				width: 152,
 				tooltip: {
-					text: 'Click on a watershed to include it in your query',
-					showDelay: 100
+					text: 'Click on a watershed to include it in your query'
 				},
 				enableToggle: true,
 				handler: function(button, evt) {
@@ -58,8 +57,7 @@ Ext.define('MyApp.view.NewLayerPanel_Watershed', {
 				y: 12,
 				height: 28,
 				tooltip: {
-					text: 'Clear all selected watersheds',
-					showDelay: 100
+					text: 'Clear all selected watersheds'
 				},
 				handler: function(button, evt) {
 					var panel = button.up();
@@ -75,7 +73,6 @@ Ext.define('MyApp.view.NewLayerPanel_Watershed', {
             		me.createOpacityPopup(self);
             	},
             	tooltip: {
-            		showDelay: 100,
             		text: 'Viewable Layer Overlay'
             	}
 			},{
@@ -89,7 +86,6 @@ Ext.define('MyApp.view.NewLayerPanel_Watershed', {
             		alert('Query for this layer would be run here...');
             	},
             	tooltip: {
-            		showDelay: 100,
             		text: 'Preview only this criteria selection'
             	}
 			}]

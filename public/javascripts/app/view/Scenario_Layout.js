@@ -85,7 +85,6 @@ Ext.define('MyApp.view.Scenario_Layout', {
 			text: 'Reset Scenario',
 			tooltip: {
 				text: 'Specify any assumptions for this scenario',
-				showDelay: 100,
 				mouseOffset: [15,-40] // make it pop up at a lower Y value than normal (18)
 			},
 			handler: function(self) {
@@ -132,7 +131,6 @@ Ext.define('MyApp.view.Scenario_Layout', {
 			text: 'Add Transform',
 			tooltip: {
 				text: 'Add a new selection and transformation group to this scenario',
-				showDelay: 100,
 				mouseOffset: [15,-40] // make it pop up at a lower Y value than normal (18)
 			},
 			handler: function(self) {
@@ -155,7 +153,6 @@ Ext.define('MyApp.view.Scenario_Layout', {
 			text: 'Set Assumptions',
 			tooltip: {
 				text: 'Specify any global assumptions for this scenario',
-				showDelay: 100,
 				mouseOffset: [15,-40] // make it pop up at a lower Y value than normal (18)
 			},
 			handler: function(self) {
@@ -180,7 +177,6 @@ Ext.define('MyApp.view.Scenario_Layout', {
 			text: 'Run Models',
 			tooltip: {
 				text: 'Run the Model using the current scenario',
-				showDelay: 100,
 				mouseOffset: [15,-40] // make it pop up at a lower Y value than normal (18)
 			},
 			handler: function(self) {

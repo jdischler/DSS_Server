@@ -59,10 +59,10 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			    x: 335,
 			    y: 3,
 			    width: 30,
-				html: '<img src="app/images/graph_icon.png" align="middle">',
+			    padding: '3 0 3 6',
+			    icon: 'app/images/graph_icon.png',
 			    tooltip: {
-			    	text: 'View a histogram graph of the two result sets',
-			    	showDelay: 100
+			    	text: 'View a histogram graph of the two result sets'
 			    },
 			    handler: function (self) {
 					var mypopup = Ext.create("MyApp.view.Report_GraphPopUp", {title: me.DSS_GraphTitle});
@@ -76,14 +76,15 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			    y: 3,
 			    width: 30,
 			    enableToggle: true,
-				html: '<img src="app/images/map_small_icon.png" align="middle">',
+			    padding: '3 0 3 6',
+			    icon: 'app/images/map_small_icon.png',
 			    tooltip: {
-			    	text: 'View a data / heatmap overlay calculated from the data sets',
-			    	showDelay: 100
+			    	text: 'View a data / heatmap overlay calculated from the data sets'
 			    },
 			    handler: function(self) {
 			    	me.showHeatmap(self, me.DSS_FieldDataType, me.DSS_SubStyleType);
-			    }
+			    },
+			    DSS_DetailReportContainer: me.DSS_DetailReportContainer // pass the parent linkage along...
 			},{
 			    itemId: 'information_button',
 			    xtype: 'button',
@@ -92,8 +93,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			    width: 30,
 			    text: '?',
 			    tooltip: {
-			    	text: 'View information about this model result',
-			    	showDelay: 100
+			    	text: 'View information about this model result'
 			    },
 			    handler: function(self) {
 			    	var mypopup = Ext.create('MyApp.view.Info_PopUp_HTML', {
@@ -113,6 +113,13 @@ Ext.define('MyApp.view.Report_DetailElement', {
 		this.getComponent('DSS_ValueField').setValue(null);
 	},
 	
+    //--------------------------------------------------------------------------
+	clearHeatToggle: function() {
+		
+		var button = this.getComponent('heat_delta_button');
+		this.hideHeatmap(button);
+    },
+
     //--------------------------------------------------------------------------
 	setWait: function() {
 		var spinnerStyle = {"background-image":"url(app/images/spinner_16a.gif)",
@@ -162,90 +169,6 @@ Ext.define('MyApp.view.Report_DetailElement', {
 		Ext.resumeLayouts(true);
 	},
 	
-	// type can be: 
-	//	delta - shows change between file1 and file2
-	//	file1 - shows file1 as an absolute map
-	//	file2 - shows file2 as an absolute map
-	// subtype can be:
-	//	equal - equal interval
-	//	quantile - quantiled..
-    //--------------------------------------------------------------------------
-    showHeatmap: function(button, type, subtype) {
-
-    	var me = this;
-    	
-		if (button.DSS_Layer) { 
-			globalMap.removeLayer(button.DSS_Layer);
-			button.DSS_Layer = null;
-		}
-		else {
-			var clientID = '1234';
-			var clientID_cookie = Ext.util.Cookies.get('DSS_clientID');
-			if (clientID_cookie) {
-				clientID = clientID_cookie;
-			}
-			else {
-				console.log('WARNING: no client id cookie was found...');
-			}
-			
-			var obj = Ext.Ajax.request({
-				url: location.href + 'getHeatmap',
-				jsonData: {
-					model: me.DSS_FieldString,
-					clientID: clientID,
-					type: type,
-					subtype: subtype
-				},
-				timeout: 10 * 60 * 1000, // minutes * seconds * (i.e. converted to) milliseconds
-				
-				success: function(response, opts) {
-					
-					var obj= JSON.parse(response.responseText);
-					console.log("success: ");
-					console.log(obj);
-					
-					// Send server data for colors/values to the legend creation code...
-					me.createHeatmapLegend(obj);
-					
-					Ext.defer(function(obj) {		
-						var bounds = new OpenLayers.Bounds(
-							-10062652.65061, 5278060.469521415,
-							-9878152.65061, 5415259.640662575
-						);
-						var imgTest = new OpenLayers.Layer.Image(
-							button.DSS_heatString,
-							'app/file/' + obj.heatFile,
-							bounds,
-							new OpenLayers.Size(2113.0,-2113.0),
-							{
-								buffer: 0,
-								opacity: 1.0,
-								isBaseLayer: false,
-								displayInLayerSwitcher: false,
-								transitionEffect: "resize",
-								visibility: true,
-								maxResolution: "auto",
-								projection: globalMap.getProjectionObject(),
-								numZoomLevels: 19
-							}
-						);
-						
-						if (button.DSS_Layer) { 
-							globalMap.removeLayer(button.DSS_Layer);
-						}
-						button.DSS_Layer = imgTest;
-						globalMap.addLayer(button.DSS_Layer);
-						button.DSS_Layer.setOpacity(0.9);
-					}, 1000, this, [obj]);
-				},
-				
-				failure: function(respose, opts) {
-					alert("heatmap request failed, request timed out?");
-				}
-			});
-		}
-    },
-    
     //--------------------------------------------------------------------------
     setValueField: function() {
     	
@@ -322,7 +245,150 @@ Ext.define('MyApp.view.Report_DetailElement', {
 		Ext.getCmp('DSS_SpiderGraphPanel').setSpiderDataElement(val1, val2, this.DSS_FieldString);
 		this.setValueField();
 		this.DSS_GraphData = data;
-    }
+    },
+    
+    //--------------------------------------------------------------------------
+    hideHeatmap: function(onButton) {
+    	
+		if (onButton.DSS_Layer) { 
+			globalMap.removeLayer(onButton.DSS_Layer);
+			onButton.DSS_Layer = null;
+			onButton.toggle(false);
+		}
+    },
+    
+    // type can be: 
+	//	delta - shows change between file1 and file2
+	//	file1 - shows file1 as an absolute map
+	//	file2 - shows file2 as an absolute map
+	// subtype can be:
+	//	equal - equal interval
+	//	quantile - quantiled..
+    //--------------------------------------------------------------------------
+    showHeatmap: function(button, type, subtype) {
 
+		var spinnerStyle = {"background-image":"url(app/images/spinner_16a.gif)",
+			"background-repeat":"no-repeat","background-position":"center center", 
+			"padding-left":"0px"};
+			
+    	var me = this;
+		if (button.DSS_Layer) { 
+			this.hideHeatmap(button);
+		}
+		else {
+			var clientID = '1234';
+			var clientID_cookie = Ext.util.Cookies.get('DSS_clientID');
+			if (clientID_cookie) {
+				clientID = clientID_cookie;
+			}
+			else {
+				console.log('WARNING: no client id cookie was found...');
+			}
+			
+			var button = this.getComponent('heat_delta_button');
+			button.setIcon('app/images/spinner_16a.gif');
+			button.setDisabled(true);
+			
+			var obj = Ext.Ajax.request({
+				url: location.href + 'getHeatmap',
+				jsonData: {
+					model: me.DSS_FieldString,
+					clientID: clientID,
+					type: type,
+					subtype: subtype
+				},
+				timeout: 1 * 60 * 1000, // minutes * seconds * (i.e. converted to) milliseconds
+				
+				success: function(response, opts) {
+					var res = JSON.parse(response.responseText);
+					console.log('success: ');
+					console.log(res);
+					
+					// Send server data for colors/values to the legend creation code...
+					me.createHeatmapLegend(res);
+					me.tryCreateHeatmapLayer(res, 0);
+				},
+				
+				failure: function(respose, opts) {
+					alert('heatmap request failed, request timed out?');
+					button.setIcon('app/images/map_small_icon.png');
+					button.setDisabled(false);
+					button.toggle(false);
+				}
+			});
+		}
+	},
+
+    //--------------------------------------------------------------------------
+    tryCreateHeatmapLayer: function(json, tryCount) {
+    	
+		var me = this;
+		var button = this.getComponent('heat_delta_button');
+		
+		console.log('Doing a try create heatmap layer');
+		
+		// waits a small amount of time...then checks to see if they image could load...
+		Ext.defer(function() {
+			var tester = new Image();
+			
+			// Set up a SUCCESS handler...
+			//----------------------------
+			tester.onload = function() {
+				var bounds = new OpenLayers.Bounds(
+					-10062652.65061, 5278060.469521415,
+					-9878152.65061, 5415259.640662575
+				);
+				var imgTest = new OpenLayers.Layer.Image(
+					button.DSS_heatString,
+					'app/file/' + json.heatFile,
+					bounds,
+					new OpenLayers.Size(2113.0,-2113.0),
+					{
+						buffer: 0,
+						opacity: 1.0,
+						isBaseLayer: false,
+						displayInLayerSwitcher: false,
+						transitionEffect: "resize",
+						visibility: true,
+						maxResolution: "auto",
+						projection: globalMap.getProjectionObject(),
+						numZoomLevels: 19
+					}
+				);
+				
+				if (button.DSS_Layer) { 
+					globalMap.removeLayer(button.DSS_Layer);
+				}
+				button.DSS_Layer = imgTest;
+				globalMap.addLayer(button.DSS_Layer);
+				button.DSS_Layer.setOpacity(0.9);
+				
+				button.setIcon('app/images/map_small_icon.png');
+				button.setDisabled(false);
+				// call up to the button owner and tell it to toggle all of the
+				//	others off (except myself if I'm toggled)...
+				button.DSS_DetailReportContainer.clearHeatToggles(button);
+				
+			};
+			// Set up a failure handler...
+			//-----------------------
+			tester.onerror = function() {
+				tryCount++;
+				if (tryCount < 20) {
+					me.tryCreateHeatmapLayer(json, tryCount);
+				}
+				else {
+					console.log(' Image not ready yet...and lets give up...');
+					button.setIcon('app/images/map_small_icon.png');
+					button.setDisabled(false);
+					button.toggle(false);
+				}
+			};
+			
+			tester.src = 'app/file/' + json.heatFile;
+		
+		}, 200 + tryCount * 100, this);
+	}
+	
 });
 

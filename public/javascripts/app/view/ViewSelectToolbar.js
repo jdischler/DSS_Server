@@ -27,8 +27,7 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 				text: 'Reset Selection',
 				icon: 'app/images/revert_icon.png',
 				tooltip: {
-					text: 'Clears all selection criteria',
-					showDelay: 100
+					text: 'Clears all selection criteria'
 				},
 				border: 1,
 				handler: function(button) {
@@ -47,8 +46,7 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 				icon: 'app/images/eye_icon.png',
 				iconAlign: 'right',
 				tooltip: {
-					text: 'Show the combined selection results for the specified criteria',
-					showDelay: 100
+					text: 'Show the combined selection results for the specified criteria'
 				},
 				border: 1,
 				handler: function(button, evt, toolEl, owner, tool) {

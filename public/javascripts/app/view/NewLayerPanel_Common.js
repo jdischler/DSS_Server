@@ -45,8 +45,7 @@ Ext.define('MyApp.view.NewLayerPanel_Common', {
 					width: 55,
 					height: 20,
 					tooltip: {
-						text: 'Include aspects of this data in your landscape selection?',
-						showDelay: 100
+						text: 'Include aspects of this data in your landscape selection?'
 					},
 					enableToggle: true,
 					listeners: {

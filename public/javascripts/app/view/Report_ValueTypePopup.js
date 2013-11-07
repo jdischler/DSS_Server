@@ -252,7 +252,10 @@ Ext.define('MyApp.view.Report_ValueTypePopup', {
     clearFields: function() {
     },
     
-    setWait: function() {
+    clearHeatToggle: function() {
+    },
+    
+	setWait: function() {
     }
 
 });

@@ -43,7 +43,6 @@ Ext.define('MyApp.view.NewLayerPanel_Indexed', {
             		me.createOpacityPopup(self, me.hideColorChips, me);
             	},
             	tooltip: {
-            		showDelay: 100,
             		text: 'Viewable Layer Overlay'
             	}
 			},{
@@ -57,7 +56,6 @@ Ext.define('MyApp.view.NewLayerPanel_Indexed', {
             		alert('Query for this layer would be run here...');
             	},
             	tooltip: {
-            		showDelay: 100,
             		text: 'Preview only this criteria selection'
             	}
 			}]

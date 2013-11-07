@@ -38,8 +38,7 @@ Ext.define('MyApp.view.NewLayerPanel_Continuous', {
 				width: 30,
 				text: me.DSS_DefaultGreaterThanTest, //'>=',
 				tooltip: {
-					text: 'Toggle greater than/equal',
-					showDelay: 100
+					text: 'Toggle greater than/equal'
 				},
 				handler: function(me,evt) {
 					if (me.text == '>=') {
@@ -68,8 +67,7 @@ Ext.define('MyApp.view.NewLayerPanel_Continuous', {
 				width: 18,
 				text: 'c',
 				tooltip: {
-					text: 'Clear this text field',
-					showDelay: 100
+					text: 'Clear this text field'
 				},
 				handler: function(me,evt) {
 					me.up().getComponent('DSS_GreaterThanValue').setValue('');
@@ -84,8 +82,7 @@ Ext.define('MyApp.view.NewLayerPanel_Continuous', {
 				xtype: 'button',
 				icon: 'app/images/switch_icon.png',
 				tooltip: {
-					text: 'Swap values',
-					showDelay: 100
+					text: 'Swap values'
 				},
 				x: 211,
 				y: 6,
@@ -104,8 +101,7 @@ Ext.define('MyApp.view.NewLayerPanel_Continuous', {
 				width: 30,
 				text: me.DSS_DefaultLessThanTest, // '<='
 				tooltip: {
-					text: 'Toggle less than/equal',
-					showDelay: 100
+					text: 'Toggle less than/equal'
 				},
 				handler: function(me,evt) {
 					if (me.text == '<=') {
@@ -134,8 +130,7 @@ Ext.define('MyApp.view.NewLayerPanel_Continuous', {
 				width: 18,
 				text: 'c',
 				tooltip: {
-					text: 'Clear this text field',
-					showDelay: 100
+					text: 'Clear this text field'
 				},
 				handler: function(me,evt) {
 					me.up().getComponent('DSS_LessThanValue').setValue('');
@@ -165,7 +160,6 @@ Ext.define('MyApp.view.NewLayerPanel_Continuous', {
             		me.createOpacityPopup(self);
             	},
             	tooltip: {
-            		showDelay: 100,
             		text: 'Viewable Layer Overlay'
             	}
 			},{
@@ -179,7 +173,6 @@ Ext.define('MyApp.view.NewLayerPanel_Continuous', {
             		alert('Query for this layer would be run here...');
             	},
             	tooltip: {
-            		showDelay: 100,
             		text: 'Preview only this criteria selection'
             	}
 			}]

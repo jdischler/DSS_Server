@@ -39,7 +39,7 @@ public class GlobalAssumptions
 		// NOTE: these are ALL temp and placeholder...rename them, change values, etc!
 		// NOTE: only one icon definition is probably needed per category? double check...
 		// NOTE: we also put based on the variable name to make lookups trivial in later code...
-		results.put("p_corn", createAssumption("Economic", "", "Corn Price", 225.0f));
+		results.put("p_corn", createAssumption("Economic", "", "Corn Price", 240.0f));
 		results.put("p_stover", createAssumption("Economic", "", "Stover Price", 80.0f));
 		results.put("p_grass", createAssumption("Economic", "", "Grass Price", 110.0f));
 		results.put("p_soy", createAssumption("Economic", "", "Soy Price", 495.0f));

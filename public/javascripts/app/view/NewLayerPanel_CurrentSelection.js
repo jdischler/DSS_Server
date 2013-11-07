@@ -62,7 +62,7 @@ Ext.define('MyApp.view.NewLayerPanel_CurrentSelection', {
 				x: 133,
 				y: 30,
 				padding: 10,
-				value: 50,
+				value: 100,
 				minValue: 0,
 				maxValue: 100,
 				increment: 10,

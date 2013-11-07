@@ -162,7 +162,9 @@ public class Scenario
 		mConfiguration = configuration;
 		
 		Logger.info("Beginning transform rotation...");
+		Logger.info("...Current rotation duplicating...");
 		mNewRotation = duplicateRotation();
+		Logger.info("...Duplicated rotation transforming...");
 		mNewRotation = transformRotation(mNewRotation);
 		Logger.info("...Transform complete!!");
 		
@@ -172,7 +174,6 @@ public class Scenario
 	//--------------------------------------------------------------------------
 	private int[][] duplicateRotation() {
 	
-		Logger.info("Current rotation duplicating...");
 		// uses clone to duplicate the data array
 		Layer_Base original = Layer_Base.getLayer("cdl_2012");//.getIntData().clone();
 		int [][] originalData = original.getIntData();
@@ -192,17 +193,16 @@ public class Scenario
 	
 		Query query = new Query();
 		
-		Logger.info("Duplicated rotation transforming...");
 		JsonNode transformQueries = mConfiguration.get("transforms");
 		if (transformQueries != null && transformQueries.isArray()) {
 			
-			Logger.info("Has Transforms array...");
+			Logger.info("...Has Transforms array...");
 			Selection currentSelection = null, oldSelection = null;
 			ArrayNode transformArray = (ArrayNode)transformQueries;
 			int count = transformArray.size();
 			
 			for (int i = 0; i < count; i++) {
-				Logger.info("-Processing one array element in the transform list...");
+				Logger.info("...Processing one array element in the transform list...");
 				JsonNode transformElement = transformArray.get(i);
 				
 				if (transformElement == null) {
@@ -216,7 +216,7 @@ public class Scenario
 				//	format of a bit mask "position" that corresponds to the index
 				//	.vs the index value itself.
 				int newLanduse = transformElement.get("newLandUse").getValueAsInt();
-				Logger.info("+New land use code: " + Integer.toString(newLanduse));
+				Logger.info("  + New land use code: " + Integer.toString(newLanduse));
 				newLanduse = Layer_Integer.convertIndexToMask(newLanduse);
 				
 				try {
@@ -225,17 +225,26 @@ public class Scenario
 					Logger.info(e.toString());
 				}
 				
-				Logger.info("  Num pixels selected from query: " +
-						Integer.toString(currentSelection.countSelectedPixels()));
+				int pixelsSelectedFromQuery = currentSelection.countSelectedPixels();
+				float perc = 1.0f;
+//				Logger.info("  Num pixels selected from query: " +
+//						Integer.toString(currentSelection.countSelectedPixels()));
 				
 				if (oldSelection != null) {
 					// remove the old selection from the current/new selection
 					//	this prevents us from running a transform on land that is
 					//	already transformed....
 					currentSelection.removeSelection(oldSelection);
-					Logger.info("  Num pixels selected after removing old selection: " +
-						Integer.toString(currentSelection.countSelectedPixels()));
+					int actualPixelsSelectedFromQuery = currentSelection.countSelectedPixels();
+//					Logger.info("  Num pixels selected after removing old selection: " +
+//						Integer.toString(currentSelection.countSelectedPixels()));
+					perc = actualPixelsSelectedFromQuery / (float)pixelsSelectedFromQuery;
+					Logger.info("  Pixels removed from selection: " +
+						Integer.toString(pixelsSelectedFromQuery - actualPixelsSelectedFromQuery));
 				}
+				
+				Logger.info("  Actual selection percentage: " + 
+					Float.toString(perc * 100));
 				
 				// Run the transform on a (possibly) reduced selection
 				//	e.g., if this is the second or later query in a series,
@@ -255,8 +264,8 @@ public class Scenario
 					//	more pixels...which will then be candidates for being excluded
 					//	from subsequent transform passes...
 					currentSelection.combineSelection(oldSelection);
-					Logger.info("  Num pixels selected after combining new and old selection: " +
-						Integer.toString(currentSelection.countSelectedPixels()));
+//					Logger.info("  Num pixels selected after combining new and old selection: " +
+//						Integer.toString(currentSelection.countSelectedPixels()));
 				}
 				
 				oldSelection = currentSelection;

@@ -144,7 +144,9 @@ Ext.define('MyApp.view.MainViewport', {
 /*		globalMap.addControl(new OpenLayers.Control.Scale($('DSS_scale_tag')));
 		Ext.getCmp('DSS_scale_tag').updateLayout();
 */		
+//		globalMap.zoomToMaxExtent();
 		globalMap.zoomTo(1);
+//		globalMap.pan(1,1); // FIXME: lame workaround for google map zoom level not starting out correctly?
 		globalMap.pan(1,1); // FIXME: lame workaround for google map zoom level not starting out correctly?
 	},
 	

@@ -21,6 +21,17 @@ Ext.Loader.setConfig({
 		}
 });
 
+// FIXME: tooltips aren't setting width correctly...
+// this is one possible work around as per:
+//	http://stackoverflow.com/questions/15834689/extjs-4-2-tooltips-not-wide-enough-to-see-contents
+delete Ext.tip.Tip.prototype.minWidth;
+
+// set up some quick tip defaults...
+Ext.apply(Ext.tip.QuickTipManager.getQuickTip(), {
+	showDelay: 100,
+	minWidth: 'auto'
+});
+
 Ext.application({
     stores: [
     ],

@@ -365,5 +365,27 @@ public class Application extends Controller
 		sendBack.put("heatFile", outputFile.getName());
 		return ok(sendBack);
 	}
+	
+	//----------------------------------------------------------------------
+	public static Result saveScenario() throws Exception
+	{
+/*		Logger.info("----- Save Scenario Request ----");
+
+		JsonNode request = request().body().asJson();
+		
+		String modelType = request.get("name").getTextValue();
+		String clientID = request.get("clientID").getTextValue();
+		
+		String srcFolder = "client_" + clientID;
+		String srcPath = "./layerData/" + srcFolder + "/*";
+
+		String destFolder = "client_" + clientID;
+		String destPath = "./layerData/" + srcFolder + "/name";
+		
+		Process proc = Runtime.getRuntime().exec("cp -r " + srcPath + " " + destPath)
+*/
+		return ok();
+	}
+	
 }
 

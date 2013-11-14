@@ -7,8 +7,11 @@ import java.io.*;
 import ar.com.hjg.pngj.*;
 import ar.com.hjg.pngj.chunks.*;
 
-import org.codehaus.jackson.*;
-import org.codehaus.jackson.node.*;
+//import org.codehaus.jackson.*;
+//import org.codehaus.jackson.node.*;
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.node.*;
 
 //------------------------------------------------------------------------------
 public class Query {
@@ -35,15 +38,15 @@ public class Query {
 		Logger.info("Called into query");
 		Logger.info(requestBody.toString());
 		
-		String partialPath = "/public/file/test" + String.valueOf(mCounter) + ".png";
+		int ctr = mCounter++;
+		String partialPath = "/public/dynamicFiles/selection" + String.valueOf(ctr) + ".png";
 		// FIXME: not sure why play doesn't hand me back the expected directory path in production?
 		if (Play.isProd()) {
 			// FIXME: blugh, like this won't be totally fragile? :)
-			partialPath = "/target/scala-2.10/classes" + partialPath;
+//			partialPath = "/target/scala-2.10/classes" + partialPath;
 		}
-		String urlPath = "/app/file/test" + String.valueOf(mCounter) + ".png";
+		String urlPath = "/files/selection" + String.valueOf(ctr) + ".png";
 		Logger.info("File write path: " + partialPath);
-		mCounter++;
 		
 		// 8 bits per pixel, one channel (indexed), file path where the png is saved
 		// Since this is the file we are saving, it will be smaller than the actual

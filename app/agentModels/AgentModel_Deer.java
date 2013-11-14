@@ -3,8 +3,9 @@ package util;
 import play.*;
 import java.util.*;
 
-import org.codehaus.jackson.*;
-import org.codehaus.jackson.node.*;
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.node.*;
 
 //------------------------------------------------------------------------------
 public class AgentModel_Deer

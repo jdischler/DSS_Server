@@ -6,8 +6,12 @@ import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
 
-import org.codehaus.jackson.*;
-import org.codehaus.jackson.node.*;
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.node.*;
+
+//import org.codehaus.jackson.*;
+//import org.codehaus.jackson.node.*;
 
 //------------------------------------------------------------------------------
 public abstract class Layer_Base
@@ -216,7 +220,7 @@ public abstract class Layer_Base
 	public static JsonNode getParameter(JsonNode clientRequest) throws Exception {
 		
 		JsonNode ret = null;
-		String layername = clientRequest.get("name").getTextValue();
+		String layername = clientRequest.get("name").textValue();
 		
 		Layer_Base layer = Layer_Base.getLayer(layername);
 		if (layer != null) {
@@ -261,7 +265,7 @@ public abstract class Layer_Base
 				JsonNode arElem = arNode.get(i);
 				JsonNode layerName = arElem.get("name");
 				if (arElem != null && layerName != null) {
-					Layer_Base layer = Layer_Base.getLayer(layerName.getValueAsText());
+					Layer_Base layer = Layer_Base.getLayer(layerName.textValue());
 					if (layer != null) {
 						layer.query(arElem, selection);
 					}

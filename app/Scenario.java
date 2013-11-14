@@ -4,8 +4,11 @@ import play.*;
 import java.util.*;
 import java.io.*;
 
-import org.codehaus.jackson.*;
-import org.codehaus.jackson.node.*;
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.node.*;
+//import org.codehaus.jackson.*;
+//import org.codehaus.jackson.node.*;
 
 //------------------------------------------------------------------------------
 public class Scenario 
@@ -215,7 +218,7 @@ public class Scenario
 				// get the new landuse...but remember that it needs to be in the
 				//	format of a bit mask "position" that corresponds to the index
 				//	.vs the index value itself.
-				int newLanduse = transformElement.get("newLandUse").getValueAsInt();
+				int newLanduse = transformElement.get("newLandUse").intValue();
 				Logger.info("  + New land use code: " + Integer.toString(newLanduse));
 				newLanduse = Layer_Integer.convertIndexToMask(newLanduse);
 				

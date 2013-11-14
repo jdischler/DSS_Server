@@ -6,8 +6,10 @@ import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
 
-import org.codehaus.jackson.*;
-import org.codehaus.jackson.node.*;
+//import org.codehaus.jackson.*;
+//import org.codehaus.jackson.node.*;
+
+import com.fasterxml.jackson.core.*;
 
 // USAGE SAMPLE
 /*

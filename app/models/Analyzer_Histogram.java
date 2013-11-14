@@ -6,8 +6,9 @@ import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
 
-import org.codehaus.jackson.*;
-import org.codehaus.jackson.node.*;
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.node.*;
 
 //------------------------------------------------------------------------------
 // Analyzer_Histogram

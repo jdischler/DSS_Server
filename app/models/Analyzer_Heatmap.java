@@ -5,8 +5,10 @@ import java.util.*;
 import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
-import org.codehaus.jackson.*;
-import org.codehaus.jackson.node.*;
+
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.node.*;
 
 import ar.com.hjg.pngj.*;
 import ar.com.hjg.pngj.chunks.*;
@@ -463,12 +465,12 @@ public class Analyzer_Heatmap {
 			ArrayNode array = (ArrayNode)node;
 			for (int i=0; i < array.size(); i++) {
 				zeroIndex = i;
-				double res1 = array.get(i).getValueAsDouble();
+				double res1 = array.get(i).doubleValue();
 				if (res1 >= 0) {
 					break;
 				}
 				if (i < array.size() - 1) {
-					double res2 = array.get(i+1).getValueAsDouble();
+					double res2 = array.get(i+1).doubleValue();
 					if (res2 > 0) {
 						break;
 					}

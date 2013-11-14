@@ -340,7 +340,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
 				);
 				var imgTest = new OpenLayers.Layer.Image(
 					button.DSS_heatString,
-					'app/file/' + json.heatFile,
+					json.heatFile,
 					bounds,
 					new OpenLayers.Size(2113.0,-2113.0),
 					{
@@ -367,7 +367,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
 				button.setDisabled(false);
 				// call up to the button owner and tell it to toggle all of the
 				//	others off (except myself if I'm toggled)...
-				button.DSS_DetailReportContainer.clearHeatToggles(button);
+				button.DSS_DetailReportContainer.clearHeatToggles(button.up());
 				
 			};
 			// Set up a failure handler...
@@ -385,7 +385,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
 				}
 			};
 			
-			tester.src = 'app/file/' + json.heatFile;
+			tester.src = json.heatFile;
 		
 		}, 200 + tryCount * 100, this);
 	}

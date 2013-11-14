@@ -13,8 +13,12 @@ import play.cache.*;
 
 import views.html.*;
 
-import org.codehaus.jackson.*;
-import org.codehaus.jackson.node.*;
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.node.*;
+
+//import org.codehaus.jackson.*;
+//import org.codehaus.jackson.node.*;
 import javax.xml.bind.DatatypeConverter;
 
 //------------------------------------------------------------------------------
@@ -58,12 +62,12 @@ public class Application extends Controller
 
 		Logger.info(request.toString());
 		// e.g., 'Vector:Watersheds-C'
-		String layerName = request.get("layer").getTextValue();
-		int x = request.get("x").getIntValue(); // 585
-		int y = request.get("y").getIntValue(); // 273
-		int width = request.get("width").getIntValue();
-		int height = request.get("height").getIntValue();
-		String bbox = request.get("bbox").getTextValue();
+		String layerName = request.get("layer").textValue();
+		int x = request.get("x").intValue(); // 585
+		int y = request.get("y").intValue(); // 273
+		int width = request.get("width").intValue();
+		int height = request.get("height").intValue();
+		String bbox = request.get("bbox").textValue();
 
 		BufferedReader rd = null;
 		OutputStreamWriter wr = null;
@@ -137,7 +141,7 @@ public class Application extends Controller
 		// Create a new scenario and get a transformed crop rotation layer from it...
 		JsonNode request = request().body().asJson();
 
-		String clientID = request.get("clientID").getTextValue();
+		String clientID = request.get("clientID").textValue();
 		String folder = "client_" + clientID;
 		
 		Scenario scenario = new Scenario();
@@ -165,11 +169,11 @@ public class Application extends Controller
 		int[][] defaultRotation = layer.getIntData();
 		int width = layer.getWidth(), height = layer.getHeight();
 		
-		Scenario scenario = Scenario.getCachedScenario(request.get("scenarioID").getTextValue());
+		Scenario scenario = Scenario.getCachedScenario(request.get("scenarioID").textValue());
 		
 		// TODO: validate that a scenario was found?
 		
-		String modelType = request.get("modelType").getTextValue();
+		String modelType = request.get("modelType").textValue();
 		List<ModelResult> results = null;
 		
 		boolean bAnalyzeAll = false;
@@ -267,7 +271,7 @@ public class Application extends Controller
 		// model can be: (TODO: verify list)
 		//	habitat_index, soc, nitrogen, phosphorus, pest, pollinator(s?), net_energy,
 		//		net_income, ethanol, nitrous_oxide
-		String model = request.get("model").getTextValue();
+		String model = request.get("model").textValue();
 
 		if (model == null) {
 			Logger.info("Tried to find a model data file but none was passed. Aborting heatmap.");
@@ -278,18 +282,18 @@ public class Application extends Controller
 		//	delta - shows change between file1 and file2
 		//	file1 - shows file1 as an absolute map
 		//	file2 - shows file2 as an absolute map		
-		String type = request.get("type").getTextValue();
+		String type = request.get("type").textValue();
 		// subtype can be:
 		//	equal - equal interval map
 		//	quantile - quantiled...
-		String subtype = request.get("subtype").getTextValue();
+		String subtype = request.get("subtype").textValue();
 
 		if (type == null) {
 			Logger.info("Tried to find a heatmap 'type' key but didn't. Assuming 'delta'");
 			type = "delta";
 		}
 		
-		String clientID = request.get("clientID").getTextValue();
+		String clientID = request.get("clientID").textValue();
 		String folder = "client_" + clientID;
 
 		String path1 = "./layerData/default/" + model + ".dss";
@@ -327,12 +331,12 @@ public class Application extends Controller
 			return ok(); // FIXME: not ok.
 		}
 
-		String outputPath = "/public/file/heat_max_" + model + "_" + Integer.toString(mHeatCount++) + ".png";
+		String outputPath = "/public/dynamicFiles/heat_max_" + model + "_" + Integer.toString(mHeatCount++) + ".png";
 		
 		// FIXME: not sure why play doesn't hand me back the expected directory path in production?
 		if (Play.isProd()) {
 			// FIXME: blugh, like this won't be totally fragile? :)
-			outputPath = "/target/scala-2.10/classes" + outputPath;
+//			outputPath = "/target/scala-2.10/classes" + outputPath;
 		}
 		outputPath = "." + outputPath;
 		
@@ -362,7 +366,7 @@ public class Application extends Controller
 							10);
 		}
 
-		sendBack.put("heatFile", outputFile.getName());
+		sendBack.put("heatFile", "/files/" + outputFile.getName());
 		return ok(sendBack);
 	}
 	
@@ -373,8 +377,8 @@ public class Application extends Controller
 
 		JsonNode request = request().body().asJson();
 		
-		String modelType = request.get("name").getTextValue();
-		String clientID = request.get("clientID").getTextValue();
+		String modelType = request.get("name").textValue();
+		String clientID = request.get("clientID").textValue();
 		
 		String srcFolder = "client_" + clientID;
 		String srcPath = "./layerData/" + srcFolder + "/*";

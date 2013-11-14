@@ -2,8 +2,11 @@ package util;
 
 import play.*;
 
-import org.codehaus.jackson.*;
-import org.codehaus.jackson.node.*;
+//import org.codehaus.jackson.*;
+//import org.codehaus.jackson.node.*;
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.node.*;
 
 //------------------------------------------------------------------------------
 public class GlobalAssumptions
@@ -104,7 +107,7 @@ public class GlobalAssumptions
 			throw new Exception();
 		}
 		
-		return (float)res.getDoubleValue();
+		return (float)res.doubleValue();
 	}
 
 	//--------------------------------------------------------------------------
@@ -127,7 +130,7 @@ public class GlobalAssumptions
 			throw new Exception();
 		}
 		
-		return res.getIntValue();
+		return res.intValue();
 	}
 	
 	//--------------------------------------------------------------------------
@@ -150,7 +153,7 @@ public class GlobalAssumptions
 			throw new Exception();
 		}
 		
-		return res.getTextValue();
+		return res.textValue();
 	}
 }		
 

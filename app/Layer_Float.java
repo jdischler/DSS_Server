@@ -5,9 +5,11 @@ import java.util.*;
 import java.io.*;
 import java.nio.*;
 
-import org.codehaus.jackson.*;
-import org.codehaus.jackson.node.*;
-
+//import org.codehaus.jackson.*;
+//import org.codehaus.jackson.node.*;
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.node.*;
 
 //------------------------------------------------------------------------------
 public class Layer_Float extends Layer_Base
@@ -121,7 +123,7 @@ public class Layer_Float extends Layer_Base
 		//	for the same parameter request type. Unsure we need that functionality but...
 		JsonNode ret = super.getParameterInternal(clientRequest);
 
-		String type = clientRequest.get("type").getTextValue();
+		String type = clientRequest.get("type").textValue();
 		if (type.equals("layerRange")) {
 			ObjectNode layerRangeObj = JsonNodeFactory.instance.objectNode();
 			layerRangeObj.put("layerMin", getLayerMin());
@@ -137,8 +139,8 @@ public class Layer_Float extends Layer_Base
 
 		Logger.info("Running continuous query");
 
-		String lessTest = queryNode.get("lessThanTest").getValueAsText();
-		String gtrTest = queryNode.get("greaterThanTest").getValueAsText();
+		String lessTest = queryNode.get("lessThanTest").textValue();
+		String gtrTest = queryNode.get("greaterThanTest").textValue();
 		
 		JsonNode gtrValNode = queryNode.get("greaterThanValue");
 		JsonNode lessValNode = queryNode.get("lessThanValue");
@@ -151,14 +153,14 @@ public class Layer_Float extends Layer_Base
 			if (gtrValNode.isNumber()) {
 				isGreaterThan = (gtrTest.compareTo(">") == 0);
 				isGreaterThanEqual = !isGreaterThan;
-				minVal = gtrValNode.getNumberValue().floatValue();
+				minVal = gtrValNode.numberValue().floatValue();
 			}
 		}
 		if (lessValNode != null) {
 			if (lessValNode.isNumber()) {
 				isLessThan = (lessTest.compareTo("<") == 0);
 				isLessThanEqual = !isLessThan;
-				maxVal = lessValNode.getNumberValue().floatValue();
+				maxVal = lessValNode.numberValue().floatValue();
 			}
 		}
 		

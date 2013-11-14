@@ -173,13 +173,13 @@ Ext.define('MyApp.view.Report_Detail', {
 	clearHeatToggles: function(exceptFor) {
 	
 		// TODO: fixme
-	/*	var c = this.getComponent('results_container');
+		var c = this.getComponent('results_container');
 		for (var idx = 0; idx < c.items.getCount(); idx++) {
 			var comp = c.items.getAt(idx);
 			if (!exceptFor || exceptFor !== comp) {
 				comp.clearHeatToggle();
 			}
-		}*/
+		}
 	},
 	
     //--------------------------------------------------------------------------

@@ -5,8 +5,11 @@ import java.util.*;
 import java.io.*;
 import java.nio.*;
 
-import org.codehaus.jackson.*;
-import org.codehaus.jackson.node.*;
+//import org.codehaus.jackson.*;
+//import org.codehaus.jackson.node.*;
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.node.*;
 
 //------------------------------------------------------------------------------
 public class Layer_Integer extends Layer_Base
@@ -191,7 +194,7 @@ public class Layer_Integer extends Layer_Base
 		//	for the same parameter request type. Unsure we need that functionality but...
 		JsonNode ret = super.getParameterInternal(clientRequest);
 
-		String type = clientRequest.get("type").getTextValue();
+		String type = clientRequest.get("type").textValue();
 		if (type.equals("colorKey")) {
 			ret = getColorKeyAsJson();
 		}
@@ -272,7 +275,7 @@ public class Layer_Integer extends Layer_Base
 			for (int i = 0; i < count; i++) {
 				JsonNode node = arNode.get(i);
 				
-				int val = node.getValueAsInt(1); // FIXME: default value?
+				int val = node.intValue(); // FIXME: default value?
 				debug.append(Integer.toString(val));
 				if (i < count - 1) {
 					debug.append(", ");

@@ -257,7 +257,7 @@ Ext.define('MyApp.view.MainViewport', {
 		var wmsWatershed = new OpenLayers.Layer.WMS("Watersheds", 
 			this.getGeoserverURL('vector'),
 			{ 
-				layers: 'Vector:Watersheds-C',  
+				layers: 'Vector:Watershed-New',  
 				transparent: true,
 				format: imgFormat,
 				tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom

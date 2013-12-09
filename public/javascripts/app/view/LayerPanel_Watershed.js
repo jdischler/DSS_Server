@@ -142,7 +142,7 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 			url: location.href + 'wmsRequest',
 			method: 'POST',
 			jsonData: {
-				layer: 'Vector:Watersheds-C',
+				layer: 'Vector:Watershed-New',
 				x: event.xy.x,
 				y: event.xy.y,
 				width: globalMap.getSize().w,

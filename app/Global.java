@@ -109,8 +109,8 @@ public class Global extends GlobalSettings
 			layer = new Layer_Float("depth"); layer.init();
 			layer = new Layer_Float("silt"); layer.init();
 			layer = new Layer_Float("soc"); layer.init();
-//			layer = new Layer_Integer("watersheds", Layer_Integer.EType.ERaw); layer.init();
-			layer = new Layer_Integer("watersheds", Layer_Integer.EType.EQueryShiftedIndex); layer.init();
+			layer = new Layer_Integer("watersheds", Layer_Integer.EType.ERaw); layer.init();
+//			layer = new Layer_Integer("watersheds", Layer_Integer.EType.EQueryShiftedIndex); layer.init();
 			layer = new Layer_Float("texture"); layer.init();
 			layer = new Layer_Float("om_soc"); layer.init();
 			layer = new Layer_Float("drainage"); layer.init();

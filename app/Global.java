@@ -109,8 +109,8 @@ public class Global extends GlobalSettings
 			layer = new Layer_Float("depth"); layer.init();
 			layer = new Layer_Float("silt"); layer.init();
 			layer = new Layer_Float("soc"); layer.init();
-//			layer = new Layer_Integer("watersheds", Layer_Integer.EType.ERaw); layer.init();
-			layer = new Layer_Integer("watersheds", Layer_Integer.EType.EQueryShiftedIndex); layer.init();
+			layer = new Layer_Integer("watersheds", Layer_Integer.EType.ERaw); layer.init();
+//			layer = new Layer_Integer("watersheds", Layer_Integer.EType.EQueryShiftedIndex); layer.init();
 			layer = new Layer_Float("texture"); layer.init();
 			layer = new Layer_Float("om_soc"); layer.init();
 			layer = new Layer_Float("drainage"); layer.init();
@@ -195,7 +195,9 @@ public class Global extends GlobalSettings
 
 			results = new Model_NitrousOxideEmissions().run(scenario);
 			QueuedWriter.queueResults(results);
-
+			
+			results = new Model_Water_Quality().run(scenario);
+			QueuedWriter.queueResults(results);
 			// NOTE: SOC for the default is not in the model run because it is not a computed data layer like others...
 			
 			// wait for write queue to dump out the defaults...

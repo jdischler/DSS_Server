@@ -12,7 +12,7 @@ Ext.define('MyApp.view.Report_GraphPopUp', {
 
 		Ext.define('Habitat_Index', {
 			extend: 'Ext.data.Model',
-			fields: ['Freq_Default', 'Freq_Transform', 'Bin']
+			fields: ['Current', 'Scenario', 'Bin']
 		});
 	
         this.graphstore = Ext.create('Ext.data.Store', {
@@ -36,7 +36,7 @@ Ext.define('MyApp.view.Report_GraphPopUp', {
 					title: 'km\xb2', // square kilometers
 					type: 'Numeric',
 					position: 'left',
-					fields: ['Freq_Default', 'Freq_Transform']
+					fields: ['Current', 'Scenario']
 				},
 				{
 					title: 'Value',
@@ -47,7 +47,7 @@ Ext.define('MyApp.view.Report_GraphPopUp', {
 				series: [{
 					type: 'line',
 					xField: 'Bin',
-					yField: 'Freq_Default',
+					yField: 'Current',
 					smooth: 3,
 					tips: {
 						trackMouse: true,
@@ -55,7 +55,7 @@ Ext.define('MyApp.view.Report_GraphPopUp', {
 						height: 40,
 						renderer: function(store, item) {
 							var areaUnits = ' km\xb2'; // km2
-							var freq = 'Area: ' + store.get('Freq_Default').toFixed(2) + areaUnits;
+							var freq = 'Area: ' + store.get('Current').toFixed(2) + areaUnits;
 							var bin = 'Value: ' + store.get('Bin').toFixed(3);
 
 							this.setTitle(freq + '<br />' + bin);
@@ -65,7 +65,7 @@ Ext.define('MyApp.view.Report_GraphPopUp', {
 				{
 					type: 'line',
 					xField: 'Bin',
-					yField: 'Freq_Transform',
+					yField: 'Scenario',
 					smooth: 3,
 					tips: {
 						trackMouse: true,
@@ -73,7 +73,7 @@ Ext.define('MyApp.view.Report_GraphPopUp', {
 						height: 40,
 						renderer: function(store, item) {
 							var areaUnits = ' km\xb2'; // km2
-							var freq = 'Area: ' + store.get('Freq_Transform').toFixed(2) + areaUnits;
+							var freq = 'Area: ' + store.get('Scenario').toFixed(2) + areaUnits;
 							var bin = 'Value: ' + store.get('Bin').toFixed(3);
 
 							this.setTitle(freq + '<br />' + bin);
@@ -88,10 +88,10 @@ Ext.define('MyApp.view.Report_GraphPopUp', {
     
     SetChartData: function(data)
     {
-		var data1 = data.file1.histogram;
-		var data2 = data.file2.histogram;
-		var min = data.min;
-		var max = data.max;
+		var data1 = data.file1.graph;
+		var data2 = data.file2.graph;
+		var min = data.range.min;
+		var max = data.range.max;
 		
 		var chart = this.getComponent("MyGraph");
 		chart.axes.items[1].maximum = max;
@@ -100,8 +100,8 @@ Ext.define('MyApp.view.Report_GraphPopUp', {
 		var array = [];
 		for (var i = 0; i < data1.length; i++)
 		{
-			array.push({ 	Freq_Default: data1[i] * 900 / 1000000, 
-							Freq_Transform: data2[i] * 900 / 1000000, 
+			array.push({ 	Current: data1[i] * 900 / 1000000, 
+							Scenario: data2[i] * 900 / 1000000, 
 							Bin: (max-min)/(data1.length) * i + min });
 		}
 		

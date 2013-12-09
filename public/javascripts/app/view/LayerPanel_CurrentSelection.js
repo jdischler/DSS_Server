@@ -1,28 +1,16 @@
 
 //------------------------------------------------------------------------------
 Ext.define('MyApp.view.LayerPanel_CurrentSelection', {
-    extend: 'MyApp.view.LayerPanel_Common',
+	extend: 'Ext.container.Container',
     alias: 'widget.layer_selection',
 
     // Unique ID for this layer, thus there should only be one of these ever?
-    id: 'CurrentSelectionLayer',
+    id: 'DSS_CurrentSelectionLayer',
     
-    title: 'Current Selection',
-    DSS_noCollapseTool: false,
-    DSS_noQueryTool: true,
-    hideCollapseTool: true,
-    collapsed: false,
+    DSS_desiredHeight: 60,
+	height: 0,
 
-    header: {
-    	style: {
-    		'background-image': 'none',
-    		'background-color': '#ebf2ff !important',
-			border: '1px dotted #d0d8e7'
-    	}
-    },
     layout: 'absolute',
-    bodyPadding: '0 0 10 0',
-
     // Print text standardizing
     DSS_areaText: 'Area Selected: ',
     DSS_areaUnits: ' km\xb2',
@@ -37,22 +25,75 @@ Ext.define('MyApp.view.LayerPanel_CurrentSelection', {
         		xtype: 'label',
         		itemId: 'DSS_selectionArea',
         		text: '',
-        		x: 30,
-        		y: 10
+        		x: 33,
+        		y: 18
         	},
         	{
         		xtype: 'label',
         		itemId: 'DSS_selectionPerc',
         		text: '',
         		x: 230,
-        		y: 10
-        	}]
+        		y: 18
+        	},{
+        		xtype: 'button',
+				itemId: 'DSS_showSelectionButon',
+        		text: 'Hide Selection',
+        		enableToggle: true,
+        		pressed: true,
+        		x: 45,
+        		y: 41,
+        		width: 90,
+        		handler: function(self) {
+					var slider = me.getComponent('DSS_opacitySlider');
+					if (self.pressed) {
+						slider.show();
+						self.setText('Hide Selection');
+					}
+					else {
+						slider.hide();
+						self.setText('Show Selection');
+					}
+					me.DSS_Layer.setVisibility(self.pressed);	
+        		}
+        	},{
+				xtype: 'slider',
+				itemId: 'DSS_opacitySlider',
+				width: 210,
+				x: 133,
+				y: 30,
+				padding: 10,
+				value: 100,
+				minValue: 0,
+				maxValue: 100,
+				increment: 10,
+				fieldLabel: 'Selection Opacity',
+				labelWidth: 105,
+				listeners: {
+					change: function(slider, newvalue) {
+						me.adjustOpacity(slider);
+					},
+					scope: me
+				}
+			}]
         });
 
         me.callParent(arguments);
     },
     
     //--------------------------------------------------------------------------
+    adjustOpacity: function(slider) {
+    	
+    	var value = slider.getValue() / 100.0;
+
+		if (value < 0.01) value = 0.01;
+		else if (value > 0.9999) value = 0.99999; // blugh, value of 1 is more transparent than 0.99??
+		
+		if (this.DSS_Layer) {
+			this.DSS_Layer.setOpacity(value);
+		}
+    },
+    
+   //--------------------------------------------------------------------------
     setSelectionLayer: function(selectionLayer) {
 		
 		// Don't forget to remove the old layer from the map system!
@@ -62,22 +103,21 @@ Ext.define('MyApp.view.LayerPanel_CurrentSelection', {
 		this.DSS_Layer = selectionLayer;
 		globalMap.addLayer(this.DSS_Layer);
 		
-		// Ensure header controls are updated...
-		var headerCheck = this.getHeader().getComponent('DSS_visibilityToggle');
-		headerCheck.setValue(true);
-		var headerSlider = this.getHeader().getComponent('DSS_opacitySlider');
-		this.DSS_Layer.setOpacity(headerSlider.getValue() / 100.0);
+		this.getComponent('DSS_showSelectionButon').toggle(true);
+		var slider = this.getComponent('DSS_opacitySlider');
+		if (slider.getValue() < 10) {
+			slider.setValue(10);
+		}
+		slider.show();
+		this.DSS_Layer.setOpacity(slider.getValue() / 100.0);
 
-		if (this.isHidden()) {
-			this.show();
+		if (this.getHeight() < this.DSS_desiredHeight) {
+			this.setSize(undefined, this.DSS_desiredHeight);
 			// OK, I don't know why this panel doesn't size correctly. Seems wrong
 			//	to have to do a slightly delayed "jiggle" of the compents, but...blah...
 			Ext.defer(function() {
 				Ext.getCmp('DSS_LeftPanel').doComponentLayout();
 			}, 5, this);
-		}
-		else if (this.getCollapsed()) {
-			this.expand();
 		}
 	},
 	
@@ -102,3 +142,4 @@ Ext.define('MyApp.view.LayerPanel_CurrentSelection', {
 	}
     
 });
+

@@ -247,76 +247,97 @@ Ext.define('MyApp.view.Report_Detail', {
 		var c = this.getComponent('results_container');
 		
 		if (obj.habitat_index) {
-			var val1 = obj.habitat_index.file1.sum / obj.habitat_index.file1.count;
-			var val2 = obj.habitat_index.file2.sum / obj.habitat_index.file2.count;
+//			var base = obj.habitat_index.selection;
+			var base = obj.habitat_index.landscape;
+			var val1 = base.file1.sum / base.file1.count;
+			var val2 = base.file2.sum / base.file2.count;
 			var totalVal = (val2 - val1);
-			c.getComponent('result_habitat_index').setData(val1, val2, totalVal, obj.habitat_index);
+			c.getComponent('result_habitat_index').setData(val1, val2, totalVal, base);
 		}
 		
 		if (obj.soc) {
-			var val1 = obj.soc.file1.sum * 0.09 / 1000;
-			var val2 = obj.soc.file2.sum * 0.09 / 1000;
+//			var base = obj.soc.selection;
+			var base = obj.soc.landscape;
+			var val1 = base.file1.sum * 0.09 / 1000;
+			var val2 = base.file2.sum * 0.09 / 1000;
 			// This is for 1 year and other process is on server side
 			// Convert change from 20 years to 1 year
 			//var totalVal = ((val2 - val1) / 20);
 			var totalVal = (val2 - val1);
-			c.getComponent('result_soc').setData(val1, val2, totalVal, obj.soc);
+			c.getComponent('result_soc').setData(val1, val2, totalVal, base);
 		}	
 
 		if (obj.net_income) {
-			var val1 = obj.net_income.file1.sum * 0.09 / 1000000;
-			var val2 = obj.net_income.file2.sum * 0.09 / 1000000;
+//			var base = obj.net_income.selection;
+			var base = obj.net_income.landscape;
+			var val1 = base.file1.sum * 0.09 / 1000000;
+			var val2 = base.file2.sum * 0.09 / 1000000;
 			var totalVal = (val2 - val1);
-			c.getComponent('result_net_income').setData(val1, val2, totalVal, obj.net_income);
+			c.getComponent('result_net_income').setData(val1, val2, totalVal, base);
 		}	
 
 		if (obj.net_energy) {
-			var val1 = obj.net_energy.file1.sum * 0.09 / 1000000;
-			var val2 = obj.net_energy.file2.sum * 0.09 / 1000000;
+//			var base = obj.net_energy.selection;
+			var base = obj.net_energy.landscape;
+			var val1 = base.file1.sum * 0.09 / 1000000;
+			var val2 = base.file2.sum * 0.09 / 1000000;
 			var totalVal = (val2 - val1);
-			c.getComponent('result_net_energy').setData(val1, val2, totalVal, obj.net_energy);
+			c.getComponent('result_net_energy').setData(val1, val2, totalVal, base);
 		}	
 		
 		if (obj.nitrogen) {
-			var val1 = obj.nitrogen.file1.sum /  obj.nitrogen.file1.count;
-			var val2 = obj.nitrogen.file2.sum /  obj.nitrogen.file2.count;
+//			var base = obj.nitrogen.selection;
+			var base = obj.nitrogen.landscape;
+			var val1 = base.file1.sum / base.file1.count;
+			var val2 = base.file2.sum / base.file2.count;
 			var totalVal = (val2 - val1);
-			c.getComponent('result_nitrogen').setData(val1, val2, totalVal, obj.nitrogen);
+			c.getComponent('result_nitrogen').setData(val1, val2, totalVal, base);
 		}	
 
 		if (obj.phosphorus) {
-			var val1 = obj.phosphorus.file1.sum /  obj.phosphorus.file1.count;
-			var val2 = obj.phosphorus.file2.sum /  obj.phosphorus.file2.count;
+//			var base = obj.phosphorus.selection;
+			var base = obj.phosphorus.landscape;
+			var val1 = base.file1.sum / base.file1.count;
+			var val2 = base.file2.sum / base.file2.count;
 			var totalVal = (val2 - val1);
-			c.getComponent('result_phosphorus').setData(val1, val2, totalVal, obj.phosphorus);
+			c.getComponent('result_phosphorus').setData(val1, val2, totalVal, base);
 		}	
     	
     	if (obj.ethanol) {
-			var val1 = obj.ethanol.file1.sum * 0.09 / 1000000;
-			var val2 = obj.ethanol.file2.sum * 0.09 / 1000000;
+//    		var base = obj.ethanol.selection;
+			var base = obj.ethanol.landscape;
+			var val1 = base.file1.sum * 0.09 / 1000000;
+			var val2 = base.file2.sum * 0.09 / 1000000;
 			var totalVal = (val2 - val1);
-			c.getComponent('result_ethanol').setData(val1, val2, totalVal, obj.ethanol);
+			c.getComponent('result_ethanol').setData(val1, val2, totalVal, base);
 		}
 		
     	if (obj.pest) {
-			var val1 = obj.pest.file1.sum / obj.pest.file1.count;
-			var val2 = obj.pest.file2.sum / obj.pest.file2.count;
+//    		var base = obj.pest.selection;
+			var base = obj.pest.landscape;
+			var val1 = base.file1.sum / base.file1.count;
+			var val2 = base.file2.sum / base.file2.count;
 			var totalVal = (val2 - val1);
-			c.getComponent('result_pest').setData(val1, val2, totalVal, obj.pest);
+			c.getComponent('result_pest').setData(val1, val2, totalVal, base);
 		}	
     	
     	if (obj.pollinator) {
-			var val1 = obj.pollinator.file1.sum / (obj.pollinator.file1.count * obj.pollinator.max);
-			var val2 = obj.pollinator.file2.sum / (obj.pollinator.file1.count * obj.pollinator.max);
+//    		var base = obj.pollinator.selection; 
+			var base = obj.pollinator.landscape;
+    		var max = base.range.max;
+			var val1 = base.file1.sum / (base.file1.count * max);
+			var val2 = base.file2.sum / (base.file1.count * max);
 			var totalVal = (val2 - val1);
-			c.getComponent('result_pollinators').setData(val1, val2, totalVal, obj.pollinator);
+			c.getComponent('result_pollinators').setData(val1, val2, totalVal, base);
 		}	
 	
     	if (obj.nitrous_oxide) {
-			var val1 = obj.nitrous_oxide.file1.sum * 0.09 / 1000000;
-			var val2 = obj.nitrous_oxide.file2.sum * 0.09 / 1000000;
+//    		var base = obj.nitrous_oxide.selection;
+			var base = obj.nitrous_oxide.landscape;
+			var val1 = base.file1.sum * 0.09 / 1000000;
+			var val2 = base.file2.sum * 0.09 / 1000000;
 			var totalVal = (val2 - val1);
-			c.getComponent('result_nitrous_oxide').setData(val1, val2, totalVal, obj.nitrous_oxide);
+			c.getComponent('result_nitrous_oxide').setData(val1, val2, totalVal, base);
 		}	
     }
 

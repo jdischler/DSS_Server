@@ -1,9 +1,9 @@
 
 
 //------------------------------------------------------------------------------
-Ext.define('MyApp.view.NewLayerPanel_ViewFooter', {
+Ext.define('MyApp.view.LayerPanel_ViewFooter', {
     extend: 'Ext.container.Container',
-    alias: 'widget.new_layer_footer',
+    alias: 'widget.layer_footer',
 
     layout: {
         type: 'hbox'

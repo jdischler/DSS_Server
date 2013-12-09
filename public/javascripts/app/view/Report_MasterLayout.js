@@ -63,8 +63,7 @@ Ext.define('MyApp.view.Report_MasterLayout', {
 				xtype: 'report_detail'
 			},
 			{
-				xtype: 'report_generate_report',
-				collapsed: true
+				xtype: 'report_generate_report'
 			}]
         });
         

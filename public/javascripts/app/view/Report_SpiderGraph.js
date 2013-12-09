@@ -8,7 +8,7 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 		'MyApp.view.Report_SpiderHeader'
 	],
 	
-    height: 480,
+    height: 450,
     width: 500,
     title: 'Quick Summary',
 	icon: 'app/images/fast_icon.png',
@@ -21,7 +21,7 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 
 		Ext.define('Spider_Model', {
 			extend: 'Ext.data.Model',
-			fields: ['Default', 'Transform', 'Bin', 'Match']
+			fields: ['Current', 'Scenario', 'Bin', 'Match']
 		});
 	
         this.graphstore = Ext.create('Ext.data.Store', {
@@ -40,25 +40,25 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 		});
                     
         Ext.applyIf(me, {
-            items: [{
+            items: [/*{
             	xtype: 'report_spider_header',
             	x: 0,
             	y: 0
             	
-            },{
+            },*/{
 				xtype: 'chart',
 				itemId: 'MyGraph_Spider',
-				x: -5,
-				y: 0,
-				height: 490,
+				x: -4,
+				y: -40,
+				height: 500,
 				width: 500,
 				animate: true,
 				store: this.graphstore,
-				insetPadding: 60,
+				insetPadding: 62,
 				legend: {
 					position: 'float',
 					x: -53,
-					y: -30
+					y: -18
 			    },
 				axes: [
 				{
@@ -71,7 +71,7 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 				series: [{
 					type: 'radar',
 					xField: 'Bin',
-					yField: 'Default',
+					yField: 'Current',
 					showInLegend: true,
 					showMarkers: true,
 					markerConfig: {
@@ -83,7 +83,7 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 						width: 120,
 						height: 40,
 						renderer: function(store, item) {
-							this.setTitle(store.get('Bin') + ': ' + store.get('Default'));
+							this.setTitle(store.get('Bin') + ': ' + store.get('Current'));
 						}
 					},
 					style: {
@@ -95,7 +95,7 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 				{
 					type: 'radar',
 					xField: 'Bin',
-					yField: 'Transform',
+					yField: 'Scenario',
 					showInLegend: true,
 					showMarkers: true,
 					markerConfig: {
@@ -107,7 +107,7 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 						width: 120,
 						height: 40,
 						renderer: function(store, item) {
-							this.setTitle(store.get('Bin') + ': ' + store.get('Transform'));
+							this.setTitle(store.get('Bin') + ': ' + store.get('Scenario'));
 						}
 					},
 					style: {
@@ -134,8 +134,8 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 //			rec.set("Default", value1 / max);
 //			rec.set("Transform", value2 / max);
 			// FIXME: reversed because we don't know why the data is reversed...blah
-			rec.set("Default", value2 / max);
-			rec.set("Transform", value1 / max);
+			rec.set("Current", value2 / max);
+			rec.set("Scenario", value1 / max);
 			rec.commit();
     	}
     },
@@ -146,8 +146,8 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 		for (var idx = 0; idx < this.graphstore.count(); idx++)
 		{
 			var rec = this.graphstore.getAt(idx);
-			rec.set("Default", defaultValue);
-			rec.set("Transform", defaultValue);
+			rec.set("Current", defaultValue);
+			rec.set("Scenario", defaultValue);
 			rec.commit();
 		}
     }

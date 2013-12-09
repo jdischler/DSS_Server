@@ -7,126 +7,25 @@ Ext.define('MyApp.view.LayerPanel_Common', {
         type: 'absolute'
     },
     
-    hideCollapseTool: true,
-    DSS_noCollapseTool: false,  
     bodyStyle: {
     	'background-color': '#fafcff'
     },
+//	icon: 'app/images/null_icon.png',
     header: {
     	style: {
     		'background-image': 'none',
     		'background-color': '#ebf2ff !important',
-			border: '1px dotted #d0d8e7'
+			'border-width': '1px',
+			'border-style': 'solid none none none',
+			'border-color': '#c4d0e0',
+			'color': '#fff important'
     	}
     },
-
+    hideCollapseTool: true,
+    
 	//--------------------------------------------------------------------------    
 	listeners: {
 		afterrender: function(c) { 
-			
-			// Place the collapse/expand tool at the front if needed, else space it...
-/*			// NOTE: always adding a collapse tool for now and disabling if it can't be toggled
-			if (0 && c.DSS_noCollapseTool) {
-				var spc = Ext.create('Ext.toolbar.Spacer',
-				{
-					width: 17
-				});
-				c.header.insert(0,spc);
-			}
-			else*/ {
-				var tool = Ext.create('Ext.panel.Tool', {
-					type: (this.collapsed ? 'plus' : 'minus'),
-					tooltip: {
-						text: 'Show/Hide Query Options',
-						showDelay: 100
-					},
-					toolOwner: c,
-					handler: function(evt, toolEl, owner, tool) {
-						console.log('Clicked panel tool');
-						if (tool.type == 'plus') {
-							c.expand();
-						} else {
-							c.collapse();
-						}
-					}
-				});
-				c.header.insert(0,tool);
-				c.DSS_collapseTool = tool;
-			}
-			if (c.DSS_noCollapseTool) {
-				tool.setDisabled(true);
-			}
-
-			// if no layer is bound, don't enable the check options, etc.
-			var checkStyle = 'position: relative; top: -2px;';
-			var checkDisabled = false;
-			var makeChecked = c.DSS_Layer ? c.DSS_Layer.getVisibility() : false;
-			// NOTE: This was added to keep Selection layers from being toggled on/off...
-			//	maybe not the best idea so commetning it out...
-//			if (!c.DSS_Layer) {
-//				checkStyle += 'filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=15);' + 
-//					'opacity: 0.15;';
-//				checkDisabled = true;
-//			}
-			
-			// Layer visiblity check box...		
-			var chk = Ext.create('Ext.form.field.Checkbox', {
-				itemId: 'DSS_visibilityToggle',
-				padding: '0 4 0 4',
-				checked: makeChecked,
-				disabled: checkDisabled,
-				fieldStyle: checkStyle
-			});
-			
-			chk.on({
-				'dirtychange': function(me) {
-					if (me.getValue() == true) {
-						me.DSS_associatedOpacitySlider.show();
-						if (c.DSS_ShortTitle && c.DSS_AutoSwapTitles) {
-							c.setTitle(c.DSS_ShortTitle);
-						}
-					}
-					else
-					{
-						me.DSS_associatedOpacitySlider.hide();
-						if (c.DSS_LongTitle && c.DSS_AutoSwapTitles) {
-							c.setTitle(c.DSS_LongTitle);
-						}
-					}
-					c.DSS_Layer.setVisibility(me.getValue());
-				},
-				scope: c
-			});
-			c.header.insert(1,chk);
-			
-			// opacity slider...
-			var hideSlider = (c.DSS_Layer ? !c.DSS_Layer.getVisibility() : true);
-			var slider = Ext.create('Ext.slider.Single', {
-				itemId: 'DSS_opacitySlider',
-				width: 140,
-				padding: '0 10 0 10',
-				value: 50,
-				minValue: 1,
-				maxValue: 100,
-				increment: 1,
-				fieldLabel: 'Opacity',
-				labelWidth: 45,
-				hidden: hideSlider,
-				listeners: {
-					change: function(slider, newvalue) {
-						c.adjustOpacity(slider);
-					},
-					scope: c
-				}
-			});
-			chk.DSS_associatedOpacitySlider = slider;
-			c.header.insert(3, slider);
-			if (c.DSS_ShortTitle) {
-				c.DSS_LongTitle = c.title;
-				if (hideSlider == false && c.DSS_AutoSwapTitles) {
-					c.setTitle(c.DSS_ShortTitle);
-				}
-			}
 			
 			// Query button if needed, else space it out...
 			if (c.DSS_noQueryTool) {
@@ -137,55 +36,33 @@ Ext.define('MyApp.view.LayerPanel_Common', {
 				c.header.add(spc);
 			}
 			else {
-/*				var drop = Ext.create('Ext.button.Button', {
-					width: 15,
-					arrowAlign: 'left',
-					tooltip: {
-						text: 'Layer Options',
-						showDelay: 100
-					},
-					menu: {
-						// to remove icon 'tray' on left...
-						//	though it just removes the bar but still uses all of the space, booo..
-						plain: true, 
-						items: [{
-							xtype: 'slider',
-							fieldLabel: 'Layer Opacity',
-							indent: false,
-							labelWidth: 75,
-							labelSeparator: '',
-							labelCls: 'x-menu-item-slider-text',
-							padding: '3 4 -4 5',
-							width: 200
-						}]
-					}
-				});
-				c.header.add(drop);
-	
-				console.log(drop);
-				var spc = Ext.create('Ext.toolbar.Spacer',
-				{
-					width: 4
-				});
-				c.header.add(spc);
-*/				
 				var queryButton = Ext.create('Ext.button.Button', {
 					itemId: 'DSS_ShouldQuery',
-					text: 'Query',
-					width: 42,
+//					icon: 'app/images/plus_icon.png',
+					text: 'Add',
+	//				textAlign: 'center',
+//					padding: '0 0 0 9',
+					width: 55,
 					height: 20,
 					tooltip: {
-						text: 'Include this layer in your query?',
-						showDelay: 100
+						text: 'Include aspects of this data in your landscape selection?'
 					},
 					enableToggle: true,
-					handler: function(self) {
-						if (DSS_DoExpandQueried) {
+					listeners: {
+						toggle: function(self, pressed) {
 							if (self.pressed) {
 								c.expand();
+//								self.setIcon('app/images/minus_icon.png');
+								self.setText('Remove');
+//								c.header.setIcon('app/images/active_block_icon.png');
+//								console.log(c.header);
 							}
 							else {
 								c.collapse();
+								self.setText('Add');
+//								self.setIcon('app/images/plus_icon.png');
+//								c.header.setIcon('app/images/block_icon.png');
+//								console.log(c.header);
 							}
 						}
 					}
@@ -196,16 +73,64 @@ Ext.define('MyApp.view.LayerPanel_Common', {
 			// and one at the end to give space for the scroll bar?
 			var spc = Ext.create('Ext.toolbar.Spacer',
 			{
-				width: 20
+				width: 16
 			});
 			c.header.add(spc);
-		},
-		expand: function(panel, eOpts) {
-			panel.DSS_collapseTool.setType('minus');
-		},
-		collapse: function(panel, eOpts) {
-			panel.DSS_collapseTool.setType('plus');
 		}
+	},
+	
+	// closefunc and scope are optional
+    //--------------------------------------------------------------------------
+	createOpacityPopup: function(tool, closefunc, scope) {
+		
+		var me = this;
+		
+		var rect = tool.getBox();
+		
+		me.DSS_Layer.setVisibility(true);
+		Ext.create('Ext.menu.Menu', {
+			width: 160,
+			plain: true,
+			floating: true,
+			listeners: {
+				close: function(menu) {
+					me.DSS_Layer.setVisibility(false);
+					if (closefunc) {
+						closefunc.call(scope);
+					}
+				},
+				beforeHide: function(comp) {
+					// don't actually hide, just close it proper...
+					comp.close();
+					return false;
+				}
+			},
+			items: [{
+				xtype: 'button',
+				text: 'Hide Layer Overlay',
+				enableToggle: true,
+				pressed: true,
+				handler: function(button) {
+					button.up().close();
+				}
+			},{
+				xtype: 'slider',
+				width: 140,
+				padding: 10,
+				value: 50,
+				minValue: 0,
+				maxValue: 100,
+				increment: 10,
+				fieldLabel: 'Opacity',
+				labelWidth: 45,
+				listeners: {
+					change: function(slider, newvalue) {
+						me.adjustOpacity(slider);
+					},
+					scope: me
+				}
+			}]
+		}).showAt(rect.left - 8, rect.top);
 	},
 
     //--------------------------------------------------------------------------
@@ -221,8 +146,8 @@ Ext.define('MyApp.view.LayerPanel_Common', {
     
     //--------------------------------------------------------------------------
     initComponent: function() {
-    	
         var me = this;
+        
         me.callParent(arguments);
     },
     

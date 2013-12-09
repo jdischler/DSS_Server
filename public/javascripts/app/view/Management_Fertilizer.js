@@ -28,13 +28,13 @@ Ext.define('MyApp.view.Management_Fertilizer', {
 				items: [{
 					xtype: 'radiofield',
 					boxLabel: 'None',
+					checked: true,
 					name: 'Amount',
 					inputValue: 'None'
 				},
 				{
 					xtype: 'radiofield',
 					boxLabel: 'Low',
-					checked: true,
 					name: 'Amount',
 					inputValue: 'Low'
 				},

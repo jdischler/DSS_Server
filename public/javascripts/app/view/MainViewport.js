@@ -18,6 +18,7 @@ var DSS_globalQueryableLayers = [];
 var DSS_globalCollapsibleLayers = [];
 var DSS_AssumptionsDefaults = null; // DON'T modify these - they come from the server...
 var DSS_AssumptionsAdjustable = null; // A copy!
+var DSS_currentModelRunID = 0;//
 
 //------------------------------------------------------------------------------
 Ext.define('MyApp.view.MainViewport', {
@@ -27,10 +28,10 @@ Ext.define('MyApp.view.MainViewport', {
 	requires: [
 		'MyApp.view.InfoToolbar',
 		'GeoExt.panel.Map',
-		'MyApp.view.NewLayerPanel_Google',
-        'MyApp.view.NewLayerPanel_Indexed',
-        'MyApp.view.NewLayerPanel_Continuous',
-        'MyApp.view.NewLayerPanel_Watershed',
+		'MyApp.view.LayerPanel_Google',
+        'MyApp.view.LayerPanel_Indexed',
+        'MyApp.view.LayerPanel_Continuous',
+        'MyApp.view.LayerPanel_Watershed',
         'MyApp.view.LogoPanel',
         'MyApp.view.ViewSelectToolbar',
 		'MyApp.view.Scenario_Layout',
@@ -111,6 +112,8 @@ Ext.define('MyApp.view.MainViewport', {
 					console.log("getClientID success: ");
 					console.log(obj);
 					Ext.util.Cookies.set('DSS_clientID', obj.DSS_clientID);
+					Ext.util.Cookies.set('DSS_nextSaveID', 0); // start off with folder zero (0)
+					
 					var res = Ext.util.Cookies.get('DSS_clientID');
 					if (res) {
 						console.log(' Cookie is: ');
@@ -347,8 +350,8 @@ Ext.define('MyApp.view.MainViewport', {
 			wmsRivers
 			]);
 		
-		var lpCDL = Ext.create('MyApp.view.NewLayerPanel_Indexed', {
-			title: 'Cropland Data',
+		var lpCDL = Ext.create('MyApp.view.LayerPanel_Indexed', {
+			title: 'Landcover',
 			DSS_Layer: wmsCDL,
 			minHeight: 90,
 			maxHeight: 400,
@@ -356,7 +359,7 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 		
-		var lpLCC = Ext.create('MyApp.view.NewLayerPanel_Indexed', {
+		var lpLCC = Ext.create('MyApp.view.LayerPanel_Indexed', {
 			title: 'Land Capability Class',
 			DSS_ShortTitle: 'LCC',
 			DSS_AutoSwapTitles: true,
@@ -367,7 +370,7 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 		
-		var lpLCS = Ext.create('MyApp.view.NewLayerPanel_Indexed', {
+		var lpLCS = Ext.create('MyApp.view.LayerPanel_Indexed', {
 			title: 'Land Capability Subclass',
 			DSS_ShortTitle: 'LCS',
 			DSS_AutoSwapTitles: true,
@@ -379,7 +382,7 @@ Ext.define('MyApp.view.MainViewport', {
 		});
 		
 		// Slope is greater than or equal to 10.2 degrees and less than or equal to 20.3 degrees
-		var lpSlope = Ext.create('MyApp.view.NewLayerPanel_Continuous', {
+		var lpSlope = Ext.create('MyApp.view.LayerPanel_Continuous', {
 			title: 'Slope',
 			DSS_Layer: wmsSlope,
 			DSS_LayerUnit: '%',//'\xb0',
@@ -391,14 +394,14 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 
-		var lpWatershed = Ext.create('MyApp.view.NewLayerPanel_Watershed', {
+		var lpWatershed = Ext.create('MyApp.view.LayerPanel_Watershed', {
 			title: 'Watershed',
 			DSS_Layer: wmsWatershed,
 			DSS_QueryTable: 'watersheds',
 			collapsed: true
 		});
 
-		var lpRiver = Ext.create('MyApp.view.NewLayerPanel_Continuous', {
+		var lpRiver = Ext.create('MyApp.view.LayerPanel_Continuous', {
 			title: 'Distance to River',
 			DSS_ShortTitle: 'River',
 			DSS_AutoSwapTitles: false,
@@ -412,7 +415,7 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 
-/*		var lpRoad = Ext.create('MyApp.view.NewLayerPanel_Continuous', {
+/*		var lpRoad = Ext.create('MyApp.view.LayerPanel_Continuous', {
 			title: 'Distance to Road',
 			DSS_ShortTitle: 'Road',
 			DSS_AutoSwapTitles: false,
@@ -426,12 +429,12 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 */		
-		var lpSOC = Ext.create('MyApp.view.NewLayerPanel_Continuous', {
+		var lpSOC = Ext.create('MyApp.view.LayerPanel_Continuous', {
 			title: 'Soil Organic Carbon',
 			DSS_ShortTitle: 'SOC',
 			DSS_AutoSwapTitles: true,
 			DSS_Layer: wmsSOC,
-			DSS_LayerUnit: '',
+			DSS_LayerUnit: '',// NOTE: use this...'Mg/ha',
 			DSS_LayerRangeMin: 0,
 			DSS_LayerRangeMax: 1300,
 			DSS_ValueDefaultLess: 300,
@@ -440,7 +443,7 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 		
-		var lpGoog = Ext.create('MyApp.view.NewLayerPanel_Google', {
+		var lpGoog = Ext.create('MyApp.view.LayerPanel_Google', {
 			DSS_LayerSatellite: googTerrain,
 			DSS_LayerHybrid: googHybrid,
 			dock: 'bottom'
@@ -673,8 +676,6 @@ Ext.define('MyApp.view.MainViewport', {
 	//--------------------------------------------------------------------------
     getAssumptions: function() {
     	
-    	console.log('Trying to get default assumptions from: ' + location.href + 'getAssumptions');
-    	
 		var obj = Ext.Ajax.request({
 			url: location.href + 'getAssumptions',
 			method: 'POST',
@@ -683,18 +684,11 @@ Ext.define('MyApp.view.MainViewport', {
 			success: function(response, opts) {
 				
 				var obj = JSON.parse(response.responseText);
-				console.log("getAssumptions success: ");
-				console.log(obj);
 				DSS_AssumptionsDefaults = obj;
 				
 				// MAKE a COPY vs just setting the pointers, which does nothing to make a copy
 				//	like we really need...
 				DSS_AssumptionsAdjustable = JSON.parse(JSON.stringify(DSS_AssumptionsDefaults));
-				
-				console.log('Defaults');
-				console.log(DSS_AssumptionsDefaults);
-				console.log('Copy');
-				console.log(DSS_AssumptionsAdjustable);
 			},
 			
 			failure: function(respose, opts) {

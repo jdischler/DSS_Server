@@ -38,8 +38,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 				width: 30,
 				text: me.DSS_DefaultGreaterThanTest, //'>=',
 				tooltip: {
-					text: 'Toggle greater than/equal',
-					showDelay: 100
+					text: 'Toggle greater than/equal'
 				},
 				handler: function(me,evt) {
 					if (me.text == '>=') {
@@ -54,28 +53,28 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 				itemId: 'DSS_GreaterThanValue',
 				x: 100,
 				y: 6,
-				width: 54,
+				width: 64,
 				hideEmptyLabel: false,
 				hideLabel: true,
 				decimalPrecision: 1,
-				step: 0.5,
-				value: me.DSS_ValueDefaultGreater
+				step: me.DSS_ValueStep,
+				value: me.DSS_ValueDefaultGreater,
+				minValue: 0
 			},{
 				xtype: 'button',
-				x: 154,
+				x: 164,
 				y: 6,
 				width: 18,
 				text: 'c',
 				tooltip: {
-					text: 'Clear this text field',
-					showDelay: 100
+					text: 'Clear this text field'
 				},
 				handler: function(me,evt) {
 					me.up().getComponent('DSS_GreaterThanValue').setValue('');
 				}
 			},{
 				xtype: 'label',
-				x: 177,
+				x: 187,
 				y: 10,
 				html: me.DSS_LayerUnit,
 				width: 60
@@ -83,10 +82,9 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 				xtype: 'button',
 				icon: 'app/images/switch_icon.png',
 				tooltip: {
-					text: 'Swap values',
-					showDelay: 100
+					text: 'Swap values'
 				},
-				x: 197,
+				x: 211,
 				y: 6,
 				handler: function(me,evt) {
 					var gtrValue = me.up().getComponent('DSS_GreaterThanValue');
@@ -98,13 +96,12 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 			},{
 				xtype: 'button',
 				itemId: 'DSS_LessThanTest',
-				x: 235,
+				x: 249,
 				y: 6,
 				width: 30,
 				text: me.DSS_DefaultLessThanTest, // '<='
 				tooltip: {
-					text: 'Toggle less than/equal',
-					showDelay: 100
+					text: 'Toggle less than/equal'
 				},
 				handler: function(me,evt) {
 					if (me.text == '<=') {
@@ -117,30 +114,30 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 			},{
 				xtype: 'numberfield',
 				itemId: 'DSS_LessThanValue',
-				x: 265,
+				x: 279,
 				y: 6,
-				width: 54,
+				width: 64,
 				hideEmptyLabel: false,
 				hideLabel: true,
 				decimalPrecision: 1,
-				step: 0.5,
-				value: me.DSS_ValueDefaultLess
+				step: me.DSS_ValueStep,
+				value: me.DSS_ValueDefaultLess,
+				minValue: 0
 			},{
 				xtype: 'button',
-				x: 319,
+				x: 343,
 				y: 6,
 				width: 18,
 				text: 'c',
 				tooltip: {
-					text: 'Clear this text field',
-					showDelay: 100
+					text: 'Clear this text field'
 				},
 				handler: function(me,evt) {
 					me.up().getComponent('DSS_LessThanValue').setValue('');
 				}
 			},{
 				xtype: 'label',
-				x: 343,
+				x: 367,
 				y: 10,
 				html: me.DSS_LayerUnit,
 				width: 60
@@ -153,6 +150,31 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 				style: {
 					color: '#888'
 				}
+			},{
+            	xtype: 'button',
+            	x: 390,
+            	y: 4,
+            	width: 23,
+            	icon: 'app/images/go_icon_small.png',
+            	handler: function(self) {
+            		me.createOpacityPopup(self);
+            	},
+            	tooltip: {
+            		text: 'Viewable Layer Overlay'
+            	}
+			},{
+            	xtype: 'button',
+            	x: 390,
+            	y: 30,
+            	width: 23,
+            	hidden: true,
+            	icon: 'app/images/eye_icon.png',
+            	handler: function(self) {
+            		alert('Query for this layer would be run here...');
+            	},
+            	tooltip: {
+            		text: 'Preview only this criteria selection'
+            	}
 			}]
         });
 
@@ -272,6 +294,22 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 		
 		// Nope, mark as not queried
 		this.header.getComponent('DSS_ShouldQuery').toggle(false);
+    },
+    
+    // turns layer off and resets it to the defaults....
+    //--------------------------------------------------------------------------
+    resetLayer: function() {
+    	
+		this.header.getComponent('DSS_ShouldQuery').toggle(false);
+		var gtrTest = this.getComponent('DSS_GreaterThanTest');
+		var gtrValue = this.getComponent('DSS_GreaterThanValue');
+		var lessTest = this.getComponent('DSS_LessThanTest');
+		var lessValue = this.getComponent('DSS_LessThanValue');
+
+		lessTest.setText(this.DSS_DefaultLessThanTest);
+		gtrTest.setText(this.DSS_DefaultGreaterThanTest);
+		lessValue.setValue(this.DSS_ValueDefaultLess);
+		gtrValue.setValue(this.DSS_ValueDefaultGreater);
     }
     
 });

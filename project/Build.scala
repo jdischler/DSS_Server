@@ -12,7 +12,8 @@ object ApplicationBuild extends Build {
     javaCore,
     cache,
     javaJdbc,
-    javaEbean
+    javaEbean,
+    "commons-io" % "commons-io" % "2.4"
   )
 
   val main = play.Project(appName, appVersion, appDependencies).settings(

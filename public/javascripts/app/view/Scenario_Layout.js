@@ -253,7 +253,6 @@ Ext.define('MyApp.view.Scenario_Layout', {
 			}
 		},
 		select: function(me, record, index, eOpts) {
-			console.log('Calling into select...setting up a query');
 			var query = record.get('Query');
 			DSS_ViewSelectToolbar.setUpSelectionFromQuery(query);
 			var dssLeftPanel = Ext.getCmp('DSS_LeftPanel');
@@ -377,9 +376,11 @@ Ext.define('MyApp.view.Scenario_Layout', {
 	//--------------------------------------------------------------------------
 	prepareModelRequest: function() {
 	
+		var scCombo1 = Ext.getCmp('DSS_ScenarioCompareCombo_1').getValue();	
 		var haveQuery = false;
 		var requestData = {
 			clientID: 1234, //temp
+			compare1ID: scCombo1,//-1, // default
 			assumptions: DSS_AssumptionsAdjustable.Assumptions,
 			transforms: []
 		};
@@ -389,9 +390,31 @@ Ext.define('MyApp.view.Scenario_Layout', {
 			requestData.clientID = clientID_cookie;
 		}
 		else {
+			requestData.clientID = 'BadID';
 			console.log('WARNING: no client id cookie was found...');
 		}
 
+		var saveID_cookie = Ext.util.Cookies.get('DSS_nextSaveID');
+		if (saveID_cookie) {
+			requestData.saveID = saveID_cookie;
+		}
+		else {
+			requestData.saveID = 0;
+			console.log('WARNING: no save id cookie was found...');
+		}
+
+		DSS_currentModelRunID = requestData.saveID;
+		var record = DSS_ScenarioComparisonStore.findRecord('Index', DSS_currentModelRunID);
+		if (record) {
+			DSS_ScenarioComparisonStore.remove(record);
+		}
+		
+		// Add the new record and select it in the combo box....
+		DSS_ScenarioComparisonStore.add({'Index': DSS_currentModelRunID, 'ScenarioName': 'Current Unsaved Result'});
+		DSS_ScenarioComparisonStore.commitChanges(); // FIXME: this necessary?
+		Ext.getCmp('DSS_ScenarioCompareCombo_2').setValue(DSS_currentModelRunID);
+
+		
 		var st = this.getStore();
 		for (var idx = 0; idx < st.getCount(); idx++) {
 			var rec = st.getAt(idx);
@@ -412,7 +435,7 @@ Ext.define('MyApp.view.Scenario_Layout', {
 			}
 		}
 		
-		console.log(requestData);
+//		console.log(requestData);
 		if (haveQuery) {
 			this.createScenario(requestData);
 		}
@@ -438,8 +461,8 @@ Ext.define('MyApp.view.Scenario_Layout', {
 				
 				try {
 					var obj= JSON.parse(response.responseText);
-					console.log("success: ");
-					console.log(obj);
+//					console.log("success: ");
+//					console.log(obj);
 					var newRequest = requestData;
 					newRequest.scenarioID = obj.scenarioID;
 					self.submitModel(newRequest);
@@ -460,7 +483,7 @@ Ext.define('MyApp.view.Scenario_Layout', {
     //--------------------------------------------------------------------------
     submitModel: function(queryJson) {
     	
-		console.log(queryJson);
+//		console.log(queryJson);
 		var button = Ext.getCmp('DSS_runModelButton');
 		
 		// NOTE: these strings MUST be synchronized with the server, or else the server will
@@ -485,8 +508,8 @@ Ext.define('MyApp.view.Scenario_Layout', {
 					
 					try {
 						var obj= JSON.parse(response.responseText);
-						console.log("success: ");
-						console.log(obj);
+//						console.log("success: ");
+//						console.log(obj);
 						Ext.getCmp('DSS_ReportDetail').setData(obj);
 					}
 					catch(err) {

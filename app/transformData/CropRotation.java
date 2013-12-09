@@ -23,14 +23,9 @@ public class CropRotation
 		Layer_Integer layer;
 		try {
 			// Load layers and store data in unmodified format, ie, RAW/original format
-			layer = new Layer_Integer("cdl_2010", Layer_Integer.EType.ERaw); 
-			layer.setNoDataConversion(-9999);	layer.init();
-			
-			layer = new Layer_Integer("cdl_2011", Layer_Integer.EType.ERaw);
-			layer.setNoDataConversion(-9999);	layer.init();
-			
-			layer = new Layer_Integer("cdl_2012", Layer_Integer.EType.ERaw);
-			layer.setNoDataConversion(-9999);	layer.init();
+			layer = new Layer_Integer("cdl_2010", Layer_Integer.EType.ERaw); layer.init();
+			layer = new Layer_Integer("cdl_2011", Layer_Integer.EType.ERaw); layer.init();
+			layer = new Layer_Integer("cdl_2012", Layer_Integer.EType.ERaw); layer.init();
 		}
 		catch (Exception e) {
 			Logger.info(e.toString());

@@ -57,21 +57,22 @@ public class Global extends GlobalSettings
 		Logger.info("+-------------------------------------------------------+");
 		Logger.info("| " + customMessage);
 		Logger.info("+-------------------------------------------------------+");
-		Logger.info("  Available Processors: " + 
+		Logger.info("|  Available Processors: " + 
 			Integer.toString(Runtime.getRuntime().availableProcessors()));
-		Logger.info("  Total Free Memory: " + 
+		Logger.info("|  Total Free Memory: " + 
 			String.format("%.2f", 
 				(float)(Runtime.getRuntime().freeMemory() / unitConversion)) +
 				unitName);
-		Logger.info("  Current Total Memory in Use: " + 
+		Logger.info("|  Current Total Memory in Use: " + 
 			String.format("%.2f", 
 				(float)(Runtime.getRuntime().totalMemory() / unitConversion)) +
 				unitName);
-		Logger.info("  Maximum Memory for Use: " + 
+		Logger.info("|  Maximum Memory for Use: " + 
 			String.format("%.2f", 
 				(float)(Runtime.getRuntime().maxMemory() / unitConversion)) +
 				unitName);
 		Logger.info("+-------------------------------------------------------+");
+		Logger.info("");
 	}
 	
 	//--------------------------------------------------------------------------
@@ -96,7 +97,10 @@ public class Global extends GlobalSettings
 		Layer_Base layer;
 		try {
 			if (Play.isProd() || LOAD_ALL_LAYERS_FOR_DEV == true) {
-				Logger.info("Loading all layers");
+				Logger.info(" ... Server is going to load all layers ... ");
+			}
+			else {
+				Logger.info(" ... Server only loading a subset of layers ... ");
 			}
 			
 			layer = new Layer_Integer("cdl_2012"); layer.init();
@@ -105,6 +109,7 @@ public class Global extends GlobalSettings
 			layer = new Layer_Float("depth"); layer.init();
 			layer = new Layer_Float("silt"); layer.init();
 			layer = new Layer_Float("soc"); layer.init();
+//			layer = new Layer_Integer("watersheds", Layer_Integer.EType.ERaw); layer.init();
 			layer = new Layer_Integer("watersheds", Layer_Integer.EType.EQueryShiftedIndex); layer.init();
 			layer = new Layer_Float("texture"); layer.init();
 			layer = new Layer_Float("om_soc"); layer.init();
@@ -131,7 +136,7 @@ public class Global extends GlobalSettings
 	private void cacheModelDefaults() {
 		
 		if (LOAD_DEFAULT_DATA) {
-			Logger.info(" --- LOADING MODEL DEFAULT RESULT FILES ---");
+			Logger.info(" ... Server is going to load MODEL DEFAULT files ...");
 			Layer_Base layer;
 			try {
 				layer = new Layer_Float("default/net_income"); layer.init();
@@ -149,7 +154,7 @@ public class Global extends GlobalSettings
 			}
 		}
 		else {
-			Logger.info(" --- SKIPPING LOAD OF MODEL DEFAULT RESULT FILES ---");
+			Logger.info(" ... The Server is skipping loading MODEL DEFAULT files ...");
 		}
 	}
 

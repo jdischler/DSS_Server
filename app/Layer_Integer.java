@@ -57,8 +57,14 @@ public class Layer_Integer extends Layer_Base
 		super(name);
 		
 		mLayerKey = new ArrayList<Layer_Key>();
-		mNoDataValue = -9999; // TODO: load from file....
-		mConvertedNoDataValue = 0; // default to turning -9999 into a zero value...
+		mNoDataValue = -9999; // TODO: load from file...
+		// if raw, don't convert the no-data value...otherwise it isn't really raw anymore...
+		if (layerType == EType.ERaw) {
+			mConvertedNoDataValue = mNoDataValue;
+		}
+		else {
+			mConvertedNoDataValue = 0; // default to turning -9999 into a zero value...
+		}
 		mLayerDataFormat = layerType;
 	}
 	
@@ -290,6 +296,34 @@ public class Layer_Integer extends Layer_Base
 		
 		return 1;
 	}
+
+	//--------------------------------------------------------------------------
+	private int[] getCompareArray(JsonNode matchValuesArray) {
+		
+		ArrayNode arNode = (ArrayNode)matchValuesArray;
+		if (arNode != null) {
+			int count = arNode.size();
+			int array[] = new int [count];
+			Logger.info("Query Index Array count: " + Integer.toString(count));
+			StringBuffer debug = new StringBuffer();
+			debug.append("Query Indices: ");
+			for (int i = 0; i < count; i++) {
+				JsonNode node = arNode.get(i);
+				
+				int val = node.intValue(); // FIXME: default value?
+				debug.append(Integer.toString(val));
+				if (i < count - 1) {
+					debug.append(", ");
+				}
+				array[i] = val;
+			}
+			
+			Logger.info(debug.toString());
+			return array;
+		}
+		
+		return null;
+	}
 	
 	//--------------------------------------------------------------------------
 	protected Selection query(JsonNode queryNode, Selection selection) {
@@ -298,15 +332,32 @@ public class Layer_Integer extends Layer_Base
 		JsonNode queryValues = queryNode.get("matchValues");
 
 		if (mLayerDataFormat == EType.ERaw) {
-			// TODO: implement this type of query, though nothing is using this type...
-			//	though we'll need it if we have indices larger than 31 because we can only
-			//	shift 31 bits (32 minus 1 for the sign bit)...watersheds are
-			//	currently close...
-			Logger.info("Tried running query on raw/unshifted indexes. Doing nothing!");
+			// Doing a slower per-array-element test...
+			int array[] = getCompareArray(queryValues);
+			if (array != null) {
+				for (int y = 0; y < mHeight; y++) {
+					for (int x = 0; x < mWidth; x++) {
+						boolean found = false;
+						// Only check values that ARE NOT noData
+						if (mIntData[y][x] != mConvertedNoDataValue) {
+							for (int i = 0; i < array.length; i++) {
+								if (mIntData[y][x] == array[i]) {
+									found = true;
+									break;
+								}
+							}
+						}
+						selection.mSelection[y][x] &= (found ? 1 : 0);
+					}
+				}
+			}
+			Logger.info("Tried to get a match array but it failed!");
 		}
 		else {
+			// Doing the faster bit-mask check...
 			int test_mask = getCompareBitMask(queryValues);
 			if (mLayerDataFormat == EType.EPreShiftedIndex) {
+				// Doing the fastest already-shifted test...
 				for (int y = 0; y < mHeight; y++) {
 					for (int x = 0; x < mWidth; x++) {
 						selection.mSelection[y][x] &= ((mIntData[y][x] & test_mask) > 0 ? 1 : 0);
@@ -314,6 +365,7 @@ public class Layer_Integer extends Layer_Base
 				}
 			}
 			else if (mLayerDataFormat == EType.EQueryShiftedIndex) {
+				// doing the slightly less fast shift-at-each-pixel test...
 				for (int y = 0; y < mHeight; y++) {
 					for (int x = 0; x < mWidth; x++) {
 						int shifted = (1 << (mIntData[y][x]-1));

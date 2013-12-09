@@ -24,7 +24,8 @@ public class QueuedWriter implements Runnable {
 	public final static void beginWatchWriteQueue() {
 	
 		if (mWriter == null) {
-			Logger.info("Creating a new file writer queue");
+			Logger.info("");
+			Logger.info(" ... Creating a new file writer queue ...");
 			mWriter = new QueuedWriter();
 			if (mResultsToWrite == null) {
 				mResultsToWrite = new ArrayList<ModelResult>();
@@ -49,7 +50,7 @@ public class QueuedWriter implements Runnable {
 	//--------------------------------------------------------------------------
 	private synchronized final void queueResultsInternal(List<ModelResult> results) {
 		
-		Logger.info("Adding ModelResults to writer queue, about to notify queue to wake up.....");
+		Logger.info(" ... Adding ModelResults to writer queue. Notify queue to wake up.....");
 		mResultsToWrite.addAll(results);
 		notifyAll();
 	}
@@ -58,11 +59,10 @@ public class QueuedWriter implements Runnable {
 	//--------------------------------------------------------------------------
 	public synchronized void run() {
 		
-		Logger.info("Watching writer queue");
+		Logger.info(" ... Writer thread is watching the writer queue");
 		while (true) {
 			
 			if (doesWriteQueueHaveFiles()) {
-				Logger.info("Writer queue has results to write!!");
 				ModelResult result = mResultsToWrite.remove(0);
 				File writeFolder = new File("./layerData/"+ result.mDestinationFolder + "/");
 				if (writeFolder.exists() == false) {
@@ -73,6 +73,8 @@ public class QueuedWriter implements Runnable {
 				if (mbWriteBinary_DSS) {
 					File writeFile = new File("./layerData/"+ result.mDestinationFolder + "/" 
 												+ result.mName + ".dss");
+					Logger.info(" ... Writer queue writing DSS: " + writeFile.toString());
+					
 					Binary_Writer writer = new Binary_Writer(writeFile, result.mWidth, result.mHeight);
 					ByteBuffer writeBuffer = writer.writeHeader();
 				
@@ -92,6 +94,7 @@ public class QueuedWriter implements Runnable {
 					try {
 						File writeFile = new File("./layerData/"+ result.mDestinationFolder + "/" 
 												+ result.mName + ".asc");
+						Logger.info(" ... Writer queue writing ASC: " + writeFile.toString());
 						ascOut = new PrintWriter(new BufferedWriter(new FileWriter(writeFile)));
 						ascOut.println("ncols         " + Integer.toString(width));
 						ascOut.println("nrows         " + Integer.toString(height));

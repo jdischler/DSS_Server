@@ -61,7 +61,7 @@ public abstract class Layer_Base
 	//--------------------------------------------------------------------------
 	public static void removeAllLayers() {
 
-		Logger.info("A call was made to clear all Layers!");
+		Logger.info(" ... A call was made to clear all Layers!");
 		mLayers.clear();
 	}
 	
@@ -208,6 +208,7 @@ public abstract class Layer_Base
 		}
 		
 		onLoadEnd();
+		Logger.info(" ");
 	}
 	
 	//--------------------------------------------------------------------------
@@ -376,6 +377,7 @@ public abstract class Layer_Base
 		}
 		
 		onLoadEnd();
+		Logger.info("");
 	}
 }
 

@@ -195,7 +195,9 @@ public class Global extends GlobalSettings
 
 			results = new Model_NitrousOxideEmissions().run(scenario);
 			QueuedWriter.queueResults(results);
-
+			
+			results = new Model_Water_Quality().run(scenario);
+			QueuedWriter.queueResults(results);
 			// NOTE: SOC for the default is not in the model run because it is not a computed data layer like others...
 			
 			// wait for write queue to dump out the defaults...

@@ -199,6 +199,10 @@ public class Application extends Controller
 			Model_NitrousOxideEmissions n20 = new Model_NitrousOxideEmissions();
 			results = n20.run(scenario);
 		}
+		else if (modelType.equals("water_quality")) {
+			Model_Water_Quality wq = new Model_Water_Quality();
+			results = wq.run(scenario);
+		}
 		
 		else {//(modelType.equals("habitat_index")) {
 			Model_HabitatIndex hi = new Model_HabitatIndex();

@@ -26,7 +26,8 @@ public class Model_NitrogenPhosphorus extends Model_Base
 	private static final String mPhosphorusModelFile = "phosphorus";
 	
 	// Number of watersheds in study area
-	private static final int mNumWatersheds = 31;
+	// private static final int mNumWatersheds = 31;
+	private static final int mNumWatersheds = 140;
 
 	//--------------------------------------------------------------------------
 	public List<ModelResult> run(Scenario scenario) {

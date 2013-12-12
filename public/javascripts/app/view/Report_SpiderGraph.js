@@ -27,7 +27,7 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
         this.graphstore = Ext.create('Ext.data.Store', {
 			model: 'Spider_Model',
 			data: [ 
-					{Bin: 'Nitrogen', Match: 'nitrogen'}, 
+					{Bin: 'Water Quality', Match: 'water_quality'}, 
 					{Bin: 'Phosphorus', Match: 'phosphorus'}, 
 					{Bin: 'Bird Index', Match: 'habitat_index'},
 					{Bin: 'Biocontrol Index', Match: 'pest'}, 

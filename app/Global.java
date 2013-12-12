@@ -143,7 +143,8 @@ public class Global extends GlobalSettings
 				layer = new Layer_Float("default/net_energy"); layer.init();
 				layer = new Layer_Float("default/ethanol"); layer.init();
 				layer = new Layer_Float("default/habitat_index"); layer.init();
-				layer = new Layer_Float("default/nitrogen"); layer.init();
+//				layer = new Layer_Float("default/nitrogen"); layer.init();
+				layer = new Layer_Float("default/water_quality"); layer.init();
 				layer = new Layer_Float("default/phosphorus"); layer.init();
 				layer = new Layer_Float("default/pest"); layer.init();
 				layer = new Layer_Float("default/pollinator"); layer.init();

@@ -339,7 +339,7 @@ public class Layer_Integer extends Layer_Base
 					for (int x = 0; x < mWidth; x++) {
 						boolean found = false;
 						// Only check values that ARE NOT noData
-						if (mIntData[y][x] != mConvertedNoDataValue) {
+						if (mIntData[y][x] >= 0) {
 							for (int i = 0; i < array.length; i++) {
 								if (mIntData[y][x] == array[i]) {
 									found = true;
@@ -351,7 +351,9 @@ public class Layer_Integer extends Layer_Base
 					}
 				}
 			}
-			Logger.info("Tried to get a match array but it failed!");
+			else {
+				Logger.info("Tried to get a match array but it failed!");
+			}
 		}
 		else {
 			// Doing the faster bit-mask check...

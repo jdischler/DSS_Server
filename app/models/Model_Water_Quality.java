@@ -139,10 +139,8 @@ Logger.info("  > Allocated memory for Water_Quality");
 					// 2st step. Add the calculated cells within a watershed
 					watershedIdx = watersheds[y][x];
 					
-					if (watershedIdx != 0) 
+					if (watershedIdx >= 0) 
 					{
-						// watershed index zero is reserved for no-data
-						watershedIdx--;
 						CountCellsInWatershed[watershedIdx]++;
 						Phosphorus[watershedIdx] = Phosphorus[watershedIdx] + PhosphorusData[y][x];
 					}
@@ -163,10 +161,8 @@ Logger.info("  > Allocated memory for Water_Quality");
 			{
 				watershedIdx = watersheds[y][x];
 				
-				if (watershedIdx != 0) 
+				if (watershedIdx >= 0) 
 				{
-					// watershed index zero is reserved for no-data
-					watershedIdx--;
 					PhosphorusData[y][x] = Phosphorus[watershedIdx];
 				}
 				else 

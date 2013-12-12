@@ -11,7 +11,7 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
     height: 86,
 	DSS_unpressedText: 'Activate Click Selection Tool',
 	DSS_pressedText: 'Deactivate Selection Tool',
-    
+   
     //--------------------------------------------------------------------------
     initComponent: function() {
     	
@@ -28,7 +28,8 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 
         Ext.applyIf(me, {
             items: [{
-				xtype: 'button', 
+				xtype: 'button',
+				itemId: 'DSS_watershedClickActivation',
 				text: 'Activate Click Selection Tool',
 				x: 70,
 				y: 12,
@@ -92,6 +93,16 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
         });
 
         me.callParent(arguments);
+        
+        me.on('collapse', function(panel) {
+			var button = panel.getComponent('DSS_watershedClickActivation');
+			button.toggle(false);
+			button.setText(panel.DSS_unpressedText);
+
+			panel.clearSelection();
+			panel.disableClickSelection();
+			panel.DSS_Layer.setVisibility(false);
+		});
     },
 	
     //--------------------------------------------------------------------------
@@ -112,7 +123,8 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 		
 		var addedElement = false;
 		for (var i = 0; i < this.DSS_watershedSelections.length; i++) {
-			queryLayer.matchValues.push(this.DSS_watershedSelections[i]);
+			// FIXME: BS, minus one because the geoserver gives the index back 1 based vs. zero based
+			queryLayer.matchValues.push(parseInt(this.DSS_watershedSelections[i])-1);
 			addedElement = true;
 		}
         if (!addedElement) {
@@ -215,6 +227,7 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 		
 		// When click selection is on, show the layer...Make sense?
 		this.DSS_Layer.setVisibility(true);
+		this.DSS_Layer.setOpacity(0.6);		
 	},
 
 	//--------------------------------------------------------------------------

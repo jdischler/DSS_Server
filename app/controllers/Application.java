@@ -215,7 +215,6 @@ public class Application extends Controller
 			Model_Water_Quality wq = new Model_Water_Quality();
 			results = wq.run(scenario);
 		}
-		
 		else {//(modelType.equals("habitat_index")) {
 			Model_HabitatIndex hi = new Model_HabitatIndex();
 			results = hi.run(scenario);
@@ -412,18 +411,29 @@ public class Application extends Controller
 							10);
 			}
 		}
-		else if (type.equals("file1")) { // ONE file absolute map
-			sendBack = Analyzer_Heatmap.runAbsolute(file1, 
-							outputFile, 
-							10);
-		}
-		else if (type.equals("file2")) { // ONE file absolute map
-			sendBack = Analyzer_Heatmap.runAbsolute(file2, 
-							outputFile, 
-							10);
+		else
+		{
+			File fileToMap = file1;
+			
+			if (type.equals("file2")) { // ONE file absolute map
+				fileToMap = file2;
+			}
+			
+			if (subtype.equals("equal")) {
+				sendBack = Analyzer_Heatmap.runAbsolute(fileToMap, 
+								outputFile, 
+								10);
+			}
+			else {
+				sendBack = Analyzer_Heatmap.runAbsoluteQuantiled(fileToMap, 
+								outputFile, 
+								10);
+			}
 		}
 
-		sendBack.put("heatFile", "/files/" + outputFile.getName());
+		if (sendBack != null) {
+			sendBack.put("heatFile", "/files/" + outputFile.getName());
+		}
 		return ok(sendBack);
 	}
 	
@@ -526,6 +536,10 @@ public class Application extends Controller
 		else if (modelType.equals("nitrous")) {
 			Model_NitrousOxideEmissions n20 = new Model_NitrousOxideEmissions();
 			results = n20.run(scenario);
+		}
+		else if (modelType.equals("water_quality")) {
+			Model_Water_Quality wq = new Model_Water_Quality();
+			results = wq.run(scenario);
 		}
 		else {//(modelType.equals("habitat_index")) {
 			Model_HabitatIndex hi = new Model_HabitatIndex();

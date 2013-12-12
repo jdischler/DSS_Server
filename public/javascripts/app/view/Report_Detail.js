@@ -64,12 +64,12 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_InfoHTML: 'http://www.epa.gov/airquality/modeling.html',
 					DSS_DetailReportContainer: me
 				},{
-					itemId: 'result_nitrogen',
+					itemId: 'result_water_quality',
 					xtype: 'report_detail_item',
-					DSS_FieldString: 'nitrogen',
+					DSS_FieldString: 'water_quality',
 					DSS_UnitLabel: 'mg/l',
-					DSS_Label: 'Nitrogen',
-					DSS_GraphTitle: 'Nitrogen Runoff',
+					DSS_Label: 'Water Quality',
+					DSS_GraphTitle: 'Water Quality',
 					DSS_InfoHTML: 'http://water.epa.gov/scitech/datait/models/index.cfm',
 					DSS_DetailReportContainer: me
 				},{
@@ -247,8 +247,8 @@ Ext.define('MyApp.view.Report_Detail', {
 		var c = this.getComponent('results_container');
 		
 		if (obj.habitat_index) {
-//			var base = obj.habitat_index.selection;
-			var base = obj.habitat_index.landscape;
+			var base = obj.habitat_index.selection;
+//			var base = obj.habitat_index.landscape;
 			var val1 = base.file1.sum / base.file1.count;
 			var val2 = base.file2.sum / base.file2.count;
 			var totalVal = (val2 - val1);
@@ -256,8 +256,8 @@ Ext.define('MyApp.view.Report_Detail', {
 		}
 		
 		if (obj.soc) {
-//			var base = obj.soc.selection;
-			var base = obj.soc.landscape;
+			var base = obj.soc.selection;
+//			var base = obj.soc.landscape;
 			var val1 = base.file1.sum * 0.09 / 1000;
 			var val2 = base.file2.sum * 0.09 / 1000;
 			// This is for 1 year and other process is on server side
@@ -268,8 +268,8 @@ Ext.define('MyApp.view.Report_Detail', {
 		}	
 
 		if (obj.net_income) {
-//			var base = obj.net_income.selection;
-			var base = obj.net_income.landscape;
+			var base = obj.net_income.selection;
+//			var base = obj.net_income.landscape;
 			var val1 = base.file1.sum * 0.09 / 1000000;
 			var val2 = base.file2.sum * 0.09 / 1000000;
 			var totalVal = (val2 - val1);
@@ -277,26 +277,26 @@ Ext.define('MyApp.view.Report_Detail', {
 		}	
 
 		if (obj.net_energy) {
-//			var base = obj.net_energy.selection;
-			var base = obj.net_energy.landscape;
+			var base = obj.net_energy.selection;
+//			var base = obj.net_energy.landscape;
 			var val1 = base.file1.sum * 0.09 / 1000000;
 			var val2 = base.file2.sum * 0.09 / 1000000;
 			var totalVal = (val2 - val1);
 			c.getComponent('result_net_energy').setData(val1, val2, totalVal, base);
 		}	
 		
-		if (obj.nitrogen) {
-//			var base = obj.nitrogen.selection;
-			var base = obj.nitrogen.landscape;
+		if (obj.water_quality) {
+			var base = obj.water_quality.selection;
+//			var base = obj.water_quality.landscape;
 			var val1 = base.file1.sum / base.file1.count;
 			var val2 = base.file2.sum / base.file2.count;
 			var totalVal = (val2 - val1);
-			c.getComponent('result_nitrogen').setData(val1, val2, totalVal, base);
+			c.getComponent('result_water_quality').setData(val1, val2, totalVal, base);
 		}	
 
 		if (obj.phosphorus) {
-//			var base = obj.phosphorus.selection;
-			var base = obj.phosphorus.landscape;
+			var base = obj.phosphorus.selection;
+//			var base = obj.phosphorus.landscape;
 			var val1 = base.file1.sum / base.file1.count;
 			var val2 = base.file2.sum / base.file2.count;
 			var totalVal = (val2 - val1);
@@ -304,8 +304,8 @@ Ext.define('MyApp.view.Report_Detail', {
 		}	
     	
     	if (obj.ethanol) {
-//    		var base = obj.ethanol.selection;
-			var base = obj.ethanol.landscape;
+    		var base = obj.ethanol.selection;
+//			var base = obj.ethanol.landscape;
 			var val1 = base.file1.sum * 0.09 / 1000000;
 			var val2 = base.file2.sum * 0.09 / 1000000;
 			var totalVal = (val2 - val1);
@@ -313,8 +313,8 @@ Ext.define('MyApp.view.Report_Detail', {
 		}
 		
     	if (obj.pest) {
-//    		var base = obj.pest.selection;
-			var base = obj.pest.landscape;
+    		var base = obj.pest.selection;
+//			var base = obj.pest.landscape;
 			var val1 = base.file1.sum / base.file1.count;
 			var val2 = base.file2.sum / base.file2.count;
 			var totalVal = (val2 - val1);
@@ -322,8 +322,8 @@ Ext.define('MyApp.view.Report_Detail', {
 		}	
     	
     	if (obj.pollinator) {
-//    		var base = obj.pollinator.selection; 
-			var base = obj.pollinator.landscape;
+    		var base = obj.pollinator.selection; 
+//			var base = obj.pollinator.landscape;
     		var max = base.range.max;
 			var val1 = base.file1.sum / (base.file1.count * max);
 			var val2 = base.file2.sum / (base.file1.count * max);
@@ -332,8 +332,8 @@ Ext.define('MyApp.view.Report_Detail', {
 		}	
 	
     	if (obj.nitrous_oxide) {
-//    		var base = obj.nitrous_oxide.selection;
-			var base = obj.nitrous_oxide.landscape;
+    		var base = obj.nitrous_oxide.selection;
+//			var base = obj.nitrous_oxide.landscape;
 			var val1 = base.file1.sum * 0.09 / 1000000;
 			var val2 = base.file2.sum * 0.09 / 1000000;
 			var totalVal = (val2 - val1);

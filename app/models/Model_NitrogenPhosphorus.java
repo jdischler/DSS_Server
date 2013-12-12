@@ -6,10 +6,6 @@ import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
 
-//import org.codehaus.jackson.*;
-//import org.codehaus.jackson.node.*;
-//import java.lang.reflect.Array;
-
 //------------------------------------------------------------------------------
 // Modeling Process
 //
@@ -22,7 +18,7 @@ import java.nio.channels.*;
 //------------------------------------------------------------------------------
 public class Model_NitrogenPhosphorus extends Model_Base
 {
-	private static final String mNitrogenModelFile = "nitrogen";
+//	private static final String mNitrogenModelFile = "nitrogen";
 	private static final String mPhosphorusModelFile = "phosphorus";
 	
 	// Number of watersheds in study area
@@ -45,10 +41,10 @@ long timeStart = System.currentTimeMillis();
 		int[] countCellsInWatershed = new int[mNumWatersheds];
 		int[] countAgCellsInWatershed = new int[mNumWatersheds];
 		// simplified bins, per watershed calculation
-		float[] nitrogen = new float[mNumWatersheds];
+//		float[] nitrogen = new float[mNumWatersheds];
 		float[] phosphorus = new float[mNumWatersheds];
 		// full raster save process...
-		float [][] nitrogenData = new float[height][width];
+//		float [][] nitrogenData = new float[height][width];
 		float [][] phosphorusData = new float[height][width];
 Logger.info("  > Allocated memory for Nitrogen / Phosphorus");
 
@@ -59,9 +55,7 @@ Logger.info("  > Allocated memory for Nitrogen / Phosphorus");
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				int watershedIdx = watersheds[y][x]; 
-				if (watershedIdx != 0) {
-					// watershed index zero is reserved for no-data
-					watershedIdx--;
+				if (watershedIdx >= 0) { // No-data check...
 					countCellsInWatershed[watershedIdx]++;
 					if ((rotationData[y][x] & Ag_Mask) > 0) {
 						countAgCellsInWatershed[watershedIdx]++;
@@ -73,7 +67,7 @@ Logger.info("  > Allocated memory for Nitrogen / Phosphorus");
 		// 2nd step...compute proportion of ag and estimate nitrogen and phosphorus
 		for (int i = 0; i < mNumWatersheds; i++) {
 			float proportionAg = countAgCellsInWatershed[i] / (float)countCellsInWatershed[i];
-			nitrogen[i] = (float)Math.pow(10, 1.13f * proportionAg - 0.23f);
+//			nitrogen[i] = (float)Math.pow(10, 1.13f * proportionAg - 0.23f);
 			phosphorus[i] = (float)Math.pow(10, 0.79f * proportionAg - 1.44f);
 		}
 		
@@ -84,14 +78,12 @@ Logger.info("  > Allocated memory for Nitrogen / Phosphorus");
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				int watershedIdx = watersheds[y][x]; 
-				if (watershedIdx != 0) {
-					// watershed index zero is reserved for no-data
-					watershedIdx--;
-					nitrogenData[y][x] = nitrogen[watershedIdx];
+				if (watershedIdx >= 0) { // no data check...
+//					nitrogenData[y][x] = nitrogen[watershedIdx];
 					phosphorusData[y][x] = phosphorus[watershedIdx];
 				}
 				else {
-					nitrogenData[y][x] = -9999.0f;
+//					nitrogenData[y][x] = -9999.0f;
 					phosphorusData[y][x] = -9999.0f;
 				}
 			}
@@ -99,7 +91,7 @@ Logger.info("  > Allocated memory for Nitrogen / Phosphorus");
 		
 		List<ModelResult> results = new ArrayList<ModelResult>();
 		
-		results.add(new ModelResult("nitrogen", scenario.mOutputDir, nitrogenData, width, height));
+//		results.add(new ModelResult("nitrogen", scenario.mOutputDir, nitrogenData, width, height));
 		results.add(new ModelResult("phosphorus", scenario.mOutputDir, phosphorusData, width, height));
 		
 long timeEnd = System.currentTimeMillis();

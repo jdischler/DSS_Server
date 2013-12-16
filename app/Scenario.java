@@ -7,8 +7,6 @@ import java.io.*;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.*;
-//import org.codehaus.jackson.*;
-//import org.codehaus.jackson.node.*;
 
 //------------------------------------------------------------------------------
 public class Scenario 

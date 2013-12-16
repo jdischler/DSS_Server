@@ -5,8 +5,6 @@ import java.util.*;
 import java.io.*;
 
 import com.fasterxml.jackson.core.*;
-//import org.codehaus.jackson.*;
-//import org.codehaus.jackson.node.*;
 
 //------------------------------------------------------------------------------
 public class Selection

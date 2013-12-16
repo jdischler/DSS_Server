@@ -7,8 +7,6 @@ import java.io.*;
 import ar.com.hjg.pngj.*;
 import ar.com.hjg.pngj.chunks.*;
 
-//import org.codehaus.jackson.*;
-//import org.codehaus.jackson.node.*;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.*;

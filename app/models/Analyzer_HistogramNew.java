@@ -241,7 +241,7 @@ public class Analyzer_HistogramNew
 			for (int x=0; x < width; x++) {
 				float data = rasterData[y][x];
 				if (data > -9999.0f) { // FIXME: NoData check...
-					if (selection.mSelection[y][x] >= 1) {
+					if (selection.mRasterData[y][x] >= 1) {
 						selMin = min(selMin, data);
 						selMax = max(selMax, data);
 					}
@@ -268,7 +268,7 @@ public class Analyzer_HistogramNew
 				float data = rasterData[y][x];
 				if (data > -9999.0f) { // FIXME: NoData check...
 					
-					if (selection.mSelection[y][x] >= 1) {
+					if (selection.mRasterData[y][x] >= 1) {
 						// handle custom, but usually rare, case of data being MAX in the above formula
 						binIndex = (int)((data - mSelectionMinMax.mMin) /
 											(mSelectionMinMax.mMax - mSelectionMinMax.mMin) * 

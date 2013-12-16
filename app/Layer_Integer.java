@@ -347,7 +347,7 @@ public class Layer_Integer extends Layer_Base
 								}
 							}
 						}
-						selection.mSelection[y][x] &= (found ? 1 : 0);
+						selection.mRasterData[y][x] &= (found ? 1 : 0);
 					}
 				}
 			}
@@ -362,7 +362,7 @@ public class Layer_Integer extends Layer_Base
 				// Doing the fastest already-shifted test...
 				for (int y = 0; y < mHeight; y++) {
 					for (int x = 0; x < mWidth; x++) {
-						selection.mSelection[y][x] &= ((mIntData[y][x] & test_mask) > 0 ? 1 : 0);
+						selection.mRasterData[y][x] &= ((mIntData[y][x] & test_mask) > 0 ? 1 : 0);
 					}
 				}
 			}
@@ -371,7 +371,7 @@ public class Layer_Integer extends Layer_Base
 				for (int y = 0; y < mHeight; y++) {
 					for (int x = 0; x < mWidth; x++) {
 						int shifted = (1 << (mIntData[y][x]-1));
-						selection.mSelection[y][x] &= ((shifted & test_mask) > 0 ? 1 : 0);
+						selection.mRasterData[y][x] &= ((shifted & test_mask) > 0 ? 1 : 0);
 					}
 				}
 			}

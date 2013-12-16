@@ -12,7 +12,7 @@ import com.fasterxml.jackson.core.*;
 public class Selection
 {	
 	// Set up to run the query...allocate memory...
-	public byte[][] mSelection;
+	public byte[][] mRasterData;
 	public int mHeight, mWidth;
 	
 	// Constructor...
@@ -21,12 +21,12 @@ public class Selection
 		
 		mHeight = height;
 		mWidth = width;
-		mSelection = new byte[mHeight][mWidth];
+		mRasterData = new byte[mHeight][mWidth];
 		int x, y;
 		// ...and initialize everything to 1 to prep for & (and) logic
 		for (y = 0; y < mHeight; y++) {
 			for (x = 0; x < mWidth; x++) {
-				mSelection[y][x] = 1;
+				mRasterData[y][x] = 1;
 			}
 		}
 	}
@@ -42,7 +42,7 @@ public class Selection
 	//--------------------------------------------------------------------------
 	public boolean isSelected(int atX, int atY) {
 		
-		return (mSelection[atY][atX] > 0);
+		return (mRasterData[atY][atX] > 0);
 	}
 
 	//--------------------------------------------------------------------------
@@ -53,9 +53,9 @@ public class Selection
 		for (y = 0; y < mHeight; y++) {
 			for (x = 0; x < mWidth; x++) {
 				// NOTE: relies on mSelection containing 1's and 0's...
-				//count += mSelection[y][x];
+				//count += mRasterData[y][x];
 				// Otherwise do something like...
-				count += (mSelection[y][x] > 0 ? 1 : 0);
+				count += (mRasterData[y][x] > 0 ? 1 : 0);
 			}
 		}
 		return count;
@@ -68,7 +68,7 @@ public class Selection
 		int x, y;
 		for (y = 0; y < mHeight; y++) {
 			for (x = 0; x < mWidth; x++) {
-				mSelection[y][x] |= otherSel.mSelection[y][x];
+				mRasterData[y][x] |= otherSel.mRasterData[y][x];
 			}
 		}
 	}
@@ -81,7 +81,7 @@ public class Selection
 		for (y = 0; y < mHeight; y++) {
 			for (x = 0; x < mWidth; x++) {
 				// Flip/invert the first bit... and AND that back in to remove
-				mSelection[y][x] &= (otherSel.mSelection[y][x] ^ 1);
+				mRasterData[y][x] &= (otherSel.mRasterData[y][x] ^ 1);
 			}
 		}
 	}
@@ -95,7 +95,7 @@ public class Selection
 		for (y = 0; y < mHeight; y++) {
 			for (x = 0; x < mWidth; x++) {
 				// flip the 1st bit
-				mSelection[y][x] ^= 1;
+				mRasterData[y][x] ^= 1;
 			}
 		}
 	}

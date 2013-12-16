@@ -178,7 +178,7 @@ public class Layer_Float extends Layer_Base
 				Logger.info("> <");
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
-						selection.mSelection[y][x] &= 
+						selection.mRasterData[y][x] &= 
 							((mFloatData[y][x] > minVal && mFloatData[y][x] < maxVal) 
 							? 1 : 0);
 					}
@@ -189,7 +189,7 @@ public class Layer_Float extends Layer_Base
 				Logger.info("> <=");
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
-						selection.mSelection[y][x] &= 
+						selection.mRasterData[y][x] &= 
 							((mFloatData[y][x] > minVal && mFloatData[y][x] <= maxVal) 
 							? 1 : 0);
 					}
@@ -200,7 +200,7 @@ public class Layer_Float extends Layer_Base
 				Logger.info(">");
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
-						selection.mSelection[y][x] &= 
+						selection.mRasterData[y][x] &= 
 							(mFloatData[y][x] > minVal 
 							? 1 : 0);
 					}
@@ -213,7 +213,7 @@ public class Layer_Float extends Layer_Base
 				Logger.info(">= <");
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
-						selection.mSelection[y][x] &= 
+						selection.mRasterData[y][x] &= 
 							((mFloatData[y][x] >= minVal && mFloatData[y][x] < maxVal) 
 							? 1 : 0);
 					}
@@ -224,7 +224,7 @@ public class Layer_Float extends Layer_Base
 				Logger.info(">= <=");
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
-						selection.mSelection[y][x] &= 
+						selection.mRasterData[y][x] &= 
 							((mFloatData[y][x] >= minVal && mFloatData[y][x] <= maxVal) 
 							? 1 : 0);
 					}
@@ -235,7 +235,7 @@ public class Layer_Float extends Layer_Base
 				Logger.info(">=");
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
-						selection.mSelection[y][x] &= 
+						selection.mRasterData[y][x] &= 
 							(mFloatData[y][x] >= minVal 
 							? 1 : 0);
 					}
@@ -247,7 +247,7 @@ public class Layer_Float extends Layer_Base
 			Logger.info("<");
 			for (y = 0; y < mHeight; y++) {
 				for (x = 0; x < mWidth; x++) {
-					selection.mSelection[y][x] &= 
+					selection.mRasterData[y][x] &= 
 						(mFloatData[y][x] < maxVal 
 						? 1 : 0);
 				}
@@ -258,7 +258,7 @@ public class Layer_Float extends Layer_Base
 			Logger.info("<=");
 			for (y = 0; y < mHeight; y++) {
 				for (x = 0; x < mWidth; x++) {
-					selection.mSelection[y][x] &= 
+					selection.mRasterData[y][x] &= 
 						(mFloatData[y][x] <= maxVal 
 						? 1 : 0);
 				}

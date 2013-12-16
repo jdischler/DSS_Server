@@ -166,6 +166,9 @@ public class Application extends Controller
 		ObjectNode sendback = JsonNodeFactory.instance.objectNode();
 		sendback.put("scenarioID", cacheID);
 		
+		QueuedWriter.queueResults(new ScenarioSetupResult(folder, scenario.mNewRotation,
+			scenario.mSelection.mRasterData, scenario.mSelection.mWidth, scenario.mSelection.mHeight));
+
 		return ok(sendback);
 	}
 	

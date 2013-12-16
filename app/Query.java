@@ -74,7 +74,7 @@ public class Query {
 		// Set up to run the query...allocate memory...
 		Selection selection = execute(requestBody);
 		
-		byte[][] temp = Downsampler.generateSelection(selection.mSelection, 
+		byte[][] temp = Downsampler.generateSelection(selection.mRasterData, 
 								selection.getWidth(), selection.getHeight(),
 								5, // transform to 5 colors
 								newWidth, newHeight);

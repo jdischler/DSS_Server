@@ -77,6 +77,14 @@ public class Binary_Writer
 	//--------------------------------------------------------------------------
 	public ByteBuffer writeHeader() {
 		
+		return writeHeader(4); // FIXME: size of int?
+	}
+
+	// Opens binary file and writes the header. Returns null if file does not exist or
+	//	some other problem occurs. Otherwise returns a ByteBuffer	
+	//--------------------------------------------------------------------------
+	public ByteBuffer writeHeader(int rasterElementSize) {
+		
 		try {
 			mFileStream = new FileOutputStream(mOutputFile);
 			mFileChannel = mFileStream.getChannel();
@@ -103,7 +111,7 @@ public class Binary_Writer
 			return null;
 		}
 		
-		mLineBuffer = ByteBuffer.allocateDirect(mWidth * 4); // FIXME: size of int?
+		mLineBuffer = ByteBuffer.allocateDirect(mWidth * rasterElementSize);
 		return mLineBuffer;
 	}
 	

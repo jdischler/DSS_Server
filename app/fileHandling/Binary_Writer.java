@@ -125,7 +125,7 @@ public class Binary_Writer
 			//	position does not get moved or set so writing that buffer will emit nothing
 			//	to file)?
 			// ALSO NOTE: there may be ways to simplify this...perhaps depending on usage
-			//	patters. E.g., setting the position to the limit might only be needed 
+			//	patterns. E.g., setting the position to the limit might only be needed 
 			//	because flip sets the limit to the position, then resets position to zero
 			//	I guess this signals the writer to emit all the data from the zero position
 			//	up to the limit. Perhaps simpler is to make sure the limit is set to the

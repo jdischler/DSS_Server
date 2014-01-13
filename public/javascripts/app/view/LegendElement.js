@@ -38,6 +38,15 @@ Ext.define('MyApp.view.LegendElement', {
 				style: {
 					'background-color': me.DSS_GreyColor,//DSS_LegendElementColor,
 					border: '1px dotted #BBBBBB'
+				},
+				// blah, make the color chip clickable...so it toggles the value of the checkbox on us...
+				listeners: {
+					render: function (c) {
+						c.el.on('click', function () {
+							var comp = c.up().getComponent('DSS_queryCheck');
+							comp.setValue(!comp.getValue());
+						});
+					}
 				}
 			},
 			{

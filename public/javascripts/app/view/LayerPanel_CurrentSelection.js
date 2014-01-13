@@ -135,7 +135,7 @@ Ext.define('MyApp.view.LayerPanel_CurrentSelection', {
 		
 		// Units should be the same (pixels), so can just divide vs. total to get %?
 		var totalAreaPerc = (pixelCount / totalPixels) * 100.0;
-		totalAreaPerc = totalAreaPerc.toFixed(2);
+		totalAreaPerc = totalAreaPerc.toFixed(3);
 
 		areaLabel.setText(this.DSS_areaText + area + this.DSS_areaUnits);
 		areaPerc.setText(this.DSS_percText + totalAreaPerc + '%');

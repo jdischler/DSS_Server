@@ -12,6 +12,8 @@ public class QueuedWriter implements Runnable {
 	private static List<ScenarioSetupResult> mScenarioSetupsToWrite;
 	private static List<ModelResult> mResultsToWrite;
 
+	private static Thread mThreadHandle;
+	
 	private static QueuedWriter mWriter;
 	
 	// NOTE: setting this to false may cause analysis and heatmapping to break. But if you
@@ -35,7 +37,15 @@ public class QueuedWriter implements Runnable {
 			if (mResultsToWrite == null) {
 				mResultsToWrite = new ArrayList<ModelResult>();
 			}
-			new Thread(mWriter).start();		
+			mThreadHandle = new Thread(mWriter);
+			Logger.info(" ...Queued writer priority is: " + Integer.toString(mThreadHandle.getPriority()));
+			if (mThreadHandle.getPriority() > Thread.NORM_PRIORITY) {
+				Logger.info(" ...Thread priority pretty, high, reducing to Normal");
+				mThreadHandle.setPriority(Thread.NORM_PRIORITY);
+				Logger.info(" ...Queued writer priority is now: " + Integer.toString(mThreadHandle.getPriority()));
+			}
+			
+			mThreadHandle.start();
 		}
 	}
 	

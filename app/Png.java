@@ -47,6 +47,8 @@ public class Png {
 			mImageInfo = new ImageInfo(width, height, bitDepth, true);
 		}
 		
+		new File(outputFile).getParentFile().mkdirs();
+		
 		OutputStream outputStream = null;
 		try {
 			outputStream = new FileOutputStream(outputFile);

@@ -16,6 +16,9 @@ public class Global extends GlobalSettings
 	private static final boolean LOAD_ALL_LAYERS_FOR_DEV = true;
 	private static final boolean LOAD_DEFAULT_DATA = true;
 	
+	// FIXME: TODO: this will be annoying...investigate automating the version numbering
+	private static final String mServerVersionMessage = "Server version: 0.51.3";
+	
 	//--------------------------------------------------------------------------
 	@Override
 	public void onStart(play.Application app) 
@@ -50,10 +53,12 @@ public class Global extends GlobalSettings
 	private void systemReport(String customMessage) {
 		
 		float unitConversion = (1024.0f * 1024.0f); // bytes -> MB
+		File apPath = Play.application().path();
 		String unitName = "MB";
 		
 		Logger.info("+-------------------------------------------------------+");
 		Logger.info("| " + customMessage);
+		Logger.info("| " + mServerVersionMessage);
 		Logger.info("+-------------------------------------------------------+");
 		Logger.info("|  Available Processors: " + 
 			Integer.toString(Runtime.getRuntime().availableProcessors()));
@@ -69,6 +74,8 @@ public class Global extends GlobalSettings
 			String.format("%.2f", 
 				(float)(Runtime.getRuntime().maxMemory() / unitConversion)) +
 				unitName);
+		Logger.info("| Application Path: " + apPath.toString());
+
 		Logger.info("+-------------------------------------------------------+");
 		Logger.info("");
 	}

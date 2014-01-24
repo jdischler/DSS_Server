@@ -329,6 +329,7 @@ public abstract class Layer_Base
 		Logger.info("+-------------------------------------------------------+");
 		File input = new File("./layerData/" + mName + ".dss");
 
+		Logger.info("  Real Path: " + input.getCanonicalPath());
 		FileInputStream fis = new FileInputStream(input);
 		
 		try {

@@ -182,10 +182,10 @@ public class Application extends Controller
 			Model_EthanolNetEnergyIncome ethanolEnergyIncome = new Model_EthanolNetEnergyIncome();
 			results = ethanolEnergyIncome.run(scenario);
 		}
-		else if (modelType.equals("n_p")) {
-			Model_NitrogenPhosphorus np = new Model_NitrogenPhosphorus();
-			results = np.run(scenario);
-		}
+		//else if (modelType.equals("n_p")) {
+		//	Model_NitrogenPhosphorus np = new Model_NitrogenPhosphorus();
+		//	results = np.run(scenario);
+		//}
 		else if (modelType.equals("soc")) {
 			Model_SoilCarbon soc = new Model_SoilCarbon();
 			results = soc.run(scenario);
@@ -203,8 +203,17 @@ public class Application extends Controller
 			Model_Water_Quality wq = new Model_Water_Quality();
 			results = wq.run(scenario);
 		}
-		
-		else {//(modelType.equals("habitat_index")) {
+		else if (modelType.equals("soil_loss")) {
+			Model_Soil_Loss sl = new Model_Soil_Loss();
+			results = sl.run(scenario);
+		}
+		else if (modelType.equals("P_Loss_EPIC")) {
+			Model_P_Loss_EPIC ple = new Model_P_Loss_EPIC();
+			results = ple.run(scenario);
+		}
+		else 
+		{
+			//(modelType.equals("habitat_index")) {
 			Model_HabitatIndex hi = new Model_HabitatIndex();
 			results = hi.run(scenario);
 			bAnalyzeAll = true;

@@ -13,15 +13,14 @@ import java.nio.channels.*;
 //------------------------------------------------------------------------------
 // Modeling Process
 //
-// This program calculates phosphorus for each pixel at watershed scale and then sum them up at watershed level (Kg per year)
-// Input is crop rotation layer 
-// Version 10/20/2013
+// This program calculates phosphorus for each pixel at watershed scale using the results of EPIC models and then sum them up at watershed level (Kg per year)
+// Version 01/20/2014
 //
 //------------------------------------------------------------------------------
-public class Model_Water_Quality extends Model_Base
+public class Model_P_Loss_EPIC extends Model_Base
 {
 
-	private static final String mPhosphorusModelFile = "water_quality";
+	private static final String mPLossModelFile = "P_Loss_EPIC";
 	// Number of watersheds in study area
 	private static final int mNumWatersheds = 140;
 	
@@ -29,16 +28,26 @@ public class Model_Water_Quality extends Model_Base
 	public List<ModelResult> run(Scenario scenario) 
 	{
 
-//Logger.info(">>> Computing Model Nitrogen / Phosphorus");
-Logger.info(">>> Computing Water_Quality Model");
+//Logger.info(">>> Computing Model Phosphorus Loss");
+Logger.info(">>> Computing P_Loss_EPIC Model");
 long timeStart = System.currentTimeMillis();
 		
 		// Spatial Layers
 		int[][] rotationData = scenario.mNewRotation;
 		int width = scenario.getWidth(), height = scenario.getHeight();
 		Layer_Integer cdl = (Layer_Integer)Layer_Base.getLayer("cdl_2012");
-		float[][] Rivers = Layer_Base.getLayer("rivers").getFloatData();
+		// Alfa
+		float[][] Alfa_p = Layer_Base.getLayer("Alfa_p").getFloatData();
+		// Corn
+		float[][] Corn_p = Layer_Base.getLayer("Corn_p").getFloatData();
+		// Soy
+		float[][] Soy_p = Layer_Base.getLayer("Soy_p").getFloatData();
+		// Grass
+		float[][] Grass_p = Layer_Base.getLayer("Grass_p").getFloatData();
+		// Watershed layer
 		int[][] watersheds = Layer_Base.getLayer("watersheds").getIntData();
+		// Distance to river
+		float[][] Rivers = Layer_Base.getLayer("rivers").getFloatData();
 		// Id for tracking watershed
 		int watershedIdx = 0;
 		
@@ -47,22 +56,10 @@ long timeStart = System.currentTimeMillis();
 		int Grass_Mask = cdl.convertStringsToMask("grass");
 		// Alfalfa
 		int Alfalfa_Mask = cdl.convertStringsToMask("alfalfa");
-		//int mGrassMask = Grass_Mask | Alfalfa_Mask;	
-		// Forest
-		int Forest_Mask = cdl.convertStringsToMask("woodland");
-		// Ag
-		//inGRAINS = 2, inVEGGIES = 3, inTREECROP = 4, inOTHERCROP = 15, inSOY =  16, inCORN_GRAIN = 18, inSOY_GRAIN = 19, inOIL = 21;
-		int Ag_Mask = 1 + 2 + 4 + 8 + 16384 + 32768 + 131072 + 262144 + 1048576;
-		// Urban
-		int Urban_Mask = cdl.convertStringsToMask("urban");
-		int SubUrban_Mask = cdl.convertStringsToMask("suburban");
-		Urban_Mask = Urban_Mask | SubUrban_Mask;
-		// Total Mask
-		//int Corn_Mask = cdl.convertStringsToMask("corn");
-		//int Soy_Mask = cdl.convertStringsToMask("soy");
-		//int Alfalfa_Mask = cdl.convertStringsToMask("Alfalfa");
-		//int TotalMask = Grass_Mask | Alfalfa_Mask | Forest_Mask | Ag_Mask | Urban_Mask;
-		//int TotalMask = mAgMask | mGrassMask;
+		// Corn
+		int Corn_Mask = cdl.convertStringsToMask("corn");
+		// Soy
+		int Soy_Mask = cdl.convertStringsToMask("soy");
 		
 		// Arrays to sum phosphorus within each watershed
 		int[] CountCellsInWatershed = new int[mNumWatersheds];
@@ -70,16 +67,14 @@ long timeStart = System.currentTimeMillis();
 		float[] Phosphorus = new float[mNumWatersheds];
 		// Arrays to save phosphorus at cell base
 		float[][] PhosphorusData = new float[height][width];
-			
-		// P-export coefficient for Ag, grass, forest, Alfalfa and urban (Kg per hectare per year)
-		float P_flux = 0;
+		
 		// Distance of cells from river in terms of area for Ag, grass, forest, Alfalfa and urban
 		int Dist = 0;
 		// Transmission coefficients for Ag, grass, forest, Alfalfa and urban
 		float Transmission = 0;
 		
 		// full raster save process...
-Logger.info("  > Allocated memory for Water_Quality");
+Logger.info("  > Allocated memory for P_Loss_EPIC");
 
 		// Water quality model
 		// 1st step. Calculate phosphorus for each cell in the landscape
@@ -89,52 +84,72 @@ Logger.info("  > Allocated memory for Water_Quality");
 			{
 				if (rotationData[y][x] > 0)
 				{
+					// Kg per Ha
 					// Grass
 					if ((rotationData[y][x] & Grass_Mask) > 0) 
 					{
-						//P_flux = 1.0f;
-						P_flux = 0.75f;
-						//Transmission = 0.6f;
-						Transmission = 0.2f;
+						if (Grass_p[y][x] > -9999)
+						{
+							Transmission = 0.2f;
+							PhosphorusData[y][x] = Grass_p[y][x];
+						}
+						else
+						{
+							Transmission = 0;
+							PhosphorusData[y][x] = 0;
+						}
+					}
+					// Corn
+					else if ((rotationData[y][x] & Corn_Mask) > 0) 
+					{
+						if(Corn_p[y][x] > -9999)
+						{
+							Transmission = 0.93f;
+							PhosphorusData[y][x] = Corn_p[y][x];
+						}
+						else
+						{
+							Transmission = 0;
+							PhosphorusData[y][x] = 0;
+						}
+					}
+					// Soy
+					else if ((rotationData[y][x] & Soy_Mask) > 0) 
+					{
+						if(Soy_p[y][x] > -9999)
+						{
+							Transmission = 0.93f;
+							PhosphorusData[y][x] = Soy_p[y][x];
+						}
+						else
+						{
+							Transmission = 0;
+							PhosphorusData[y][x] = 0;
+						}
 					} 
 					// Alfalfa
 					else if ((rotationData[y][x] & Alfalfa_Mask) > 0) 
 					{
-						P_flux = 1.0f;
-						Transmission = 0.3f;
+						if (Alfa_p[y][x] > -9999)
+						{
+							Transmission = 0.3f;
+							PhosphorusData[y][x] = Alfa_p[y][x];
+						}
+						else
+						{
+							Transmission = 0;
+							PhosphorusData[y][x] = 0;
+						}
 					} 
-					// Forest
-					else if ((rotationData[y][x] & Forest_Mask) > 0) 
-					{
-						P_flux = 0.1f;
-						//Transmission = 0.25f;
-						Transmission = 0.1f;
-					} 
-					// Agriculture
-					else if ((rotationData[y][x] & Ag_Mask) > 0) 
-					{
-						//P_flux = 3f;
-						P_flux = 2.0f;
-						//Transmission = 0.75f;
-						Transmission = 0.93f;
-					}
-					// Urban
-					else if ((rotationData[y][x] & Urban_Mask) > 0) 
-					{
-						P_flux = 1.5f;
-						//Transmission = 0.95f;
-						Transmission = 1.00f;
-					}
-					// Other land use classes
 					else
 					{
-						P_flux = 0;
 						Transmission = 0;
+						PhosphorusData[y][x] = 0;
 					}
-					
-					// Calculate phosphorus for each cell in the landscape (Kg per year)
+					// Correct phosphorus Calculation for each cell in the landscape based on the distance (Kg per year)
+					// Convert Kg per Ha to Kg per cell
 					Dist = (int)(Rivers[y][x] / 30) + 1;
-					PhosphorusData[y][x] = P_flux * 900 * 0.0001f * (float)(Math.pow(Transmission, Dist));
+					PhosphorusData[y][x] = PhosphorusData[y][x] * 900 * 0.0001f * (float)(Math.pow(Transmission, Dist));
 					
 					// 2st step. Add the calculated cells within a watershed
 					watershedIdx = watersheds[y][x];
@@ -179,11 +194,11 @@ Logger.info("  > Allocated memory for Water_Quality");
 		List<ModelResult> results = new ArrayList<ModelResult>();
 		
 		//results.add(new ModelResult("nitrogen", scenario.mOutputDir, nitrogenData, width, height));
-		results.add(new ModelResult("water_quality", scenario.mOutputDir, PhosphorusData, width, height));
+		results.add(new ModelResult("P_Loss_EPIC", scenario.mOutputDir, PhosphorusData, width, height));
 		
 long timeEnd = System.currentTimeMillis();
 float timeSec = (timeEnd - timeStart) / 1000.0f;
-Logger.info(">>> Model_Water_Quality is finished - timing: " + Float.toString(timeSec));
+Logger.info(">>> P_Loss_EPIC Model is finished - timing: " + Float.toString(timeSec));
 
 		return results;
 	}

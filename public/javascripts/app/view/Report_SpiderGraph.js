@@ -21,14 +21,14 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 
 		Ext.define('Spider_Model', {
 			extend: 'Ext.data.Model',
-			fields: ['Default', 'Transform', 'Bin', 'Match']
+			fields: ['Default', 'Transform', 'Bin', 'Match', 'IntermDefault', 'IntermTransform']
 		});
 	
-        this.graphstore = Ext.create('Ext.data.Store', {
+        this.graphdetailstore = Ext.create('Ext.data.Store', {
 			model: 'Spider_Model',
 			data: [ 
-					{Bin: 'Nitrogen', Match: 'nitrogen'}, 
-					{Bin: 'Phosphorus', Match: 'phosphorus'}, 
+					{Bin: 'Phosphorus EPIC', Match: 'P_Loss_EPIC'}, 
+					{Bin: 'Phosphorus', Match: 'water_quality'}, 
 					{Bin: 'Bird Index', Match: 'habitat_index'},
 					{Bin: 'Biocontrol Index', Match: 'pest'}, 
 					{Bin: 'Pollinator Index', Match: 'pollinator'}, 
@@ -37,6 +37,14 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 					{Bin: 'Net Energy', Match: 'net_energy'}, 
 					{Bin: 'Soil Carbon', Match: 'soc'}, 
 					{Bin: 'Nitrous Oxide', Match: 'nitrous_oxide'}]
+		});
+        this.graphshortstore = Ext.create('Ext.data.Store', {
+			model: 'Spider_Model',
+			data: [ 
+					{Bin: 'Surface Water', Match: 'surface_water'}, 
+					{Bin: 'Emissions', Match: 'emissions'}, 
+					{Bin: 'Ecosystem', Match: 'ecosystem'},
+					{Bin: 'Economic', Match: 'economic'}]
 		});
                     
         Ext.applyIf(me, {
@@ -53,7 +61,8 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 				height: 490,
 				width: 500,
 				animate: true,
-				store: this.graphstore,
+//				store: this.graphdetailstore,
+				store: this.graphshortstore,
 				insetPadding: 60,
 				legend: {
 					position: 'float',
@@ -65,7 +74,7 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 					title: '',
 					type: 'Radial',
 					position: 'radial',
-					maximum: 1,
+					maximum: 100,
 					fields: ['Bin']
 				}],
 				series: [{
@@ -125,29 +134,113 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
     //--------------------------------------------------------------------------
     setSpiderDataElement: function(value1, value2, element) {
 
-    	var rec = this.graphstore.findRecord('Match', element);
+    	// Fill in detailed spider data
+    	var rec = this.graphdetailstore.findRecord('Match', element);
+		var max = value1;
+		if (value2 > max) {
+			max = value2;
+		}
+		var result1 = value2 / max * 100;
+		var result2 = value1 / max * 100;
     	if (rec) {
-    		var max = value1;
-    		if (value2 > max) {
-    			max = value2;
-    		}
 //			rec.set("Default", value1 / max);
 //			rec.set("Transform", value2 / max);
 			// FIXME: reversed because we don't know why the data is reversed...blah
-			rec.set("Default", value2 / max);
-			rec.set("Transform", value1 / max);
+			rec.set("Default", result1);
+			rec.set("Transform", result2);
 			rec.commit();
     	}
+    	
+    	// calculate combined spider data - have to figure out which things go to which
+    	var newmatch='';
+    	var divisor = 1;
+		if (element =='P_Loss_EPIC') {
+			newmatch = 'surface_water';
+			divisor = 2;
+		}
+		else if (element =='water_quality') {
+			newmatch = 'surface_water';
+			divisor = 2;
+		}
+		else if (element =='habitat_index') {
+			newmatch = 'ecosystem';
+			divisor = 3;
+		}
+		else if (element =='pest') {
+			newmatch = 'ecosystem';
+			divisor = 3;
+		}
+		else if (element =='pollinator') {
+			newmatch = 'ecosystem';
+			divisor = 3;
+		}
+		else if (element =='ethanol') {
+			newmatch = 'economic';
+			divisor = 3;
+		}
+		else if (element =='net_income') {
+			newmatch = 'economic';
+			divisor = 3;
+		}
+		else if (element =='net_energy') {
+			newmatch = 'economic';
+			divisor = 3;
+		}
+		else if (element =='soc') {
+			newmatch = 'emissions';
+			divisor = 2;
+		}
+		else if (element =='nitrous_oxide') {
+			newmatch = 'emissions';
+			divisor = 2;
+		}
+		
+		var rec = this.graphshortstore.findRecord('Match', newmatch);
+		if (rec) {
+//			rec.set("Default", value1 / max);
+//			rec.set("Transform", value2 / max);
+			// FIXME: reversed because we don't know why the data is reversed...blah
+			var intermediate1 = rec.get('IntermDefault') + result1;
+			var intermediate2 = rec.get('IntermTransform') + result2;
+			rec.set('IntermDefault', intermediate1);
+			rec.set('IntermTransform', intermediate2);
+			
+			intermediate1 = intermediate1 / divisor;
+			intermediate2 = intermediate2 / divisor;
+			
+			var max = intermediate1;
+			if (intermediate2 > max) {
+				max = intermediate2;
+			}
+			result1 = intermediate2 / max * 100;
+			result2 = intermediate1 / max * 100;
+  			
+			rec.set('Default', result1);
+			rec.set('Transform', result2);
+			
+			rec.commit();
+    	}
+
     },
     
     //--------------------------------------------------------------------------
     clearSpiderData: function(defaultValue)
     {
-		for (var idx = 0; idx < this.graphstore.count(); idx++)
+    	// Clear the detailed spider
+		for (var idx = 0; idx < this.graphdetailstore.count(); idx++)
 		{
-			var rec = this.graphstore.getAt(idx);
+			var rec = this.graphdetailstore.getAt(idx);
 			rec.set("Default", defaultValue);
 			rec.set("Transform", defaultValue);
+			rec.commit();
+		}
+		for (var idx = 0; idx < this.graphshortstore.count(); idx++)
+		{
+			var rec = this.graphshortstore.getAt(idx);
+			rec.set("Default", defaultValue);
+			rec.set("Transform", defaultValue);
+			rec.set('IntermDefault', 0);
+			rec.set('IntermTransform', 0);
 			rec.commit();
 		}
     }

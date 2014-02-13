@@ -10,7 +10,7 @@ import java.io.*;
 //------------------------------------------------------------------------------
 // Modeling Process
 //
-// This program uses to calculate nitrous oxide emissions(Tonnes per hec) 
+// This program uses to calculate nitrous oxide emissions(Tonnes per Ha) 
 // This model is from unpublished work by 
 // Inputs are layers, selected cells in the raster map and crop rotation layer 
 // Outputs are ASCII map of nitrous oxide emissions
@@ -29,7 +29,7 @@ Logger.info(">>> Computing Nitrous Oxide Index");
 long timeStart = System.currentTimeMillis();
 		
 		float [][] nitrousOxideData = new float[height][width];
-Logger.info("  > Allocated memory for N20");
+Logger.info("  > Allocated memory for N2O");
 		
 		// Mask
 		Layer_Integer cdl = (Layer_Integer)Layer_Base.getLayer("cdl_2012"); 

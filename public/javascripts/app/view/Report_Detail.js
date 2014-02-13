@@ -64,19 +64,21 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_InfoHTML: 'http://www.epa.gov/airquality/modeling.html',
 					DSS_DetailReportContainer: me
 				},{
-					itemId: 'result_nitrogen',
+					itemId: 'result_phosphorus_epic',
 					xtype: 'report_detail_item',
-					DSS_FieldString: 'nitrogen',
-					DSS_UnitLabel: 'mg/l',
-					DSS_Label: 'Nitrogen',
-					DSS_GraphTitle: 'Nitrogen Runoff',
+					DSS_FieldString: 'P_Loss_EPIC',
+					//DSS_UnitLabel: 'mg/l',
+					DSS_UnitLabel: 'kg',
+					DSS_Label: 'Phosphorus Epic',
+					DSS_GraphTitle: 'Phosphorus Epic',
 					DSS_InfoHTML: 'http://water.epa.gov/scitech/datait/models/index.cfm',
 					DSS_DetailReportContainer: me
 				},{
 					itemId: 'result_phosphorus',
 					xtype: 'report_detail_item',
-					DSS_FieldString: 'phosphorus',
-					DSS_UnitLabel: 'mg/l',
+					DSS_FieldString: 'water_quality',
+					//DSS_UnitLabel: 'mg/l',
+					DSS_UnitLabel: 'kg',
 					DSS_Label: 'Phosphorus',
 					DSS_GraphTitle: 'Phosphorus Runoff',
 					DSS_InfoHTML: 'http://water.epa.gov/scitech/datait/models/index.cfm',
@@ -277,18 +279,18 @@ Ext.define('MyApp.view.Report_Detail', {
 			c.getComponent('result_net_energy').setData(val1, val2, totalVal, obj.net_energy);
 		}	
 		
-		if (obj.nitrogen) {
-			var val1 = obj.nitrogen.file1.sum /  obj.nitrogen.file1.count;
-			var val2 = obj.nitrogen.file2.sum /  obj.nitrogen.file2.count;
+		if (obj.P_Loss_EPIC) {
+			var val1 = obj.P_Loss_EPIC.file1.sum /  obj.P_Loss_EPIC.file1.count;
+			var val2 = obj.P_Loss_EPIC.file2.sum /  obj.P_Loss_EPIC.file2.count;
 			var totalVal = (val2 - val1);
-			c.getComponent('result_nitrogen').setData(val1, val2, totalVal, obj.nitrogen);
+			c.getComponent('result_phosphorus_epic').setData(val1, val2, totalVal, obj.P_Loss_EPIC);
 		}	
 
-		if (obj.phosphorus) {
-			var val1 = obj.phosphorus.file1.sum /  obj.phosphorus.file1.count;
-			var val2 = obj.phosphorus.file2.sum /  obj.phosphorus.file2.count;
+		if (obj.water_quality) {
+			var val1 = obj.water_quality.file1.sum /  obj.water_quality.file1.count;
+			var val2 = obj.water_quality.file2.sum /  obj.water_quality.file2.count;
 			var totalVal = (val2 - val1);
-			c.getComponent('result_phosphorus').setData(val1, val2, totalVal, obj.phosphorus);
+			c.getComponent('result_phosphorus').setData(val1, val2, totalVal, obj.water_quality);
 		}	
     	
     	if (obj.ethanol) {

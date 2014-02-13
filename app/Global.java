@@ -115,7 +115,15 @@ public class Global extends GlobalSettings
 			layer = new Layer_Float("om_soc"); layer.init();
 			layer = new Layer_Float("drainage"); layer.init();
 			layer = new Layer_Float("ph"); layer.init();
-			
+			layer = new Layer_Float("Soil_Erodibility"); layer.init();
+			layer = new Layer_Float("Rainfall_Erosivity"); layer.init();
+			layer = new Layer_Float("Slope_Steepness"); layer.init();
+			layer = new Layer_Float("Slope_Length"); layer.init();
+			// Calculated outputs from EPIC models
+			layer = new Layer_Float("alfa_p"); layer.init();
+			layer = new Layer_Float("corn_p"); layer.init();
+			layer = new Layer_Float("grass_p"); layer.init();
+			layer = new Layer_Float("soy_p"); layer.init();
 			// NOTE: am putting low-priority (rarely used) data layers here so that
 			//	we can have them skip loading in DEVELOPMENT mode. Ie, faster loads
 			//	and less memory usage...
@@ -143,11 +151,13 @@ public class Global extends GlobalSettings
 				layer = new Layer_Float("default/net_energy"); layer.init();
 				layer = new Layer_Float("default/ethanol"); layer.init();
 				layer = new Layer_Float("default/habitat_index"); layer.init();
-				layer = new Layer_Float("default/nitrogen"); layer.init();
-				layer = new Layer_Float("default/phosphorus"); layer.init();
+				//layer = new Layer_Float("default/nitrogen"); layer.init();
+				//layer = new Layer_Float("default/phosphorus"); layer.init();
+				layer = new Layer_Float("default/water_quality"); layer.init();
 				layer = new Layer_Float("default/pest"); layer.init();
 				layer = new Layer_Float("default/pollinator"); layer.init();
 				layer = new Layer_Float("default/nitrous_oxide"); layer.init();
+				layer = new Layer_Float("default/P_Loss_EPIC"); layer.init();
 			}
 			catch (Exception e) {
 				Logger.info(e.toString());
@@ -190,13 +200,19 @@ public class Global extends GlobalSettings
 			results = new Model_PollinatorPestSuppression().run(scenario);
 			QueuedWriter.queueResults(results);
 			
-			results = new Model_NitrogenPhosphorus().run(scenario);
-			QueuedWriter.queueResults(results);
+			//results = new Model_NitrogenPhosphorus().run(scenario);
+			//QueuedWriter.queueResults(results);
 
 			results = new Model_NitrousOxideEmissions().run(scenario);
 			QueuedWriter.queueResults(results);
 			
 			results = new Model_Water_Quality().run(scenario);
+			QueuedWriter.queueResults(results);
+			
+			results = new Model_Soil_Loss().run(scenario);
+			QueuedWriter.queueResults(results);
+			
+			results = new Model_P_Loss_EPIC().run(scenario);
 			QueuedWriter.queueResults(results);
 			// NOTE: SOC for the default is not in the model run because it is not a computed data layer like others...
 			

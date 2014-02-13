@@ -465,7 +465,7 @@ Ext.define('MyApp.view.Scenario_Layout', {
 		
 		// NOTE: these strings MUST be synchronized with the server, or else the server will
 		//	not know which models to run. FIXME: should maybe set this up in a more robust fashion?? How?
-		var modelTypes = ['yield', 'n_p', 'pest_pol', 'soc', 'nitrous', 'habitat_index'];
+		var modelTypes = ['yield', 'water_quality', 'pest_pol', 'soc', 'nitrous', 'habitat_index', 'P_Loss_EPIC'];
 		
 		var requestCount = modelTypes.length;
 		

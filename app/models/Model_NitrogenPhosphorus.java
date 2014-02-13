@@ -59,7 +59,7 @@ Logger.info("  > Allocated memory for Nitrogen / Phosphorus");
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				int watershedIdx = watersheds[y][x]; 
-				if (watershedIdx != 0) {
+				if (watershedIdx >= 0) {
 					// watershed index zero is reserved for no-data
 					watershedIdx--;
 					countCellsInWatershed[watershedIdx]++;
@@ -84,7 +84,7 @@ Logger.info("  > Allocated memory for Nitrogen / Phosphorus");
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				int watershedIdx = watersheds[y][x]; 
-				if (watershedIdx != 0) {
+				if (watershedIdx >= 0) {
 					// watershed index zero is reserved for no-data
 					watershedIdx--;
 					nitrogenData[y][x] = nitrogen[watershedIdx];

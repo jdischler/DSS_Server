@@ -52,7 +52,7 @@ Ext.define('MyApp.view.Report_ScenarioComparison', {
     bodyStyle: {
     	'background-color': '#f4f8ff'
     },
-  //  hidden: true,
+    hidden: true,
    
     //--------------------------------------------------------------------------
     initComponent: function() {

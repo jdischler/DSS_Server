@@ -115,11 +115,15 @@ public class Global extends GlobalSettings
 			layer = new Layer_Float("silt"); layer.init();
 			layer = new Layer_Float("soc"); layer.init();
 			layer = new Layer_Integer("watersheds", Layer_Integer.EType.ERaw); layer.init();
-//			layer = new Layer_Integer("watersheds", Layer_Integer.EType.EQueryShiftedIndex); layer.init();
 			layer = new Layer_Float("texture"); layer.init();
 			layer = new Layer_Float("om_soc"); layer.init();
 			layer = new Layer_Float("drainage"); layer.init();
 			layer = new Layer_Float("ph"); layer.init();
+			// Epic computed data...
+			layer = new Layer_Float("Alfa_p"); layer.init();
+			layer = new Layer_Float("Corn_p"); layer.init();
+			layer = new Layer_Float("Soy_p"); layer.init();
+			layer = new Layer_Float("Grass_p"); layer.init();
 			
 			// NOTE: am putting low-priority (rarely used) data layers here so that
 			//	we can have them skip loading in DEVELOPMENT mode. Ie, faster loads
@@ -129,7 +133,6 @@ public class Global extends GlobalSettings
 				layer = new Layer_Float("rivers"); layer.init();
 				layer = new Layer_Integer("lcc"); layer.init();
 				layer = new Layer_Integer("lcs"); layer.init();
-//				layer = new Layer_Continuous("roads"); layer.init();
 			}
 		}
 		catch (Exception e) {
@@ -148,9 +151,8 @@ public class Global extends GlobalSettings
 				layer = new Layer_Float("default/net_energy"); layer.init();
 				layer = new Layer_Float("default/ethanol"); layer.init();
 				layer = new Layer_Float("default/habitat_index"); layer.init();
-//				layer = new Layer_Float("default/nitrogen"); layer.init();
 				layer = new Layer_Float("default/water_quality"); layer.init();
-				layer = new Layer_Float("default/phosphorus"); layer.init();
+				layer = new Layer_Float("default/P_Loss_EPIC"); layer.init();
 				layer = new Layer_Float("default/pest"); layer.init();
 				layer = new Layer_Float("default/pollinator"); layer.init();
 				layer = new Layer_Float("default/nitrous_oxide"); layer.init();
@@ -196,14 +198,15 @@ public class Global extends GlobalSettings
 			results = new Model_PollinatorPestSuppression().run(scenario);
 			QueuedWriter.queueResults(results);
 			
-			results = new Model_NitrogenPhosphorus().run(scenario);
-			QueuedWriter.queueResults(results);
-
 			results = new Model_NitrousOxideEmissions().run(scenario);
 			QueuedWriter.queueResults(results);
 			
-			results = new Model_Water_Quality().run(scenario);
+			results = new Model_WaterQuality().run(scenario);
 			QueuedWriter.queueResults(results);
+			
+			results = new Model_P_LossEpic().run(scenario);
+			QueuedWriter.queueResults(results);
+
 			// NOTE: SOC for the default is not in the model run because it is not a computed data layer like others...
 			
 			// wait for write queue to dump out the defaults...

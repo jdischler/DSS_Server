@@ -13,6 +13,8 @@ POST	/createScenario			controllers.Application.setUpScenario()
 POST	/modelCluster			controllers.Application.runModelCluster()
 POST	/getHeatmap				controllers.Application.getHeatmap()
 # POST	/saveScenario			controllers.Application.saveScenario()
+POST	/initComparison			controllers.Application.initComparison()
+POST	/runComparison			controllers.Application.runComparison()
 
 # Map static resources from the /public folder to the /assets URL path
 GET		/files/:file			controllers.FileService.getFile(file: String)

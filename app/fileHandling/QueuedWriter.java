@@ -2,9 +2,12 @@ package util;
 
 import play.*;
 import java.util.*;
+import java.net.*;
 import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
+
+import org.apache.commons.io.FileUtils; 
 
 //------------------------------------------------------------------------------
 public class QueuedWriter implements Runnable {
@@ -109,15 +112,24 @@ public class QueuedWriter implements Runnable {
 				
 				if (mResultsToWrite.size() > 0) {
 					ModelResult result = mResultsToWrite.remove(0);
-					File writeFolder = new File("./layerData/"+ result.mDestinationFolder + "/");
+					File writeFolder = new File("./layerData/" + result.mDestinationFolder + "/");
 					if (writeFolder.exists() == false) {
-						writeFolder.mkdirs();
+						Logger.info(" ... Writer queue creating directory: " + writeFolder.toString());
+						try {
+							FileUtils.forceMkdir(writeFolder);
+						}
+						catch (Exception err) {
+							Logger.info(err.toString());
+						}
+						//writeFolder.mkdirs();
+						if (writeFolder.exists() == false) {
+							Logger.info(" Error - Writer queue directory creation failed!!");
+						}
 					}
 					
 					// ---WRITE BINARY DSS?
 					if (mbWriteBinary_DSS) {
-						File writeFile = new File("./layerData/"+ result.mDestinationFolder + "/" 
-													+ result.mName + ".dss");
+						File writeFile = new File(writeFolder, result.mName + ".dss");
 						Logger.info(" ... Writer queue writing DSS: " + writeFile.toString());
 						
 						Binary_Writer writer = new Binary_Writer(writeFile, result.mWidth, result.mHeight);
@@ -137,8 +149,7 @@ public class QueuedWriter implements Runnable {
 						PrintWriter ascOut = null;
 						int width = result.mWidth, height = result.mHeight;
 						try {
-							File writeFile = new File("./layerData/"+ result.mDestinationFolder + "/" 
-													+ result.mName + ".asc");
+							File writeFile = new File(writeFolder, result.mName + ".asc");
 							Logger.info(" ... Writer queue writing ASC: " + writeFile.toString());
 							ascOut = new PrintWriter(new BufferedWriter(new FileWriter(writeFile)));
 							ascOut.println("ncols         " + Integer.toString(width));
@@ -187,14 +198,29 @@ public class QueuedWriter implements Runnable {
 					
 					ScenarioSetupResult result = mScenarioSetupsToWrite.remove(0);
 					File writeFolder = new File("./layerData/"+ result.mDestinationFolder + "/");
+					try {
+						writeFolder = new File(writeFolder.getCanonicalPath());
+					}
+					catch (Exception err) {
+						Logger.info(err.toString());
+					}
+					
 					if (writeFolder.exists() == false) {
-						writeFolder.mkdirs();
+						Logger.info(" ... Writer queue creating directory: " + writeFolder.toString());
+						try {
+							FileUtils.forceMkdir(writeFolder);
+						}
+						catch (Exception err) {
+							Logger.info(err.toString());
+						}
+						if (writeFolder.exists() == false) {
+							Logger.info(" Error - Writer queue directory creation failed!!");
+						}
 					}
 
 					// ---WRITE Selection in Binary --- 
 					if (true) {
-						File writeFile = new File("./layerData/"+ result.mDestinationFolder + "/" 
-													+ "selection.sel");
+						File writeFile = new File(writeFolder, "selection.sel");
 						Logger.info(" ... Writer queue writing sel: " + writeFile.toString());
 						
 						Binary_Writer writer = new Binary_Writer(writeFile, result.mWidth, result.mHeight);
@@ -211,8 +237,7 @@ public class QueuedWriter implements Runnable {
 					
 					// ---WRITE BINARY DSS for New Transformed Landscape?
 					if (mbWriteBinary_DSS && mbWriteLandscape) {
-						File writeFile = new File("./layerData/"+ result.mDestinationFolder + "/" 
-													+ "cdl_transformed.dss");
+						File writeFile = new File(writeFolder, "cdl_transformed.dss");
 						Logger.info(" ... Writer queue writing DSS: " + writeFile.toString());
 						
 						Binary_Writer writer = new Binary_Writer(writeFile, result.mWidth, result.mHeight);
@@ -232,8 +257,7 @@ public class QueuedWriter implements Runnable {
 						PrintWriter ascOut = null;
 						int width = result.mWidth, height = result.mHeight;
 						try {
-							File writeFile = new File("./layerData/"+ result.mDestinationFolder + "/" 
-													+ "cdl_transformed.asc");
+							File writeFile = new File(writeFolder, "cdl_transformed.asc");
 							Logger.info(" ... Writer queue writing ASC: " + writeFile.toString());
 							ascOut = new PrintWriter(new BufferedWriter(new FileWriter(writeFile)));
 							ascOut.println("ncols         " + Integer.toString(width));

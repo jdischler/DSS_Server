@@ -16,19 +16,21 @@ public class Scenario
 	private long mCachedAtTime;
 	
 	public GlobalAssumptions mAssumptions;
-	public String mClientID;
+//	public String mClientID; // NOTE: not currently used?
 	public Selection mSelection; 
 	public String mOutputDir;
 	private JsonNode mConfiguration;
 	public int[][] mNewRotation; // copy of Rotation layer, but selection transformed
 	
-	//--------------------------------------------------------------------------
+	
+	// NOTE: unused constructor??
+/*	//--------------------------------------------------------------------------
 	public Scenario(JsonNode configuration, String outputDir) {
 		
 		mConfiguration = configuration;
 		mOutputDir = outputDir;
 	}
-
+*/
 	//--------------------------------------------------------------------------
 	public Scenario() {
 		
@@ -136,7 +138,7 @@ public class Scenario
 		
 		Scenario res = mCachedScenarios.get(cacheStringID);
 		if (res == null) {
-			Logger.info("Attempting to uncache acenario named <" + cacheStringID + 
+			Logger.info("Attempting to uncache scenario named <" + cacheStringID + 
 							"> but that does not appear to be cached");
 			return;
 		}

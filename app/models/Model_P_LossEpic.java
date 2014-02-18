@@ -96,7 +96,6 @@ Logger.info("  > Allocated memory for P_Loss_EPIC");
 						else
 						{
 							Transmission = 0;
-							PhosphorusData[y][x] = 0;
 						}
 					}
 					// Corn
@@ -110,7 +109,6 @@ Logger.info("  > Allocated memory for P_Loss_EPIC");
 						else
 						{
 							Transmission = 0;
-							PhosphorusData[y][x] = 0;
 						}
 					}
 					// Soy
@@ -124,7 +122,6 @@ Logger.info("  > Allocated memory for P_Loss_EPIC");
 						else
 						{
 							Transmission = 0;
-							PhosphorusData[y][x] = 0;
 						}
 					} 
 					// Alfalfa
@@ -138,13 +135,11 @@ Logger.info("  > Allocated memory for P_Loss_EPIC");
 						else
 						{
 							Transmission = 0;
-							PhosphorusData[y][x] = 0;
 						}
 					} 
 					else
 					{
 						Transmission = 0;
-						PhosphorusData[y][x] = 0;
 					}
 					// Correct phosphorus Calculation for each cell in the landscape based on the distance (Kg per year)
 					// Convert Kg per Ha to Kg per cell

@@ -9,18 +9,11 @@ var ClearScenarioGridStore = Ext.create('Ext.data.Store', {
     data: {
         items: [{ 
         	Active: true, 
-            SelectionName: 'Default-Corn to Grass', 
-        	TransformText: 'To Grass',
-        	ManagementText: '<b><i>Management Options:</i></b></br><b>Fertilizer:</b> Low, Manure',
-        	Transform: 6,
-        	Query: {
-        		clientID: 0,
-        		queryLayers: [{
-					name: 'cdl_2012',
-					type: 'indexed',
-					matchValues: [1]
-        		}]
-        	}
+            SelectionName: 'Undefined', 
+        	TransformText: 'Undefined',
+        	ManagementText: '',
+        	Transform: 1,
+        	Query: {}
         }]
     },
     proxy: {
@@ -103,19 +96,12 @@ Ext.define('MyApp.view.Scenario_Layout', {
 								getStore(); 
 							store.removeAll();
 							store.add({
-									Active: true, 
-									SelectionName: 'Default-Corn to Grass', 
-									TransformText: 'To Grass',
-									ManagementText: '<b><i>Management Options:</i></b></br><b>Tillage:</b> Conventional</br><b>Fertilizer:</b> Low, Manure',
-									Transform: 1,
-									Query: {
-										clientID: 0,
-										queryLayers: [{
-											name: 'cdl_2012',
-											type: 'indexed',
-											matchValues: [1]
-										}]
-									}
+								Active: true, 
+								SelectionName: 'Undefined', 
+								TransformText: 'Undefined',
+								ManagementText: '',
+								Transform: 1,
+								Query: {}
 							});
 							var selModel = self.up().up().getSelectionModel();
 							selModel.select(0);
@@ -138,9 +124,9 @@ Ext.define('MyApp.view.Scenario_Layout', {
 					up(). // goes to panel level, where the functions are...
 					getStore().add({
 						Active: true, 
-						SelectionName: 'undefined', 
-						TransformText: 'To Corn',
-						ManagementText: '<b><i>Management Options:</i></b></br><b>Tillage:</b> Conventional</br><b>Fertilizer:</b> Low, Manure',
+						SelectionName: 'Undefined', 
+						TransformText: 'Undefined',
+						ManagementText: '',
 						Transform: 1,
 						Query: {}
 				});

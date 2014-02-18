@@ -42,10 +42,11 @@ long timeStart = System.currentTimeMillis();
 		int width = scenario.getWidth(), height = scenario.getHeight();
 		Layer_Integer cdl = (Layer_Integer)Layer_Base.getLayer("cdl_2012");
 		int[][] watersheds = Layer_Base.getLayer("watersheds").getIntData();
-		// Unit (ton ha hr/ha MJ mm)
-		float[][] Soil_Erodibility = Layer_Base.getLayer("Soil_Erodibility").getFloatData();
-		// Unit (MJ mm/ha hr yr)
+		// Calculate A using this formula A = R * K * LS * C * P
+		// Unit (MJ mm/ha hr yr) or R
 		float[][] Rainfall_Erosivity = Layer_Base.getLayer("Rainfall_Erosivity").getFloatData();
+		// Unit (ton ha hr/ha MJ mm) or K
+		float[][] Soil_Erodibility = Layer_Base.getLayer("Soil_Erodibility").getFloatData();
 		//float[][] Slope = Layer_Base.getLayer("Slope").getIntData();
 		// Unit (Dimensionless)
 		float[][] Slope_Steepness = Layer_Base.getLayer("Slope_Steepness").getFloatData();
@@ -133,7 +134,7 @@ Logger.info("  > Allocated memory for Soil_Loss");
 						P = 0;
 					}
 
-					// Calculate Soil Loss for each cell in the landscape (Mg per Ha per year)
+					// Calculate Soil Loss for each cell in the landscape (Tonns per Ha per year)
 					Soil_Loss_Data[y][x] = Rainfall_Erosivity[y][x] * Soil_Erodibility[y][x] * Slope_Length[y][x] * Slope_Steepness[y][x] * C * P;
 					
 					// 2st step. Add the calculated cells within a watershed

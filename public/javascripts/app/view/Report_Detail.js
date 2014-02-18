@@ -36,8 +36,6 @@ Ext.define('MyApp.view.Report_Detail', {
             items: [{
 				xtype: 'container', 
 				itemId: 'results_container',
-				x: 0,
-				y: 0,
 				padding: '0 0 3 0', // just really need to pad bottom to maintain spacing there
 				layout: {
 					type: 'vbox'

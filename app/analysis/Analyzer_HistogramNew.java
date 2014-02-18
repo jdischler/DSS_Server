@@ -240,7 +240,7 @@ public class Analyzer_HistogramNew
 		for (int y=0; y < height; y++) {
 			for (int x=0; x < width; x++) {
 				float data = rasterData[y][x];
-				if (data > -9999.0f) { // FIXME: NoData check...
+				if (data > -9999.0f || data < -9999.1f) { // FIXME: NoData check...
 					if (selection.mRasterData[y][x] >= 1) {
 						selMin = min(selMin, data);
 						selMax = max(selMax, data);
@@ -266,7 +266,7 @@ public class Analyzer_HistogramNew
 		for (int y=0; y < height; y++) {
 			for (int x=0; x < width; x++) {
 				float data = rasterData[y][x];
-				if (data > -9999.0f) { // FIXME: NoData check...
+				if (data > -9999.0f || data < -9999.1f) { // FIXME: NoData check...
 					
 					if (selection.mRasterData[y][x] >= 1) {
 						// handle custom, but usually rare, case of data being MAX in the above formula

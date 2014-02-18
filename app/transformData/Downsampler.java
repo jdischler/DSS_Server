@@ -46,7 +46,7 @@ public class Downsampler
 				int ct = 0;
 				for (int yy = upLeftY; yy <= lowRightY; yy++) {
 					for (int xx = upLeftX; xx <= lowRightX; xx++) {
-						if (data[yy][xx] > -9999.0f) {
+						if (data[yy][xx] > -9999.0f || data[yy][xx] < -9999.1f) {
 							sum += data[yy][xx];
 							ct++;
 						}
@@ -92,7 +92,7 @@ public class Downsampler
 				for (int yy = upLeftY; yy <= lowRightY; yy++) {
 					for (int xx = upLeftX; xx <= lowRightX; xx++) {
 						float result = data[yy][xx];
-						if (result > -9999.0f) {
+						if (result > -9999.0f || result < -9999.1f) {
 							if (!mbHasMax) {
 								max = result;
 								mbHasMax = true;

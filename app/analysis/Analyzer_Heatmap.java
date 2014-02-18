@@ -223,7 +223,7 @@ public class Analyzer_Heatmap {
 		for (int y=0; y < newHeight; y++) {
 			for (int x=0; x < newWidth; x++) {
 				float data = resampled[y][x];
-				if (data > -9999.0f) { // FIXME: NoData check...
+				if (data > -9999.0f || data < -9999.1f) { // FIXME: boo, hate these NoData check...
 					int binIndex = (int)((data - min)/(max - min) * binCount);
 					if (binIndex > binCount - 1) binIndex = binCount - 1;
 					bins[binIndex]++;
@@ -263,7 +263,7 @@ public class Analyzer_Heatmap {
 		for (int y = 0; y < newHeight; y++) {
 			for (int x = 0; x < newWidth; x++) {
 				float data = resampled[y][x];
-				if (data > -9999.0f) {
+				if (data > -9999.0f || data < -9999.1f) { // BOO...hate these NoData checks!
 					int index = (int)((data - min)/(max - min) * binCount);
 					if (index > binCount - 1) index = binCount - 1;
 					int palIndex = bins[index];
@@ -321,7 +321,8 @@ public class Analyzer_Heatmap {
 				for (int x=0; x < width; x++) {
 					float data_1 = buff_1.getFloat(x * 4),
 							data_2 = buff_2.getFloat(x * 4);
-					if (data_1 > -9999.0f && data_2 > -9999.0f) {
+					if ((data_1 > -9999.0f || data_1 < -9999.1f) 
+						&& (data_2 > -9999.0f || data_2 < -9999.1f)) {
 						heatmap[y][x] = data_2 - data_1;
 					}
 					else {
@@ -384,7 +385,8 @@ public class Analyzer_Heatmap {
 				for (int x=0; x < width; x++) {
 					float data_1 = buff_1.getFloat(x * 4),
 							data_2 = buff_2.getFloat(x * 4);
-					if (data_1 > -9999.0f && data_2 > -9999.0f) {
+					if ((data_1 > -9999.0f || data_1 < -9999.1f) 
+						&& (data_2 > -9999.0f || data_2 < -9999.1f)) {
 						heatmap[y][x] = data_2 - data_1;
 					}
 					else {
@@ -415,7 +417,7 @@ public class Analyzer_Heatmap {
 		for (int y=0; y < newHeight; y++) {
 			for (int x=0; x < newWidth; x++) {
 				float data = resampled[y][x];
-				if (data > -9999.0f) { // FIXME: NoData check...
+				if (data > -9999.0f || data < -9999.1f) { // FIXME: NoData check...
 					int binIndex = (int)((data - min)/(max - min) * binCount);
 					if (binIndex > binCount - 1) binIndex = binCount - 1;
 					bins[binIndex]++;
@@ -455,7 +457,7 @@ public class Analyzer_Heatmap {
 		for (int y = 0; y < newHeight; y++) {
 			for (int x = 0; x < newWidth; x++) {
 				float data = resampled[y][x];
-				if (data > -9999.0f) {
+				if (data > -9999.0f || data < -9999.1f) {
 					int index = (int)((data - min)/(max - min) * binCount);
 					if (index > binCount - 1) index = binCount - 1;
 					int palIndex = bins[index];
@@ -492,7 +494,7 @@ public class Analyzer_Heatmap {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				float val = data[y][x];
-				if (val > -9999.0f) {
+				if (val > -9999.0f || val < -9999.1f) {
 					if (!bHasMinMax) {
 						bHasMinMax = true;
 						minMax.mMax = val;
@@ -524,7 +526,7 @@ public class Analyzer_Heatmap {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				float val = data[y][x];
-				if (val > -9999.0f) {
+				if (val > -9999.0f || val < -9999.1f) {
 					int bin = (int)((val - min) / (max - min) * numVals);
 					if (bin < 0) bin = 0;
 					else if (bin > numVals - 1) bin = numVals - 1;

@@ -44,6 +44,64 @@ Ext.define('MyApp.view.Report_Detail', {
 					xtype: 'report_value_popup'
 				},
 				{
+					itemId: 'result_net_income',
+					xtype: 'report_detail_item',
+					DSS_FieldString: 'net_income',
+					DSS_UnitLabel: '$Million/Yr',
+					DSS_Label: 'Net Income',
+					DSS_GraphTitle: 'Net Income',
+					DSS_InfoHTML: 'http://www.sciencedirect.com/science/article/pii/S0305750X11000933',
+					DSS_DetailReportContainer: me
+				},{
+					itemId: 'result_ethanol',
+					xtype: 'report_detail_item',
+					DSS_FieldString: 'ethanol',
+					DSS_UnitLabel: 'Gl/Yr',
+					DSS_Label: 'Gross Biofuel',
+					DSS_GraphTitle: 'Biofuel Production',
+					DSS_InfoHTML: 'http://www.sciencedirect.com/science/article/pii/S0305750X11000933',
+					DSS_DetailReportContainer: me
+				},{
+					itemId: 'result_net_energy',
+					xtype: 'report_detail_item',
+					DSS_FieldString: 'net_energy',
+					DSS_UnitLabel: 'TJ/Yr',
+					DSS_Label: 'Net Energy',
+					DSS_GraphTitle: 'Net Energy',
+					DSS_InfoHTML: 'http://www.sciencedirect.com/science/article/pii/S0305750X11000933',
+					DSS_DetailReportContainer: me
+				},{
+					itemId: 'result_water_quality',
+					xtype: 'report_detail_item',
+					DSS_FieldString: 'water_quality',
+					DSS_UnitLabel: 'Kg/Yr',
+					DSS_Label: 'Water Quality',
+					DSS_GraphTitle: 'Water Quality',
+					DSS_InfoHTML: 'http://www.epa.gov/airquality/modeling.html',
+					DSS_DetailReportContainer: me
+				},{
+					itemId: 'result_phosphorus_epic',
+					xtype: 'report_detail_item',
+					DSS_FieldString: 'P_Loss_EPIC',
+					DSS_UnitLabel: 'Kg/Yr',
+					DSS_Label: 'P Loading',
+					DSS_GraphTitle: 'Phosphorus Epic',
+					DSS_InfoHTML: 'http://water.epa.gov/scitech/datait/models/index.cfm',
+					DSS_DetailReportContainer: me
+				},
+/*				{ // TODO: Soil Loss Model Goes Here as Per Order Tim Would Like!!!
+
+					itemId: 'result_soil_loss',
+					xtype: 'report_detail_item',
+					DSS_FieldString: 'soil_loss',
+					DSS_UnitLabel: '??',
+					DSS_Label: 'Soil Loss',
+					DSS_GraphTitle: 'Soil Loss',
+					DSS_InfoHTML: 'http://water.epa.gov/scitech/datait/models/index.cfm',
+					DSS_DetailReportContainer: me
+				},
+*/
+				{
 					itemId: 'result_soc',
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'soc',
@@ -61,36 +119,15 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_GraphTitle: 'Nitrous Oxide Emissions',
 					DSS_InfoHTML: 'http://www.epa.gov/airquality/modeling.html',
 					DSS_DetailReportContainer: me
-				},
-				{
-					itemId: 'result_water_quality',
-					xtype: 'report_detail_item',
-					DSS_FieldString: 'water_quality',
-					DSS_UnitLabel: 'Kg/Yr',
-					DSS_Label: 'Water Quality',
-					DSS_GraphTitle: 'Water Quality',
-					DSS_InfoHTML: 'http://www.epa.gov/airquality/modeling.html',
-					DSS_DetailReportContainer: me
-				},
-				{
-					itemId: 'result_phosphorus_epic',
-					xtype: 'report_detail_item',
-					DSS_FieldString: 'P_Loss_EPIC',
-					//DSS_UnitLabel: 'mg/l',
-					DSS_UnitLabel: 'Kg/Yr',
-					DSS_Label: 'P Loading',
-					DSS_GraphTitle: 'Phosphorus Epic',
-					DSS_InfoHTML: 'http://water.epa.gov/scitech/datait/models/index.cfm',
-					DSS_DetailReportContainer: me
 				},{
-					itemId: 'result_habitat_index',
+					itemId: 'result_pollinators',
 					xtype: 'report_detail_item',
-					DSS_FieldString: 'habitat_index',
+					DSS_FieldString: 'pollinator',
 					DSS_UnitLabelDelta: '0 to 1',
 					DSS_UnitLabelFile: '0 to 1',
-					DSS_Label: 'Bird Habitat',
-					DSS_GraphTitle: 'Bird Habitat Index',
-					DSS_InfoHTML: 'http://www.chjv.org/chjv_forest_bird_hsi_modeling_p.html',
+					DSS_Label: 'Pollinators',
+					DSS_GraphTitle: 'Key Pollinators',
+					DSS_InfoHTML: 'http://ncp-dev.stanford.edu/~dataportal/invest-releases/documentation/current_release/croppollination.html',
 					DSS_DetailReportContainer: me
 				},{
 					itemId: 'result_pest',
@@ -103,41 +140,14 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_InfoHTML: 'http://ncp-dev.stanford.edu/~dataportal/invest-releases/documentation/current_release/croppollination.html',
 					DSS_DetailReportContainer: me
 				},{
-					itemId: 'result_pollinators',
+					itemId: 'result_habitat_index',
 					xtype: 'report_detail_item',
-					DSS_FieldString: 'pollinator',
+					DSS_FieldString: 'habitat_index',
 					DSS_UnitLabelDelta: '0 to 1',
 					DSS_UnitLabelFile: '0 to 1',
-					DSS_Label: 'Pollinators',
-					DSS_GraphTitle: 'Key Pollinators',
-					DSS_InfoHTML: 'http://ncp-dev.stanford.edu/~dataportal/invest-releases/documentation/current_release/croppollination.html',
-					DSS_DetailReportContainer: me
-				},{
-					itemId: 'result_ethanol',
-					xtype: 'report_detail_item',
-					DSS_FieldString: 'ethanol',
-					DSS_UnitLabel: 'Gl/Yr',
-					DSS_Label: 'Gross Biofuel',
-					DSS_GraphTitle: 'Biofuel Production',
-					DSS_InfoHTML: 'http://www.sciencedirect.com/science/article/pii/S0305750X11000933',
-					DSS_DetailReportContainer: me
-				},{
-					itemId: 'result_net_income',
-					xtype: 'report_detail_item',
-					DSS_FieldString: 'net_income',
-					DSS_UnitLabel: '$Million/Yr',
-					DSS_Label: 'Net Income',
-					DSS_GraphTitle: 'Net Income',
-					DSS_InfoHTML: 'http://www.sciencedirect.com/science/article/pii/S0305750X11000933',
-					DSS_DetailReportContainer: me
-				},{
-					itemId: 'result_net_energy',
-					xtype: 'report_detail_item',
-					DSS_FieldString: 'net_energy',
-					DSS_UnitLabel: 'TJ/Yr',
-					DSS_Label: 'Net Energy',
-					DSS_GraphTitle: 'Net Energy',
-					DSS_InfoHTML: 'http://www.sciencedirect.com/science/article/pii/S0305750X11000933',
+					DSS_Label: 'Bird Habitat',
+					DSS_GraphTitle: 'Bird Habitat Index',
+					DSS_InfoHTML: 'http://www.chjv.org/chjv_forest_bird_hsi_modeling_p.html',
 					DSS_DetailReportContainer: me
 				}]
 			},{

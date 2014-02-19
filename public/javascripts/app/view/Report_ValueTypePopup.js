@@ -78,6 +78,9 @@ Ext.define('MyApp.view.Report_ValueTypePopup', {
             		x: 460,
             		y: 4,
             		type: 'down',
+					tooltip: {
+						text: 'Show/Hide display options for this report section.'
+					},
             		handler: function() {
             			Ext.suspendLayouts();
             			Ext.getCmp('DSS_reportHeaderDisplay').hide();
@@ -224,6 +227,9 @@ Ext.define('MyApp.view.Report_ValueTypePopup', {
             		x: 460,
             		y: 4,
             		type: 'up',
+					tooltip: {
+						text: 'Show/Hide display options for this report section.'
+					},
             		handler: function() {
             			Ext.suspendLayouts();
             			Ext.getCmp('DSS_reportHeaderChange').hide();

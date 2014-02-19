@@ -374,7 +374,7 @@ Ext.define('MyApp.view.MainViewport', {
 			title: 'Land Capability Subclass',
 			DSS_ShortTitle: 'LCS',
 			DSS_AutoSwapTitles: true,
-			DSS_Layer: wmsLCC,
+			DSS_Layer: wmsLCS,
 			minHeight: 90,
 			maxHeight: 400,
 			DSS_QueryTable: 'lcs',

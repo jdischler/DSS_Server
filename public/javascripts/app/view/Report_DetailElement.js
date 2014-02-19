@@ -38,7 +38,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
             {
 			    itemId: 'DSS_ValueField',  
 			    xtype: 'textfield',
-			    x: 30,
+			    x: 20,
 			    y: 5,
 			    width: 240,
 			    fieldLabel: me.DSS_Label,
@@ -47,7 +47,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			},{
 				xtype: 'label',
 				itemId: 'DSS_UnitsLabel',
-				x: 275,
+				x: 265,
 				y: 9,
 				text: me.DSS_UnitLabelDelta ? me.DSS_UnitLabelDelta : me.DSS_UnitLabel,
 				style: {
@@ -88,6 +88,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			},{
 			    itemId: 'information_button',
 			    xtype: 'button',
+			    disabled: true,
 			    x: 415,
 			    y: 5,
 			    width: 30,

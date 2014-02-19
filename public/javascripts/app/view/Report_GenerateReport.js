@@ -10,7 +10,8 @@ Ext.define('MyApp.view.Report_GenerateReport', {
     width: 300,
     title: 'Save/Print Results',
 	icon: 'app/images/new_icon.png',
-
+	collapsed: true,
+	 
     layout: 'absolute',
     
     //--------------------------------------------------------------------------
@@ -20,6 +21,7 @@ Ext.define('MyApp.view.Report_GenerateReport', {
         Ext.applyIf(me, {
 			items: [{
 				xtype: 'button',
+				disabled: true,
 				text: 'Save Results',
 				icon: 'app/images/save_small_icon.png',
 				x: 100,
@@ -30,6 +32,7 @@ Ext.define('MyApp.view.Report_GenerateReport', {
 				}
 			},{
 				xtype: 'button',
+				disabled: true,
 				text: 'Print Results',
 				icon: 'app/images/print_small_icon.png',
 				x: 250,

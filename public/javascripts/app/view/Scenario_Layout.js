@@ -407,6 +407,10 @@ Ext.define('MyApp.view.Scenario_Layout', {
 			
 			if (rec.get('Active')) {
 				var query = rec.get('Query');		
+				if (query == null) {
+					break;
+				}
+				
 				var landUse = rec.get('Transform');
 				if (landUse == null) {
 					landUse = 1; // blurf, set to corn....

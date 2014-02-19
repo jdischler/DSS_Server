@@ -9,6 +9,8 @@ Ext.define('MyApp.view.Management_Fertilizer', {
 		type: 'absolute'
 	},
 	
+	disabled: true,
+	
 	//--------------------------------------------------------------------------
 	initComponent: function() {
 		var me = this;

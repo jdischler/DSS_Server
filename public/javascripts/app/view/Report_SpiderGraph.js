@@ -22,31 +22,31 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 
 		Ext.define('Spider_Model', {
 			extend: 'Ext.data.Model',
-			fields: ['Default', 'Transform', 'Bin', 'Match', 'IntermDefault', 'IntermTransform']
+			fields: ['Current', 'Scenario', 'Bin', 'Match', 'IntermCurrent', 'IntermScenario']
 		});
 	
-        this.graphDetailStore = Ext.create('Ext.data.Store', {
+        me.graphDetailStore = Ext.create('Ext.data.Store', {
 			model: 'Spider_Model',
 			data: [ 
-					{Bin: 'Phosphorus', Match: 'water_quality'}, 
-					{Bin: 'Soil Carbon', Match: 'soc'}, 
-					{Bin: 'Nitrous Oxide', Match: 'nitrous_oxide'},
-					{Bin: 'Pollinators', Match: 'pollinator'}, 
-					{Bin: 'Biocontrol', Match: 'pest'}, 
-					{Bin: 'Bird Habitat', Match: 'habitat_index'},
-					{Bin: 'Net Income', Match: 'net_income'}, 
-					{Bin: 'Gross Biofuel', Match: 'ethanol'}, 
-					{Bin: 'Net Energy', Match: 'net_energy'},
-					{Bin: 'Phosphorus EPIC', Match: 'P_Loss_EPIC'}]
+				{Bin: 'Net Income', Match: 'net_income'}, 
+				{Bin: 'Gross Biofuel', Match: 'ethanol'}, 
+				{Bin: 'Net Energy', Match: 'net_energy'},
+				{Bin: 'Phosphorus EPIC', Match: 'P_Loss_EPIC'},
+				{Bin: 'Phosphorus', Match: 'water_quality'}, 
+				{Bin: 'Soil Carbon', Match: 'soc'}, 
+				{Bin: 'Nitrous Oxide', Match: 'nitrous_oxide'},
+				{Bin: 'Pollinators', Match: 'pollinator'}, 
+				{Bin: 'Biocontrol', Match: 'pest'}, 
+				{Bin: 'Bird Habitat', Match: 'habitat_index'}]
 		});
-        this.graphCombinedStore = Ext.create('Ext.data.Store', {
+        me.graphCombinedStore = Ext.create('Ext.data.Store', {
 			model: 'Spider_Model',
 			data: [ 
-					{Bin: 'Erosion', Match: 'erosion'}, 
-					{Bin: 'Emissions', Match: 'emissions'}, 
-					{Bin: 'Biodiversity', Match: 'biodiversity'},
-					{Bin: 'Economic', Match: 'economic'},
-					{Bin: 'Energy', Match: 'energy'}]
+				{Bin: 'Economic', Match: 'economic'},
+				{Bin: 'Energy', Match: 'energy'},
+				{Bin: 'Erosion', Match: 'erosion'}, 
+				{Bin: 'Emissions', Match: 'emissions'}, 
+				{Bin: 'Biodiversity', Match: 'biodiversity'}]
 		});
                     
         Ext.applyIf(me, {
@@ -56,11 +56,11 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 				xtype: 'report_spiderObject',
 				hidden: true,
 				id: 'DSS_CombinedSpiderGraph',
-				store: this.graphCombinedStore
+				store: me.graphCombinedStore
 			},{
 				xtype: 'report_spiderObject',
 				id: 'DSS_DetailSpiderGraph',
-				store: this.graphDetailStore
+				store: me.graphDetailStore,
 			}]
         });
 
@@ -80,8 +80,8 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 		var result2 = value1 / max * 100;
     	if (rec) {
 			// FIXME: reversed because we don't know why the data is reversed...blah
-			rec.set("Default", result1);
-			rec.set("Transform", result2);
+			rec.set("Current", result1);
+			rec.set("Scenario", result2);
 			rec.commit();
     	}
     	
@@ -132,10 +132,10 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 		var rec = this.graphCombinedStore.findRecord('Match', newmatch);
 		if (rec) {
 			// FIXME: reversed because we don't know why the data is reversed...blah
-			var intermediate1 = rec.get('IntermDefault') + result1;
-			var intermediate2 = rec.get('IntermTransform') + result2;
-			rec.set('IntermDefault', intermediate1);
-			rec.set('IntermTransform', intermediate2);
+			var intermediate1 = rec.get('IntermCurrent') + result1;
+			var intermediate2 = rec.get('IntermScenario') + result2;
+			rec.set('IntermCurrent', intermediate1);
+			rec.set('IntermScenario', intermediate2);
 			
 			intermediate1 = intermediate1 / divisor;
 			intermediate2 = intermediate2 / divisor;
@@ -147,8 +147,8 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 			result1 = intermediate2 / max * 100;
 			result2 = intermediate1 / max * 100;
   			
-			rec.set('Default', result1);
-			rec.set('Transform', result2);
+			rec.set('Current', result1);
+			rec.set('Scenario', result2);
 			
 			rec.commit();
     	}
@@ -162,17 +162,17 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 		for (var idx = 0; idx < this.graphDetailStore.count(); idx++)
 		{
 			var rec = this.graphDetailStore.getAt(idx);
-			rec.set("Default", defaultValue);
-			rec.set("Transform", defaultValue);
+			rec.set("Current", defaultValue);
+			rec.set("Scenario", defaultValue);
 			rec.commit();
 		}
 		for (var idx = 0; idx < this.graphCombinedStore.count(); idx++)
 		{
 			var rec = this.graphCombinedStore.getAt(idx);
-			rec.set("Default", defaultValue);
-			rec.set("Transform", defaultValue);
-			rec.set('IntermDefault', 0);
-			rec.set('IntermTransform', 0);
+			rec.set("Current", defaultValue);
+			rec.set("Scenario", defaultValue);
+			rec.set('IntermCurrent', 0);
+			rec.set('IntermScenario', 0);
 			rec.commit();
 		}
     },
@@ -198,6 +198,6 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 		Ext.resumeLayouts(true);
 
     }
-
+    
 });
 

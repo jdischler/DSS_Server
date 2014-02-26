@@ -4,6 +4,11 @@ Ext.define('MyApp.view.Report_SpiderGraphObject', {
     extend: 'Ext.chart.Chart',
     alias: 'widget.report_spiderObject',
 
+    requires: [
+    	'MyApp.view.DSS_Radar', // series
+    	'MyApp.view.DSS_Radial' // axes
+    ],
+    
 	height: 400,
 	width: 500,
 	insetPadding: 40,	
@@ -12,32 +17,35 @@ Ext.define('MyApp.view.Report_SpiderGraphObject', {
 	legend: {
 		position: 'float',
 		boxFill: '#fafcff',
-		x: -32,
-		y: -30
+		x: -38,
+		y: -38
 	},
 	axes: [{
 		title: '',
-		type: 'Radial',
-		position: 'radial',
+		type: 'DSS_Radial',
+		position: 'dss_radial',
+		startDegrees: -90,
 		maximum: 100,
 		fields: ['Bin']
 	}],
 	series: [{
-		type: 'radar',
+		type: 'dss_radar',
 		xField: 'Bin',
-		yField: 'Default',
+		yField: 'Current',
+		startDegrees: -90,
 		showInLegend: true,
 		showMarkers: true,
 		markerConfig: {
-			radius: 3,
-			size: 3
+			radius: 2,
+			size: 2,
+			opacity: 0.75
 		},
 		tips: {
 			trackMouse: true,
 			width: 120,
 			height: 50,
 			renderer: function(store, item) {
-				this.setTitle(store.get('Bin') + ': ' + store.get('Default'));
+				this.setTitle(store.get('Bin') + ': ' + store.get('Current'));
 			}
 		},
 		style: {
@@ -47,21 +55,23 @@ Ext.define('MyApp.view.Report_SpiderGraphObject', {
 		}
 	},
 	{
-		type: 'radar',
+		type: 'dss_radar',
 		xField: 'Bin',
-		yField: 'Transform',
+		yField: 'Scenario',
+		startDegrees: -90,
 		showInLegend: true,
 		showMarkers: true,
 		markerConfig: {
-			radius: 3,
-			size: 3
+			radius: 2,
+			size: 2,
+			opacity: 0.75
 		},
 		tips: {
 			trackMouse: true,
 			width: 150,
 			height: 40,
 			renderer: function(store, item) {
-				this.setTitle(store.get('Bin') + ': ' + store.get('Transform'));
+				this.setTitle(store.get('Bin') + ': ' + store.get('Scenario'));
 			}
 		},
 		style: {

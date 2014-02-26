@@ -7,17 +7,14 @@ Ext.define('MyApp.view.LogoPanel', {
 
 	id: 'DSS_LogoPanel',
 	frame: false,
-	layout: {
-		type: 'hbox',
-		pack: 'center',
-		align: 'stretch'
-	},
+	layout: 'absolute',
 	header: false,
 	dock: 'top',
 	collapsible: true,
 	animCollapse: false,
 	collapsed: false,
 	height: 0, // start closed...otherwise use...DSS_LogoPanelHeight,
+//	height: DSS_LogoPanelHeight,
 	bodyStyle: 'background-color:rgb(220,230,240)',
 	
     //--------------------------------------------------------------------------
@@ -28,7 +25,9 @@ Ext.define('MyApp.view.LogoPanel', {
         Ext.applyIf(me, {
 			items: [{
 				xtype: 'image',
-				width: 356,
+				width: 399,
+				x: 0,
+				y: 0,
 				src: 'app/images/dss_logo.png',
 				autoEl: {
 					tag: 'a',
@@ -38,21 +37,34 @@ Ext.define('MyApp.view.LogoPanel', {
 			},
 			{
 				xtype: 'image',
-				flex: 1,
-				src: 'app/images/globe_icon.png',
+				x: 375,
+				y: 10,
+				src: 'app/images/dss_home_button.png',
 				autoEl: {
 					tag: 'a',
-					href: 'http://www.glbrc.org',
+					href: 'http://www.youtube.com',
 					onclick: "javascript:window.open(this.href,'_blank');return false;"	
 				}
 			},
 			{
 				xtype: 'image',
-				flex: 1,
-				src: 'app/images/globe_icon.png',
+				x: 575,
+				y: 10,
+				src: 'app/images/dss_help_button.png',
 				autoEl: {
 					tag: 'a',
-					href: 'http://www.glbrc.org',
+					href: 'http://www.facebook.com',
+					onclick: "javascript:window.open(this.href,'_blank');return false;"	
+				}
+			},
+			{
+				xtype: 'image',
+				x: 775,
+				y: 10,
+				src: 'app/images/dss_help_button.png',
+				autoEl: {
+					tag: 'a',
+					href: 'http://www.google.com',
 					onclick: "javascript:window.open(this.href,'_blank');return false;"	
 				}
 			}]

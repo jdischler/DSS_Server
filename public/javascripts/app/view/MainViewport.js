@@ -11,7 +11,7 @@ var vectorPath = '/geoserver/Vector/wms';
 var rasterPath = '/geoserver/Raster/wms';
 var DSS_bufferSize = 2; // how many non-visible tiles on either side of visible area to cache?
 var DSS_resizeMethod = null; // "resize";
-var DSS_LogoPanelHeight = 64;
+var DSS_LogoPanelHeight = 70;
 
 // boo
 var DSS_globalQueryableLayers = [];

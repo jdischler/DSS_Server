@@ -2,7 +2,7 @@
 //------------------------------------------------------------------------------
 Ext.define('MyApp.view.LogoPanel', {
 		
-    extend: 'Ext.panel.Panel',
+    extend: 'Ext.toolbar.Toolbar',//panel.Panel',
     alias: 'widget.logo_panel',
 
 	id: 'DSS_LogoPanel',
@@ -15,7 +15,8 @@ Ext.define('MyApp.view.LogoPanel', {
 	collapsed: false,
 	height: 0, // start closed...otherwise use...DSS_LogoPanelHeight,
 //	height: DSS_LogoPanelHeight,
-	bodyStyle: 'background-color:rgb(220,230,240)',
+//	bodyStyle: 'background-color:rgb(220,230,240)',
+ 	overflowY: 'hidden',
 	
     //--------------------------------------------------------------------------
     initComponent: function() {
@@ -36,36 +37,42 @@ Ext.define('MyApp.view.LogoPanel', {
 				}
 			},
 			{
-				xtype: 'image',
-				x: 375,
-				y: 10,
-				src: 'app/images/dss_home_button.png',
-				autoEl: {
-					tag: 'a',
-					href: 'http://www.youtube.com',
-					onclick: "javascript:window.open(this.href,'_blank');return false;"	
+				xtype: 'button',
+				x: 350,
+				y: 16,
+				width: 200,
+				border: 1,
+				scale: 'large',
+				text: 'SmartScape DSS',
+				aURL: 'http://www.facebook.com',
+				handler: function(self) {
+					javascript:window.open(self.aURL,'_blank');return false;
 				}
 			},
 			{
-				xtype: 'image',
-				x: 575,
-				y: 10,
-				src: 'app/images/dss_help_button.png',
-				autoEl: {
-					tag: 'a',
-					href: 'http://www.facebook.com',
-					onclick: "javascript:window.open(this.href,'_blank');return false;"	
+				xtype: 'button',
+				x: 560,
+				y: 16,
+				width: 200,
+				border: 1,
+				scale: 'large',
+				text: 'SmartScape DSS Help',
+				aURL: 'http://www.facebook.com',
+				handler: function(self) {
+					javascript:window.open(self.aURL,'_blank');return false;
 				}
 			},
 			{
-				xtype: 'image',
-				x: 775,
-				y: 10,
-				src: 'app/images/dss_help_button.png',
-				autoEl: {
-					tag: 'a',
-					href: 'http://www.google.com',
-					onclick: "javascript:window.open(this.href,'_blank');return false;"	
+				xtype: 'button',
+				x: 770,
+				y: 16,
+				width: 200,
+				border: 1,
+				scale: 'large',
+				text: 'About SmartScape DSS',
+				aURL: 'http://www.facebook.com',
+				handler: function(self) {
+					javascript:window.open(self.aURL,'_blank');return false;
 				}
 			}]
         });

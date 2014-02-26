@@ -396,7 +396,7 @@ Ext.define('MyApp.view.Scenario_Layout', {
 		}
 		
 		// Add the new record and select it in the combo box....
-		DSS_ScenarioComparisonStore.add({'Index': DSS_currentModelRunID, 'ScenarioName': 'Current Unsaved Result'});
+		DSS_ScenarioComparisonStore.add({'Index': DSS_currentModelRunID, 'ScenarioName': 'Unsaved Scenario Result'});
 		DSS_ScenarioComparisonStore.commitChanges(); // FIXME: this necessary?
 		Ext.getCmp('DSS_ScenarioCompareCombo_2').setValue(DSS_currentModelRunID);
 

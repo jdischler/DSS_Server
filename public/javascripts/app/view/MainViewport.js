@@ -304,7 +304,7 @@ Ext.define('MyApp.view.MainViewport', {
 			this.getWMS_Settings(false, 0.5)
 		);
 		
-		//------------------------------------------------
+/*		//------------------------------------------------
 		var wmsSOC = new OpenLayers.Layer.WMS("SOC", 
 			this.getGeoserverURL('raster'),
 			{
@@ -315,7 +315,7 @@ Ext.define('MyApp.view.MainViewport', {
 			},
 			this.getWMS_Settings(false, 0.5)
 		);
-		
+*/		
 		//------------------------------------------------
 		var wmsCDL = new OpenLayers.Layer.WMS('cdl_2012', 
 			this.getGeoserverURL('raster'),
@@ -343,7 +343,7 @@ Ext.define('MyApp.view.MainViewport', {
 		map.addLayers([googTerrain,googHybrid,
 			wmsCDL,
 			wmsSlope,
-			wmsSOC,
+//			wmsSOC,
 			wmsLCC,
 			wmsLCS,
 			wmsWatershed,
@@ -429,7 +429,7 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 */		
-		var lpSOC = Ext.create('MyApp.view.LayerPanel_Continuous', {
+/*		var lpSOC = Ext.create('MyApp.view.LayerPanel_Continuous', {
 			title: 'Soil Organic Carbon',
 			DSS_ShortTitle: 'SOC',
 			DSS_AutoSwapTitles: true,
@@ -442,7 +442,7 @@ Ext.define('MyApp.view.MainViewport', {
 			DSS_QueryTable: 'soc',
 			collapsed: true
 		});
-		
+*/		
 		var lpGoog = Ext.create('MyApp.view.LayerPanel_Google', {
 			DSS_LayerSatellite: googTerrain,
 			DSS_LayerHybrid: googHybrid,
@@ -453,7 +453,7 @@ Ext.define('MyApp.view.MainViewport', {
 		// 	elements are added...		
 		Ext.suspendLayouts();
 		var dssLeftPanel = Ext.getCmp('DSS_LeftPanel');
-		dssLeftPanel.insert(0,lpSOC);
+//		dssLeftPanel.insert(0,lpSOC);
 		dssLeftPanel.insert(0,lpLCS);
 		dssLeftPanel.insert(0,lpLCC);
 		dssLeftPanel.insert(0,lpSlope);
@@ -472,10 +472,10 @@ Ext.define('MyApp.view.MainViewport', {
 		DSS_globalQueryableLayers.push(lpWatershed);
 //		DSS_globalQueryableLayers.push(lpRoad);
 		DSS_globalQueryableLayers.push(lpRiver);
-		DSS_globalQueryableLayers.push(lpSOC);
+//		DSS_globalQueryableLayers.push(lpSOC);
 		
 		DSS_globalCollapsibleLayers.push(lpGoog);
-		DSS_globalCollapsibleLayers.push(lpSOC);
+//		DSS_globalCollapsibleLayers.push(lpSOC);
 		DSS_globalCollapsibleLayers.push(lpLCC);
 		DSS_globalCollapsibleLayers.push(lpLCS);
 		DSS_globalCollapsibleLayers.push(lpSlope);

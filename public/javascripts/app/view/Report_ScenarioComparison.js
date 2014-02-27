@@ -11,7 +11,7 @@ var DSS_ScenarioComparisonStore = Ext.create('Ext.data.Store', {
     data: {
         items: [{ 
         	Index: DSS_ScenarioComparison_DEFAULT, 
-            ScenarioName: 'LANDSCAPE DEFAULTS',
+            ScenarioName: 'CURRENT LANDSCAPE',
             Scenario: undefined
         }]
     },
@@ -52,7 +52,7 @@ Ext.define('MyApp.view.Report_ScenarioComparison', {
     bodyStyle: {
     	'background-color': '#f4f8ff'
     },
-    hidden: true,
+    hidden: true, // FIXME: finish so we can show this when needed...
    
     //--------------------------------------------------------------------------
     initComponent: function() {

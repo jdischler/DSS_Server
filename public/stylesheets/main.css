@@ -187,6 +187,25 @@
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c4dae3', endColorstr='#93bac6',GradientType=0 );
 }
 
+.x-btn-default-toolbar-large {
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+  border-radius: 10px;
+  padding: 3px 3px 3px 3px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #c7d7ea;
+  background-color: rgba(100,128,128,.07);
+}
+
+.x-btn-default-toolbar-large .x-btn-inner {
+  font-size: 18px;
+  color: white;
+  text-shadow: 0 1px 2px #000;
+}
+
 .x-panel-collapsed .x-window-header-default,
 .x-panel-collapsed .x-panel-header-default {
   border-color: #58e; 

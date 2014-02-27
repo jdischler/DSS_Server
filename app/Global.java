@@ -119,6 +119,9 @@ public class Global extends GlobalSettings
 			layer = new Layer_Float("om_soc"); layer.init();
 			layer = new Layer_Float("drainage"); layer.init();
 			layer = new Layer_Float("ph"); layer.init();
+			layer = new Layer_Float("ls"); layer.init();
+			layer = new Layer_Float("rainfall_erosivity"); layer.init();
+			layer = new Layer_Float("soil_erodibility"); layer.init();
 			// Epic computed data...
 			layer = new Layer_Float("Alfa_p"); layer.init();
 			layer = new Layer_Float("Corn_p"); layer.init();
@@ -156,6 +159,7 @@ public class Global extends GlobalSettings
 				layer = new Layer_Float("default/pest"); layer.init();
 				layer = new Layer_Float("default/pollinator"); layer.init();
 				layer = new Layer_Float("default/nitrous_oxide"); layer.init();
+				layer = new Layer_Float("default/soil_loss"); layer.init();
 			}
 			catch (Exception e) {
 				Logger.info(e.toString());
@@ -207,6 +211,8 @@ public class Global extends GlobalSettings
 			results = new Model_P_LossEpic().run(scenario);
 			QueuedWriter.queueResults(results);
 
+			results = new Model_Soil_Loss().run(scenario);
+			QueuedWriter.queueResults(results);
 			// NOTE: SOC for the default is not in the model run because it is not a computed data layer like others...
 			
 			// wait for write queue to dump out the defaults...

@@ -437,6 +437,10 @@ public class Application extends Controller
 			Model_NitrousOxideEmissions n20 = new Model_NitrousOxideEmissions();
 			results = n20.run(scenario);
 		}
+		else if (modelType.equals("soil_loss")) {
+			Model_Soil_Loss sl = new Model_Soil_Loss();
+			results = sl.run(scenario);
+		}
 		else {//(modelType.equals("habitat_index")) {
 			Model_HabitatIndex hi = new Model_HabitatIndex();
 			results = hi.run(scenario);

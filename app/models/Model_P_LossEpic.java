@@ -90,7 +90,7 @@ Logger.info("  > Allocated memory for P_Loss_EPIC");
 					{
 						if (Grass_p[y][x] > -9999)
 						{
-							Transmission = 0.2f;
+							Transmission = 0.20f;
 							PhosphorusData[y][x] = Grass_p[y][x];
 						}
 						else
@@ -103,7 +103,7 @@ Logger.info("  > Allocated memory for P_Loss_EPIC");
 					{
 						if(Corn_p[y][x] > -9999)
 						{
-							Transmission = 0.93f;
+							Transmission = 0.80f;
 							PhosphorusData[y][x] = Corn_p[y][x];
 						}
 						else
@@ -116,7 +116,7 @@ Logger.info("  > Allocated memory for P_Loss_EPIC");
 					{
 						if(Soy_p[y][x] > -9999)
 						{
-							Transmission = 0.93f;
+							Transmission = 0.80f;
 							PhosphorusData[y][x] = Soy_p[y][x];
 						}
 						else
@@ -129,7 +129,7 @@ Logger.info("  > Allocated memory for P_Loss_EPIC");
 					{
 						if (Alfa_p[y][x] > -9999)
 						{
-							Transmission = 0.3f;
+							Transmission = 0.30f;
 							PhosphorusData[y][x] = Alfa_p[y][x];
 						}
 						else

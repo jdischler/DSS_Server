@@ -15,7 +15,7 @@ import java.nio.channels.*;
 //
 // This program calculates phosphorus for each pixel at watershed scale and then sum them up at watershed level (Kg per year)
 // Input is crop rotation layer 
-// Version 10/20/2013
+// Version 12/20/2013
 //
 //------------------------------------------------------------------------------
 public class Model_WaterQuality extends Model_Base

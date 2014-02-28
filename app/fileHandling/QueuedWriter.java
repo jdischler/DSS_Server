@@ -22,7 +22,7 @@ public class QueuedWriter implements Runnable {
 	// NOTE: setting this to false may cause analysis and heatmapping to break. But if you
 	//	just want the server to write ASC (or other formats) for analysis, then that might be ok.
 	private static final boolean mbWriteBinary_DSS = true; 
-	private static final boolean mbWriteText_ASC = false;
+	private static final boolean mbWriteText_ASC = true;
 	
 	private static final boolean mbWriteLandscape = true; // thinking this is mostly for debugging at this point?
 	

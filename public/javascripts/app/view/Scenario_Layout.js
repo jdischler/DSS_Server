@@ -480,7 +480,7 @@ Ext.define('MyApp.view.Scenario_Layout', {
 		//	not know which models to run. FIXME: should maybe set this up in a more robust fashion?? How?
 //		var modelTypes = ['yield', 'n_p', 'pest_pol', 'soc', 'nitrous', 'habitat_index', 'water_quality'];
 		var modelTypes = ['yield', 'pest_pol', 'soc', 'nitrous', 'habitat_index', 
-								'water_quality', 'epic_phosphorus'];
+						  'soil_loss', /*'water_quality',*/ 'epic_phosphorus'];
 		
 		var requestCount = modelTypes.length;
 		

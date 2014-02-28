@@ -31,8 +31,8 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 				{Bin: 'Net Income', Match: 'net_income'}, 
 				{Bin: 'Gross Biofuel', Match: 'ethanol'}, 
 				{Bin: 'Net Energy', Match: 'net_energy'},
-				{Bin: 'Phosphorus EPIC', Match: 'P_Loss_EPIC'},
-				{Bin: 'Phosphorus', Match: 'water_quality'}, 
+				{Bin: 'Phosphorus', Match: 'P_Loss_EPIC'},
+				{Bin: 'Soil Loss', Match: 'soil_loss'}, 
 				{Bin: 'Soil Carbon', Match: 'soc'}, 
 				{Bin: 'Nitrous Oxide', Match: 'nitrous_oxide'},
 				{Bin: 'Pollinators', Match: 'pollinator'}, 
@@ -92,7 +92,7 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 			newmatch = 'erosion';
 			divisor = 2;
 		}
-		else if (element =='water_quality') {
+		else if (element =='soil_loss') {
 			newmatch = 'erosion';
 			divisor = 2;
 		}

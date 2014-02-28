@@ -154,7 +154,7 @@ public class Global extends GlobalSettings
 				layer = new Layer_Float("default/net_energy"); layer.init();
 				layer = new Layer_Float("default/ethanol"); layer.init();
 				layer = new Layer_Float("default/habitat_index"); layer.init();
-				layer = new Layer_Float("default/water_quality"); layer.init();
+				//layer = new Layer_Float("default/water_quality"); layer.init();
 				layer = new Layer_Float("default/P_Loss_EPIC"); layer.init();
 				layer = new Layer_Float("default/pest"); layer.init();
 				layer = new Layer_Float("default/pollinator"); layer.init();
@@ -205,8 +205,8 @@ public class Global extends GlobalSettings
 			results = new Model_NitrousOxideEmissions().run(scenario);
 			QueuedWriter.queueResults(results);
 			
-			results = new Model_WaterQuality().run(scenario);
-			QueuedWriter.queueResults(results);
+			//results = new Model_WaterQuality().run(scenario);
+			//QueuedWriter.queueResults(results);
 			
 			results = new Model_P_LossEpic().run(scenario);
 			QueuedWriter.queueResults(results);

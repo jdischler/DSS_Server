@@ -13,10 +13,13 @@ import java.nio.channels.*;
 //------------------------------------------------------------------------------
 // Modeling Process
 //
-// This program calculates soil loss for each pixel at watershed scale and then sum them up at watershed level
+// This program calculates soil loss for each pixel
 // The inputs are where R is the rainfall erosivity, K is the soil erodibility factor, LS is the slope length factor, C is the crop-management factor and P is the support practice factor
 // A = R * K * LS * C * P
 // Units are normmally ton per Ha year for A, MJ mm per ha hr yr for R, ton ha hr per ha MJ mm for K, 
+// R was calculated using Eq from below page
+// http://gisedu.colostate.edu/webcontent/nr505/ethiopia/group4/GIS%20Analyses.html#rainfall
+// K layer was incorporated from SSURGO data base and we converted it to ton per ha from ton / acre
 // Other units are LS, C and P are dimensionless
 // Input is crop rotation layer 
 // Version 02/10/2014

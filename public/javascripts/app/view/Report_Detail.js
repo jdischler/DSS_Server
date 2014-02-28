@@ -70,7 +70,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_GraphTitle: 'Net Energy',
 					DSS_InfoHTML: 'http://www.sciencedirect.com/science/article/pii/S0305750X11000933',
 					DSS_DetailReportContainer: me
-				},{
+				},/*{
 					itemId: 'result_water_quality',
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'water_quality',
@@ -79,14 +79,23 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_GraphTitle: 'Water Quality',
 					DSS_InfoHTML: 'http://www.epa.gov/airquality/modeling.html',
 					DSS_DetailReportContainer: me
-				},{
+				},*/{
 					itemId: 'result_phosphorus_epic',
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'P_Loss_EPIC',
 					DSS_UnitLabel: 'Kg/Yr',
-					DSS_Label: 'P Loading',
+					DSS_Label: 'Phosphorus',
 					DSS_GraphTitle: 'Phosphorus Epic',
 					DSS_InfoHTML: 'http://water.epa.gov/scitech/datait/models/index.cfm',
+					DSS_DetailReportContainer: me
+				},{
+					itemId: 'result_soil_loss',
+					xtype: 'report_detail_item',
+					DSS_FieldString: 'soil_loss',
+					DSS_UnitLabel: 'Mg/Yr',
+					DSS_Label: 'Soil Loss',
+					DSS_GraphTitle: 'Soil Loss',
+					DSS_InfoHTML: 'http://www.epa.gov/airquality/modeling.html',
 					DSS_DetailReportContainer: me
 				},
 /*				{ // TODO: Soil Loss Model Goes Here as Per Order Tim Would Like!!!
@@ -315,14 +324,21 @@ Ext.define('MyApp.view.Report_Detail', {
 			var totalVal = (val2 - val1);
 			c.getComponent('result_phosphorus_epic').setData(val1, val2, totalVal, base);
 		}	
-
-		if (obj.water_quality) {
+		/*if (obj.water_quality) {
 			var base = obj.water_quality.selection;
 //			var base = obj.water_quality.landscape;
 			var val1 = base.file1.sum / base.file1.count;
 			var val2 = base.file2.sum / base.file2.count;
 			var totalVal = (val2 - val1);
 			c.getComponent('result_water_quality').setData(val1, val2, totalVal, base);
+		}*/
+		if (obj.soil_loss) {
+			var base = obj.soil_loss.selection;
+//			var base = obj.water_quality.landscape;
+			var val1 = base.file1.sum / base.file1.count;
+			var val2 = base.file2.sum / base.file2.count;
+			var totalVal = (val2 - val1);
+			c.getComponent('result_soil_loss').setData(val1, val2, totalVal, base);
 		}	
     	
     	if (obj.ethanol) {

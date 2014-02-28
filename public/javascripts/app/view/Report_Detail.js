@@ -150,7 +150,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_InfoHTML: 'http://www.chjv.org/chjv_forest_bird_hsi_modeling_p.html',
 					DSS_DetailReportContainer: me
 				}]
-			},{
+			}/*,{
 				xtype: 'container',
 				id: 'DSS_heatmap_legend',
 				x: -1,
@@ -161,7 +161,7 @@ Ext.define('MyApp.view.Report_Detail', {
 				layout: {
 					type: 'hbox'
 				}
-			}]
+			}*/]
         });
         
         me.callParent(arguments);

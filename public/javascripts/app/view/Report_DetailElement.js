@@ -21,7 +21,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
 	layout: {
         type: 'absolute'
     },
-
+    
     //--------------------------------------------------------------------------
     initComponent: function() {
         var me = this;
@@ -145,29 +145,9 @@ Ext.define('MyApp.view.Report_DetailElement', {
     //--------------------------------------------------------------------------
 	createHeatmapLegend: function(serverData) {
 		
-		var legendContainer = Ext.getCmp('DSS_heatmap_legend');
+		var legendObject = Ext.getCmp('DSS_heatmap_legend');
 		
-		// suspend layout while we make the changes otherwise EACH minor change
-		//	will cause a layout recalc which slows everything down. Do it all at once!
-		Ext.suspendLayouts();
-		
-		// remove everything and then add all new color/widget elements back...
-		legendContainer.removeAll();
-		
-		for (var idx = 0; idx < serverData.palette.length; idx++) {
-			var obj = {
-				DSS_ElementColor: serverData.palette[idx],
-				DSS_ElementValue: serverData.values[idx],
-			};
-			if (idx == serverData.palette.length - 1) {
-				obj.DSS_ElementValueLast = serverData.values[idx+1];
-			}
-			
-			var element = Ext.create('MyApp.view.Legend_HeatmapColor', obj);
-			legendContainer.add(element);
-		}
-		// Layouts were disabled...must turn them back on!!
-		Ext.resumeLayouts(true);
+		legendObject.setKeys(this.DSS_GraphTitle, serverData);
 	},
 	
     //--------------------------------------------------------------------------

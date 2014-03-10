@@ -17,7 +17,8 @@ Ext.define('MyApp.view.Report_Detail', {
     	'MyApp.view.Report_ValueTypePopup',
 		'MyApp.view.Report_DetailHeader',
 		'MyApp.view.Report_DetailElement',
-		'MyApp.view.Report_GraphPopUp'
+		'MyApp.view.Report_GraphPopUp',
+        'MyApp.view.Report_HeatmapLegendPopUp'
     ],
     
  /*   tools:[{
@@ -159,21 +160,13 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_InfoHTML: 'http://www.chjv.org/chjv_forest_bird_hsi_modeling_p.html',
 					DSS_DetailReportContainer: me
 				}]
-			}/*,{
-				xtype: 'container',
-				id: 'DSS_heatmap_legend',
-				x: -1,
-				y: 310,
-				
-				width: 502,
-				height: 40,
-				layout: {
-					type: 'hbox'
-				}
-			}*/]
+			}]
         });
         
         me.callParent(arguments);
+        
+    	// Create a hidden popup for our legend...
+		Ext.create("MyApp.view.Report_HeatmapLegendPopUp");//.show();
     },
 
     //--------------------------------------------------------------------------
@@ -200,6 +193,23 @@ Ext.define('MyApp.view.Report_Detail', {
 				comp.clearHeatToggle();
 			}
 		}
+	},
+	
+	// TODO: Just trying to cut down on crappy duplicated code...ie, having display strings
+	//	littered everywhere. This idea (of things being config'd in one place) needs
+	//	to go a ton further, really...
+    //--------------------------------------------------------------------------
+	getDisplayLabelForKey: function(keyString) {
+		
+		var c = this.getComponent('results_container');
+		for (var idx = 0; idx < c.items.getCount(); idx++) {
+			var comp = c.items.getAt(idx);
+			if (comp.DSS_FieldString && comp.DSS_FieldString == keyString) {
+				return comp.DSS_GraphTitle;
+			}
+		}
+		
+		return null;
 	},
 	
     //--------------------------------------------------------------------------

@@ -4,9 +4,10 @@ Ext.define('MyApp.view.Legend_HeatmapColorLabel', {
     extend: 'Ext.form.Label',
     alias: 'widget.heatmapcolorlabel',
 
-    width: 80,
+    width: 50,
 	style: {
-		'text-align': 'center'
+		'text-align': 'center',
+		'font-size': '80%'
 	},
 
     //--------------------------------------------------------------------------

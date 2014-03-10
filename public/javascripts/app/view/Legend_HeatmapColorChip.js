@@ -4,8 +4,8 @@ Ext.define('MyApp.view.Legend_HeatmapColorChip', {
     extend: 'Ext.container.Container',
     alias: 'widget.heatmapcolorchip',
 
-    width: 80,
-    height: 24,
+    width: 50,
+    height: 16,
 	
 	//--------------------------------------------------------------------------
     initComponent: function() {

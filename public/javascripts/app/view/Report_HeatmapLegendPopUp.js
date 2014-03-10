@@ -8,8 +8,11 @@ Ext.define('MyApp.view.Report_HeatmapLegendPopUp', {
     	'MyApp.view.Legend_HeatmapColorLabel'
     ],
     
-    height: 75,
-    width: 700,
+    // TODO: FIXME: client body is too small if there's a scroll bar in it...
+    //	Maybe size window based on the client body size needs vs. just blindly setting
+    //	a window height?
+    height: 65,
+    width: 420,
     constrainHeader: true, // keep the header from being dragged out of the app body...otherwise may not be able to close it!
     resizable: false,
     closeAction: 'hide',
@@ -17,7 +20,7 @@ Ext.define('MyApp.view.Report_HeatmapLegendPopUp', {
     	type: 'hbox',
     	pack: 'center'
     },
-	overflowX: 'scroll',
+//	overflowX: 'scroll',
 	hidden: true,
 	DSS_everShown: false,
 
@@ -37,13 +40,13 @@ Ext.define('MyApp.view.Report_HeatmapLegendPopUp', {
 				items: [{
 					id: 'DSS_heatmapLegendColorKey',
 					xtype: 'container',
-					height: 25,
+					height: 16,
 					layout: 'hbox',
 					items: []
 				},{
 					id: 'DSS_heatmapLegendValue',
 					xtype: 'container',
-					height: 20,
+					height: 18,
 					layout: 'hbox',
 					items: []
 				}]

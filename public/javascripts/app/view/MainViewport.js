@@ -591,17 +591,12 @@ Ext.define('MyApp.view.MainViewport', {
 							}
 							panel = Ext.getCmp('DSS_ScenarioSummary');
 							panel.setSize(undefined,250);//doComponentLayout();
-							
 						}
 					}]
 				}],
 				dockedItems: [{
 					xtype: 'logo_panel', // docked top
-				}/*,
-				{
-					xtype: 'infotoolbar' // docked bottom
-					, hidden: true
-				}*/,
+				},
 				{
 					xtype: 'panel',
 					dock: 'left',

@@ -17,7 +17,7 @@ public class Global extends GlobalSettings
 	private static final boolean LOAD_DEFAULT_DATA = true;
 	
 	// FIXME: TODO: this will be annoying...investigate automating the version numbering
-	private static final String mServerVersionMessage = "Server version: 0.51.3";
+	private static final String mServerVersionMessage = "Server version: 0.51.4";
 	
 	//--------------------------------------------------------------------------
 	@Override

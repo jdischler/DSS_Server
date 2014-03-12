@@ -83,7 +83,7 @@ Ext.define('MyApp.view.Report_Detail', {
 				},*/{
 					itemId: 'result_phosphorus_epic',
 					xtype: 'report_detail_item',
-					DSS_FieldString: 'P_Loss_EPIC',
+					DSS_FieldString: 'p_loss_epic',
 					DSS_UnitLabel: 'Kg/Yr',
 					DSS_Label: 'Phosphorus',
 					DSS_GraphTitle: 'Phosphorus Epic',
@@ -326,9 +326,9 @@ Ext.define('MyApp.view.Report_Detail', {
 			var totalVal = (val2 - val1);
 			c.getComponent('result_phosphorus').setData(val1, val2, totalVal, base);
 		}
-		if (obj.P_Loss_EPIC) {
-			var base = obj.P_Loss_EPIC.selection;
-//			var base = obj.P_Loss_EPIC.landscape;
+		if (obj.p_loss_epic) {
+			var base = obj.p_loss_epic.selection;
+//			var base = obj.p_loss_epic.landscape;
 			var val1 = base.file1.sum / base.file1.count;
 			var val2 = base.file2.sum / base.file2.count;
 			var totalVal = (val2 - val1);

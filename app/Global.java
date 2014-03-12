@@ -123,10 +123,10 @@ public class Global extends GlobalSettings
 			layer = new Layer_Float("rainfall_erosivity"); layer.init();
 			layer = new Layer_Float("soil_erodibility"); layer.init();
 			// Epic computed data...
-			layer = new Layer_Float("Alfa_p"); layer.init();
-			layer = new Layer_Float("Corn_p"); layer.init();
-			layer = new Layer_Float("Soy_p"); layer.init();
-			layer = new Layer_Float("Grass_p"); layer.init();
+			layer = new Layer_Float("alfa_p"); layer.init();
+			layer = new Layer_Float("corn_p"); layer.init();
+			layer = new Layer_Float("soy_p"); layer.init();
+			layer = new Layer_Float("grass_p"); layer.init();
 			
 			// NOTE: am putting low-priority (rarely used) data layers here so that
 			//	we can have them skip loading in DEVELOPMENT mode. Ie, faster loads
@@ -155,7 +155,7 @@ public class Global extends GlobalSettings
 				layer = new Layer_Float("default/ethanol"); layer.init();
 				layer = new Layer_Float("default/habitat_index"); layer.init();
 				//layer = new Layer_Float("default/water_quality"); layer.init();
-				layer = new Layer_Float("default/P_Loss_EPIC"); layer.init();
+				layer = new Layer_Float("default/p_loss_epic"); layer.init();
 				layer = new Layer_Float("default/pest"); layer.init();
 				layer = new Layer_Float("default/pollinator"); layer.init();
 				layer = new Layer_Float("default/nitrous_oxide"); layer.init();

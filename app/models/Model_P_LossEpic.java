@@ -20,7 +20,7 @@ import java.nio.channels.*;
 public class Model_P_LossEpic extends Model_Base
 {
 
-	private static final String mPLossModelFile = "P_Loss_EPIC";
+	private static final String mPLossModelFile = "p_loss_epic";
 	// Number of watersheds in study area
 	private static final int mNumWatersheds = 140;
 	
@@ -37,13 +37,13 @@ long timeStart = System.currentTimeMillis();
 		int width = scenario.getWidth(), height = scenario.getHeight();
 		Layer_Integer cdl = (Layer_Integer)Layer_Base.getLayer("cdl_2012");
 		// Alfa
-		float[][] Alfa_p = Layer_Base.getLayer("Alfa_p").getFloatData();
+		float[][] Alfa_p = Layer_Base.getLayer("alfa_p").getFloatData();
 		// Corn
-		float[][] Corn_p = Layer_Base.getLayer("Corn_p").getFloatData();
+		float[][] Corn_p = Layer_Base.getLayer("corn_p").getFloatData();
 		// Soy
-		float[][] Soy_p = Layer_Base.getLayer("Soy_p").getFloatData();
+		float[][] Soy_p = Layer_Base.getLayer("soy_p").getFloatData();
 		// Grass
-		float[][] Grass_p = Layer_Base.getLayer("Grass_p").getFloatData();
+		float[][] Grass_p = Layer_Base.getLayer("grass_p").getFloatData();
 		// Watershed layer
 		int[][] watersheds = Layer_Base.getLayer("watersheds").getIntData();
 		// Distance to river
@@ -186,7 +186,7 @@ Logger.info("  > Allocated memory for P_Loss_EPIC");
 		List<ModelResult> results = new ArrayList<ModelResult>();
 		
 		//results.add(new ModelResult("nitrogen", scenario.mOutputDir, nitrogenData, width, height));
-		results.add(new ModelResult("P_Loss_EPIC", scenario.mOutputDir, PhosphorusData, width, height));
+		results.add(new ModelResult("p_loss_epic", scenario.mOutputDir, PhosphorusData, width, height));
 		
 long timeEnd = System.currentTimeMillis();
 float timeSec = (timeEnd - timeStart) / 1000.0f;

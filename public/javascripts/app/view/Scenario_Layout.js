@@ -396,7 +396,7 @@ Ext.define('MyApp.view.Scenario_Layout', {
 		}
 		
 		// Add the new record and select it in the combo box....
-		DSS_ScenarioComparisonStore.add({'Index': DSS_currentModelRunID, 'ScenarioName': 'Unsaved Scenario Result'});
+		DSS_ScenarioComparisonStore.add({'Index': DSS_currentModelRunID, 'ScenarioName': 'Unstored Scenario Result'});
 		DSS_ScenarioComparisonStore.commitChanges(); // FIXME: this necessary?
 		Ext.getCmp('DSS_ScenarioCompareCombo_2').setValue(DSS_currentModelRunID);
 
@@ -483,9 +483,12 @@ Ext.define('MyApp.view.Scenario_Layout', {
 						  'soil_loss', /*'water_quality',*/ 'epic_phosphorus'];
 		
 		var requestCount = modelTypes.length;
+		var successCount = 0;
 		
 		Ext.getCmp('DSS_ReportDetail').setWaitFields();
 		Ext.getCmp('DSS_SpiderGraphPanel').clearSpiderData(0);// set all fields to zero
+		// Disable the save button until all models complete...
+		Ext.getCmp('DSS_ScenarioSaveButton').setDisabled(true);
 
 		for (var i = 0; i < modelTypes.length; i++) {
 			var request = queryJson;
@@ -512,15 +515,21 @@ Ext.define('MyApp.view.Scenario_Layout', {
 						reportPanel.expand();
 					}
 					requestCount--;
-					if (requestCount <=0 ) {
+					successCount++;
+					if (requestCount <= 0) {
 						button.setIcon('app/images/go_icon.png');
 						button.setDisabled(false);
+						
+						// Only enable save button if all models succeed?
+						if (successCount >= modelTypes.length) {
+							Ext.getCmp('DSS_ScenarioSaveButton').setDisabled(false);
+						}
 					}
 				},
 				
 				failure: function(respose, opts) {
 					requestCount--;
-					if (requestCount <=0 ) {
+					if (requestCount <=0) {
 						button.setIcon('app/images/go_icon.png');
 						button.setDisabled(false);
 					}

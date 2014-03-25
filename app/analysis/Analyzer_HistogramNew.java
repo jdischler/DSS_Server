@@ -227,6 +227,9 @@ public class Analyzer_HistogramNew
 			fileReader.close();
 			findRange(width, height, rasterData, selectionForFile);
 		}
+		else {
+			Logger.info("read failed!! <" + file.toString() + ">");
+		}
 	}
 	
 	// Finds the min/max (range of values) for the selected pixels in rasterData AND

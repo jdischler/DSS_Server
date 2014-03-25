@@ -8,10 +8,10 @@ Ext.define('MyApp.view.Report_GenerateReport', {
 
     height: 64,
     width: 300,
-    title: 'Save/Print Results',
+    title: 'Store/Print Results',
 	icon: 'app/images/new_icon.png',
 	collapsed: true,
-	 
+	
     layout: 'absolute',
     
     //--------------------------------------------------------------------------
@@ -21,14 +21,18 @@ Ext.define('MyApp.view.Report_GenerateReport', {
         Ext.applyIf(me, {
 			items: [{
 				xtype: 'button',
+				id: 'DSS_ScenarioSaveButton',
 				disabled: true,
-				text: 'Save Results',
+				text: 'Store Results',
 				icon: 'app/images/save_small_icon.png',
+				tooltip: {
+					text: 'Store these results so they can be compared with your other scenarios'
+				},
 				x: 100,
 				y: 6,
 				height: 24,
-				handler: function() {
-					me.askSaveResults();
+				handler: function(btn) {
+					me.askSaveResults(btn);
 				}
 			},{
 				xtype: 'button',
@@ -45,11 +49,11 @@ Ext.define('MyApp.view.Report_GenerateReport', {
     },
 
     //--------------------------------------------------------------------------
-    askSaveResults: function() {
+    askSaveResults: function(save_button) {
     	
     	var me = this;
-    	Ext.Msg.prompt('Save As:', 'Please name this scenario:', function(btn, text) {
-			if (btn == 'ok') {
+    	Ext.Msg.prompt('Store As:', 'Please name this scenario:', function(msg_btn, text) {
+			if (msg_btn == 'ok') {
 				//me.saveScenarioResults(text);
 				var res = Ext.util.Cookies.get('DSS_nextSaveID');
 				res++;
@@ -72,6 +76,9 @@ Ext.define('MyApp.view.Report_GenerateReport', {
 				DSS_currentModelRunID = res;
 				
 				Ext.getCmp('DSS_ScenarioComparisonTool').show();
+				
+				// Disable button again until model run is pressed...
+				save_button.setDisabled(true);
 			}
     	});
     }/*,

@@ -12,7 +12,6 @@ POST	/getClientID			controllers.Application.getClientID()
 POST	/createScenario			controllers.Application.setUpScenario()
 POST	/modelCluster			controllers.Application.runModelCluster()
 POST	/getHeatmap				controllers.Application.getHeatmap()
-# POST	/saveScenario			controllers.Application.saveScenario()
 POST	/initComparison			controllers.Application.initComparison()
 POST	/runComparison			controllers.Application.runComparison()
 

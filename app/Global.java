@@ -127,6 +127,9 @@ public class Global extends GlobalSettings
 			layer = new Layer_Float("corn_p"); layer.init();
 			layer = new Layer_Float("soy_p"); layer.init();
 			layer = new Layer_Float("grass_p"); layer.init();
+			// Public Land and Dairy
+			layer = new Layer_Float("dairy"); layer.init();
+			layer = new Layer_Float("public_land"); layer.init();
 			
 			// NOTE: am putting low-priority (rarely used) data layers here so that
 			//	we can have them skip loading in DEVELOPMENT mode. Ie, faster loads

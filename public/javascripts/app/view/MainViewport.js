@@ -415,6 +415,34 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 
+		var lpPublicLand = Ext.create('MyApp.view.LayerPanel_Continuous', {
+			title: 'Distanace to Public Land',
+			DSS_ShortTitle: 'Public Land',
+			DSS_AutoSwapTitles: false,
+			DSS_Layer: wmsRivers,//fix
+			DSS_LayerUnit: 'm',// fix to mile
+			DSS_LayerRangeMin: 0,
+			DSS_LayerRangeMax: 14500,
+			DSS_ValueDefaultLess: 1000,
+			DSS_ValueStep: 100,
+			DSS_QueryTable: 'public_land',
+			collapsed: true
+		});
+		
+		var lpDairy = Ext.create('MyApp.view.LayerPanel_Continuous', {
+			title: 'Density of Dairy',
+			DSS_ShortTitle: 'Dairy',
+			DSS_AutoSwapTitles: false,
+			DSS_Layer: wmsRivers,//fix
+			DSS_LayerUnit: '',
+			DSS_LayerRangeMin: 0,
+			DSS_LayerRangeMax: 8,
+			DSS_ValueDefaultGreater: 4,
+			DSS_ValueStep: 1,
+			DSS_QueryTable: 'dairy',
+			collapsed: true
+		});
+				
 /*		var lpRoad = Ext.create('MyApp.view.LayerPanel_Continuous', {
 			title: 'Distance to Road',
 			DSS_ShortTitle: 'Road',
@@ -454,6 +482,8 @@ Ext.define('MyApp.view.MainViewport', {
 		Ext.suspendLayouts();
 		var dssLeftPanel = Ext.getCmp('DSS_LeftPanel');
 //		dssLeftPanel.insert(0,lpSOC);
+		dssLeftPanel.insert(0,lpDairy);
+		dssLeftPanel.insert(0,lpPublicLand);
 		dssLeftPanel.insert(0,lpLCS);
 		dssLeftPanel.insert(0,lpLCC);
 		dssLeftPanel.insert(0,lpSlope);
@@ -473,6 +503,8 @@ Ext.define('MyApp.view.MainViewport', {
 //		DSS_globalQueryableLayers.push(lpRoad);
 		DSS_globalQueryableLayers.push(lpRiver);
 //		DSS_globalQueryableLayers.push(lpSOC);
+		DSS_globalQueryableLayers.push(lpPublicLand);
+		DSS_globalQueryableLayers.push(lpDairy);
 		
 		DSS_globalCollapsibleLayers.push(lpGoog);
 //		DSS_globalCollapsibleLayers.push(lpSOC);
@@ -483,6 +515,8 @@ Ext.define('MyApp.view.MainViewport', {
 //		DSS_globalCollapsibleLayers.push(lpRoad);
 		DSS_globalCollapsibleLayers.push(lpRiver);
 		DSS_globalCollapsibleLayers.push(lpCDL);
+		DSS_globalCollapsibleLayers.push(lpPublicLand);
+		DSS_globalCollapsibleLayers.push(lpDairy);
 		
 		this.addFeatureClickControl(map);
 	},

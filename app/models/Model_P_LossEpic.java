@@ -36,20 +36,20 @@ long timeStart = System.currentTimeMillis();
 		int[][] rotationData = scenario.mNewRotation;
 		int width = scenario.getWidth(), height = scenario.getHeight();
 		Layer_Integer cdl = (Layer_Integer)Layer_Base.getLayer("cdl_2012");
-		// Alfa
+		// Alfa in kg per ha per year
 		float[][] Alfa_p = Layer_Base.getLayer("alfa_p").getFloatData();
-		// Corn
+		// Corn in kg per ha per year
 		float[][] Corn_p = Layer_Base.getLayer("corn_p").getFloatData();
-		// Soy
+		// Soy in kg per ha per year
 		float[][] Soy_p = Layer_Base.getLayer("soy_p").getFloatData();
-		// Grass
+		// Grass in kg per ha per year
 		float[][] Grass_p = Layer_Base.getLayer("grass_p").getFloatData();
 		// Watershed layer
-		int[][] watersheds = Layer_Base.getLayer("watersheds").getIntData();
+		//int[][] watersheds = Layer_Base.getLayer("watersheds").getIntData();
 		// Distance to river
 		float[][] Rivers = Layer_Base.getLayer("rivers").getFloatData();
 		// Id for tracking watershed
-		int watershedIdx = 0;
+		//int watershedIdx = 0;
 		
 		// Mask
 		// Grass
@@ -60,11 +60,13 @@ long timeStart = System.currentTimeMillis();
 		int Corn_Mask = cdl.convertStringsToMask("corn");
 		// Soy
 		int Soy_Mask = cdl.convertStringsToMask("soy");
+		// Total Mask
+		int TotalMask = GrassMask | Corn_Mask | Soy_Mask | Alfalfa_Mask;
 		
 		// Arrays to sum phosphorus within each watershed
-		int[] CountCellsInWatershed = new int[mNumWatersheds];
+		//int[] CountCellsInWatershed = new int[mNumWatersheds];
 		// Arrays to save phosphorus at watershed scale
-		float[] Phosphorus = new float[mNumWatersheds];
+		//float[] Phosphorus = new float[mNumWatersheds];
 		// Arrays to save phosphorus at cell base
 		float[][] PhosphorusData = new float[height][width];
 		

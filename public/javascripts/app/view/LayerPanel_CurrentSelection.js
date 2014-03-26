@@ -13,7 +13,7 @@ Ext.define('MyApp.view.LayerPanel_CurrentSelection', {
     layout: 'absolute',
     // Print text standardizing
     DSS_areaText: 'Area Selected: ',
-    DSS_areaUnits: ' km\xb2',
+    DSS_areaUnits: ' m\xb2',
     DSS_percText: '% of study area: ',
     
     //--------------------------------------------------------------------------
@@ -131,7 +131,11 @@ Ext.define('MyApp.view.LayerPanel_CurrentSelection', {
 		
 		// 1 pixel is 30x30 meters...then convert to km sqr
 		var area = (pixelCount * 30.0 * 30.0) / 1000000.0;
-		area = area.toFixed(1);
+
+		// Convert km2 to m2
+		area = area * 0.38610;
+		area = area.toFixed(2);
+		
 		
 		// Units should be the same (pixels), so can just divide vs. total to get %?
 		var totalAreaPerc = (pixelCount / totalPixels) * 100.0;

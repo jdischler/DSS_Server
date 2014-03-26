@@ -61,7 +61,7 @@ long timeStart = System.currentTimeMillis();
 		// Soy
 		int Soy_Mask = cdl.convertStringsToMask("soy");
 		// Total Mask
-		int TotalMask = GrassMask | Corn_Mask | Soy_Mask | Alfalfa_Mask;
+		int TotalMask = Grass_Mask | Corn_Mask | Soy_Mask | Alfalfa_Mask;
 		
 		// Arrays to sum phosphorus within each watershed
 		//int[] CountCellsInWatershed = new int[mNumWatersheds];
@@ -84,13 +84,13 @@ Logger.info("  > Allocated memory for P_Loss_EPIC");
 		{
 			for (int x = 0; x < width; x++) 
 			{
-				if (rotationData[y][x] > 0)
+				if ((rotationData[y][x] & TotalMask) > 0)
 				{
 					// Kg per Ha
 					// Grass
 					if ((rotationData[y][x] & Grass_Mask) > 0) 
 					{
-						if (Grass_p[y][x] > -9999)
+						if (Grass_p[y][x] > -9999.0f)
 						{
 							Transmission = 0.20f;
 							PhosphorusData[y][x] = Grass_p[y][x];
@@ -103,7 +103,7 @@ Logger.info("  > Allocated memory for P_Loss_EPIC");
 					// Corn
 					else if ((rotationData[y][x] & Corn_Mask) > 0) 
 					{
-						if(Corn_p[y][x] > -9999)
+						if(Corn_p[y][x] > -9999.0f)
 						{
 							Transmission = 0.80f;
 							PhosphorusData[y][x] = Corn_p[y][x];
@@ -116,7 +116,7 @@ Logger.info("  > Allocated memory for P_Loss_EPIC");
 					// Soy
 					else if ((rotationData[y][x] & Soy_Mask) > 0) 
 					{
-						if(Soy_p[y][x] > -9999)
+						if(Soy_p[y][x] > -9999.0f)
 						{
 							Transmission = 0.80f;
 							PhosphorusData[y][x] = Soy_p[y][x];
@@ -129,7 +129,7 @@ Logger.info("  > Allocated memory for P_Loss_EPIC");
 					// Alfalfa
 					else if ((rotationData[y][x] & Alfalfa_Mask) > 0) 
 					{
-						if (Alfa_p[y][x] > -9999)
+						if (Alfa_p[y][x] > -9999.0f)
 						{
 							Transmission = 0.30f;
 							PhosphorusData[y][x] = Alfa_p[y][x];
@@ -149,14 +149,14 @@ Logger.info("  > Allocated memory for P_Loss_EPIC");
 					PhosphorusData[y][x] = PhosphorusData[y][x] * 900 * 0.0001f * (float)(Math.pow(Transmission, Dist));
 					
 					// 2st step. Add the calculated cells within a watershed
-					watershedIdx = watersheds[y][x];
+					//watershedIdx = watersheds[y][x];
 					
-					if (watershedIdx >= 0) 
-					{
+					//if (watershedIdx >= 0) 
+					//{
 						// watershed index zero is reserved for no-data
-						CountCellsInWatershed[watershedIdx]++;
-						Phosphorus[watershedIdx] = Phosphorus[watershedIdx] + PhosphorusData[y][x];
-					}
+					//	CountCellsInWatershed[watershedIdx]++;
+					//	Phosphorus[watershedIdx] = Phosphorus[watershedIdx] + PhosphorusData[y][x];
+					//}
 				}
 				else 
 				{
@@ -168,22 +168,22 @@ Logger.info("  > Allocated memory for P_Loss_EPIC");
 		
 		// 3rd step...fill in a full-sized raster with those values so they can be used
 		//	to compute heatmaps or be analyzed with the standard code-paths...
-		for (int y = 0; y < height; y++) 
-		{
-			for (int x = 0; x < width; x++) 
-			{
-				watershedIdx = watersheds[y][x];
+		//for (int y = 0; y < height; y++) 
+		//{
+		//	for (int x = 0; x < width; x++) 
+		//	{
+		//		watershedIdx = watersheds[y][x];
 				
-				if (watershedIdx >= 0) 
-				{
-					PhosphorusData[y][x] = Phosphorus[watershedIdx];
-				}
-				else 
-				{
-					PhosphorusData[y][x] = -9999.0f;
-				}
-			}
-		}
+		//		if (watershedIdx >= 0) 
+		//		{
+		//			PhosphorusData[y][x] = Phosphorus[watershedIdx];
+		//		}
+		//		else 
+		//		{
+		//			PhosphorusData[y][x] = -9999.0f;
+		//		}
+		//	}
+		//}
 		
 		List<ModelResult> results = new ArrayList<ModelResult>();
 		

@@ -20,8 +20,6 @@ import com.fasterxml.jackson.databind.node.*;
 import org.apache.commons.io.FileUtils; 
 import org.apache.commons.io.filefilter.*; 
 
-//import org.codehaus.jackson.*;
-//import org.codehaus.jackson.node.*;
 import javax.xml.bind.DatatypeConverter;
 
 //------------------------------------------------------------------------------
@@ -329,66 +327,6 @@ public class Application extends Controller
 		return ok(sendBack);
 	}
 	
-	// TODO: safety fallbacks (ie, restore files to original dir) if moves or whatnots fail?
-/*	//----------------------------------------------------------------------
-	public static Result saveScenario() throws Exception
-	{
-		Logger.info("----- Save Scenario Request ----");
-
-		JsonNode request = request().body().asJson();
-		
-		String clientID = request.get("clientID").textValue();
-	
-		Logger.info("Information from client: " + clientID);		
-		String baseFolder = "client_" + clientID;
-		String srcPath = "./layerData/" + baseFolder;
-
-		// find highest currently used slot number, default to zero so an increment later will start
-		//	us at slot 1;
-		File srcDir = new File(srcPath);
-		String[] subDirList = srcDir.list(DirectoryFileFilter.DIRECTORY);
-		int slot = 0;
-		int lowestSlot = Integer.MAX_VALUE;
-		
-		for (int i = 0; i < subDirList.length; i++) {
-			int res = Integer.parseInt(subDirList[i]);
-			if (res > slot) {
-				slot = res;
-			}
-			if (res < lowestSlot) {
-				lowestSlot = res;
-			}
-		}
-		
-		slot++;
-
-		ObjectNode sendBack = JsonNodeFactory.instance.objectNode();
-	
-		// Move the files to the new slot...if they exist...
-		// FIXME: probably shouldn't be able to even push the save button if these files don't exist?
-		Collection<File> files = FileUtils.listFiles(srcDir, null, false);
-		
-		if (files.size() > 0) {
-			String destPath = "./layerData/" + baseFolder + "/" + Integer.toString(slot);
-			for (File aFile : FileUtils.listFiles(srcDir, null, false)) {
-					FileUtils.moveFileToDirectory(aFile, new File(destPath), true);
-			}
-
-			sendBack.put("saveSlot", slot);
-		}
-
-		// Oldest directory (lowest slot...which we'll delete if we have more than 10 slots active)
-		if (subDirList.length >= 10) {		
-			String deletePath = "./layerData/" + baseFolder + "/" + Integer.toString(lowestSlot);
-			FileUtils.deleteDirectory(new File(deletePath));
-			
-			sendBack.put("removedSlot", lowestSlot);
-		}
-
-		return ok(sendBack);
-	}
-*/
- // NEW STUFFS -----------------------------------------------------------------
  
 	//----------------------------------------------------------------------
 	public static Result runModelCluster() throws Exception 
@@ -512,6 +450,8 @@ public class Application extends Controller
 		return ok(sendBack);
 	}
  
+	// TODO: validate that Compare1ID and compare2ID are not the same?
+	//	The client could also validate this but probably smart to make the server also check here...
 	//----------------------------------------------------------------------
 	public static Result initComparison() throws Exception {
 		
@@ -602,121 +542,37 @@ public class Application extends Controller
 	//----------------------------------------------------------------------
 	public static Result runComparison() throws Exception {
 		
-		return ok();
-	}
-}
-
-/*
-//------------------
-	// TODO: set up the analysis tools
-	//----------------------------------------------------------------------
-	public static Result runAnalysisCluster() throws Exception 
-	{
 		Logger.info("----- Custom Comparison Analysis Cluster Process Started ----");
 
 		JsonNode request = request().body().asJson();
 		
-		String compareID = request.get("customComparisonID").textValue()
+		String compareID = request.get("customCompareID").textValue();
 		CustomComparison comparison = CustomComparison.getCachedComparison(compareID);
 		
 		if (comparison == null) {
 			return badRequest(); // TODO: return error if needed...
 		}
 		
-		String modelType = request.get("modelType").textValue();
-		List<ModelResult> results = null;
-		
-		if (modelType.equals("yield")) {
-			Model_EthanolNetEnergyInTcome ethanolEnergyIncome = new Model_EthanolNetEnergyIncome();
-			results = ethanolEnergyIncome.run(scenario);
-		}
-		else if (modelType.equals("n_p")) {
-			Model_NitrogenPhosphorus np = new Model_NitrogenPhosphorus();
-			results = np.run(scenario);
-		}
-		else if (modelType.equals("soc")) {
-			Model_SoilCarbon soc = new Model_SoilCarbon();
-			results = soc.run(scenario);
-		}
-		else if (modelType.equals("pest_pol")) {
-			Model_PollinatorPestSuppression pp = new Model_PollinatorPestSuppression();
-			results = pp.run(scenario);
-		}
-		else if (modelType.equals("nitrous")) {
-			Model_NitrousOxideEmissions n20 = new Model_NitrousOxideEmissions();
-			results = n20.run(scenario);
-		}
-		else if (modelType.equals("water_quality")) {
-			Model_Water_Quality wq = new Model_Water_Quality();
-			results = wq.run(scenario);
-		}
-		else {//(modelType.equals("habitat_index")) {
-			Model_HabitatIndex hi = new Model_HabitatIndex();
-			results = hi.run(scenario);
-		}
-		
+		String file = request.get("file").textValue();
+
 		// SendBack to Client
 		ObjectNode sendBack  = JsonNodeFactory.instance.objectNode();
 		
-		if (results != null) {
-			Analyzer_HistogramNew histogram = new Analyzer_HistogramNew();
-			
-			// Try to do an in-memory compare of (usually) default...
-			//	if layer is not in memory, try doing a file-based compare
-			for (int i = 0; i < results.size(); i++) {
-				
-				ModelResult res = results.get(i);
-				Logger.info("Procesing results for " + res.mName);
-				
-				String clientID = request.get("clientID").textValue();
-				String clientFolder = "client_" + clientID + "/";
-				int compare1ID = request.get("compare1ID").asInt(); // -1 is default
-				String runFolder = Integer.toString(compare1ID) + "/";
-			
-				String path1 = "";
-				// Asking to compare against DEFAULT?
-				if (compare1ID == -1) {
-					// YES, but SOC is not actually in DEFAULT so redirect to its real location
-					if (res.mName.equals("soc")) {
-						path1 = "soc";
-					}
-					else {
-						// YES, so set up the path to the default folder
-						path1 = "default/" + res.mName;
-					}
-					
-					// See if the layer is in memory (it usually will be unless the server was started
-					//	with the DEFAULTS NOT loaded...)
-					layer = Layer_Base.getLayer(path1);
-					if (layer != null) {
-						// other layer is in memory so compare with that.
-						float[][] data1 = layer.getFloatData();
-						if (data1 == null) {
-							Logger.info("could not get layer in runModelCluster");
-						}
-						else {
-							sendBack.put(res.mName, 
-								histogram.run(res.mWidth, res.mHeight, data1, scenario.mSelection,
-												res.mRasterData, scenario.mSelection));
-						}
-						continue; // process next result...
-					}
-				}
-				else {
-					path1 = clientFolder + runFolder + res.mName;
-				}
-				
-				// Compare to file was not in memory, set up the real path and we'll try to load it for
-				//	comparison (which is slower...booo)
-				path1 = "./layerData/" + path1 + ".dss";
-				sendBack.put(res.mName, 
-						histogram.run(new File(path1), scenario.mSelection,
-										res.mWidth, res.mHeight, res.mRasterData, scenario.mSelection));
-			}
-		}
+		Analyzer_HistogramNew histogram = new Analyzer_HistogramNew();
+
+		// TODO: FIXME: this isn't going to properly handle the SOC layer?
+		File file1 = new File(comparison.mBasePath1 + "/" + file + ".dss");
+		File file2 = new File(comparison.mBasePath2 + "/" + file + ".dss");
+		
+		Logger.info("Basepath1: " + file1.toString());
+		Logger.info("Basepath2: " + file2.toString());
+
+		sendBack.put(file, 
+				histogram.run(file1, comparison.mSelection1, 
+								file2, comparison.mSelection2));
 
 		Logger.info(sendBack.toString());
 		return ok(sendBack);
 	}
-*/
+}
 

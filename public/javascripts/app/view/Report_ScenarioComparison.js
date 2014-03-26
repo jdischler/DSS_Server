@@ -37,8 +37,6 @@ Ext.define('MyApp.view.Report_ScenarioComparison', {
     extend: 'Ext.container.Container',
     alias: 'widget.scenariocompare',
 
-    id: 'DSS_ScenarioComparisonTool',
-    
    	requires: [
     	'MyApp.view.Report_ComparisonTypePopup',
    	],
@@ -52,7 +50,6 @@ Ext.define('MyApp.view.Report_ScenarioComparison', {
     bodyStyle: {
     	'background-color': '#f4f8ff'
     },
-    hidden: true, // FIXME: finish so we can show this when needed...
    
     //--------------------------------------------------------------------------
     initComponent: function() {
@@ -63,6 +60,8 @@ Ext.define('MyApp.view.Report_ScenarioComparison', {
             	xtype: 'report_comparison_popup'
             },{
             	xtype: 'container',
+            	id: 'DSS_ScenarioComparisonTool',
+            	hidden: true, // hidden until a result has been saved!
             	layout: 'absolute',
             	height: 34,
             	items: [{
@@ -120,13 +119,137 @@ Ext.define('MyApp.view.Report_ScenarioComparison', {
 					width: 30,
 					text: 'Go',
 					handler: function() {
+						me.initComparison();
 					}
 				}]
 			}]
         });
 
         me.callParent(arguments);
-    }
+    },
+    
+    //--------------------------------------------------------------------------
+    initComparison: function() {
+    	
+		var self = this;
+		var combo1 = Ext.getCmp('DSS_ScenarioCompareCombo_1');
+		var combo2 = Ext.getCmp('DSS_ScenarioCompareCombo_2');
+		var requestData = {
+			clientID: 1234, //temp
+			compare1ID: combo1.getValue(),//-1, // default
+			compare2ID: combo2.getValue()
+		};
+		
+		var clientID_cookie = Ext.util.Cookies.get('DSS_clientID');
+		if (clientID_cookie) {
+			requestData.clientID = clientID_cookie;
+		}
+		else {
+			requestData.clientID = 'BadID';
+			console.log('WARNING: no client id cookie was found...');
+		}
+		
+		var button = Ext.getCmp('DSS_runModelButton');
+		button.setIcon('app/images/spinner_16a.gif');
+		button.setDisabled(true);
+		
+		var obj = Ext.Ajax.request({
+			url: location.href + 'initComparison',
+			jsonData: requestData,
+			timeout: 10 * 60 * 1000, // minutes * seconds * (i.e. converted to) milliseconds
+			
+			success: function(response, opts) {
+				
+				try {
+					var obj= JSON.parse(response.responseText);
+					console.log("success: ");
+					console.log(obj);
+					var newRequest = requestData;
+					newRequest.customCompareID = obj.customCompareID;
+					self.submitComparisons(newRequest);
+				}
+				catch(err) {
+					console.log(err);
+				}
+			},
+			
+			failure: function(respose, opts) {
+				button.setIcon('app/images/go_icon.png');
+				button.setDisabled(false);
+				alert("Model run failed, request timed out?");
+			}
+		});
+	},
+	
+	//--------------------------------------------------------------------------
+	submitComparisons: function(newRequest) {
+	 
+		var button = Ext.getCmp('DSS_runModelButton');
+		
+		// NOTE: these strings MUST be synchronized with the server, or else the server will
+		//	not know which files to compare. 
+		// More specifically, these are the FILE names that the model process would be writing out
+		var files = ['net_income','ethanol','net_energy','p_loss_epic','soil_loss',
+						'soc','nitrous_oxide','pollinator','pest','habitat_index'];
+		
+		var requestCount = files.length;
+		var successCount = 0;
+		
+		Ext.getCmp('DSS_ReportDetail').setWaitFields();
+		Ext.getCmp('DSS_SpiderGraphPanel').clearSpiderData(0);// set all fields to zero
+		// Disable the save button until all models complete...
+		Ext.getCmp('DSS_ScenarioSaveButton').setDisabled(true);
 
+		for (var i = 0; i < files.length; i++) {
+			var request = newRequest;
+			request.file = files[i];
+			
+			var obj = Ext.Ajax.request({
+				url: location.href + 'runComparison',
+				jsonData: request,
+				timeout: 10 * 60 * 1000, // minutes * seconds * (i.e. converted to) milliseconds
+				
+				success: function(response, opts) {
+					
+					try {
+						var obj= JSON.parse(response.responseText);
+						console.log("success: ");
+						console.log(obj);
+						Ext.getCmp('DSS_ReportDetail').setData(obj);
+					}
+					catch(err) {
+						console.log(err);
+					}
+					// NOTE: most likely is going to be expaned already since this is where the
+					//	GO button is?
+					var reportPanel = Ext.getCmp('DSS_report_panel');
+					if (reportPanel.getCollapsed() != false) {
+						reportPanel.expand();
+					}
+					requestCount--;
+					successCount++;
+					if (requestCount <= 0) {
+						button.setIcon('app/images/go_icon.png');
+						button.setDisabled(false);
+						
+						// Only enable save button if all models succeed?
+						if (successCount >= files.length) {
+							Ext.getCmp('DSS_ScenarioSaveButton').setDisabled(false);
+						}
+					}
+				},
+				
+				failure: function(respose, opts) {
+					requestCount--;
+					if (requestCount <=0) {
+						button.setIcon('app/images/go_icon.png');
+						button.setDisabled(false);
+					}
+					alert("Comparison failed, request timed out?");
+				}
+			});
+		}
+	}
+	
 });
 

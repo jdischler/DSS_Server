@@ -47,6 +47,16 @@ public class Png {
 			mImageInfo = new ImageInfo(width, height, bitDepth, true);
 		}
 		
+		File dir = new File(outputFile).getParentFile();
+		if (!dir.exists()) {
+			Logger.info(" -- This directory does not exist: " + dir.toString());
+			Logger.info(" --  Attempting directory creation....");
+			dir.mkdirs();
+			if (!dir.exists()) {
+				Logger.info(" -- Critical failure!...the directory was not created!");
+			}
+		}
+		
 		OutputStream outputStream = null;
 		try {
 			outputStream = new FileOutputStream(outputFile);

@@ -1,8 +1,8 @@
 
 //------------------------------------------------------------------------------
-Ext.define('MyApp.view.Report_SpiderHeader', {
+Ext.define('MyApp.view.Report_ComparisonTypePopup.js', {
     extend: 'Ext.container.Container',
-    alias: 'widget.report_spider_header',
+    alias: 'widget.report_comparison_popup',
 
     width: 500,
 	layout: 'vbox',
@@ -18,125 +18,132 @@ Ext.define('MyApp.view.Report_SpiderHeader', {
         Ext.applyIf(me, {
             items: [{
             	xtype: 'container',
-            	id: 'DSS_spiderHeaderDisplay',
+            	id: 'DSS_comparisonHeaderDisplay',
             	layout: 'absolute',
             	height: 24,
             	items: [{
 					xtype: 'label',
-					x: 60,
+					x: 30,
 					y: 4,
 					labelAlign: 'right',
 					style: 'color:#777;',
-					text: 'Value Type:',
-					width: 65
+					text: 'Comparison Type:',
+					width: 105
             	},{
 					xtype: 'label',
-					id: 'DSS_spiderValueTypeDisplay',
-					disabledCls: 'dss-disabled-label',
-					x: 130,
+					id: 'DSS_comparisonTypeDisplay',
+					x: 131,
 					y: 4,
-					text: 'Normalized'
+					text: 'Selected Cells',
+					width: 100
 				},{
 					xtype: 'label',
-					x: 260,
+					x: 270,
 					y: 4,
 					labelAlign: 'right',
 					style: 'color:#777;',
-					text: 'Graph:',
-					width: 30
+					text: 'Normalize By:',
+					width: 80
             	},{
 					xtype: 'label',
-					id: 'DSS_spiderGraphType',
-					x: 305,
+					id: 'DSS_normalizeTypeDisplay',
+					x: 348,
 					y: 4,
-					text: 'Detail'
+					text: 'None'
             	},{
             		xtype: 'tool',
             		x: 460,
             		y: 4,
             		type: 'down',
- 					tooltip: {
-						text: 'Show/Hide display options for this report section.'
-					},
-					handler: function() {
+            		handler: function() {
             			Ext.suspendLayouts();
-            			Ext.getCmp('DSS_spiderHeaderDisplay').hide();
-            			Ext.getCmp('DSS_spiderHeaderChange').show();
+            			Ext.getCmp('DSS_comparisonHeaderDisplay').hide();
+            			Ext.getCmp('DSS_comparisonHeaderChange').show();
             			Ext.resumeLayouts(true);
             		}
             	}]
             },
             {
 				xtype: 'container',
-            	id: 'DSS_spiderHeaderChange',
+            	id: 'DSS_comparisonHeaderChange',
 				layout: 'absolute',
-				height: 50,
+				height: 70,
 				hidden: true,
 				items: [{
 					xtype: 'radiogroup',
-					disabled: true,
-					x: 60,
+					id: 'DSS_ComparisonStyleRadioGroup',
+					x: 30,
 					y: 0,
-					fieldLabel: 'Value Type',
-					labelWidth: 62,
+					fieldLabel: 'Comparison Type',
+					labelWidth: 98,
 					labelAlign: 'right',
-					width: 200,
+					width: 220,
 					vertical: true,
 					columns: 1,
 					labelPad: 5,
 					labelAlign: 'left',
 					labelStyle: 'color:#777;',
 					items: [{
-						boxLabel: 'Normalized',
-						name: 'graphValue',
+						boxLabel: 'Selected Cells',
+						name: 'compareStyle',
 						checked: true,
 						padding: '0 0 -5 0',
 						handler: function(radio, checked) {
 							if (checked) {
-							//	Ext.getCmp('DSS_ReportDetail').setValueStyle('absolute');
-								Ext.getCmp('DSS_spiderValueTypeDisplay').setText('Normalized');
+								Ext.getCmp('DSS_ReportDetail').setValueStyle('absolute');
+								Ext.getCmp('DSS_comparisonTypeDisplay').setText('Selected Cells');
 							}
 						}
 					},{
-						boxLabel: 'Absolute',
-						name: 'graphValue',
+						boxLabel: 'All Cells',
+						name: 'compareStyle',
 						padding: '0 0 -5 0',
 						handler: function(radio, checked) {
 							if (checked) {
-							//	Ext.getCmp('DSS_ReportDetail').setValueStyle('%');
-								Ext.getCmp('DSS_spiderValueTypeDisplay').setText('Absolute');
+								Ext.getCmp('DSS_ReportDetail').setValueStyle('%');
+								Ext.getCmp('DSS_comparisonTypeDisplay').setText('All Cells');
 							}
 						}
 					}]
 				},{
 					xtype: 'radiogroup',
-					x: 260,
+					x: 270,
 					y: 0,
-					fieldLabel: 'Graph',
-					labelWidth: 40,
+					fieldLabel: 'Normalize By',
+					labelWidth: 75,
 					width: 190,
 					vertical: true,
 					columns: 1,
 					labelStyle: 'color:#777;',
 					items: [{
-						boxLabel: 'Detail',
-						name: 'graphStyle',
+						boxLabel: 'None',
+						name: 'normalizeStyle',
 						checked: true,
 						padding: '0 0 -5 0',
 						handler: function(radio, checked) {
 							if (checked) {
-								Ext.getCmp('DSS_SpiderGraphPanel').setSpiderDetailType('detail');
-								Ext.getCmp('DSS_spiderGraphType').setText('Detail');
+								Ext.getCmp('DSS_ReportDetail').setDataStyle('delta');
+								Ext.getCmp('DSS_normalizeTypeDisplay').setText('None');
 							}
 						}
 					},{
-						boxLabel: 'Simplified',
-						name: 'graphStyle',
+						boxLabel: 'Area',
+						name: 'normalizeStyle',
 						padding: '0 0 -5 0',
 						handler: function(radio, checked) {
 							if (checked) {
-								Ext.getCmp('DSS_SpiderGraphPanel').setSpiderDetailType('combined');
-								Ext.getCmp('DSS_spiderGraphType').setText('Simplified');
+								Ext.getCmp('DSS_ReportDetail').setDataStyle('file1');
+								Ext.getCmp('DSS_normalizeTypeDisplay').setText('Area');
+							}
+						}
+					},{
+						boxLabel: '&#916; Income',
+						name: 'normalizeStyle',
+						padding: '0 0 -5 0',
+						handler: function(radio, checked) {
+							if (checked) {
+								Ext.getCmp('DSS_ReportDetail').setDataStyle('file2');
+								Ext.getCmp('DSS_dataTypeDisplay').setText('&#916; Income');
 							}
 						}
 					}]
@@ -145,13 +152,10 @@ Ext.define('MyApp.view.Report_SpiderHeader', {
             		x: 460,
             		y: 4,
             		type: 'up',
-					tooltip: {
-						text: 'Show/Hide display options for this report section.'
-					},
             		handler: function() {
             			Ext.suspendLayouts();
-            			Ext.getCmp('DSS_spiderHeaderChange').hide();
-            			Ext.getCmp('DSS_spiderHeaderDisplay').show();
+            			Ext.getCmp('DSS_comparisonHeaderChange').hide();
+            			Ext.getCmp('DSS_comparisonHeaderDisplay').show();
             			Ext.resumeLayouts(true);
             		}
             	}]
@@ -160,6 +164,6 @@ Ext.define('MyApp.view.Report_SpiderHeader', {
         
         me.callParent(arguments);
     }
-    
+
 });
 

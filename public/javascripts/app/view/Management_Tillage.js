@@ -8,7 +8,9 @@ Ext.define('MyApp.view.Management_Tillage', {
 	layout: {
 		type: 'absolute'
 	},
-	
+
+	disabled: true,
+
 	//--------------------------------------------------------------------------
 	initComponent: function() {
 		var me = this;

@@ -32,7 +32,7 @@ Ext.define('MyApp.view.Report_ValueTypePopup', {
             	items: [{
 					xtype: 'label',
 					x: 20,
-					y: 6,
+					y: 4,
 					labelAlign: 'right',
 					style: 'color:#777;',
 					text: 'Value Type:',
@@ -42,35 +42,35 @@ Ext.define('MyApp.view.Report_ValueTypePopup', {
 					id: 'DSS_valueTypeDisplay',
 					disabledCls: 'dss-disabled-label',
 					x: 90,
-					y: 6,
-					text: 'Absolute'
+					y: 4,
+					text: 'Actual'
 				},{
 					xtype: 'label',
-					x: 190,
-					y: 6,
+					x: 180,
+					y: 4,
 					labelAlign: 'right',
 					style: 'color:#777;',
-					text: 'Data:',
+					text: 'Results:',
 					width: 30
             	},{
 					xtype: 'label',
 					id: 'DSS_dataTypeDisplay',
 					x: 225,
-					y: 6,
-					text: 'Delta'
+					y: 4,
+					text: 'Change'
             	},{
 					xtype: 'label',
-					x: 300,
-					y: 6,
+					x: 330,
+					y: 4,
 					labelAlign: 'right',
 					style: 'color:#777;',
-					text: 'Heatmap:',
+					text: 'Map:',
 					width: 50
             	},{
 					xtype: 'label',
 					id: 'DSS_heatmapTypeDisplay',
-					x: 355,
-					y: 6,
+					x: 362,
+					y: 4,
 					width: 110,
 					text: 'Quantile'
             	},{
@@ -78,6 +78,9 @@ Ext.define('MyApp.view.Report_ValueTypePopup', {
             		x: 460,
             		y: 4,
             		type: 'down',
+					tooltip: {
+						text: 'Show/Hide display options for this report section.'
+					},
             		handler: function() {
             			Ext.suspendLayouts();
             			Ext.getCmp('DSS_reportHeaderDisplay').hide();
@@ -96,9 +99,9 @@ Ext.define('MyApp.view.Report_ValueTypePopup', {
 					xtype: 'radiogroup',
 					id: 'DSS_ValueStyleRadioGroup',
 					x: 20,
-					y: 2,
+					y: 0,
 					fieldLabel: 'Value Type',
-					labelWidth: 65,
+					labelWidth: 62,
 					labelAlign: 'right',
 					width: 200,
 					vertical: true,
@@ -107,14 +110,14 @@ Ext.define('MyApp.view.Report_ValueTypePopup', {
 					labelAlign: 'left',
 					labelStyle: 'color:#777;',
 					items: [{
-						boxLabel: 'Absolute',
+						boxLabel: 'Actual',
 						name: 'valueStyle',
 						checked: true,
 						padding: '0 0 -5 0',
 						handler: function(radio, checked) {
 							if (checked) {
 								Ext.getCmp('DSS_ReportDetail').setValueStyle('absolute');
-								Ext.getCmp('DSS_valueTypeDisplay').setText('Absolute');
+								Ext.getCmp('DSS_valueTypeDisplay').setText('Actual');
 							}
 						}
 					},{
@@ -131,6 +134,7 @@ Ext.define('MyApp.view.Report_ValueTypePopup', {
 						boxLabel: '$',
 						name: 'valueStyle',
 						padding: '0 0 -5 0',
+						disabled: true,
 						handler: function(radio, checked) {
 							if (checked) {
 								Ext.getCmp('DSS_ReportDetail').setValueStyle('$');
@@ -140,16 +144,16 @@ Ext.define('MyApp.view.Report_ValueTypePopup', {
 					}]
 				},{
 					xtype: 'radiogroup',
-					x: 190,
-					y: 2,
-					fieldLabel: 'Data',
-					labelWidth: 30,
+					x: 180,
+					y: 0,
+					fieldLabel: 'Results',
+					labelWidth: 40,
 					width: 190,
 					vertical: true,
 					columns: 1,
 					labelStyle: 'color:#777;',
 					items: [{
-						boxLabel: 'Delta',
+						boxLabel: 'Change',
 						name: 'dataStyle',
 						checked: true,
 						padding: '0 0 -5 0',
@@ -158,11 +162,11 @@ Ext.define('MyApp.view.Report_ValueTypePopup', {
 								Ext.getCmp('DSS_ReportDetail').setDataStyle('delta');
 								Ext.getCmp('DSS_ValueStyleRadioGroup').setDisabled(false);
 								Ext.getCmp('DSS_valueTypeDisplay').setDisabled(false);
-								Ext.getCmp('DSS_dataTypeDisplay').setText('Delta');
+								Ext.getCmp('DSS_dataTypeDisplay').setText('Change');
 							}
 						}
 					},{
-						boxLabel: 'File1',
+						boxLabel: 'Current',
 						name: 'dataStyle',
 						padding: '0 0 -5 0',
 						handler: function(radio, checked) {
@@ -170,11 +174,11 @@ Ext.define('MyApp.view.Report_ValueTypePopup', {
 								Ext.getCmp('DSS_ReportDetail').setDataStyle('file1');
 								Ext.getCmp('DSS_ValueStyleRadioGroup').setDisabled(true);
 								Ext.getCmp('DSS_valueTypeDisplay').setDisabled(true);
-								Ext.getCmp('DSS_dataTypeDisplay').setText('File1');
+								Ext.getCmp('DSS_dataTypeDisplay').setText('Current');
 							}
 						}
 					},{
-						boxLabel: 'File2',
+						boxLabel: 'Scenario',
 						name: 'dataStyle',
 						padding: '0 0 -5 0',
 						handler: function(radio, checked) {
@@ -182,17 +186,17 @@ Ext.define('MyApp.view.Report_ValueTypePopup', {
 								Ext.getCmp('DSS_ReportDetail').setDataStyle('file2');
 								Ext.getCmp('DSS_ValueStyleRadioGroup').setDisabled(true);
 								Ext.getCmp('DSS_valueTypeDisplay').setDisabled(true);
-								Ext.getCmp('DSS_dataTypeDisplay').setText('File2');
+								Ext.getCmp('DSS_dataTypeDisplay').setText('Scenario');
 							}
 						}
 					}]
 				},{
 					xtype: 'radiogroup',
-					x: 300,
-					y: 2,
-					fieldLabel: 'Heatmap',
-					labelWidth: 50,
-					width: 190,
+					x: 330,
+					y: 0,
+					fieldLabel: 'Map',
+					labelWidth: 20,
+					width: 160,
 					vertical: true,
 					columns: 1,
 					labelStyle: 'color:#777;',
@@ -223,6 +227,9 @@ Ext.define('MyApp.view.Report_ValueTypePopup', {
             		x: 460,
             		y: 4,
             		type: 'up',
+					tooltip: {
+						text: 'Show/Hide display options for this report section.'
+					},
             		handler: function() {
             			Ext.suspendLayouts();
             			Ext.getCmp('DSS_reportHeaderChange').hide();

@@ -8,11 +8,10 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
     alias: 'widget.layer_watershed',
 
     width: 400,
-    height: 66,
-//    bodyPadding: '0 0 3 0', // just really need to pad bottom to maintain spacing there
+    height: 86,
 	DSS_unpressedText: 'Activate Click Selection Tool',
 	DSS_pressedText: 'Deactivate Selection Tool',
-    
+   
     //--------------------------------------------------------------------------
     initComponent: function() {
     	
@@ -29,14 +28,15 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 
         Ext.applyIf(me, {
             items: [{
-				xtype: 'button', 
+				xtype: 'button',
+				itemId: 'DSS_watershedClickActivation',
 				text: 'Activate Click Selection Tool',
-				x: 35,
-				y: 6,
-				height: 20,
+				x: 70,
+				y: 12,
+				height: 28,
+				width: 152,
 				tooltip: {
-					text: 'Click on a watershed to include it in your query',
-					showDelay: 100
+					text: 'Click on a watershed to include it in your query'
 				},
 				enableToggle: true,
 				handler: function(button, evt) {
@@ -54,21 +54,55 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 			},{
 				xtype: 'button', 
 				text: 'Clear Selection',
-				x: 190,
-				y: 6,
-				height: 20,
+				x: 230,
+				y: 12,
+				height: 28,
 				tooltip: {
-					text: 'Clear all selected watersehds',
-					showDelay: 100
+					text: 'Clear all selected watersheds'
 				},
 				handler: function(button, evt) {
 					var panel = button.up();
 					panel.clearSelection();
 				}
+			},{
+            	xtype: 'button',
+            	x: 390,
+            	y: 4,
+            	width: 23,
+            	icon: 'app/images/go_icon_small.png',
+            	handler: function(self) {
+            		me.createOpacityPopup(self);
+            	},
+            	tooltip: {
+            		text: 'Viewable Layer Overlay'
+            	}
+			},{
+            	xtype: 'button',
+            	x: 390,
+            	y: 30,
+            	width: 23,
+            	hidden: true,
+            	icon: 'app/images/eye_icon.png',
+            	handler: function(self) {
+            		alert('Query for this layer would be run here...');
+            	},
+            	tooltip: {
+            		text: 'Preview only this criteria selection'
+            	}
 			}]
         });
 
         me.callParent(arguments);
+        
+        me.on('collapse', function(panel) {
+			var button = panel.getComponent('DSS_watershedClickActivation');
+			button.toggle(false);
+			button.setText(panel.DSS_unpressedText);
+
+			panel.clearSelection();
+			panel.disableClickSelection();
+			panel.DSS_Layer.setVisibility(false);
+		});
     },
 	
     //--------------------------------------------------------------------------
@@ -89,7 +123,8 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 		
 		var addedElement = false;
 		for (var i = 0; i < this.DSS_watershedSelections.length; i++) {
-			queryLayer.matchValues.push(this.DSS_watershedSelections[i]);
+			// FIXME: BS, minus one because the geoserver gives the index back 1 based vs. zero based
+			queryLayer.matchValues.push(parseInt(this.DSS_watershedSelections[i])-1);
 			addedElement = true;
 		}
         if (!addedElement) {
@@ -191,8 +226,8 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 		this.DSS_selectionLayer.setVisibility(true);
 		
 		// When click selection is on, show the layer...Make sense?
-		var layerVisToggle = this.header.getComponent('DSS_visibilityToggle');
-		layerVisToggle.setValue(true);
+		this.DSS_Layer.setVisibility(true);
+		this.DSS_Layer.setOpacity(0.6);		
 	},
 
 	//--------------------------------------------------------------------------
@@ -203,6 +238,14 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 		viewport.deactivateClickControl();
 		// FIXME: probably want to tie this to the watershed layer visibility?
 		this.DSS_selectionLayer.setVisibility(false);
+	},
+	
+	//--------------------------------------------------------------------------
+	resetLayer: function() {
+		
+		// TODO: RESET everything...
+		this.header.getComponent('DSS_ShouldQuery').toggle(false);
+		this.clearSelection();
 	}
 	
 });

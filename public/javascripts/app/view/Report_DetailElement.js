@@ -21,7 +21,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
 	layout: {
         type: 'absolute'
     },
-
+    
     //--------------------------------------------------------------------------
     initComponent: function() {
         var me = this;
@@ -38,7 +38,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
             {
 			    itemId: 'DSS_ValueField',  
 			    xtype: 'textfield',
-			    x: 30,
+			    x: 20,
 			    y: 5,
 			    width: 240,
 			    fieldLabel: me.DSS_Label,
@@ -47,7 +47,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			},{
 				xtype: 'label',
 				itemId: 'DSS_UnitsLabel',
-				x: 275,
+				x: 265,
 				y: 9,
 				text: me.DSS_UnitLabelDelta ? me.DSS_UnitLabelDelta : me.DSS_UnitLabel,
 				style: {
@@ -88,6 +88,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			},{
 			    itemId: 'information_button',
 			    xtype: 'button',
+			    disabled: true,
 			    x: 415,
 			    y: 5,
 			    width: 30,
@@ -144,29 +145,9 @@ Ext.define('MyApp.view.Report_DetailElement', {
     //--------------------------------------------------------------------------
 	createHeatmapLegend: function(serverData) {
 		
-		var legendContainer = Ext.getCmp('DSS_heatmap_legend');
+		var legendObject = Ext.getCmp('DSS_heatmap_legend');
 		
-		// suspend layout while we make the changes otherwise EACH minor change
-		//	will cause a layout recalc which slows everything down. Do it all at once!
-		Ext.suspendLayouts();
-		
-		// remove everything and then add all new color/widget elements back...
-		legendContainer.removeAll();
-		
-		for (var idx = 0; idx < serverData.palette.length; idx++) {
-			var obj = {
-				DSS_ElementColor: serverData.palette[idx],
-				DSS_ElementValue: serverData.values[idx],
-			};
-			if (idx == serverData.palette.length - 1) {
-				obj.DSS_ElementValueLast = serverData.values[idx+1];
-			}
-			
-			var element = Ext.create('MyApp.view.Legend_HeatmapColor', obj);
-			legendContainer.add(element);
-		}
-		// Layouts were disabled...must turn them back on!!
-		Ext.resumeLayouts(true);
+		legendObject.setKeys(this.DSS_GraphTitle, serverData);
 	},
 	
     //--------------------------------------------------------------------------
@@ -267,15 +248,20 @@ Ext.define('MyApp.view.Report_DetailElement', {
     //--------------------------------------------------------------------------
     showHeatmap: function(button, type, subtype) {
 
-		var spinnerStyle = {"background-image":"url(app/images/spinner_16a.gif)",
-			"background-repeat":"no-repeat","background-position":"center center", 
-			"padding-left":"0px"};
+//		var spinnerStyle = {"background-image":"url(app/images/spinner_16a.gif)",
+//			"background-repeat":"no-repeat","background-position":"center center", 
+//			"padding-left":"0px"};
 			
     	var me = this;
 		if (button.DSS_Layer) { 
 			this.hideHeatmap(button);
 		}
 		else {
+			var scCombo1 = Ext.getCmp('DSS_ScenarioCompareCombo_1').getValue();	
+			var scCombo2 = Ext.getCmp('DSS_ScenarioCompareCombo_2').getValue();
+			
+			// TODO: validate scCombo1 & 2? Should be numbers in the range of -1 to 9
+			
 			var clientID = '1234';
 			var clientID_cookie = Ext.util.Cookies.get('DSS_clientID');
 			if (clientID_cookie) {
@@ -294,6 +280,8 @@ Ext.define('MyApp.view.Report_DetailElement', {
 				jsonData: {
 					model: me.DSS_FieldString,
 					clientID: clientID,
+					compare1ID: scCombo1,//-1, // default
+					compare2ID: scCombo2,//DSS_currentModelRunID,
 					type: type,
 					subtype: subtype
 				},

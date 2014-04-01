@@ -8,6 +8,7 @@ import java.util.*;
 public class Downsampler
 {
 	// FLOAT: Returns a transformed data array of the requested size. Sampling is done via averaging
+	// 
 	//--------------------------------------------------------------------------
 	static public float [][] generateAveraged(float[][] data, 
 								int dataWidth, int dataHeight, 
@@ -15,23 +16,37 @@ public class Downsampler
 	
 		float [][] resampledData = new float[newHeight][newWidth];
 		
-		float widthFactor = dataWidth / newWidth;
-		float heightFactor = dataHeight / newHeight;
+		float widthFactor = (dataWidth / newWidth);
+		float heightFactor = (dataHeight / newHeight);
+		float halfWidthFactor = widthFactor * 0.5f;
+		float halfHeightFactor = heightFactor * 0.5f;
 		
-		int upLeftX = 0, upLeftY = 0;
-		
-		for (int y = 0; y < newHeight - 1; y++) {
-			int lowRightY = Math.round((y + 1) * heightFactor);
+		for (int y = 0; y < newHeight; y++) {
+			int upLeftY = Math.round(y * heightFactor - halfHeightFactor);
+			int lowRightY = Math.round(y * heightFactor + halfHeightFactor);
 			
-			for (int x = 0; x < newWidth - 1; x++) {
-				int lowRightX = Math.round((x + 1) * widthFactor);
+			// clamp to legal range...
+			if (upLeftY < 0) upLeftY = 0;
+			if (upLeftY >= dataHeight) upLeftY = dataHeight - 1;
+			if (lowRightY < 0) lowRightY = 0;
+			if (lowRightY >= dataHeight) lowRightY = dataHeight - 1;
+			
+			for (int x = 0; x < newWidth; x++) {
+				int upLeftX = Math.round(x * widthFactor - halfWidthFactor);
+				int lowRightX = Math.round(x * widthFactor + halfWidthFactor);
+				
+				// clamp to legal range...
+				if (upLeftX < 0) upLeftX = 0;
+				if (upLeftX >= dataWidth) upLeftX = dataWidth - 1;
+				if (lowRightX < 0) lowRightX = 0;
+				if (lowRightX >= dataWidth) lowRightX = dataWidth - 1;
 				
 				// Calculate that ave value and stuff it into resampledData[y][x]
 				float sum = 0;
 				int ct = 0;
 				for (int yy = upLeftY; yy <= lowRightY; yy++) {
 					for (int xx = upLeftX; xx <= lowRightX; xx++) {
-						if (data[yy][xx] > -9999.0f) {
+						if (data[yy][xx] > -9999.0f || data[yy][xx] < -9999.1f) {
 							sum += data[yy][xx];
 							ct++;
 						}
@@ -77,7 +92,7 @@ public class Downsampler
 				for (int yy = upLeftY; yy <= lowRightY; yy++) {
 					for (int xx = upLeftX; xx <= lowRightX; xx++) {
 						float result = data[yy][xx];
-						if (result > -9999.0f) {
+						if (result > -9999.0f || result < -9999.1f) {
 							if (!mbHasMax) {
 								max = result;
 								mbHasMax = true;

@@ -6,8 +6,6 @@ import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
 
-//import org.codehaus.jackson.*;
-//import org.codehaus.jackson.node.*;
 import com.fasterxml.jackson.core.*;
 
 // USAGE SAMPLE
@@ -77,6 +75,14 @@ public class Binary_Writer
 	//--------------------------------------------------------------------------
 	public ByteBuffer writeHeader() {
 		
+		return writeHeader(4); // FIXME: size of int?
+	}
+
+	// Opens binary file and writes the header. Returns null if file does not exist or
+	//	some other problem occurs. Otherwise returns a ByteBuffer	
+	//--------------------------------------------------------------------------
+	public ByteBuffer writeHeader(int rasterElementSize) {
+		
 		try {
 			mFileStream = new FileOutputStream(mOutputFile);
 			mFileChannel = mFileStream.getChannel();
@@ -103,7 +109,7 @@ public class Binary_Writer
 			return null;
 		}
 		
-		mLineBuffer = ByteBuffer.allocateDirect(mWidth * 4); // FIXME: size of int?
+		mLineBuffer = ByteBuffer.allocateDirect(mWidth * rasterElementSize);
 		return mLineBuffer;
 	}
 	
@@ -119,7 +125,7 @@ public class Binary_Writer
 			//	position does not get moved or set so writing that buffer will emit nothing
 			//	to file)?
 			// ALSO NOTE: there may be ways to simplify this...perhaps depending on usage
-			//	patters. E.g., setting the position to the limit might only be needed 
+			//	patterns. E.g., setting the position to the limit might only be needed 
 			//	because flip sets the limit to the position, then resets position to zero
 			//	I guess this signals the writer to emit all the data from the zero position
 			//	up to the limit. Perhaps simpler is to make sure the limit is set to the

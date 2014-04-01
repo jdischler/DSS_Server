@@ -4,8 +4,6 @@ import play.*;
 import java.util.*;
 import java.io.*;
 
-//import org.codehaus.jackson.*;
-//import org.codehaus.jackson.node.*;
 import java.lang.reflect.Array;
 
 //------------------------------------------------------------------------------
@@ -57,7 +55,7 @@ Logger.info("  > Allocated memory for SOC");
 		// Soil_Carbon
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				if ((rotationD_Data[y][x] & TotalMask) > 0 /*&& scenario.mSelection.mSelection[y][x] >= 1*/)
+				if ((rotationD_Data[y][x] & TotalMask) > 0 /*&& scenario.mSelection.mRasterData[y][x] >= 1*/)
 				{
 					if (rotationD_Data[y][x] == 0 || rotationT_Data[y][x] == 0 || SOC[y][x] <= 0.0f) {
 						soilCarbonData[y][x] = -9999.0f;

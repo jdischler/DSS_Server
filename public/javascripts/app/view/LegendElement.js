@@ -36,8 +36,18 @@ Ext.define('MyApp.view.LegendElement', {
 				width: 20,
 				html: '',
 				style: {
-					'background-color': me.DSS_GreyColor,//DSS_LegendElementColor,
+//					'background-color': me.DSS_GreyColor,//DSS_LegendElementColor,
+					'background-color': me.DSS_LegendElementColor,
 					border: '1px dotted #BBBBBB'
+				},
+				// blah, make the color chip clickable...so it toggles the value of the checkbox on us...
+				listeners: {
+					render: function (c) {
+						c.el.on('click', function () {
+							var comp = c.up().getComponent('DSS_queryCheck');
+							comp.setValue(!comp.getValue());
+						});
+					}
 				}
 			},
 			{
@@ -69,15 +79,17 @@ Ext.define('MyApp.view.LegendElement', {
     //--------------------------------------------------------------------------
     showColorChip: function() {
     	
-    	var chip = this.getComponent('DSS_ColorChip');
+/*    	var chip = this.getComponent('DSS_ColorChip');
     	chip.el.setStyle({'background-color': this.DSS_LegendElementColor});
+*/
     },
     
     //--------------------------------------------------------------------------
     hideColorChip: function() {
     	
-    	var chip = this.getComponent('DSS_ColorChip');
+/*    	var chip = this.getComponent('DSS_ColorChip');
     	chip.el.setStyle({'background-color': this.DSS_GreyColor});
+*/
     },
     
     //--------------------------------------------------------------------------

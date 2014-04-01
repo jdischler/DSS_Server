@@ -6,18 +6,19 @@ var baseUrl = 'pgis.glbrc.org';
 var baseUrl1 = 'pgis1.wei.wisc.edu';
 var baseUrl2 = 'pgis2.wei.wisc.edu';
 var baseUrl3 = 'pgis3.wei.wisc.edu';
+var port = '8080';
 var vectorPath = '/geoserver/Vector/wms';
 var rasterPath = '/geoserver/Raster/wms';
-var port = '8080';
 var DSS_bufferSize = 2; // how many non-visible tiles on either side of visible area to cache?
 var DSS_resizeMethod = null; // "resize";
-var DSS_LogoPanelHeight = 64;
+var DSS_LogoPanelHeight = 70;
 
 // boo
 var DSS_globalQueryableLayers = [];
 var DSS_globalCollapsibleLayers = [];
 var DSS_AssumptionsDefaults = null; // DON'T modify these - they come from the server...
 var DSS_AssumptionsAdjustable = null; // A copy!
+var DSS_currentModelRunID = 0;//
 
 //------------------------------------------------------------------------------
 Ext.define('MyApp.view.MainViewport', {
@@ -27,14 +28,14 @@ Ext.define('MyApp.view.MainViewport', {
 	requires: [
 		'MyApp.view.InfoToolbar',
 		'GeoExt.panel.Map',
-		'MyApp.view.NewLayerPanel_Google',
-        'MyApp.view.NewLayerPanel_Indexed',
-        'MyApp.view.NewLayerPanel_Continuous',
-        'MyApp.view.NewLayerPanel_Watershed',
+		'MyApp.view.LayerPanel_Google',
+        'MyApp.view.LayerPanel_Indexed',
+        'MyApp.view.LayerPanel_Continuous',
+        'MyApp.view.LayerPanel_Watershed',
         'MyApp.view.LogoPanel',
         'MyApp.view.ViewSelectToolbar',
 		'MyApp.view.Scenario_Layout',
-        'MyApp.view.Report_MasterLayout'        
+        'MyApp.view.Report_MasterLayout'
 	],
 	
 	//autoScroll: true,
@@ -111,6 +112,8 @@ Ext.define('MyApp.view.MainViewport', {
 					console.log("getClientID success: ");
 					console.log(obj);
 					Ext.util.Cookies.set('DSS_clientID', obj.DSS_clientID);
+					Ext.util.Cookies.set('DSS_nextSaveID', 0); // start off with folder zero (0)
+					
 					var res = Ext.util.Cookies.get('DSS_clientID');
 					if (res) {
 						console.log(' Cookie is: ');
@@ -301,7 +304,7 @@ Ext.define('MyApp.view.MainViewport', {
 			this.getWMS_Settings(false, 0.5)
 		);
 		
-		//------------------------------------------------
+/*		//------------------------------------------------
 		var wmsSOC = new OpenLayers.Layer.WMS("SOC", 
 			this.getGeoserverURL('raster'),
 			{
@@ -312,7 +315,7 @@ Ext.define('MyApp.view.MainViewport', {
 			},
 			this.getWMS_Settings(false, 0.5)
 		);
-		
+*/		
 		//------------------------------------------------
 		var wmsCDL = new OpenLayers.Layer.WMS('cdl_2012', 
 			this.getGeoserverURL('raster'),
@@ -340,15 +343,15 @@ Ext.define('MyApp.view.MainViewport', {
 		map.addLayers([googTerrain,googHybrid,
 			wmsCDL,
 			wmsSlope,
-			wmsSOC,
+//			wmsSOC,
 			wmsLCC,
 			wmsLCS,
 			wmsWatershed,
 			wmsRivers
 			]);
 		
-		var lpCDL = Ext.create('MyApp.view.NewLayerPanel_Indexed', {
-			title: 'Cropland Data',
+		var lpCDL = Ext.create('MyApp.view.LayerPanel_Indexed', {
+			title: 'Landcover',
 			DSS_Layer: wmsCDL,
 			minHeight: 90,
 			maxHeight: 400,
@@ -356,7 +359,7 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 		
-		var lpLCC = Ext.create('MyApp.view.NewLayerPanel_Indexed', {
+		var lpLCC = Ext.create('MyApp.view.LayerPanel_Indexed', {
 			title: 'Land Capability Class',
 			DSS_ShortTitle: 'LCC',
 			DSS_AutoSwapTitles: true,
@@ -367,11 +370,11 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 		
-		var lpLCS = Ext.create('MyApp.view.NewLayerPanel_Indexed', {
+		var lpLCS = Ext.create('MyApp.view.LayerPanel_Indexed', {
 			title: 'Land Capability Subclass',
 			DSS_ShortTitle: 'LCS',
 			DSS_AutoSwapTitles: true,
-			DSS_Layer: wmsLCC,
+			DSS_Layer: wmsLCS,
 			minHeight: 90,
 			maxHeight: 400,
 			DSS_QueryTable: 'lcs',
@@ -379,7 +382,7 @@ Ext.define('MyApp.view.MainViewport', {
 		});
 		
 		// Slope is greater than or equal to 10.2 degrees and less than or equal to 20.3 degrees
-		var lpSlope = Ext.create('MyApp.view.NewLayerPanel_Continuous', {
+		var lpSlope = Ext.create('MyApp.view.LayerPanel_Continuous', {
 			title: 'Slope',
 			DSS_Layer: wmsSlope,
 			DSS_LayerUnit: '%',//'\xb0',
@@ -391,14 +394,14 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 
-		var lpWatershed = Ext.create('MyApp.view.NewLayerPanel_Watershed', {
+		var lpWatershed = Ext.create('MyApp.view.LayerPanel_Watershed', {
 			title: 'Watershed',
 			DSS_Layer: wmsWatershed,
 			DSS_QueryTable: 'watersheds',
 			collapsed: true
 		});
 
-		var lpRiver = Ext.create('MyApp.view.NewLayerPanel_Continuous', {
+		var lpRiver = Ext.create('MyApp.view.LayerPanel_Continuous', {
 			title: 'Distance to River',
 			DSS_ShortTitle: 'River',
 			DSS_AutoSwapTitles: false,
@@ -412,7 +415,35 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 
-/*		var lpRoad = Ext.create('MyApp.view.NewLayerPanel_Continuous', {
+		var lpPublicLand = Ext.create('MyApp.view.LayerPanel_Continuous', {
+			title: 'Distanace to Public Land',
+			DSS_ShortTitle: 'Public Land',
+			DSS_AutoSwapTitles: false,
+			DSS_Layer: wmsRivers,//fix
+			DSS_LayerUnit: 'm',// fix to mile
+			DSS_LayerRangeMin: 0,
+			DSS_LayerRangeMax: 14500,
+			DSS_ValueDefaultLess: 1000,
+			DSS_ValueStep: 100,
+			DSS_QueryTable: 'public_land',
+			collapsed: true
+		});
+		
+		var lpDairy = Ext.create('MyApp.view.LayerPanel_Continuous', {
+			title: 'Density of Dairy',
+			DSS_ShortTitle: 'Dairy',
+			DSS_AutoSwapTitles: false,
+			DSS_Layer: wmsRivers,//fix
+			DSS_LayerUnit: '',
+			DSS_LayerRangeMin: 0,
+			DSS_LayerRangeMax: 8,
+			DSS_ValueDefaultGreater: 4,
+			DSS_ValueStep: 1,
+			DSS_QueryTable: 'dairy',
+			collapsed: true
+		});
+				
+/*		var lpRoad = Ext.create('MyApp.view.LayerPanel_Continuous', {
 			title: 'Distance to Road',
 			DSS_ShortTitle: 'Road',
 			DSS_AutoSwapTitles: false,
@@ -426,12 +457,12 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 */		
-		var lpSOC = Ext.create('MyApp.view.NewLayerPanel_Continuous', {
+/*		var lpSOC = Ext.create('MyApp.view.LayerPanel_Continuous', {
 			title: 'Soil Organic Carbon',
 			DSS_ShortTitle: 'SOC',
 			DSS_AutoSwapTitles: true,
 			DSS_Layer: wmsSOC,
-			DSS_LayerUnit: '',
+			DSS_LayerUnit: '',// NOTE: use this...'Mg/ha',
 			DSS_LayerRangeMin: 0,
 			DSS_LayerRangeMax: 1300,
 			DSS_ValueDefaultLess: 300,
@@ -439,8 +470,8 @@ Ext.define('MyApp.view.MainViewport', {
 			DSS_QueryTable: 'soc',
 			collapsed: true
 		});
-		
-		var lpGoog = Ext.create('MyApp.view.NewLayerPanel_Google', {
+*/		
+		var lpGoog = Ext.create('MyApp.view.LayerPanel_Google', {
 			DSS_LayerSatellite: googTerrain,
 			DSS_LayerHybrid: googHybrid,
 			dock: 'bottom'
@@ -450,7 +481,9 @@ Ext.define('MyApp.view.MainViewport', {
 		// 	elements are added...		
 		Ext.suspendLayouts();
 		var dssLeftPanel = Ext.getCmp('DSS_LeftPanel');
-		dssLeftPanel.insert(0,lpSOC);
+//		dssLeftPanel.insert(0,lpSOC);
+		dssLeftPanel.insert(0,lpDairy);
+		dssLeftPanel.insert(0,lpPublicLand);
 		dssLeftPanel.insert(0,lpLCS);
 		dssLeftPanel.insert(0,lpLCC);
 		dssLeftPanel.insert(0,lpSlope);
@@ -469,10 +502,12 @@ Ext.define('MyApp.view.MainViewport', {
 		DSS_globalQueryableLayers.push(lpWatershed);
 //		DSS_globalQueryableLayers.push(lpRoad);
 		DSS_globalQueryableLayers.push(lpRiver);
-		DSS_globalQueryableLayers.push(lpSOC);
+//		DSS_globalQueryableLayers.push(lpSOC);
+		DSS_globalQueryableLayers.push(lpPublicLand);
+		DSS_globalQueryableLayers.push(lpDairy);
 		
 		DSS_globalCollapsibleLayers.push(lpGoog);
-		DSS_globalCollapsibleLayers.push(lpSOC);
+//		DSS_globalCollapsibleLayers.push(lpSOC);
 		DSS_globalCollapsibleLayers.push(lpLCC);
 		DSS_globalCollapsibleLayers.push(lpLCS);
 		DSS_globalCollapsibleLayers.push(lpSlope);
@@ -480,6 +515,8 @@ Ext.define('MyApp.view.MainViewport', {
 //		DSS_globalCollapsibleLayers.push(lpRoad);
 		DSS_globalCollapsibleLayers.push(lpRiver);
 		DSS_globalCollapsibleLayers.push(lpCDL);
+		DSS_globalCollapsibleLayers.push(lpPublicLand);
+		DSS_globalCollapsibleLayers.push(lpDairy);
 		
 		this.addFeatureClickControl(map);
 	},
@@ -588,17 +625,12 @@ Ext.define('MyApp.view.MainViewport', {
 							}
 							panel = Ext.getCmp('DSS_ScenarioSummary');
 							panel.setSize(undefined,250);//doComponentLayout();
-							
 						}
 					}]
 				}],
 				dockedItems: [{
 					xtype: 'logo_panel', // docked top
-				}/*,
-				{
-					xtype: 'infotoolbar' // docked bottom
-					, hidden: true
-				}*/,
+				},
 				{
 					xtype: 'panel',
 					dock: 'left',
@@ -673,8 +705,6 @@ Ext.define('MyApp.view.MainViewport', {
 	//--------------------------------------------------------------------------
     getAssumptions: function() {
     	
-    	console.log('Trying to get default assumptions from: ' + location.href + 'getAssumptions');
-    	
 		var obj = Ext.Ajax.request({
 			url: location.href + 'getAssumptions',
 			method: 'POST',
@@ -683,18 +713,11 @@ Ext.define('MyApp.view.MainViewport', {
 			success: function(response, opts) {
 				
 				var obj = JSON.parse(response.responseText);
-				console.log("getAssumptions success: ");
-				console.log(obj);
 				DSS_AssumptionsDefaults = obj;
 				
 				// MAKE a COPY vs just setting the pointers, which does nothing to make a copy
 				//	like we really need...
 				DSS_AssumptionsAdjustable = JSON.parse(JSON.stringify(DSS_AssumptionsDefaults));
-				
-				console.log('Defaults');
-				console.log(DSS_AssumptionsDefaults);
-				console.log('Copy');
-				console.log(DSS_AssumptionsAdjustable);
 			},
 			
 			failure: function(respose, opts) {

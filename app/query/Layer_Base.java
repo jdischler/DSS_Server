@@ -10,9 +10,6 @@ import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.*;
 
-//import org.codehaus.jackson.*;
-//import org.codehaus.jackson.node.*;
-
 //------------------------------------------------------------------------------
 public abstract class Layer_Base
 {
@@ -332,6 +329,7 @@ public abstract class Layer_Base
 		Logger.info("+-------------------------------------------------------+");
 		File input = new File("./layerData/" + mName + ".dss");
 
+		Logger.info("  Real Path: " + input.getCanonicalPath());
 		FileInputStream fis = new FileInputStream(input);
 		
 		try {

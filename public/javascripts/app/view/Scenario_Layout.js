@@ -9,18 +9,11 @@ var ClearScenarioGridStore = Ext.create('Ext.data.Store', {
     data: {
         items: [{ 
         	Active: true, 
-            SelectionName: 'Default-Corn to Grass', 
-        	TransformText: 'To Grass',
-        	ManagementText: '<b><i>Management Options:</i></b></br><b>Fertilizer:</b> Low, Manure',
-        	Transform: 6,
-        	Query: {
-        		clientID: 0,
-        		queryLayers: [{
-					name: 'cdl_2012',
-					type: 'indexed',
-					matchValues: [1]
-        		}]
-        	}
+            SelectionName: 'Undefined', 
+        	TransformText: 'Undefined',
+        	ManagementText: '',
+        	Transform: 1,
+        	Query: {}
         }]
     },
     proxy: {
@@ -103,19 +96,12 @@ Ext.define('MyApp.view.Scenario_Layout', {
 								getStore(); 
 							store.removeAll();
 							store.add({
-									Active: true, 
-									SelectionName: 'Default-Corn to Grass', 
-									TransformText: 'To Grass',
-									ManagementText: '<b><i>Management Options:</i></b></br><b>Tillage:</b> Conventional</br><b>Fertilizer:</b> Low, Manure',
-									Transform: 1,
-									Query: {
-										clientID: 0,
-										queryLayers: [{
-											name: 'cdl_2012',
-											type: 'indexed',
-											matchValues: [1]
-										}]
-									}
+								Active: true, 
+								SelectionName: 'Undefined', 
+								TransformText: 'Undefined',
+								ManagementText: '',
+								Transform: 1,
+								Query: {}
 							});
 							var selModel = self.up().up().getSelectionModel();
 							selModel.select(0);
@@ -138,9 +124,9 @@ Ext.define('MyApp.view.Scenario_Layout', {
 					up(). // goes to panel level, where the functions are...
 					getStore().add({
 						Active: true, 
-						SelectionName: 'undefined', 
-						TransformText: 'To Corn',
-						ManagementText: '<b><i>Management Options:</i></b></br><b>Tillage:</b> Conventional</br><b>Fertilizer:</b> Low, Manure',
+						SelectionName: 'Undefined', 
+						TransformText: 'Undefined',
+						ManagementText: '',
 						Transform: 1,
 						Query: {}
 				});
@@ -253,7 +239,6 @@ Ext.define('MyApp.view.Scenario_Layout', {
 			}
 		},
 		select: function(me, record, index, eOpts) {
-			console.log('Calling into select...setting up a query');
 			var query = record.get('Query');
 			DSS_ViewSelectToolbar.setUpSelectionFromQuery(query);
 			var dssLeftPanel = Ext.getCmp('DSS_LeftPanel');
@@ -377,9 +362,11 @@ Ext.define('MyApp.view.Scenario_Layout', {
 	//--------------------------------------------------------------------------
 	prepareModelRequest: function() {
 	
+		var scCombo1 = Ext.getCmp('DSS_ScenarioCompareCombo_1').getValue();	
 		var haveQuery = false;
 		var requestData = {
 			clientID: 1234, //temp
+			compare1ID: scCombo1,//-1, // default
 			assumptions: DSS_AssumptionsAdjustable.Assumptions,
 			transforms: []
 		};
@@ -389,15 +376,41 @@ Ext.define('MyApp.view.Scenario_Layout', {
 			requestData.clientID = clientID_cookie;
 		}
 		else {
+			requestData.clientID = 'BadID';
 			console.log('WARNING: no client id cookie was found...');
 		}
 
+		var saveID_cookie = Ext.util.Cookies.get('DSS_nextSaveID');
+		if (saveID_cookie) {
+			requestData.saveID = saveID_cookie;
+		}
+		else {
+			requestData.saveID = 0;
+			console.log('WARNING: no save id cookie was found...');
+		}
+
+		DSS_currentModelRunID = requestData.saveID;
+		var record = DSS_ScenarioComparisonStore.findRecord('Index', DSS_currentModelRunID);
+		if (record) {
+			DSS_ScenarioComparisonStore.remove(record);
+		}
+		
+		// Add the new record and select it in the combo box....
+		DSS_ScenarioComparisonStore.add({'Index': DSS_currentModelRunID, 'ScenarioName': 'Unstored Scenario Result'});
+		DSS_ScenarioComparisonStore.commitChanges(); // FIXME: this necessary?
+		Ext.getCmp('DSS_ScenarioCompareCombo_2').setValue(DSS_currentModelRunID);
+
+		
 		var st = this.getStore();
 		for (var idx = 0; idx < st.getCount(); idx++) {
 			var rec = st.getAt(idx);
 			
 			if (rec.get('Active')) {
 				var query = rec.get('Query');		
+				if (query == null) {
+					break;
+				}
+				
 				var landUse = rec.get('Transform');
 				if (landUse == null) {
 					landUse = 1; // blurf, set to corn....
@@ -412,7 +425,7 @@ Ext.define('MyApp.view.Scenario_Layout', {
 			}
 		}
 		
-		console.log(requestData);
+//		console.log(requestData);
 		if (haveQuery) {
 			this.createScenario(requestData);
 		}
@@ -438,8 +451,8 @@ Ext.define('MyApp.view.Scenario_Layout', {
 				
 				try {
 					var obj= JSON.parse(response.responseText);
-					console.log("success: ");
-					console.log(obj);
+//					console.log("success: ");
+//					console.log(obj);
 					var newRequest = requestData;
 					newRequest.scenarioID = obj.scenarioID;
 					self.submitModel(newRequest);
@@ -460,17 +473,22 @@ Ext.define('MyApp.view.Scenario_Layout', {
     //--------------------------------------------------------------------------
     submitModel: function(queryJson) {
     	
-		console.log(queryJson);
+//		console.log(queryJson);
 		var button = Ext.getCmp('DSS_runModelButton');
 		
 		// NOTE: these strings MUST be synchronized with the server, or else the server will
 		//	not know which models to run. FIXME: should maybe set this up in a more robust fashion?? How?
-		var modelTypes = ['yield', 'water_quality', 'pest_pol', 'soc', 'nitrous', 'habitat_index', 'P_Loss_EPIC'];
+//		var modelTypes = ['yield', 'n_p', 'pest_pol', 'soc', 'nitrous', 'habitat_index', 'water_quality'];
+		var modelTypes = ['yield', 'pest_pol', 'soc', 'nitrous', 'habitat_index', 
+						  'soil_loss', /*'water_quality',*/ 'epic_phosphorus'];
 		
 		var requestCount = modelTypes.length;
+		var successCount = 0;
 		
 		Ext.getCmp('DSS_ReportDetail').setWaitFields();
 		Ext.getCmp('DSS_SpiderGraphPanel').clearSpiderData(0);// set all fields to zero
+		// Disable the save button until all models complete...
+		Ext.getCmp('DSS_ScenarioSaveButton').setDisabled(true);
 
 		for (var i = 0; i < modelTypes.length; i++) {
 			var request = queryJson;
@@ -485,8 +503,8 @@ Ext.define('MyApp.view.Scenario_Layout', {
 					
 					try {
 						var obj= JSON.parse(response.responseText);
-						console.log("success: ");
-						console.log(obj);
+//						console.log("success: ");
+//						console.log(obj);
 						Ext.getCmp('DSS_ReportDetail').setData(obj);
 					}
 					catch(err) {
@@ -497,15 +515,21 @@ Ext.define('MyApp.view.Scenario_Layout', {
 						reportPanel.expand();
 					}
 					requestCount--;
-					if (requestCount <=0 ) {
+					successCount++;
+					if (requestCount <= 0) {
 						button.setIcon('app/images/go_icon.png');
 						button.setDisabled(false);
+						
+						// Only enable save button if all models succeed?
+						if (successCount >= modelTypes.length) {
+							Ext.getCmp('DSS_ScenarioSaveButton').setDisabled(false);
+						}
 					}
 				},
 				
 				failure: function(respose, opts) {
 					requestCount--;
-					if (requestCount <=0 ) {
+					if (requestCount <=0) {
 						button.setIcon('app/images/go_icon.png');
 						button.setDisabled(false);
 					}

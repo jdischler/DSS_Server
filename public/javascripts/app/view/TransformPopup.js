@@ -45,7 +45,7 @@ Ext.define('MyApp.view.TransformPopup', {
 				x: 10,
 				y: 10,
 				style: 'font-size: 120%',
-				text: 'New Landuse'
+				text: 'New Landcover'
 			},
 			{
 				xtype: 'label',

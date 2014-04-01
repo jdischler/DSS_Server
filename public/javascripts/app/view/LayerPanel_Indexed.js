@@ -10,7 +10,7 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
     ],
 
     width: 400,
-    bodyPadding: '0 0 3 0', // just really need to pad bottom to maintain spacing there
+    bodyPadding: '0 0 5 0', // just really need to pad bottom to maintain spacing there
     
     //--------------------------------------------------------------------------
     initComponent: function() {
@@ -20,30 +20,44 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
 
         Ext.applyIf(me, {
             items: [{
-            	xtype: 'legendtitle',
-            	x: 30,
-            	y: 3
-            },
-            {
-            	xtype: 'legendtitle',
-            	x: 210,
-            	y: 3
-            },
-            {
 				xtype: 'container',
 				itemId: 'legendcontainer',
-				x: 30,
-				y: 24,
-				style: {
-//					border: '1px solid #c0c0c0'
-					border: '1px solid #f0f0f0'
-				},
-				width: 358,
+				x: 40,
+				y: 4,
+				padding: '0 0 5 0',
+//				style: {
+//					border: '1px solid #f0f0f0'
+//				},
+				width: 346,
 				layout: {
-//					align: 'stretch',
-//					type: 'vbox'
 					type: 'column'
 				}
+			},{
+            	xtype: 'button',
+            	x: 390,
+            	y: 4,
+            	width: 23,
+            	icon: 'app/images/go_icon_small.png',
+            	handler: function(self) {
+            		me.showColorChips();
+            		me.createOpacityPopup(self, me.hideColorChips, me);
+            	},
+            	tooltip: {
+            		text: 'Viewable Layer Overlay'
+            	}
+			},{
+            	xtype: 'button',
+            	x: 390,
+            	y: 30,
+            	width: 23,
+            	hidden: true,
+            	icon: 'app/images/eye_icon.png',
+            	handler: function(self) {
+            		alert('Query for this layer would be run here...');
+            	},
+            	tooltip: {
+            		text: 'Preview only this criteria selection'
+            	}
 			}]
         });
 
@@ -133,6 +147,7 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
 		});
 	},
 
+	
     //--------------------------------------------------------------------------
 	clearChecks: function() {
 		
@@ -142,7 +157,27 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
         	item.setChecked(false);
         }
     },
+
+    //--------------------------------------------------------------------------
+	showColorChips: function() {
+		
+        var cont = this.getComponent('legendcontainer');
+        for (var i = 0; i < cont.items.length; i++) {
+        	var item = cont.items.items[i];
+        	item.showColorChip();
+        }
+    },
 	
+    //--------------------------------------------------------------------------
+	hideColorChips: function() {
+		
+        var cont = this.getComponent('legendcontainer');
+        for (var i = 0; i < cont.items.length; i++) {
+        	var item = cont.items.items[i];
+        	item.hideColorChip();
+        }
+    },
+    
     //--------------------------------------------------------------------------
     getSelectionCriteria: function() {
     	
@@ -214,6 +249,13 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
 				
 		// Nope, mark as not queried
 		this.header.getComponent('DSS_ShouldQuery').toggle(false);
+    },
+
+    //--------------------------------------------------------------------------    
+	resetLayer: function() {
+    	
+		this.header.getComponent('DSS_ShouldQuery').toggle(false);
+		this.clearChecks();
     }
     
 });

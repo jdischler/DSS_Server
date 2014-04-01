@@ -339,7 +339,7 @@ public class Layer_Integer extends Layer_Base
 					for (int x = 0; x < mWidth; x++) {
 						boolean found = false;
 						// Only check values that ARE NOT noData
-						if (mIntData[y][x] != mConvertedNoDataValue) {
+						if (mIntData[y][x] >= 0) {
 							for (int i = 0; i < array.length; i++) {
 								if (mIntData[y][x] == array[i]) {
 									found = true;
@@ -347,11 +347,13 @@ public class Layer_Integer extends Layer_Base
 								}
 							}
 						}
-						selection.mSelection[y][x] &= (found ? 1 : 0);
+						selection.mRasterData[y][x] &= (found ? 1 : 0);
 					}
 				}
 			}
-			Logger.info("Tried to get a match array but it failed!");
+			else {
+				Logger.info("Tried to get a match array but it failed!");
+			}
 		}
 		else {
 			// Doing the faster bit-mask check...
@@ -360,7 +362,7 @@ public class Layer_Integer extends Layer_Base
 				// Doing the fastest already-shifted test...
 				for (int y = 0; y < mHeight; y++) {
 					for (int x = 0; x < mWidth; x++) {
-						selection.mSelection[y][x] &= ((mIntData[y][x] & test_mask) > 0 ? 1 : 0);
+						selection.mRasterData[y][x] &= ((mIntData[y][x] & test_mask) > 0 ? 1 : 0);
 					}
 				}
 			}
@@ -369,7 +371,7 @@ public class Layer_Integer extends Layer_Base
 				for (int y = 0; y < mHeight; y++) {
 					for (int x = 0; x < mWidth; x++) {
 						int shifted = (1 << (mIntData[y][x]-1));
-						selection.mSelection[y][x] &= ((shifted & test_mask) > 0 ? 1 : 0);
+						selection.mRasterData[y][x] &= ((shifted & test_mask) > 0 ? 1 : 0);
 					}
 				}
 			}

@@ -15,21 +15,55 @@
 
 Ext.Loader.setConfig({
     enabled: true,
-		paths: {
-			GeoExt: "http://geoext.github.com/geoext2/src/GeoExt",
-			Ext: "http://cdn.sencha.io/ext-4.2.1-gpl/src"
-		}
+	paths: {
+		GeoExt: "http://geoext.github.com/geoext2/src/GeoExt",
+		Ext: "http://cdn.sencha.io/ext-4.2.1-gpl/src"
+	}
 });
-
-// FIXME: tooltips aren't setting width correctly...
-// this is one possible work around as per:
-//	http://stackoverflow.com/questions/15834689/extjs-4-2-tooltips-not-wide-enough-to-see-contents
-delete Ext.tip.Tip.prototype.minWidth;
 
 // set up some quick tip defaults...
 Ext.apply(Ext.tip.QuickTipManager.getQuickTip(), {
-	showDelay: 100,
-	minWidth: 'auto'
+	showDelay: 100
+});
+
+// FIXME: workaround for quick tips sizing issue...
+// as per Stack overflow:
+// http://stackoverflow.com/questions/15834689/extjs-4-2-tooltips-not-wide-enough-to-see-contents
+
+Ext.override(Ext.tip.QuickTip, {
+	helperElId: 'ext-quicktips-tip-helper',
+	initComponent: function ()
+	{
+		var me = this;
+
+		me.target = me.target || Ext.getDoc();
+		me.targets = me.targets || {};
+		me.callParent();
+
+		me.on('move', function ()
+		{
+			var offset = me.hasCls('x-tip-form-invalid') ? 35 : 12, // UGH, what is this <<
+				helperEl = Ext.fly(me.helperElId) || Ext.fly(
+					Ext.DomHelper.createDom({
+						tag: 'div',
+						id: me.helperElId,
+						style: {
+							position: 'absolute',
+							left: '-1000px',
+							top: '-1000px',
+							'font-size': '12px',
+							'font-family': 'tahoma, arial, verdana, sans-serif'
+						}
+					}, Ext.getBody())
+				);
+
+			if (me.html && (me.html !== helperEl.getHTML() || me.getWidth() !== (helperEl.dom.clientWidth + offset)))
+			{
+				helperEl.update(me.html);
+				me.setWidth(Ext.Number.constrain(helperEl.dom.clientWidth + offset, me.minWidth, me.maxWidth));
+			}
+		}, this);
+	}
 });
 
 Ext.application({

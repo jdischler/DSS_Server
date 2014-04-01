@@ -15,10 +15,10 @@ import java.nio.channels.*;
 //
 // This program calculates phosphorus for each pixel at watershed scale and then sum them up at watershed level (Kg per year)
 // Input is crop rotation layer 
-// Version 10/20/2013
+// Version 12/20/2013
 //
 //------------------------------------------------------------------------------
-public class Model_Water_Quality extends Model_Base
+public class Model_WaterQuality extends Model_Base
 {
 
 	private static final String mPhosphorusModelFile = "water_quality";
@@ -141,8 +141,6 @@ Logger.info("  > Allocated memory for Water_Quality");
 					
 					if (watershedIdx >= 0) 
 					{
-						// watershed index zero is reserved for no-data
-						watershedIdx--;
 						CountCellsInWatershed[watershedIdx]++;
 						Phosphorus[watershedIdx] = Phosphorus[watershedIdx] + PhosphorusData[y][x];
 					}
@@ -165,8 +163,6 @@ Logger.info("  > Allocated memory for Water_Quality");
 				
 				if (watershedIdx >= 0) 
 				{
-					// watershed index zero is reserved for no-data
-					watershedIdx--;
 					PhosphorusData[y][x] = Phosphorus[watershedIdx];
 				}
 				else 
@@ -188,4 +184,3 @@ Logger.info(">>> Model_Water_Quality is finished - timing: " + Float.toString(ti
 		return results;
 	}
 }
-

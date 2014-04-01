@@ -105,7 +105,7 @@ public class Analyzer_Histogram
 				if (buff != null) {
 					for (int x=0; x < width; x++) {
 						float data = buff.getFloat(x * 4); // blah, 4 = size of float, ie 32bit
-						if (mSelection.mSelection[y][x] >= 1 && data > -9999.0f) { // FIXME: NoData check...
+						if (mSelection.mRasterData[y][x] >= 1 && data >= -9999.0f) { // FIXME: NoData check...
 							min = min(min, data);
 							max = max(max, data);
 						}
@@ -129,7 +129,7 @@ public class Analyzer_Histogram
 		for (int y=0; y < height; y++) {
 			for (int x=0; x < width; x++) {
 				float data = rasterData[y][x];
-				if (mSelection.mSelection[y][x] >= 1 && data > -9999.0f) { // FIXME: NoData check...
+				if (mSelection.mRasterData[y][x] >= 1 && data >= -9999.0f) { // FIXME: NoData check...
 					totalFile += data;
 					int binIndex = (int)((data - min)/(max - min) * mHistogramSize);
 					// handle custom, but usually rare, case of data being MAX in the above formula
@@ -232,7 +232,7 @@ long processStart = System.currentTimeMillis();
 		for (int y=0; y < height; y++) {
 			for (int x=0; x < width; x++) {
 				float data = data2[y][x];
-				if (mSelection.mSelection[y][x] >= 1 && data > -9999.0f) { // FIXME: NoData check...
+				if (mSelection.mRasterData[y][x] >= 1 && data >= -9999.0f) { // FIXME: NoData check...
 					min = min(min, data);
 					max = max(max, data);
 				}
@@ -285,7 +285,7 @@ long processStart = System.currentTimeMillis();
 		for (int y=0; y < height; y++) {
 			for (int x=0; x < width; x++) {
 				float data = data1[y][x];
-				if (mSelection.mSelection[y][x] >= 1 && data > -9999.0f) { // FIXME: NoData check...
+				if (mSelection.mRasterData[y][x] >= 1 && data > -9999.0f) { // FIXME: NoData check...
 					min = min(min, data);
 					max = max(max, data);
 				}
@@ -295,7 +295,7 @@ long processStart = System.currentTimeMillis();
 		for (int y=0; y < height; y++) {
 			for (int x=0; x < width; x++) {
 				float data = data2[y][x];
-				if (mSelection.mSelection[y][x] >= 1 && data > -9999.0f) { // FIXME: NoData check...
+				if (mSelection.mRasterData[y][x] >= 1 && data > -9999.0f) { // FIXME: NoData check...
 					min = min(min, data);
 					max = max(max, data);
 				}

@@ -17,8 +17,9 @@ import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.*;
 
-//import org.codehaus.jackson.*;
-//import org.codehaus.jackson.node.*;
+import org.apache.commons.io.FileUtils; 
+import org.apache.commons.io.filefilter.*; 
+
 import javax.xml.bind.DatatypeConverter;
 
 //------------------------------------------------------------------------------
@@ -51,7 +52,7 @@ public class Application extends Controller
 			return ok(ret);
 		}
 		
-		return ok(); // derp, not really OK if gets here...or??
+		return badRequest(); // TODO: add return errors if needed...
 	}
 	
 	//----------------------------------------------------------------------
@@ -99,6 +100,8 @@ public class Application extends Controller
 				Logger.info(line);
 				String line1 = rd.readLine();
 				if (line1 != null) {
+					wr.close();
+					rd.close();
 					return ok(line1);
 				}
 			}
@@ -111,8 +114,7 @@ public class Application extends Controller
 		}
 		
 		Logger.info("WMS request failed");
-		// TODO: return NOT ok?
-		return ok();
+		return badRequest(); // TODO: add return errors if needed...
 	}
 
 	//----------------------------------------------------------------------
@@ -125,10 +127,12 @@ public class Application extends Controller
 		return ok(sendback);
 	}
 
+	// TODO: should ultimately have accounts....
 	//----------------------------------------------------------------------
 	public static Result getClientID() throws Exception 
 	{
 		ObjectNode sendback = JsonNodeFactory.instance.objectNode();
+		// FIXME: should ultimately have accounts with log in?
 		sendback.put("DSS_clientID", RandomString.get(6));
 		
 		return ok(sendback);
@@ -141,8 +145,17 @@ public class Application extends Controller
 		// Create a new scenario and get a transformed crop rotation layer from it...
 		JsonNode request = request().body().asJson();
 
+		// TODO: validate that this can't contain anything that could be used as an attack?
 		String clientID = request.get("clientID").textValue();
-		String folder = "client_" + clientID;
+//		String folder = "client_" + clientID;
+
+		int saveID = request.get("saveID").asInt();
+		if (saveID < 0) saveID = 0;
+		else if (saveID > 9) {
+			saveID = 9;
+		}
+		
+		String folder = "client_" + clientID + "/" + Integer.toString(saveID);
 		
 		Scenario scenario = new Scenario();
 		scenario.setAssumptions(request);
@@ -154,13 +167,8 @@ public class Application extends Controller
 		ObjectNode sendback = JsonNodeFactory.instance.objectNode();
 		sendback.put("scenarioID", cacheID);
 		
-		return ok(sendback);
-	}
-	
-	//----------------------------------------------------------------------
-	public static Result runModelCluster() throws Exception 
-	{
-		Logger.info("----- Model Cluster Process Started ----");
+		QueuedWriter.queueResults(new ScenarioSetupResult(folder, scenario.mNewRotation,
+			scenario.mSelection.mRasterData, scenario.mSelection.mWidth, scenario.mSelection.mHeight));
 
 		JsonNode request = request().body().asJson();
 		
@@ -288,7 +296,7 @@ public class Application extends Controller
 
 		if (model == null) {
 			Logger.info("Tried to find a model data file but none was passed. Aborting heatmap.");
-			return ok(); // FIXME: not ok.
+			return badRequest(); // TODO: add return errors if needed...
 		}
 
 		// type can be: 
@@ -309,13 +317,46 @@ public class Application extends Controller
 		String clientID = request.get("clientID").textValue();
 		String folder = "client_" + clientID;
 
-		String path1 = "./layerData/default/" + model + ".dss";
-		String path2 = "./layerData/" + folder + "/" + model + ".dss";
-		
-		// BLURF, crutching up for SOC layer being handled/stored kind of differntly...
-		if (model.equals("soc")) {
-			path1 = "./layerData/soc.dss";
+		int compare1ID = request.get("compare1ID").asInt(); // -1 is default, otherwise 0-9, validated below
+		int compare2ID = request.get("compare2ID").asInt(); // -1 is default, otherwise 0-9, validated below
+	
+		String path1 = "./layerData/";
+		if (compare1ID == -1) {
+			path1 += "default/";
 		}
+		else if (compare1ID < 0 || compare1ID > 9) {
+			return badRequest(); // TODO: add return errors if needed...
+		}
+		else {
+			path1 += folder + "/" + Integer.toString(compare1ID) + "/";
+		}
+		path1 += model + ".dss";
+		
+		String path2 = "./layerData/";
+		if (compare2ID == -1) {
+			path2 += "default/";
+		}
+		else if (compare2ID < 0 || compare2ID > 9) {
+			return badRequest(); // TODO: add return errors if needed...
+		}
+		else {
+			path2 += folder + "/" + Integer.toString(compare2ID) + "/";
+		}
+		path2 += model + ".dss";
+		
+		// BLURF, crutching up for SOC layer being handled/stored kind of differently...
+		if (model.equals("soc")) {
+			if (compare1ID == -1) {
+				path1 = "./layerData/soc.dss";
+			}
+			if (compare2ID == -1) {
+				path2 = "./layerData/soc.dss";
+			}
+		}
+
+		Logger.info("Going to heatmap files:");
+		Logger.info("  " + path1);
+		Logger.info("  " + path2);
 		
 		File file1 = new File(path1);
 		File file2 = new File(path2);
@@ -324,24 +365,24 @@ public class Application extends Controller
 			// for 'delta' type, both files must exist!
 			if (!file1.exists() || !file2.exists()) {
 				Logger.info("Wanted to open files for 'delta' heatmap but one of the files did not exist");
-				return ok(); // FIXME: not ok.
+				return badRequest(); // TODO: add return errors if needed...
 			}
 		}
 		else if (type.equals("file1")) {
 			if (!file1.exists()) {
 				Logger.info("Wanted to open file for 'file1' heatmap but that file did not exist");
-				return ok(); // FIXME: not ok.
+				return badRequest(); // TODO: add return errors if needed...
 			}
 		}
 		else if (type.equals("file2")) {
 			if (!file2.exists()) {
 				Logger.info("Wanted to open file for 'file2' heatmap but that file did not exist");
-				return ok(); // FIXME: not ok.
+				return badRequest(); // TODO: add return errors if needed...
 			}
 		}
 		else {
 			Logger.info("Error, unknown heatmap type: <" + type + ">");
-			return ok(); // FIXME: not ok.
+			return badRequest(); // TODO: add return errors if needed...
 		}
 
 		String outputPath = "/public/dynamicFiles/heat_max_" + model + "_" + Integer.toString(mHeatCount++) + ".png";
@@ -368,41 +409,278 @@ public class Application extends Controller
 							10);
 			}
 		}
-		else if (type.equals("file1")) { // ONE file absolute map
-			sendBack = Analyzer_Heatmap.runAbsolute(file1, 
-							outputFile, 
-							10);
-		}
-		else if (type.equals("file2")) { // ONE file absolute map
-			sendBack = Analyzer_Heatmap.runAbsolute(file2, 
-							outputFile, 
-							10);
+		else
+		{
+			File fileToMap = file1;
+			
+			if (type.equals("file2")) { // ONE file absolute map
+				fileToMap = file2;
+			}
+			
+			if (subtype.equals("equal")) {
+				sendBack = Analyzer_Heatmap.runAbsolute(fileToMap, 
+								outputFile, 
+								10);
+			}
+			else {
+				sendBack = Analyzer_Heatmap.runAbsoluteQuantiled(fileToMap, 
+								outputFile, 
+								10);
+			}
 		}
 
-		sendBack.put("heatFile", "/files/" + outputFile.getName());
+		if (sendBack != null) {
+			sendBack.put("heatFile", "/files/" + outputFile.getName());
+		}
 		return ok(sendBack);
 	}
 	
+ 
 	//----------------------------------------------------------------------
-	public static Result saveScenario() throws Exception
+	public static Result runModelCluster() throws Exception 
 	{
-/*		Logger.info("----- Save Scenario Request ----");
+		Logger.info("----- Model Cluster Process Started ----");
 
 		JsonNode request = request().body().asJson();
 		
-		String modelType = request.get("name").textValue();
-		String clientID = request.get("clientID").textValue();
-		
-		String srcFolder = "client_" + clientID;
-		String srcPath = "./layerData/" + srcFolder + "/*";
+/*		// NOTE: Seems to not be needed? TODO: verify...
 
-		String destFolder = "client_" + clientID;
-		String destPath = "./layerData/" + srcFolder + "/name";
+		// Rotation
+		Layer_Base layer = Layer_Base.getLayer("cdl_2012");
+		int[][] defaultRotation = layer.getIntData();
+		int width = layer.getWidth(), height = layer.getHeight();
+*/		
+		Scenario scenario = Scenario.getCachedScenario(request.get("scenarioID").textValue());
 		
-		Process proc = Runtime.getRuntime().exec("cp -r " + srcPath + " " + destPath)
-*/
-		return ok();
+		if (scenario == null) {
+			return badRequest();
+		}
+		
+		String modelType = request.get("modelType").textValue();
+		List<ModelResult> results = null;
+		
+		if (modelType.equals("yield")) {
+			Model_EthanolNetEnergyIncome ethanolEnergyIncome = new Model_EthanolNetEnergyIncome();
+			results = ethanolEnergyIncome.run(scenario);
+		}
+		else if (modelType.equals("epic_phosphorus")) {
+			Model_P_LossEpic ple = new Model_P_LossEpic();
+			results = ple.run(scenario);
+		}
+		else if (modelType.equals("water_quality")) {
+			Model_WaterQuality wq = new Model_WaterQuality();
+			results = wq.run(scenario);
+		}
+		else if (modelType.equals("soc")) {
+			Model_SoilCarbon soc = new Model_SoilCarbon();
+			results = soc.run(scenario);
+		}
+		else if (modelType.equals("pest_pol")) {
+			Model_PollinatorPestSuppression pp = new Model_PollinatorPestSuppression();
+			results = pp.run(scenario);
+		}
+		else if (modelType.equals("nitrous")) {
+			Model_NitrousOxideEmissions n20 = new Model_NitrousOxideEmissions();
+			results = n20.run(scenario);
+		}
+		else if (modelType.equals("soil_loss")) {
+			Model_Soil_Loss sl = new Model_Soil_Loss();
+			results = sl.run(scenario);
+		}
+		else {//(modelType.equals("habitat_index")) {
+			Model_HabitatIndex hi = new Model_HabitatIndex();
+			results = hi.run(scenario);
+		}
+		
+		// SendBack to Client
+		ObjectNode sendBack  = JsonNodeFactory.instance.objectNode();
+		
+		if (results != null) {
+			Analyzer_HistogramNew histogram = new Analyzer_HistogramNew();
+			
+			// Try to do an in-memory compare of (usually) default...
+			//	if layer is not in memory, try doin a file-based compare
+			for (int i = 0; i < results.size(); i++) {
+				
+				ModelResult res = results.get(i);
+				Logger.info("Procesing results for " + res.mName);
+				
+				String clientID = request.get("clientID").textValue();
+				String clientFolder = "client_" + clientID + "/";
+				int compare1ID = request.get("compare1ID").asInt(); // -1 is default
+				String runFolder = Integer.toString(compare1ID) + "/";
+			
+				String path1 = "";
+				// Asking to compare against DEFAULT?
+				if (compare1ID == -1) {
+					// YES, but SOC is not actually in DEFAULT so redirect to its real location
+					if (res.mName.equals("soc")) {
+						path1 = "soc";
+					}
+					else {
+						// YES, so set up the path to the default folder
+						path1 = "default/" + res.mName;
+					}
+					
+					// See if the layer is in memory (it usually will be unless the server was started
+					//	with the DEFAULTS NOT loaded...)
+					Layer_Base layer = Layer_Base.getLayer(path1);
+					if (layer != null) {
+						// other layer is in memory so compare with that.
+						float[][] data1 = layer.getFloatData();
+						if (data1 == null) {
+							Logger.info("could not get layer in runModelCluster");
+						}
+						else {
+							sendBack.put(res.mName, 
+								histogram.run(res.mWidth, res.mHeight, data1, scenario.mSelection,
+												res.mRasterData, scenario.mSelection));
+						}
+						continue; // process next result...
+					}
+				}
+				else {
+					path1 = clientFolder + runFolder + res.mName;
+				}
+				
+				// Compare to file was not in memory, set up the real path and we'll try to load it for
+				//	comparison (which is slower...booo)
+				path1 = "./layerData/" + path1 + ".dss";
+				sendBack.put(res.mName, 
+						histogram.run(new File(path1), scenario.mSelection,
+										res.mWidth, res.mHeight, res.mRasterData, scenario.mSelection));
+			}
+		}
+		Logger.info("Done processing list of results, queuing results for file writer");
+		QueuedWriter.queueResults(results);
+
+		Logger.info(sendBack.toString());
+		return ok(sendBack);
 	}
-	
+ 
+	// TODO: validate that Compare1ID and compare2ID are not the same?
+	//	The client could also validate this but probably smart to make the server also check here...
+	//----------------------------------------------------------------------
+	public static Result initComparison() throws Exception {
+		
+		Logger.info("----- Initializing for comparison ----");
+		JsonNode request = request().body().asJson();
+
+		// TODO: validate that this can't contain anything that could be used as an attack?
+		String clientID = request.get("clientID").textValue();
+		String folder = "client_" + clientID;
+
+		int compare1ID = request.get("compare1ID").asInt(); // -1 is default
+		int compare2ID = request.get("compare2ID").asInt(); // -1 is default
+
+		String path1 = "./layerData/";
+		if (compare1ID == -1) {
+			path1 += "default/";
+		}
+		else if (compare1ID < 0 || compare1ID > 9) {
+			return badRequest(); // TODO: add return errors if needed...
+		}
+		else {
+			path1 += folder + "/" + Integer.toString(compare1ID) + "/";
+		}
+		String basePath1 = path1;
+		path1 += "selection.sel";
+		
+		String path2 = "./layerData/";
+		if (compare2ID == -1) {
+			path2 += "default/";
+		}
+		else if (compare2ID < 0 || compare2ID > 9) {
+			return badRequest(); // TODO: add return errors if needed...
+		}
+		else {
+			path2 += folder + "/" + Integer.toString(compare2ID) + "/";
+		}
+		String basePath2 = path2;
+		path2 += "selection.sel";
+
+		Logger.info(" ... Going to custom compare files:");
+		Logger.info("  " + path1);
+		Logger.info("  " + path2);
+		
+		File file1 = new File(path1);
+		File file2 = new File(path2);
+		
+		boolean failed = false;
+		
+		if (!file1.exists()) {
+			Logger.info(" Error! - file <" + file1.toString() + 
+				"> does not exist");
+			failed = true;
+		}
+		if (!file2.exists()) {
+			Logger.info(" Error! - file <" + file2.toString() + 
+				"> does not exist");
+			failed = true;
+		}
+
+		if (failed) {
+			Logger.info(" Error! - custom comparison aborting.");
+			return badRequest(); // TODO: add return errors if needed...
+		}
+		
+		Selection sel1 = new Selection(file1);
+		if (!sel1.isValid) {
+			Logger.info(" Error! - load of selection from file <" + file1.toString() + 
+				"> failed! Custom comparison aborting.");
+			return badRequest(); // TODO: add return errors if needed...
+		}
+		Selection sel2 = new Selection(file2);
+		if (!sel2.isValid) {
+			Logger.info(" Error! - load of selection from file <" + file2.toString() + 
+				"> failed! Custom comparison aborting.");
+			return badRequest(); // TODO: add return errors if needed...
+		}
+		
+		CustomComparison customCompare = new CustomComparison(basePath1, sel1, basePath2, sel2);
+		
+		String cacheID = CustomComparison.cacheCustomComparions(customCompare, clientID);
+
+		ObjectNode sendback = JsonNodeFactory.instance.objectNode();
+		sendback.put("customCompareID", cacheID);
+		
+		return ok(sendback);
+	}
+
+	//----------------------------------------------------------------------
+	public static Result runComparison() throws Exception {
+		
+		Logger.info("----- Custom Comparison Analysis Cluster Process Started ----");
+
+		JsonNode request = request().body().asJson();
+		
+		String compareID = request.get("customCompareID").textValue();
+		CustomComparison comparison = CustomComparison.getCachedComparison(compareID);
+		
+		if (comparison == null) {
+			return badRequest(); // TODO: return error if needed...
+		}
+		
+		String file = request.get("file").textValue();
+
+		// SendBack to Client
+		ObjectNode sendBack  = JsonNodeFactory.instance.objectNode();
+		
+		Analyzer_HistogramNew histogram = new Analyzer_HistogramNew();
+
+		// TODO: FIXME: this isn't going to properly handle the SOC layer?
+		File file1 = new File(comparison.mBasePath1 + "/" + file + ".dss");
+		File file2 = new File(comparison.mBasePath2 + "/" + file + ".dss");
+		
+		Logger.info("Basepath1: " + file1.toString());
+		Logger.info("Basepath2: " + file2.toString());
+
+		sendBack.put(file, 
+				histogram.run(file1, comparison.mSelection1, 
+								file2, comparison.mSelection2));
+
+		Logger.info(sendBack.toString());
+		return ok(sendBack);
+	}
 }
 

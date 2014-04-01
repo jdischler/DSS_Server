@@ -23,7 +23,7 @@ public class Model_WaterQuality extends Model_Base
 
 	private static final String mPhosphorusModelFile = "water_quality";
 	// Number of watersheds in study area
-	private static final int mNumWatersheds = 140;
+	//private static final int mNumWatersheds = 140;
 	
 	//--------------------------------------------------------------------------
 	public List<ModelResult> run(Scenario scenario) 
@@ -38,9 +38,9 @@ long timeStart = System.currentTimeMillis();
 		int width = scenario.getWidth(), height = scenario.getHeight();
 		Layer_Integer cdl = (Layer_Integer)Layer_Base.getLayer("cdl_2012");
 		float[][] Rivers = Layer_Base.getLayer("rivers").getFloatData();
-		int[][] watersheds = Layer_Base.getLayer("watersheds").getIntData();
+		//int[][] watersheds = Layer_Base.getLayer("watersheds").getIntData();
 		// Id for tracking watershed
-		int watershedIdx = 0;
+		//int watershedIdx = 0;
 		
 		// Mask
 		// Grass
@@ -58,6 +58,8 @@ long timeStart = System.currentTimeMillis();
 		int SubUrban_Mask = cdl.convertStringsToMask("suburban");
 		Urban_Mask = Urban_Mask | SubUrban_Mask;
 		// Total Mask
+		int TotalMask = Grass_Mask | Alfalfa_Mask | Forest_Mask | Ag_Mask | Urban_Mask;
+		// Total Mask
 		//int Corn_Mask = cdl.convertStringsToMask("corn");
 		//int Soy_Mask = cdl.convertStringsToMask("soy");
 		//int Alfalfa_Mask = cdl.convertStringsToMask("Alfalfa");
@@ -65,9 +67,9 @@ long timeStart = System.currentTimeMillis();
 		//int TotalMask = mAgMask | mGrassMask;
 		
 		// Arrays to sum phosphorus within each watershed
-		int[] CountCellsInWatershed = new int[mNumWatersheds];
+		//int[] CountCellsInWatershed = new int[mNumWatersheds];
 		// Arrays to save phosphorus at watershed scale
-		float[] Phosphorus = new float[mNumWatersheds];
+		//float[] Phosphorus = new float[mNumWatersheds];
 		// Arrays to save phosphorus at cell base
 		float[][] PhosphorusData = new float[height][width];
 			
@@ -87,7 +89,7 @@ Logger.info("  > Allocated memory for Water_Quality");
 		{
 			for (int x = 0; x < width; x++) 
 			{
-				if (rotationData[y][x] > 0)
+				if ((rotationData[y][x] & TotalMask) > 0)
 				{
 					// Grass
 					if ((rotationData[y][x] & Grass_Mask) > 0) 
@@ -132,18 +134,30 @@ Logger.info("  > Allocated memory for Water_Quality");
 						Transmission = 0;
 					}
 					
-					// Calculate phosphorus for each cell in the landscape (Kg per year)
+					// Distance
 					Dist = (int)(Rivers[y][x] / 30) + 1;
-					PhosphorusData[y][x] = P_flux * 900 * 0.0001f * (float)(Math.pow(Transmission, Dist));
 					
+					//if ((rotationData[y][x] & TotalMask) > 0)
+					//{
+						// Calculate phosphorus kg per Ha and then convert in Mg per year
+						PhosphorusData[y][x] = (P_flux * 900.0f / 10000.0f * (float)(Math.pow(Transmission, Dist))) / 1000.0f;
+						// Calculate phosphorus (kg per Ha) in the landscape (per year)
+						//PhosphorusData[y][x] = P_flux * (float)(Math.pow(Transmission, Dist));
+						// Calculate phosphorus (Mg per Ha per Year)
+						//PhosphorusData[y][x] = (P_flux * (float)(Math.pow(Transmission, Dist))) / 1000.0f;
+					//}
+					//else 
+					//{
+					//	PhosphorusData[y][x] = -9999.0f;
+					//}
 					// 2st step. Add the calculated cells within a watershed
-					watershedIdx = watersheds[y][x];
+					//watershedIdx = watersheds[y][x];
 					
-					if (watershedIdx >= 0) 
-					{
-						CountCellsInWatershed[watershedIdx]++;
-						Phosphorus[watershedIdx] = Phosphorus[watershedIdx] + PhosphorusData[y][x];
-					}
+					//if (watershedIdx >= 0) 
+					//{
+					//	CountCellsInWatershed[watershedIdx]++;
+					//	Phosphorus[watershedIdx] = Phosphorus[watershedIdx] + PhosphorusData[y][x];
+					//}
 				}
 				else 
 				{
@@ -155,22 +169,22 @@ Logger.info("  > Allocated memory for Water_Quality");
 		
 		// 3rd step...fill in a full-sized raster with those values so they can be used
 		//	to compute heatmaps or be analyzed with the standard code-paths...
-		for (int y = 0; y < height; y++) 
-		{
-			for (int x = 0; x < width; x++) 
-			{
-				watershedIdx = watersheds[y][x];
+		//for (int y = 0; y < height; y++) 
+		//{
+		//	for (int x = 0; x < width; x++) 
+		//	{
+		//		watershedIdx = watersheds[y][x];
 				
-				if (watershedIdx >= 0) 
-				{
-					PhosphorusData[y][x] = Phosphorus[watershedIdx];
-				}
-				else 
-				{
-					PhosphorusData[y][x] = -9999.0f;
-				}
-			}
-		}
+		//		if (watershedIdx >= 0) 
+		//		{
+		//			PhosphorusData[y][x] = Phosphorus[watershedIdx];
+		//		}
+		//		else 
+		//		{
+		//			PhosphorusData[y][x] = -9999.0f;
+		//		}
+		//	}
+		//}
 		
 		List<ModelResult> results = new ArrayList<ModelResult>();
 		

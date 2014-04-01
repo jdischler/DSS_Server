@@ -22,7 +22,7 @@ public class Model_P_LossEpic extends Model_Base
 
 	private static final String mPLossModelFile = "p_loss_epic";
 	// Number of watersheds in study area
-	private static final int mNumWatersheds = 140;
+	//private static final int mNumWatersheds = 140;
 	
 	//--------------------------------------------------------------------------
 	public List<ModelResult> run(Scenario scenario) 
@@ -45,11 +45,11 @@ long timeStart = System.currentTimeMillis();
 		// Grass
 		float[][] Grass_p = Layer_Base.getLayer("grass_p").getFloatData();
 		// Watershed layer
-		int[][] watersheds = Layer_Base.getLayer("watersheds").getIntData();
+		//int[][] watersheds = Layer_Base.getLayer("watersheds").getIntData();
 		// Distance to river
 		float[][] Rivers = Layer_Base.getLayer("rivers").getFloatData();
 		// Id for tracking watershed
-		int watershedIdx = 0;
+		//int watershedIdx = 0;
 		
 		// Mask
 		// Grass
@@ -62,9 +62,9 @@ long timeStart = System.currentTimeMillis();
 		int Soy_Mask = cdl.convertStringsToMask("soy");
 		
 		// Arrays to sum phosphorus within each watershed
-		int[] CountCellsInWatershed = new int[mNumWatersheds];
+		//int[] CountCellsInWatershed = new int[mNumWatersheds];
 		// Arrays to save phosphorus at watershed scale
-		float[] Phosphorus = new float[mNumWatersheds];
+		//float[] Phosphorus = new float[mNumWatersheds];
 		// Arrays to save phosphorus at cell base
 		float[][] PhosphorusData = new float[height][width];
 		
@@ -141,20 +141,20 @@ Logger.info("  > Allocated memory for P_Loss_EPIC");
 					{
 						Transmission = 0;
 					}
-					// Correct phosphorus Calculation for each cell in the landscape based on the distance (Kg per year)
-					// Convert Kg per Ha to Kg per cell
+					// Correct phosphorus Calculation for each cell in the landscape based on the distance
+					// Convert Kg per Ha to Mg per cell
 					Dist = (int)(Rivers[y][x] / 30) + 1;
-					PhosphorusData[y][x] = PhosphorusData[y][x] * 900 * 0.0001f * (float)(Math.pow(Transmission, Dist));
+					PhosphorusData[y][x] = (PhosphorusData[y][x] * 900.0f * 0.0001f * (float)(Math.pow(Transmission, Dist))) / 1000.0f;
 					
 					// 2st step. Add the calculated cells within a watershed
-					watershedIdx = watersheds[y][x];
+					//watershedIdx = watersheds[y][x];
 					
-					if (watershedIdx >= 0) 
-					{
+					//if (watershedIdx >= 0) 
+					//{
 						// watershed index zero is reserved for no-data
-						CountCellsInWatershed[watershedIdx]++;
-						Phosphorus[watershedIdx] = Phosphorus[watershedIdx] + PhosphorusData[y][x];
-					}
+						//CountCellsInWatershed[watershedIdx]++;
+						//Phosphorus[watershedIdx] = Phosphorus[watershedIdx] + PhosphorusData[y][x];
+					//}
 				}
 				else 
 				{
@@ -166,22 +166,22 @@ Logger.info("  > Allocated memory for P_Loss_EPIC");
 		
 		// 3rd step...fill in a full-sized raster with those values so they can be used
 		//	to compute heatmaps or be analyzed with the standard code-paths...
-		for (int y = 0; y < height; y++) 
-		{
-			for (int x = 0; x < width; x++) 
-			{
-				watershedIdx = watersheds[y][x];
+		//for (int y = 0; y < height; y++) 
+		//{
+			//for (int x = 0; x < width; x++) 
+			//{
+				//watershedIdx = watersheds[y][x];
 				
-				if (watershedIdx >= 0) 
-				{
-					PhosphorusData[y][x] = Phosphorus[watershedIdx];
-				}
-				else 
-				{
-					PhosphorusData[y][x] = -9999.0f;
-				}
-			}
-		}
+				//if (watershedIdx >= 0) 
+				//{
+				//	PhosphorusData[y][x] = Phosphorus[watershedIdx];
+				//}
+				//else 
+				//{
+				//	PhosphorusData[y][x] = -9999.0f;
+				//}
+			//}
+		//}
 		
 		List<ModelResult> results = new ArrayList<ModelResult>();
 		

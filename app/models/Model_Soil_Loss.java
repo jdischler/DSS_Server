@@ -22,7 +22,7 @@ import java.nio.channels.*;
 // K layer was incorporated from SSURGO data base and we converted it to ton per ha from ton / acre
 // Other units are LS, C and P are dimensionless
 // Input is crop rotation layer 
-// Version 02/10/2014
+// Version 02/15/2014
 //
 //------------------------------------------------------------------------------
 public class Model_Soil_Loss extends Model_Base
@@ -111,33 +111,34 @@ Logger.info("  > Allocated memory for Soil_Loss");
 				if ((rotationData[y][x] & TotalMask) > 0)
 				{
 					// Update C and P factors for different LUCC type
+					// C and P are coming from biophysical table (Invest)
 					// Grass
 					if ((rotationData[y][x] & Grass_Mask) > 0) 
 					{
-						C = 0.01f;
-						P = 1;
-						//P = 0.20f;
+						C = 0.02f;
+						//P = 0.25f;
+						P = 1.0f;
 					} 
 					// Alfalfa
 					else if ((rotationData[y][x] & Alfalfa_Mask) > 0) 
 					{
 						C = 0.02f;
-						P = 1;
 						//P = 0.25f;
+						P = 1.0f;
 					} 
 					// Forest
 					else if ((rotationData[y][x] & Forest_Mask) > 0) 
 					{
 						C = 0.003f;
-						P = 1;
 						//P = 0.2f;
+						P = 1.0f;
 					} 
 					// Agriculture
 					else if ((rotationData[y][x] & Ag_Mask) > 0) 
 					{
 						C = 0.5f;
-						P = 1;
 						//P = 0.4f;
+						P = 1.0f;
 					}
 					// Other land use classes
 					//else
@@ -146,13 +147,20 @@ Logger.info("  > Allocated memory for Soil_Loss");
 					//	P = -9999;
 					//}
 
-					if (Rainfall_Erosivity[y][x] > -9999 && Soil_Erodibility[y][x] > -9999 && LS[y][x] > -9999)
+					if (Rainfall_Erosivity[y][x] > -9999.0f && Soil_Erodibility[y][x] > -9999.0f && LS[y][x] > -9999.0f)
 					{
-						// Convert Tonn per Ha to Tonns per cell
-						// Calculate Soil Loss for each cell in the landscape (Tonns per cell per year)
-						Soil_Loss_Data[y][x] = Rainfall_Erosivity[y][x] * Soil_Erodibility[y][x] * LS[y][x] * C * P * 900 * 0.0001f;
+						// Convert Mg per Ha to Mg per cell
+						// Calculate Soil Loss for each cell in the landscape (Mg per cell per year)
+						Soil_Loss_Data[y][x] = Rainfall_Erosivity[y][x] * Soil_Erodibility[y][x] * LS[y][x] * C * P * 900.0f / 10000.0f;
+						// Calculate Soil Loss in the landscape (Mg per Ha per year)
+						//Soil_Loss_Data[y][x] = Rainfall_Erosivity[y][x] * Soil_Erodibility[y][x] * LS[y][x] * C * P;
+						// Calculate Soil Loss (Mg per Ha per year)
+						//Soil_Loss_Data[y][x] = Rainfall_Erosivity[y][x] * Soil_Erodibility[y][x] * LS[y][x] * C * P;
 					}
-					
+					else
+					{
+						Soil_Loss_Data[y][x] = -9999.0f;
+					}
 					// 2st step. Add the calculated cells within a watershed
 					//watershedIdx = watersheds[y][x];
 					

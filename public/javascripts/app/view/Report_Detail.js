@@ -57,7 +57,8 @@ Ext.define('MyApp.view.Report_Detail', {
 					itemId: 'result_ethanol',
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'ethanol',
-					DSS_UnitLabel: 'Gl/Yr',
+					DSS_UnitLabel: 'Gal/Yr',
+					//DSS_UnitLabel: 'Gl/Yr',
 					DSS_Label: 'Gross Biofuel',
 					DSS_GraphTitle: 'Biofuel Production',
 					DSS_InfoHTML: 'http://www.sciencedirect.com/science/article/pii/S0305750X11000933',
@@ -66,7 +67,8 @@ Ext.define('MyApp.view.Report_Detail', {
 					itemId: 'result_net_energy',
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'net_energy',
-					DSS_UnitLabel: 'TJ/Yr',
+					//DSS_UnitLabel: 'TJ/Yr',
+					DSS_UnitLabel: 'Million Btu/Yr',
 					DSS_Label: 'Net Energy',
 					DSS_GraphTitle: 'Net Energy',
 					DSS_InfoHTML: 'http://www.sciencedirect.com/science/article/pii/S0305750X11000933',
@@ -76,6 +78,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'water_quality',
 					DSS_UnitLabel: 'Kg/Yr',
+					DSS_UnitLabel: 'ton/Yr',
 					DSS_Label: 'Water Quality',
 					DSS_GraphTitle: 'Water Quality',
 					DSS_InfoHTML: 'http://www.epa.gov/airquality/modeling.html',
@@ -84,7 +87,8 @@ Ext.define('MyApp.view.Report_Detail', {
 					itemId: 'result_phosphorus_epic',
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'p_loss_epic',
-					DSS_UnitLabel: 'Kg/Yr',
+					//DSS_UnitLabel: 'Kg/Yr',
+					DSS_UnitLabel: 'ton/Yr',
 					DSS_Label: 'Phosphorus',
 					DSS_GraphTitle: 'Phosphorus Epic',
 					DSS_InfoHTML: 'http://water.epa.gov/scitech/datait/models/index.cfm',
@@ -93,7 +97,8 @@ Ext.define('MyApp.view.Report_Detail', {
 					itemId: 'result_soil_loss',
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'soil_loss',
-					DSS_UnitLabel: 'Mg/Yr',
+					//DSS_UnitLabel: 'Mg/Yr',
+					DSS_UnitLabel: 'ton/Yr',
 					DSS_Label: 'Soil Loss',
 					DSS_GraphTitle: 'Soil Loss',
 					DSS_InfoHTML: 'http://www.epa.gov/airquality/modeling.html',
@@ -116,7 +121,8 @@ Ext.define('MyApp.view.Report_Detail', {
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'soc',
 					DSS_Label: 'Soil Carbon',
-					DSS_UnitLabel: 'Mg/Yr',
+					//DSS_UnitLabel: 'Mg/Yr',
+					DSS_UnitLabel: 'ton/Yr',
 					DSS_GraphTitle: 'Soil Carbon',
 					DSS_InfoHTML: 'http://www.epa.gov/airquality/modeling.html',
 					DSS_DetailReportContainer: me
@@ -124,7 +130,8 @@ Ext.define('MyApp.view.Report_Detail', {
 					itemId: 'result_nitrous_oxide',
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'nitrous_oxide',
-					DSS_UnitLabel: 'Mg/Yr',
+					//DSS_UnitLabel: 'Mg/Yr',
+					DSS_UnitLabel: 'ton/Yr',
 					DSS_Label: 'Nitrous Oxide',
 					DSS_GraphTitle: 'Nitrous Oxide Emissions',
 					DSS_InfoHTML: 'http://www.epa.gov/airquality/modeling.html',
@@ -272,28 +279,37 @@ Ext.define('MyApp.view.Report_Detail', {
 	//			.min
 	//			.max
     //--------------------------------------------------------------------------
-    setData: function(obj)
+        setData: function(obj)
     {
 		var c = this.getComponent('results_container');
 		
 		if (obj.habitat_index) {
 			var base = obj.habitat_index.selection;
 //			var base = obj.habitat_index.landscape;
+//			Calculate average habitat index per cell
 			var val1 = base.file1.sum / base.file1.count;
 			var val2 = base.file2.sum / base.file2.count;
-			var totalVal = (val2 - val1);
+			var totalVal = val2 - val1;
 			c.getComponent('result_habitat_index').setData(val1, val2, totalVal, base);
 		}
 		
 		if (obj.soc) {
 			var base = obj.soc.selection;
 //			var base = obj.soc.landscape;
-			// Convert from Kg per Ha to Mg per cell (...*900/(10000*1000))
-			var val1 = base.file1.sum * 0.09 / 1000;
-			var val2 = base.file2.sum * 0.09 / 1000;
+			// Convert from Mg per Ha to Mg per cell (...*900/10000)
+			//var val1 = base.file1.sum * 0.09;
+			//var val2 = base.file2.sum * 0.09;
+			/// Convert from Mg per Ha to short tons per acre (...*0.44597329)
+			//var val1 = base.file1.sum * 0.44597329;
+			//var val2 = base.file2.sum * 0.44597329;
+			/// Convert Mg to short tons
+			var val1 = base.file1.sum * 1.102;
+			var val2 = base.file2.sum * 1.102;
 			// This is for 1 year and other process is on server side
-			// Convert change from 20 years to 1 year
-			var totalVal = ((val2 - val1) / 20);
+			// Mg
+			//var val1 = base.file1.sum;
+			//var val2 = base.file2.sum;
+			var totalVal = val2 - val1;
 			//var totalVal = (val2 - val1);
 			c.getComponent('result_soc').setData(val1, val2, totalVal, base);
 		}	
@@ -302,52 +318,87 @@ Ext.define('MyApp.view.Report_Detail', {
 			var base = obj.net_income.selection;
 //			var base = obj.net_income.landscape;
 		// Convert from $ per Ha to million $ per cell (...*900/(10000*1000*1000))
-			var val1 = base.file1.sum * 0.09 / 1000000;
-			var val2 = base.file2.sum * 0.09 / 1000000;
-			var totalVal = (val2 - val1);
+			//var val1 = base.file1.sum * 0.09 / 1000000;
+			//var val2 = base.file2.sum * 0.09 / 1000000;
+			// Convert $ to million $
+			var val1 = base.file1.sum / 1000000;
+			var val2 = base.file2.sum / 1000000;
+			var totalVal = val2 - val1;
 			c.getComponent('result_net_income').setData(val1, val2, totalVal, base);
 		}	
 
 		if (obj.net_energy) {
 			var base = obj.net_energy.selection;
 //			var base = obj.net_energy.landscape;
-			// Convert from MJ per Ha to TJ per cell (...*900/(10000*1000*1000))
-			var val1 = base.file1.sum * 0.09 / 1000000;
-			var val2 = base.file2.sum * 0.09 / 1000000;
-			var totalVal = (val2 - val1);
+			// Convert from MJ per Ha to TJ per cell (...*900/(10000*1000*1000*2.4710))
+			//var val1 = base.file1.sum * 0.09 / 1000000;
+			//var val2 = base.file2.sum * 0.09 / 1000000;
+			// MJ per cell to TJ per cell
+			//var val1 = base.file1.sum / 1000000;
+			//var val2 = base.file2.sum / 1000000;
+			// Convert MJ to Million btu
+			var val1 = base.file1.sum * 947.817 / 1000000;
+			var val2 = base.file2.sum * 947.817 / 1000000;
+			var totalVal = val2 - val1;
 			c.getComponent('result_net_energy').setData(val1, val2, totalVal, base);
 		}	
 
 		if (obj.phosphorus) {
 			var base = obj.phosphorus.selection;
 //			var base = obj.phosphorus.landscape;
-			var val1 = base.file1.sum / base.file1.count;
-			var val2 = base.file2.sum / base.file2.count;
-			var totalVal = (val2 - val1);
+			// Units are Mg per Ha
+			//var val1 = base.file1.sum / base.file1.count;
+			//var val2 = base.file2.sum / base.file2.count;
+			// Kg
+			//var val1 = base.file1.sum;
+			//var val2 = base.file2.sum;
+			// Convert Mg to Short tons
+			var val1 = base.file1.sum * 1.102;
+			var val2 = base.file2.sum * 1.102;
+			var totalVal = val2 - val1;
 			c.getComponent('result_phosphorus').setData(val1, val2, totalVal, base);
 		}
 		if (obj.p_loss_epic) {
 			var base = obj.p_loss_epic.selection;
-//			var base = obj.p_loss_epic.landscape;
-			var val1 = base.file1.sum / base.file1.count;
-			var val2 = base.file2.sum / base.file2.count;
-			var totalVal = (val2 - val1);
+//			var base = obj.P_Loss_EPIC.landscape;
+			// Kg
+			//var val1 = base.file1.sum;
+			//var val2 = base.file2.sum;
+			//var val1 = base.file1.sum / base.file1.count;
+			//var val2 = base.file2.sum / base.file2.count;
+			// Convert Mg per Ha to Short tons per acre
+			//val1 = val1 * 0.44597329;
+			//val2 = val2 * 0.44597329;
+			// Convert Mg to Short tons per Year
+			var val1 = base.file1.sum * 1.102;
+			var val2 = base.file2.sum * 1.102;
+			var totalVal = val2 - val1;
 			c.getComponent('result_phosphorus_epic').setData(val1, val2, totalVal, base);
 		}	
 		/*if (obj.water_quality) {
 			var base = obj.water_quality.selection;
 //			var base = obj.water_quality.landscape;
-			var val1 = base.file1.sum / base.file1.count;
-			var val2 = base.file2.sum / base.file2.count;
+			var val1 = base.file1.sum;
+			var val2 = base.file2.sum;
+			// Convert Mg to Short tons per per Year
+			val1 = val1 * 1.102;
+			val2 = val2 * 1.102;
 			var totalVal = (val2 - val1);
 			c.getComponent('result_water_quality').setData(val1, val2, totalVal, base);
 		}*/
 		if (obj.soil_loss) {
 			var base = obj.soil_loss.selection;
 //			var base = obj.water_quality.landscape;
-			var val1 = base.file1.sum / base.file1.count;
-			var val2 = base.file2.sum / base.file2.count;
-			var totalVal = (val2 - val1);
+			//Tonns per cell
+			//var val1 = base.file1.sum / base.file1.count;
+			//var val2 = base.file2.sum / base.file2.count;
+			//Mg per cell per year
+			//var val1 = base.file1.sum;
+			//var val2 = base.file2.sum;
+			// Convert Mg to Short tons per year
+			var val1 = base.file1.sum * 1.102;
+			var val2 = base.file2.sum * 1.102;
+			var totalVal = val2 - val1;
 			c.getComponent('result_soil_loss').setData(val1, val2, totalVal, base);
 		}	
     	
@@ -355,18 +406,25 @@ Ext.define('MyApp.view.Report_Detail', {
     		var base = obj.ethanol.selection;
 //			var base = obj.ethanol.landscape;
 			// Convert from L per Ha to Giga L per cell (...*900/(10000*1000*1000))
-			var val1 = base.file1.sum * 0.09 / 1000000;
-			var val2 = base.file2.sum * 0.09 / 1000000;
-			var totalVal = (val2 - val1);
+			//var val1 = base.file1.sum * 0.09 / 1000000;
+			//var val2 = base.file2.sum * 0.09 / 1000000;
+			// L per cell to GL per cell
+			//var val1 = base.file1.sum / 1000000000;
+			//var val2 = base.file2.sum / 1000000000;
+			// Convert L to Gallon per year 
+			var val1 = base.file1.sum * 0.264172;
+			var val2 = base.file2.sum * 0.264172;
+			var totalVal = val2 - val1;
 			c.getComponent('result_ethanol').setData(val1, val2, totalVal, base);
 		}
 		
     	if (obj.pest) {
     		var base = obj.pest.selection;
 //			var base = obj.pest.landscape;
+//			Calculate average index using entire landscape
 			var val1 = base.file1.sum / base.file1.count;
 			var val2 = base.file2.sum / base.file2.count;
-			var totalVal = (val2 - val1);
+			var totalVal = val2 - val1;
 			c.getComponent('result_pest').setData(val1, val2, totalVal, base);
 		}	
     	
@@ -374,22 +432,31 @@ Ext.define('MyApp.view.Report_Detail', {
     		var base = obj.pollinator.selection; 
 //			var base = obj.pollinator.landscape;
     		var max = base.range.max;
+//			Calculate average index using entire landscape
 			var val1 = base.file1.sum / (base.file1.count * max);
 			var val2 = base.file2.sum / (base.file1.count * max);
-			var totalVal = (val2 - val1);
+			var totalVal = val2 - val1;
 			c.getComponent('result_pollinators').setData(val1, val2, totalVal, base);
 		}	
-	
+
     	if (obj.nitrous_oxide) {
     		var base = obj.nitrous_oxide.selection;
-//			var base = obj.nitrous_oxide.landscape;
-			// Convert from Kg per Ha to Mega per cell (...*900/(10000*1000))
-			var val1 = base.file1.sum * 0.09 / 1000;
-			var val2 = base.file2.sum * 0.09 / 1000;
-			var totalVal = (val2 - val1);
+			//var base = obj.nitrous_oxide.landscape;
+			// Convert from Kg per Ha to Mg per cell (...*900/(10000*1000))
+			//var val1 = base.file1.sum * 0.09 / 1000;
+			//var val2 = base.file2.sum * 0.09 / 1000;
+			// Mg
+			//var val1 = base.file1.sum;
+			//var val2 = base.file2.sum;
+			// Convert Mg to short tons per year
+			var val1 = base.file1.sum * 1.102;
+			var val2 = base.file2.sum * 1.102;
+			// Convert Mega per cell to Short Tons per cell
+			//val1 = val1 * 1.1023;
+			//val2 = val2 * 1.1023;
+			var totalVal = val2 - val1;
 			c.getComponent('result_nitrous_oxide').setData(val1, val2, totalVal, base);
 		}	
     }
 
 });
-

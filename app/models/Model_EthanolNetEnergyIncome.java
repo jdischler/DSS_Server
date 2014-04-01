@@ -14,7 +14,7 @@ import java.lang.reflect.Array;
 // This program uses corn, soy, grass and alfalfa production to calculate Net Energy 
 // This model is from unpublished work by Tim University of Wisconsin Madison
 // Inputs are corn, soy, grass and alfalfa layers and crop rotation layer 
-// Outputs are ASCII map of Net Energy
+// Outputs are ASCII map of Ethanol, Net_Energy and Net_Income
 // Version 08/20/2013
 //
 //------------------------------------------------------------------------------
@@ -84,11 +84,11 @@ Logger.info("  > Allocated memory for NetEnergy, NetIncom, Fuel");
 		
 		float returnAmount;	// Gross return
 		
-		float PC_Cost = 1135; // $ per hec cost for Corn
-		float PCS_Cost = 412; // $ per hec cost for Corn Stover
-		float PG_Cost = 412; // $ per hec cost for Grass
-		float PS_Cost = 627; // $ per hec cost for Soy
-		float PA_Cost = 620; // $ per hec cost for Alfalfa
+		float PC_Cost = 1135; // $ per ha cost for Corn
+		float PCS_Cost = 412; // $ per ha cost for Corn Stover
+		float PG_Cost = 412; // $ per ha cost for Grass
+		float PS_Cost = 627; // $ per ha cost for Soy
+		float PA_Cost = 620; // $ per ha cost for Alfalfa
 		
 		// Price per tonne
 		float P_Per_Corn = 274;
@@ -123,35 +123,35 @@ Logger.info("  > Allocated memory for NetEnergy, NetIncom, Fuel");
 				float ethanol = 0, netEnergy = 0, netIncome = 0;
 				if (yield > -9999.0f) {
 					if ((rotationData[y][x] & Corn_Mask) > 0) {
-						// Tonnes per Ha
+						// L per Ha
 						ethanol = yield * 0.5f * CEO_C + yield * 0.25f * CEO_CS;
 						// Net_Energy - MJ per Ha
 						Net_Energy_C = (yield * 0.5f * CEO_C * EO_C) - (EI_CF + EI_CP * yield * 0.5f * CEO_C);
 						Net_Energy_S = (yield * Prop_Stover_Harvest * 0.5f * CEO_CS * EO_CS) - (EI_CSF + EI_CSP * yield * Prop_Stover_Harvest * 0.5f * CEO_CS);
 						netEnergy = Net_Energy_C + Net_Energy_S;
-						// Gross inc return $ per hec
+						// Gross inc return $ per Ha
 						returnAmount = P_Per_Corn * 0.5f * yield + P_Per_Stover * Prop_Stover_Harvest * 0.5f * yield;
-						// Net Income $ per hec
+						// Net Income $ per Ha
 						netIncome = returnAmount - PC_Cost - PCS_Cost;
 					}
 					else if ((rotationData[y][x] & Grass_Mask) > 0) {
-						// Tonnes per pixel
+						// L per Ha
 						ethanol = yield * CEO_G;
 						// MJ per Ha
 						netEnergy = (yield * CEO_G * EO_G) - (EI_GF + EI_GP * yield * CEO_G);
-						// Gross return $ per pixel
+						// Gross return $ per ha
 						returnAmount = P_Per_Grass * yield;
-						// Net Income $ per pixel
+						// Net Income $ per ha
 						netIncome = returnAmount  - PG_Cost;
 					}
 					else if ((rotationData[y][x] & Soy_Mask) > 0) {
-						// Tonnes per pixel
+						// L per Ha
 						ethanol = yield * CEO_S;
 						// MJ per Ha
 						netEnergy = (yield * 0.40f * CEO_S * EO_S) - (EI_SF + EI_SP * yield * CEO_S);
-						// Soy return $ per pixel
+						// Soy return $ per Ha
 						returnAmount = P_Per_Soy * yield;
-						// Net Income $ per pixel
+						// Net Income $ per Ha
 						netIncome = returnAmount  - PS_Cost;
 					}
 					/*else if ((rotationData[y][x] & Corn_Soy_Mask) > 0) {
@@ -165,19 +165,23 @@ Logger.info("  > Allocated memory for NetEnergy, NetIncom, Fuel");
 						netIncome = returnAmount - PC_Cost - PCS_Cost - PS_Cost;
 					}*/
 					else if ((rotationData[y][x] & Alfalfa_Mask) > 0) {
-						// Tonnes per pixel
+						// L per Ha
 						ethanol = yield * CEO_A;
 						// MJ per Ha
 						netEnergy = (yield * CEO_A * EO_A) - (EI_AF + EI_AP * yield * CEO_A);
-						// Alfalfa return $ per pixel
+						// Alfalfa return $ per Ha
 						returnAmount = P_Per_Alfalfa * yield;
-						// Net Income $ per pixel
+						// Net Income $ per Ha
 						netIncome = returnAmount  - PA_Cost;
 					}
 					
-					ethanolData[y][x] = ethanol;
-					netEnergyData[y][x] = netEnergy;
-					netIncomeData[y][x] = netIncome;
+					// Convert L per Ha to L per cell
+					//ethanolData[y][x] = Math.round(ethanol * 900.0f / 10000.0f * 100.0f) / 100.0f;
+					ethanolData[y][x] = ethanol * 900.0f / 10000.0f;
+					// Convert MJ per Ha to MJ per cell
+					netEnergyData[y][x] = netEnergy * 900.0f / 10000.0f;
+					// Convert $ per Ha to $ per cell
+					netIncomeData[y][x] = netIncome * 900.0f / 10000.0f;
 				}
 				else {
 					ethanolData[y][x] = -9999.0f;
@@ -189,7 +193,7 @@ Logger.info("  > Allocated memory for NetEnergy, NetIncom, Fuel");
 		
 		List<ModelResult> results = new ArrayList<ModelResult>();
 		
-//		results.add(new ModelResult("yeild", scenario.mOutputDir, calculatedYield, width, height));
+		results.add(new ModelResult("yeild", scenario.mOutputDir, calculatedYield, width, height));
 		results.add(new ModelResult("ethanol", scenario.mOutputDir, ethanolData, width, height));
 		results.add(new ModelResult("net_energy", scenario.mOutputDir, netEnergyData, width, height));
 		results.add(new ModelResult("net_income", scenario.mOutputDir, netIncomeData, width, height));

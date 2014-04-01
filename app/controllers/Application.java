@@ -239,14 +239,6 @@ public class Application extends Controller
 		path2 += model + ".dss";
 		
 		// BLURF, crutching up for SOC layer being handled/stored kind of differently...
-		if (model.equals("soc")) {
-			if (compare1ID == -1) {
-				path1 = "./layerData/soc.dss";
-			}
-			if (compare2ID == -1) {
-				path2 = "./layerData/soc.dss";
-			}
-		}
 
 		Logger.info("Going to heatmap files:");
 		Logger.info("  " + path1);
@@ -467,14 +459,7 @@ public class Application extends Controller
 				String path1 = "";
 				// Asking to compare against DEFAULT?
 				if (compare1ID == -1) {
-					// YES, but SOC is not actually in DEFAULT so redirect to its real location
-					if (res.mName.equals("soc")) {
-						path1 = "soc";
-					}
-					else {
-						// YES, so set up the path to the default folder
-						path1 = "default/" + res.mName;
-					}
+					path1 = "default/" + res.mName;
 					
 					// See if the layer is in memory (it usually will be unless the server was started
 					//	with the DEFAULTS NOT loaded...)

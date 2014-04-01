@@ -46,10 +46,11 @@ Logger.info("  > Allocated memory for SOC");
 		int Alfalfa_Mask = cdl.convertStringsToMask("Alfalfa");
 		
 		int TotalMask = Grass_Mask | Corn_Mask | Soy_Mask | Alfalfa_Mask;
-		float factor = 1.0f;
-		float adjFactor = 1.0f;
+		float factor = -1.0f;
+		float adjFactor = -1.0f;
 		
 		int [][] rotationD_Data = Layer_Base.getLayer("cdl_2012").getIntData();
+		// Mg per Ha
 		float[][] SOC = Layer_Base.getLayer("SOC").getFloatData();
 		
 		// Soil_Carbon
@@ -61,7 +62,7 @@ Logger.info("  > Allocated memory for SOC");
 						soilCarbonData[y][x] = -9999.0f;
 					}
 					else {
-						factor = 0.0f;
+						//factor = 0.0f;
 						
 						// ----- CORN to...
 						if ((rotationD_Data[y][x] & Corn_Mask) > 0) {
@@ -113,13 +114,26 @@ Logger.info("  > Allocated memory for SOC");
 							adjFactor = 1.2f;
 						}
 						
-						// Convert the change from 20 years to 1 year
-						//soilCarbonData[y][x] = SOC[y][x] + (SOC[y][x] * factor * adjFactor) / 20.0f;
-						//soilCarbonData[y][x] = SOC[y][x] * adjFactor + SOC[y][x] * factor * adjFactor;
-						
-						soilCarbonData[y][x] = SOC[y][x] * (1 + (factor * adjFactor));
-						
-												
+						if(factor > -1.0f && adjFactor > -1.0f)
+						{
+							// Convert the change from 20 years to 1 year
+							//soilCarbonData[y][x] = SOC[y][x] + (SOC[y][x] * factor * adjFactor) / 20.0f;
+							//soilCarbonData[y][x] = SOC[y][x] * adjFactor + SOC[y][x] * factor * adjFactor;
+							
+							// Mg per Ha and convert to Mg per cell
+							soilCarbonData[y][x] = (SOC[y][x] * (1 + (factor * adjFactor) / 20.0f)) * 900.0f / 10000.0f;
+							// Convert from Mg to short tons
+							//soilCarbonData[y][x] = soilCarbonData[y][x] * 1.102f;
+						}
+						else
+						{
+							// Mg per Ha and convert to Mg per cell
+							soilCarbonData[y][x] = SOC[y][x] * 900.0f / 10000.0f;
+						}
+						//else
+						//{
+						//	soilCarbonData[y][x] = -9999.0f;
+						//}
 						//if (adjFactor < 0 || factor < 0 || soilCarbonData[y][x] < SOC[y][x])
 						//{
 							//Logger.info(Float.toString(adjFactor));

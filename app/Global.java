@@ -163,6 +163,7 @@ public class Global extends GlobalSettings
 				layer = new Layer_Float("default/pollinator"); layer.init();
 				layer = new Layer_Float("default/nitrous_oxide"); layer.init();
 				layer = new Layer_Float("default/soil_loss"); layer.init();
+				layer = new Layer_Float("default/soc"); layer.init();
 			}
 			catch (Exception e) {
 				Logger.info(e.toString());
@@ -206,6 +207,9 @@ public class Global extends GlobalSettings
 			QueuedWriter.queueResults(results);
 			
 			results = new Model_NitrousOxideEmissions().run(scenario);
+			QueuedWriter.queueResults(results);
+			
+			results = new Model_SoilCarbon().run(scenario);
 			QueuedWriter.queueResults(results);
 			
 			//results = new Model_WaterQuality().run(scenario);

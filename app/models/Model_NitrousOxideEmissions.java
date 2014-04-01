@@ -7,7 +7,7 @@ import java.io.*;
 //------------------------------------------------------------------------------
 // Modeling Process
 //
-// This program uses to calculate nitrous oxide emissions(Tonnes per hec) 
+// This program uses to calculate nitrous oxide emissions(Mg per Ha) 
 // This model is from unpublished work by 
 // Inputs are layers, selected cells in the raster map and crop rotation layer 
 // Outputs are ASCII map of nitrous oxide emissions
@@ -26,7 +26,7 @@ Logger.info(">>> Computing Nitrous Oxide Index");
 long timeStart = System.currentTimeMillis();
 		
 		float [][] nitrousOxideData = new float[height][width];
-Logger.info("  > Allocated memory for N20");
+Logger.info("  > Allocated memory for N2O");
 		
 		// Mask
 		Layer_Integer cdl = (Layer_Integer)Layer_Base.getLayer("cdl_2012"); 
@@ -50,8 +50,8 @@ Logger.info("  > Allocated memory for N20");
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				
-				if (texture[y][x] > -9995.0f && OM_SOC[y][x] > -9995.0f &&
-					drainage[y][x] > -9995.0f && pH[y][x] > -9995.0f)
+				if (texture[y][x] > -9999.0f && OM_SOC[y][x] > -9999.0f &&
+					drainage[y][x] > -9999.0f && pH[y][x] > -9999.0f)
 				{
 					fertRate = 0.0f;
 					
@@ -85,9 +85,9 @@ Logger.info("  > Allocated memory for N20");
 					
 					if ((rotationData[y][x] & TotalMask) > 0)
 					{
-						// Calculate Nitrous Oxide Emissions (Unit Kg/Ha per year)
-						nitrousOxideData[y][x] = (float)(Math.exp(0.414f + 0.825f + fertRate * 0.005f + cropRotation +
-							texture[y][x] + OM_SOC[y][x] + drainage[y][x] + pH[y][x]));
+						// Calculate Nitrous Oxide Emissions in Kg per Ha and then convert to Mg per cell per year
+						nitrousOxideData[y][x] = ((float)(Math.exp(0.414f + 0.825f + fertRate * 0.005f + cropRotation +
+							texture[y][x] + OM_SOC[y][x] + drainage[y][x] + pH[y][x]))) * 900.0f * 0.0001f * 0.001f;
 					}
 					else
 					{

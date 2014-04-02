@@ -68,7 +68,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'net_energy',
 					//DSS_UnitLabel: 'TJ/Yr',
-					DSS_UnitLabel: 'Million Btu/Yr',
+					DSS_UnitLabel: 'MBtu/Yr',
 					DSS_Label: 'Net Energy',
 					DSS_GraphTitle: 'Net Energy',
 					DSS_InfoHTML: 'http://www.sciencedirect.com/science/article/pii/S0305750X11000933',

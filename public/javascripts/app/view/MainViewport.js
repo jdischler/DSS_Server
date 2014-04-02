@@ -1,17 +1,21 @@
 // * File: app/view/MainViewport.js
 
 var globalMap;
-var imgFormat = 'image/png';
-var baseUrl = 'pgis.glbrc.org';
-var baseUrl1 = 'pgis1.wei.wisc.edu';
-var baseUrl2 = 'pgis2.wei.wisc.edu';
-var baseUrl3 = 'pgis3.wei.wisc.edu';
-var port = '8080';
-var vectorPath = '/geoserver/Vector/wms';
-var rasterPath = '/geoserver/Raster/wms';
+var DSS_ImgFormat = 'image/png';
 var DSS_bufferSize = 2; // how many non-visible tiles on either side of visible area to cache?
 var DSS_resizeMethod = null; // "resize";
-var DSS_LogoPanelHeight = 70;
+
+// The pgis123 variants are all mapped to pgis at the server level. From the client POV,
+//	they appear as different URLs which allows the client to make multiple simultaneous
+//	requests and potentially get results back faster.
+var DSS_GeoServerURLS = [
+	'pgis.glbrc.org:8080',
+	'pgis1.wei.wisc.edu:8080',
+	'pgis2.wei.wisc.edu:8080',
+	'pgis3.wei.wisc.edu:8080'];
+
+var DSS_VectorPath = '/geoserver/Vector/wms';
+var DSS_RasterPath = '/geoserver/Raster/wms';
 
 // boo
 var DSS_globalQueryableLayers = [];
@@ -19,6 +23,8 @@ var DSS_globalCollapsibleLayers = [];
 var DSS_AssumptionsDefaults = null; // DON'T modify these - they come from the server...
 var DSS_AssumptionsAdjustable = null; // A copy!
 var DSS_currentModelRunID = 0;//
+
+var DSS_LogoPanelHeight = 70;
 
 //------------------------------------------------------------------------------
 Ext.define('MyApp.view.MainViewport', {
@@ -48,7 +54,6 @@ Ext.define('MyApp.view.MainViewport', {
 		// Some controls need the layout to be done before being wired in...
 		afterrender: function(c) {
 			this.addControlsNeedingLayout();
-
 		}
 	},
 	
@@ -86,6 +91,8 @@ Ext.define('MyApp.view.MainViewport', {
 		this.doApplyIf(me, map);
 		
 		me.callParent(arguments);
+		
+		this.addGoogleLayers(map);
 		this.addMapLayers(map);
 		this.addMapControls(map);	
 		this.getAssumptions();
@@ -144,9 +151,6 @@ Ext.define('MyApp.view.MainViewport', {
 	//--------------------------------------------------------------------------
 	addControlsNeedingLayout: function() {
 		
-/*		globalMap.addControl(new OpenLayers.Control.Scale($('DSS_scale_tag')));
-		Ext.getCmp('DSS_scale_tag').updateLayout();
-*/		
 //		globalMap.zoomToMaxExtent();
 		globalMap.zoomTo(1);
 //		globalMap.pan(1,1); // FIXME: lame workaround for google map zoom level not starting out correctly?
@@ -156,8 +160,6 @@ Ext.define('MyApp.view.MainViewport', {
 	//--------------------------------------------------------------------------
 	addMapControls: function(map) {
 		
-		var layerBrowser = Ext.getCmp('mapLayerPanel');
-
 		map.addControl(new OpenLayers.Control.Navigation({
 			documentDrag: true, 
 			dragPanOptions: {
@@ -166,20 +168,7 @@ Ext.define('MyApp.view.MainViewport', {
 			}
 		}));
 		
-/*		var overviewMap = new OpenLayers.Control.OverviewMap({minRatio: 32, maxRatio:64, 
-			autoPan:true,
-			size: {w: 270, h: 120},
-			maximized: false
-		}); 
-		map.addControl(overviewMap);
-		var tip = Ext.create('Ext.tip.ToolTip', {
-				target: overviewMap.maximizeDiv,
-				html: 'Open Overview Map'
-		});
-*/		
 		map.addControl(new OpenLayers.Control.Zoom());
-//		map.addControl(new OpenLayers.Control.ZoomPanel());
-//		map.addControl(new OpenLayers.Control.PanZoomBar({zoomWorldIcon: true}));
 		map.addControl(new OpenLayers.Control.ArgParser());
 		
 		var scaleLine = new OpenLayers.Control.ScaleLine({maxWidth: 200,         					
@@ -199,27 +188,32 @@ Ext.define('MyApp.view.MainViewport', {
 		map.addControl(scaleLine);
 	},
 
-	// Type is 'raster' or 'vector'	
+	// endpath would typically be DSS_RasterPath or DSS_VectorPath ( <- note, those are global vars)	
 	//--------------------------------------------------------------------------
-	getGeoserverURL: function(urltype, thePort) {
+	getGeoserverURLs: function(endpath) {
 		
-		if (urltype == 'raster') {
-			return ['http://' + baseUrl + ':' + port + rasterPath,
-					'http://' + baseUrl1 + ':' + port + rasterPath,
-					'http://' + baseUrl2 + ':' + port + rasterPath,
-					'http://' + baseUrl3 + ':' + port + rasterPath 
-			];
+		// create a copy of the URL array...and append to that...
+		var urls = DSS_GeoServerURLS.slice(0);
+		for (var index = 0; index < urls.length; ++index) {
+			urls[index] += endpath;
 		}
-		else {
-			return ['http://' + baseUrl + ':' + port + vectorPath,
-					'http://' + baseUrl1 + ':' + port + vectorPath,
-					'http://' + baseUrl2 + ':' + port + vectorPath,
-					'http://' + baseUrl3 + ':' + port + vectorPath 
-			];
-		}
+
+		return urls;
+	},
+
+	//--------------------------------------------------------------------------
+	getLayerSettings: function(map, layerName) {
+
+		var	res = {
+			layers: layerName,
+			format: DSS_ImgFormat,
+			transparent: true,
+			tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
+		};
+		
+		return res;
 	},
 	
-	// returns
 	//--------------------------------------------------------------------------
 	getWMS_Settings: function(visible, opacity) {
 		
@@ -241,94 +235,8 @@ Ext.define('MyApp.view.MainViewport', {
 	},
 	
 	//--------------------------------------------------------------------------
-	addMapLayers: function(map) {
+	addGoogleLayers: function(map) {
 		
-		var layerBrowser = Ext.getCmp('mapLayerPanel');
-		
-		//------------------------------------------------
-		var wmsRivers = new OpenLayers.Layer.WMS("Rivers", 
-			this.getGeoserverURL('vector'),
-			{ 
-				layers: 'Vector:Rivers-B',  
-				transparent: true,
-				format: imgFormat,
-				tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom  
-			},
-			this.getWMS_Settings(false, 1)
-		);
-		//------------------------------------------------
-		var wmsWatershed = new OpenLayers.Layer.WMS("Watersheds", 
-			this.getGeoserverURL('vector'),
-			{ 
-				layers: 'Vector:Watershed-New',  
-				transparent: true,
-				format: imgFormat,
-				tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
-			},
-			this.getWMS_Settings(false, 1)
-		);
-		
-		//------------------------------------------------
-		var wmsSlope = new OpenLayers.Layer.WMS("Slope", 
-			this.getGeoserverURL('raster'),
-			{
-				layers: 'Raster:Slope-b',
-				format: imgFormat,
-				transparent: true,
-				tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
-			},
-			this.getWMS_Settings(false, 0.5)
-		);
-
-		//------------------------------------------------
-		var wmsLCC = new OpenLayers.Layer.WMS("lcc", 
-			this.getGeoserverURL('raster'),
-			{
-				layers: 'Raster:LCC',
-				format: imgFormat,
-				transparent: true,
-				tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
-			},
-			this.getWMS_Settings(false, 0.5)
-		);
-		
-		//------------------------------------------------
-		var wmsLCS = new OpenLayers.Layer.WMS("lcs",
-			this.getGeoserverURL('raster'),
-			{
-				layers: 'Raster:LCS',
-				format: imgFormat,
-				transparent: true,
-				tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
-			},
-			this.getWMS_Settings(false, 0.5)
-		);
-		
-/*		//------------------------------------------------
-		var wmsSOC = new OpenLayers.Layer.WMS("SOC", 
-			this.getGeoserverURL('raster'),
-			{
-				layers: 'Raster:SOC_I',
-				format: imgFormat,
-				transparent: true,
-				tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
-			},
-			this.getWMS_Settings(false, 0.5)
-		);
-*/		
-		//------------------------------------------------
-		var wmsCDL = new OpenLayers.Layer.WMS('cdl_2012', 
-			this.getGeoserverURL('raster'),
-			{
-				layers: 'Raster:CDL_2012',
-				format: imgFormat,
-				transparent: true,
-				tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
-			},
-			this.getWMS_Settings(false, 0.5)
-		);
-		
-		//----------------
 		var googTerrain = new OpenLayers.Layer.Google(
 			"Google Terrain",
 			{
@@ -340,14 +248,70 @@ Ext.define('MyApp.view.MainViewport', {
 				type: google.maps.MapTypeId.HYBRID, minZoomLevel: 9, maxZoomLevel: 15
 			});
 		
-		map.addLayers([googTerrain,googHybrid,
+		map.addLayers([googTerrain,googHybrid]);
+		
+		var lpGoog = Ext.create('MyApp.view.LayerPanel_Google', {
+			DSS_LayerSatellite: googTerrain,
+			DSS_LayerHybrid: googHybrid,
+			dock: 'bottom'
+		});
+		
+		var dssLeftPanel = Ext.getCmp('DSS_LeftPanel');
+		dssLeftPanel.up().addDocked(lpGoog);
+	},
+	
+	//--------------------------------------------------------------------------
+	addMapLayers: function(map) {
+	
+		//-- CDL -----------------------------------------------
+		var wmsCDL = new OpenLayers.Layer.WMS('cdl_2012', 
+			this.getGeoserverURLs(DSS_RasterPath),
+			this.getLayerSettings(map, 'Raster:CDL_2012'),
+			this.getWMS_Settings(false, 0.5)
+		);
+		
+		//-- Rivers ----------------------------------------------
+		var wmsRivers = new OpenLayers.Layer.WMS("Rivers", 
+			this.getGeoserverURLs(DSS_VectorPath),
+			this.getLayerSettings(map, 'Vector:Rivers-B'),
+			this.getWMS_Settings(false, 1)
+		);
+
+		//-- Slope ----------------------------------------------
+		var wmsSlope = new OpenLayers.Layer.WMS("Slope", 
+			this.getGeoserverURLs(DSS_RasterPath),
+			this.getLayerSettings(map, 'Raster:Slope-b'),
+			this.getWMS_Settings(false, 0.5)
+		);
+
+		//-- Watersheds ----------------------------------------------
+		var wmsWatershed = new OpenLayers.Layer.WMS("Watersheds", 
+			this.getGeoserverURLs(DSS_VectorPath),
+			this.getLayerSettings(map, 'Vector:Watershed-New'),
+			this.getWMS_Settings(false, 1)
+		);
+		
+		//-- LCC ----------------------------------------------
+		var wmsLCC = new OpenLayers.Layer.WMS("lcc", 
+			this.getGeoserverURLs(DSS_RasterPath),
+			this.getLayerSettings(map, 'Raster:LCC'),
+			this.getWMS_Settings(false, 0.5)
+		);
+		
+		//-- LCS ----------------------------------------------
+		var wmsLCS = new OpenLayers.Layer.WMS("lcs",
+			this.getGeoserverURLs(DSS_RasterPath),
+			this.getLayerSettings(map, 'Raster:LCS'),
+			this.getWMS_Settings(false, 0.5)
+		);
+		
+		map.addLayers([
 			wmsCDL,
 			wmsSlope,
-//			wmsSOC,
-			wmsLCC,
-			wmsLCS,
+			wmsRivers,
 			wmsWatershed,
-			wmsRivers
+			wmsLCC,
+			wmsLCS
 			]);
 		
 		var lpCDL = Ext.create('MyApp.view.LayerPanel_Indexed', {
@@ -359,6 +323,40 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 		
+		// Slope is greater than or equal to 10.2 degrees and less than or equal to 20.3 degrees
+		var lpSlope = Ext.create('MyApp.view.LayerPanel_Continuous', {
+			title: 'Slope',
+			DSS_Layer: wmsSlope,
+			DSS_LayerUnit: '%',//'\xb0',
+			DSS_LayerRangeMin: 0,
+			DSS_LayerRangeMax: 45.5,
+			DSS_ValueDefaultGreater: 5,
+			DSS_ValueStep: 1,
+			DSS_QueryTable: 'slope',
+			collapsed: true
+		});
+
+		var lpRiver = Ext.create('MyApp.view.LayerPanel_Continuous', {
+			title: 'Distance to River',
+			DSS_ShortTitle: 'River',
+			DSS_AutoSwapTitles: false,
+			DSS_Layer: wmsRivers,
+			DSS_LayerUnit: 'm',
+			DSS_LayerRangeMin: 0,
+			DSS_LayerRangeMax: 915.5,
+			DSS_ValueDefaultLess: 120,
+			DSS_ValueStep: 15,
+			DSS_QueryTable: 'rivers',
+			collapsed: true
+		});
+
+		var lpWatershed = Ext.create('MyApp.view.LayerPanel_Watershed', {
+			title: 'Watershed',
+			DSS_Layer: wmsWatershed,
+			DSS_QueryTable: 'watersheds',
+			collapsed: true
+		});
+
 		var lpLCC = Ext.create('MyApp.view.LayerPanel_Indexed', {
 			title: 'Land Capability Class',
 			DSS_ShortTitle: 'LCC',
@@ -381,45 +379,11 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 		
-		// Slope is greater than or equal to 10.2 degrees and less than or equal to 20.3 degrees
-		var lpSlope = Ext.create('MyApp.view.LayerPanel_Continuous', {
-			title: 'Slope',
-			DSS_Layer: wmsSlope,
-			DSS_LayerUnit: '%',//'\xb0',
-			DSS_LayerRangeMin: 0,
-			DSS_LayerRangeMax: 45.5,
-			DSS_ValueDefaultGreater: 5,
-			DSS_ValueStep: 1,
-			DSS_QueryTable: 'slope',
-			collapsed: true
-		});
-
-		var lpWatershed = Ext.create('MyApp.view.LayerPanel_Watershed', {
-			title: 'Watershed',
-			DSS_Layer: wmsWatershed,
-			DSS_QueryTable: 'watersheds',
-			collapsed: true
-		});
-
-		var lpRiver = Ext.create('MyApp.view.LayerPanel_Continuous', {
-			title: 'Distance to River',
-			DSS_ShortTitle: 'River',
-			DSS_AutoSwapTitles: false,
-			DSS_Layer: wmsRivers,
-			DSS_LayerUnit: 'm',
-			DSS_LayerRangeMin: 0,
-			DSS_LayerRangeMax: 915.5,
-			DSS_ValueDefaultLess: 120,
-			DSS_ValueStep: 15,
-			DSS_QueryTable: 'rivers',
-			collapsed: true
-		});
-
 		var lpPublicLand = Ext.create('MyApp.view.LayerPanel_Continuous', {
 			title: 'Distanace to Public Land',
 			DSS_ShortTitle: 'Public Land',
 			DSS_AutoSwapTitles: false,
-			DSS_Layer: wmsRivers,//fix
+		//	DSS_Layer: wmsRivers,//fix
 			DSS_LayerUnit: 'm',// fix to mile
 			DSS_LayerRangeMin: 0,
 			DSS_LayerRangeMax: 14500,
@@ -433,91 +397,50 @@ Ext.define('MyApp.view.MainViewport', {
 			title: 'Density of Dairy',
 			DSS_ShortTitle: 'Dairy',
 			DSS_AutoSwapTitles: false,
-			DSS_Layer: wmsRivers,//fix
+		//	DSS_Layer: wmsRivers,//fix
 			DSS_LayerUnit: '',
 			DSS_LayerRangeMin: 0,
 			DSS_LayerRangeMax: 8,
-			DSS_ValueDefaultGreater: 4,
+			DSS_ValueDefaultGreater: 2,
 			DSS_ValueStep: 1,
 			DSS_QueryTable: 'dairy',
 			collapsed: true
 		});
 				
-/*		var lpRoad = Ext.create('MyApp.view.LayerPanel_Continuous', {
-			title: 'Distance to Road',
-			DSS_ShortTitle: 'Road',
-			DSS_AutoSwapTitles: false,
-			DSS_Layer: null,
-			DSS_LayerUnit: 'm',
-			DSS_LayerRangeMin: 0,
-			DSS_LayerRangeMax: 915.5,
-			DSS_ValueDefaultGreater: 1,
-			DSS_ValueDefaultLess: 120,
-			DSS_QueryTable: 'roads',
-			collapsed: true
-		});
-*/		
-/*		var lpSOC = Ext.create('MyApp.view.LayerPanel_Continuous', {
-			title: 'Soil Organic Carbon',
-			DSS_ShortTitle: 'SOC',
-			DSS_AutoSwapTitles: true,
-			DSS_Layer: wmsSOC,
-			DSS_LayerUnit: '',// NOTE: use this...'Mg/ha',
-			DSS_LayerRangeMin: 0,
-			DSS_LayerRangeMax: 1300,
-			DSS_ValueDefaultLess: 300,
-			DSS_ValueStep: 20,
-			DSS_QueryTable: 'soc',
-			collapsed: true
-		});
-*/		
-		var lpGoog = Ext.create('MyApp.view.LayerPanel_Google', {
-			DSS_LayerSatellite: googTerrain,
-			DSS_LayerHybrid: googHybrid,
-			dock: 'bottom'
-		});
-
 		// Speed up the insertion process a bit by suspending the layout engine until the new
 		// 	elements are added...		
 		Ext.suspendLayouts();
 		var dssLeftPanel = Ext.getCmp('DSS_LeftPanel');
-//		dssLeftPanel.insert(0,lpSOC);
-		dssLeftPanel.insert(0,lpDairy);
-		dssLeftPanel.insert(0,lpPublicLand);
-		dssLeftPanel.insert(0,lpLCS);
-		dssLeftPanel.insert(0,lpLCC);
-		dssLeftPanel.insert(0,lpSlope);
-		dssLeftPanel.insert(0,lpWatershed);
-//		dssLeftPanel.insert(0,lpRoad);
-		dssLeftPanel.insert(0,lpRiver);
-		dssLeftPanel.insert(0,lpCDL);
-		dssLeftPanel.up().addDocked(lpGoog);
+		dssLeftPanel.add(lpCDL);
+		dssLeftPanel.add(lpRiver);
+		dssLeftPanel.add(lpSlope);
+		dssLeftPanel.add(lpWatershed);
+		dssLeftPanel.add(lpLCC);
+		dssLeftPanel.add(lpLCS);
+		dssLeftPanel.add(lpPublicLand);
+		dssLeftPanel.add(lpDairy);
 		Ext.resumeLayouts(true);
 		
 		// BOO - FIXME
 		DSS_globalQueryableLayers.push(lpCDL);
 		DSS_globalQueryableLayers.push(lpSlope);
+		DSS_globalQueryableLayers.push(lpRiver);
 		DSS_globalQueryableLayers.push(lpLCC);
 		DSS_globalQueryableLayers.push(lpLCS);
 		DSS_globalQueryableLayers.push(lpWatershed);
-//		DSS_globalQueryableLayers.push(lpRoad);
-		DSS_globalQueryableLayers.push(lpRiver);
-//		DSS_globalQueryableLayers.push(lpSOC);
 		DSS_globalQueryableLayers.push(lpPublicLand);
 		DSS_globalQueryableLayers.push(lpDairy);
 		
-		DSS_globalCollapsibleLayers.push(lpGoog);
-//		DSS_globalCollapsibleLayers.push(lpSOC);
+		DSS_globalCollapsibleLayers.push(lpCDL);
+		DSS_globalCollapsibleLayers.push(lpSlope);
+		DSS_globalCollapsibleLayers.push(lpRiver);
 		DSS_globalCollapsibleLayers.push(lpLCC);
 		DSS_globalCollapsibleLayers.push(lpLCS);
-		DSS_globalCollapsibleLayers.push(lpSlope);
 		DSS_globalCollapsibleLayers.push(lpWatershed);
-//		DSS_globalCollapsibleLayers.push(lpRoad);
-		DSS_globalCollapsibleLayers.push(lpRiver);
-		DSS_globalCollapsibleLayers.push(lpCDL);
 		DSS_globalCollapsibleLayers.push(lpPublicLand);
 		DSS_globalCollapsibleLayers.push(lpDairy);
 		
+		// TODO: only add this if linking in a layer type that needs it. E.g. Watershed
 		this.addFeatureClickControl(map);
 	},
 	

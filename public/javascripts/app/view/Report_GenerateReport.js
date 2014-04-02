@@ -1,7 +1,5 @@
-/*
- * File: app/view/ReportTools.js
- */
 
+//--------------------------------------------------------------------------
 Ext.define('MyApp.view.Report_GenerateReport', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.report_generate_report',
@@ -10,7 +8,7 @@ Ext.define('MyApp.view.Report_GenerateReport', {
     width: 300,
     title: 'Store/Print Results',
 	icon: 'app/images/new_icon.png',
-	collapsed: true,
+	//collapsed: true,
 	
     layout: 'absolute',
     
@@ -37,6 +35,7 @@ Ext.define('MyApp.view.Report_GenerateReport', {
 			},{
 				xtype: 'button',
 				disabled: true,
+				hidden: true,
 				text: 'Print Results',
 				icon: 'app/images/print_small_icon.png',
 				x: 250,
@@ -54,7 +53,6 @@ Ext.define('MyApp.view.Report_GenerateReport', {
     	var me = this;
     	Ext.Msg.prompt('Store As:', 'Please name this scenario:', function(msg_btn, text) {
 			if (msg_btn == 'ok') {
-				//me.saveScenarioResults(text);
 				var res = Ext.util.Cookies.get('DSS_nextSaveID');
 				res++;
 				if (res > 9) {
@@ -81,70 +79,6 @@ Ext.define('MyApp.view.Report_GenerateReport', {
 				save_button.setDisabled(true);
 			}
     	});
-    }/*,
-    
-    //--------------------------------------------------------------------------
-    saveScenarioResults: function(name) {
-  
-		var requestData = {
-			clientID: 1234, //temp
-			name: name
-		};
-		
-		var clientID_cookie = Ext.util.Cookies.get('DSS_clientID');
-		if (clientID_cookie) {
-			requestData.clientID = clientID_cookie;
-		}
-		else {
-			console.log('WARNING: no client id cookie was found...');
-		}
-    	
-//		var button = Ext.getCmp('DSS_runModelButton');
-//		button.setIcon('app/images/spinner_16a.gif');
-//		button.setDisabled(true);
-		
-		var self = this;
-		var obj = Ext.Ajax.request({
-			url: location.href + 'saveScenario',
-			jsonData: requestData,
-			timeout: 10 * 60 * 1000, // minutes * seconds * (i.e. converted to) milliseconds
-			
-			success: function(response, opts) {
-				
-				try {
-					var obj= JSON.parse(response.responseText);
-					console.log('success: ');
-					console.log(obj);
-					
-					if (obj.saveSlot) {
-						// TODO: 1) find the CurrentScenario data item, 2) remove it
-//						console.log(DSS_ScenarioComparisonStore.findRecord('Index', 0));
-
-						// 3) add the new item
-						console.log('Attempting to add a new Save slot item for the combo...');
-						DSS_ScenarioComparisonStore.add({'Index': obj.saveSlot, 'ScenarioName': name});
-						DSS_ScenarioComparisonStore.commitChanges(); // FIXME: this necessary?
-						// TODO: 4) set the combo box to select this new item....
-					}
-					if (obj.removedSlot) {
-						console.log('Server says a slot was deleted. Its number is: ' + obj.removedSlot);
-						// TODO: 1) find old slot, 2) remove it, 
-						//	3) if it was selected in the combo box, select a new item? Anything else?
-						DSS_ScenarioComparisonStore.findRecord('Index', obj.removedSlot);
-					}
-					
-				}
-				catch(err) {
-					console.log(err);
-				}
-			},
-			
-			failure: function(respose, opts) {
-//				button.setIcon('app/images/go_icon.png');
-//				button.setDisabled(false);
-				alert("Scenario save failed, request timed out?");
-			}
-		});
     }
-*/
+    
 });

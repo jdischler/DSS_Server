@@ -37,6 +37,8 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
             	x: 390,
             	y: 4,
             	width: 23,
+            	// if no WMS layer bound, just hide this control
+            	hidden: (typeof me.DSS_Layer === 'undefined'), 
             	icon: 'app/images/go_icon_small.png',
             	handler: function(self) {
             		me.showColorChips();

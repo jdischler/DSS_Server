@@ -108,13 +108,17 @@ public class Global extends GlobalSettings
 				Logger.info(" ... Server only loading a subset of layers ... ");
 			}
 			
+			// Queryable layers...though some of these are also used by model computations..
 			layer = new Layer_Integer("cdl_2012"); layer.init();
 			layer = new Layer_Float("slope"); layer.init();
+			layer = new Layer_Float("rivers"); layer.init();
+			layer = new Layer_Integer("watersheds", Layer_Integer.EType.ERaw); layer.init();
+			
+			// Layers for model computation
 			layer = new Layer_Float("cec"); layer.init();
 			layer = new Layer_Float("depth"); layer.init();
 			layer = new Layer_Float("silt"); layer.init();
 			layer = new Layer_Float("soc"); layer.init();
-			layer = new Layer_Integer("watersheds", Layer_Integer.EType.ERaw); layer.init();
 			layer = new Layer_Float("texture"); layer.init();
 			layer = new Layer_Float("om_soc"); layer.init();
 			layer = new Layer_Float("drainage"); layer.init();
@@ -122,23 +126,23 @@ public class Global extends GlobalSettings
 			layer = new Layer_Float("ls"); layer.init();
 			layer = new Layer_Float("rainfall_erosivity"); layer.init();
 			layer = new Layer_Float("soil_erodibility"); layer.init();
+			
 			// Epic computed data...
 			layer = new Layer_Float("alfa_p"); layer.init();
 			layer = new Layer_Float("corn_p"); layer.init();
 			layer = new Layer_Float("soy_p"); layer.init();
 			layer = new Layer_Float("grass_p"); layer.init();
-			// Public Land and Dairy
-			layer = new Layer_Float("dairy"); layer.init();
-			layer = new Layer_Float("public_land"); layer.init();
 			
 			// NOTE: am putting low-priority (rarely used) data layers here so that
 			//	we can have them skip loading in DEVELOPMENT mode. Ie, faster loads
 			//	and less memory usage...
 			if (Play.isProd() || LOAD_ALL_LAYERS_FOR_DEV == true) {
 				
-				layer = new Layer_Float("rivers"); layer.init();
+				// Queryable layers...
 				layer = new Layer_Integer("lcc"); layer.init();
 				layer = new Layer_Integer("lcs"); layer.init();
+				layer = new Layer_Float("dairy"); layer.init();
+				layer = new Layer_Float("public_land"); layer.init();
 			}
 		}
 		catch (Exception e) {

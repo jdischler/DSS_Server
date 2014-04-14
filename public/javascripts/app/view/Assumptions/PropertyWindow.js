@@ -9,9 +9,12 @@ Ext.define('MyApp.view.Assumptions.PropertyWindow', {
     ],
 
     height: 503,
+    minHeight: 400,
     width: 300,
     closable: false,
     title: 'Global Assumptions',
+    constrainHeader: true, // keep the header from being dragged out of the app body...otherwise may not be able to close it!
+    modal: true,
 
 	dockedItems: [{
 		xtype: 'toolbar',
@@ -104,40 +107,54 @@ Ext.define('MyApp.view.Assumptions.PropertyWindow', {
     //--------------------------------------------------------------------------
     populateAssumptions: function(assumptionsObject) {
     	
-		// first find unique categories....
-        var categories = {};
-		for (var key in assumptionsObject) {
-			categories[assumptionsObject[key].Category] = assumptionsObject[key].Icon; 
-		}
-        
         // create panels for each unique category...
-        var categoryPanels = {};
-        for (var property in categories) {
+        for (var categoryName in assumptionsObject) {
+        	var category = assumptionsObject[categoryName];
         	var panel = Ext.create('MyApp.view.Assumptions.PropertyContainer', {
-        		title: property,
-				icon: 'app/images/' + categories[property]
+        		title: category.CategoryName,
+				icon: 'app/images/' + category.CategoryIcon
         	});
-        	categoryPanels[property] = panel;
         	this.getComponent('DSS_AssumptionCategories').add(panel);
+        	
+			// Now push the variables into the correct panel....
+			for (var propertyName in category) {
+				var property = category[propertyName];
+				if (typeof property === "object") {
+					panel.addAssumptionElement(propertyName, property);
+				}
+			}
         }
         
-        // Now finally push the variables into the correct panel....
-		for (var key in assumptionsObject) {
-        	categoryPanels[assumptionsObject[key].Category].addAssumptionElement(key, assumptionsObject[key]);
-        }
     },
     
     // Recursively travel through the objects to get all the values back off the controls...
     //--------------------------------------------------------------------------
     scrapeValues: function(assumptionsObject) {
     	
+    	var results = [];
     	var cats = this.getComponent('DSS_AssumptionCategories');
 		for (var idx = 0; idx < cats.items.getCount(); idx++) {
 			var comp = cats.items.getAt(idx);
 
 			// check to see if it's safe to call this as a function...			
-			if (typeof(comp.applyValue) !== 'undefined' && typeof(comp.applyValue) === 'function') {
-				comp.applyValue(assumptionsObject);
+			if (typeof(comp.getValues) !== 'undefined' && typeof(comp.getValues) === 'function') {
+				var result = comp.getValues();
+				results = results.concat(result);
+			}
+		}
+		
+		// Not terribly efficient...update any variable instances found in the array to 
+		//	the source object...
+		for (var i = 0; i < results.length; i++) {
+			var propertyToFind = results[i].key;
+			
+			for (var categoryName in assumptionsObject) {
+				var category = assumptionsObject[categoryName];
+				for (var propertyName in category) {
+					if (propertyName == propertyToFind) {
+						category[propertyName].DefaultValue = results[i].value;
+					}
+				}
 			}
 		}
     }

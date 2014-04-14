@@ -23,7 +23,7 @@ Ext.define('MyApp.view.Assumptions.PropertyContainer', {
         me.callParent(arguments);
     },
     
-    // {"Category","VariableName","DisplayName","DefaultValue"}
+    // {"DisplayName","DefaultValue"}
 	//--------------------------------------------------------------------------
     addAssumptionElement: function(key, definition) {
     	
@@ -33,16 +33,20 @@ Ext.define('MyApp.view.Assumptions.PropertyContainer', {
     },
     
 	//--------------------------------------------------------------------------
-    applyValue: function(assumptionsObject) {
+    getValues: function() {
+    	
+    	var results = [];
     	
 		for (var idx = 0; idx < this.items.getCount(); idx++) {
 			var comp = this.items.getAt(idx);
 			
 			// check if safe to call this function....
-			if (typeof(comp.applyValue) !== 'undefined' && typeof(comp.applyValue) === 'function') {
-				comp.applyValue(assumptionsObject);
+			if (typeof(comp.getValue) !== 'undefined' && typeof(comp.getValue) === 'function') {
+				results.push(comp.getValue());
 			}
 		}
+		
+		return results;
     }
 
 });

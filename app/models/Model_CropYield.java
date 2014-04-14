@@ -47,6 +47,31 @@ Logger.info(" >> Computing Yield");
 		float Alfalfa_Y = 0;
 		
 		float Yield = 0;
+
+		// Yield Modification/Scalar - default to multiply by 1.0, which is NO change
+		float cornYieldModifier = 1.0f; //
+		float soyYieldModifier = 1.0f; //
+		float alfalfaYieldModifier = 1.0f; //
+		float grassYieldModifier = 1.0f; //
+		
+		// Get user changeable yield scaling values from the client...
+		//----------------------------------------------------------------------
+		try {	
+			// Value comes in as a percent, e.g. -5%...convert to a multipler
+			cornYieldModifier = scenario.mAssumptions.getAssumptionFloat("ym_corn") / 100.0f + 1.0f;
+			soyYieldModifier = scenario.mAssumptions.getAssumptionFloat("ym_soy") / 100.0f + 1.0f;
+			alfalfaYieldModifier = scenario.mAssumptions.getAssumptionFloat("ym_alfalfa") / 100.0f + 1.0f;
+			grassYieldModifier = scenario.mAssumptions.getAssumptionFloat("ym_grass") / 100.0f + 1.0f;
+		}
+		catch (Exception e) {
+			Logger.info(e.toString());
+		}
+		
+		Logger.info(" Corn yield from client = " + Float.toString(cornYieldModifier) );
+		Logger.info(" Soy yield from client = " + Float.toString(soyYieldModifier) );
+		Logger.info(" Alfalfa yield from client = " + Float.toString(alfalfaYieldModifier) );
+		Logger.info(" Grass yield from client = " + Float.toString(grassYieldModifier) );
+		//----------------------------------------------------------------------		
 		
 		// Define separate arrays to keep corn and grass production
 		// Crop Yield
@@ -79,6 +104,8 @@ Logger.info("  > Allocated memory for Yield");
 						Corn_Y = Corn_Y + Corn_Y;
 						// Mg per Ha
 						Yield = Corn_Y * 0.053f;
+						// Factor in yield modifcation from client, which defaults to 0% change, ie * 1.0f
+						Yield *= cornYieldModifier;
 					}
 					else if ((rotationData[y][x] & Grass_Mask) > 0) 
 					{
@@ -88,6 +115,8 @@ Logger.info("  > Allocated memory for Yield");
 						Grass_Y = Grass_Y * 1.05f;
 						// Mg per Ha
 						Yield = Grass_Y * 1.91f;
+						// Factor in yield modifcation from client, which defaults to 0% change, ie * 1.0f
+						Yield *= grassYieldModifier;
 					}
 					else if ((rotationData[y][x] & Soy_Mask) > 0) 
 					{
@@ -99,6 +128,8 @@ Logger.info("  > Allocated memory for Yield");
 						Soy_Y = Soy_Y * 0.0585f;
 						// add residue
 						Yield = Soy_Y + Soy_Y * 1.5f;
+						// Factor in yield modifcation from client, which defaults to 0% change, ie * 1.0f
+						Yield *= soyYieldModifier;
 					}
 					/*else if ((rotationData[y][x] & Corn_Soy_Mask) > 0) {
 						// Bushels per Ac
@@ -124,6 +155,8 @@ Logger.info("  > Allocated memory for Yield");
 						Alfalfa_Y = Alfalfa_Y * 1.05f;
 						// Mg per Ha
 						Yield = Alfalfa_Y * 1.905f;
+						// Factor in yield modifcation from client, which defaults to 0% change, ie * 1.0f
+						Yield *= alfalfaYieldModifier;
 					}
 					
 					// Set Min and Max

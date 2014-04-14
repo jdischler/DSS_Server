@@ -3,7 +3,7 @@
 var globalMap;
 var DSS_ImgFormat = 'image/png';
 var DSS_bufferSize = 2; // how many non-visible tiles on either side of visible area to cache?
-var DSS_resizeMethod = null; // "resize";
+var DSS_resizeMethod = 'null';//null; // can be: null, "resize", or ”map-resize”
 
 // The pgis123 variants are all mapped to pgis at the server level. From the client POV,
 //	they appear as different URLs which allows the client to make multiple simultaneous
@@ -153,7 +153,6 @@ Ext.define('MyApp.view.MainViewport', {
 		
 //		globalMap.zoomToMaxExtent();
 		globalMap.zoomTo(1);
-//		globalMap.pan(1,1); // FIXME: lame workaround for google map zoom level not starting out correctly?
 		globalMap.pan(1,1); // FIXME: lame workaround for google map zoom level not starting out correctly?
 	},
 	
@@ -637,6 +636,8 @@ Ext.define('MyApp.view.MainViewport', {
 				
 				var obj = JSON.parse(response.responseText);
 				DSS_AssumptionsDefaults = obj;
+				
+				//console.log(obj);
 				
 				// MAKE a COPY vs just setting the pointers, which does nothing to make a copy
 				//	like we really need...

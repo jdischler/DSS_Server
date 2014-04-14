@@ -47,7 +47,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			},{
 				xtype: 'label',
 				itemId: 'DSS_UnitsLabel',
-				x: 265,
+				x: 262,
 				y: 9,
 				text: me.DSS_UnitLabelDelta ? me.DSS_UnitLabelDelta : me.DSS_UnitLabel,
 				style: {

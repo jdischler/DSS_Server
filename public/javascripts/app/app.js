@@ -17,7 +17,7 @@ Ext.Loader.setConfig({
     enabled: true,
 	paths: {
 		GeoExt: "http://geoext.github.com/geoext2/src/GeoExt",
-		Ext: "http://cdn.sencha.io/ext-4.2.1-gpl/src"
+		Ext: "http://cdn.sencha.com/ext/gpl/4.2.1/src"
 	}
 });
 

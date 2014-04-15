@@ -37,7 +37,7 @@ Ext.define('MyApp.view.Report_ScenarioComparison', {
     extend: 'Ext.container.Container',
     alias: 'widget.scenariocompare',
 
-    id: 'DSS_ScenarioComparisonTool',
+//    id: 'DSS_ScenarioComparisonTool',
     
    	requires: [
     	'MyApp.view.Report_ComparisonTypePopup',
@@ -52,7 +52,7 @@ Ext.define('MyApp.view.Report_ScenarioComparison', {
     bodyStyle: {
     	'background-color': '#f4f8ff'
     },
-    hidden: true, // FIXME: finish so we can show this when needed...
+//    hidden: true, // FIXME: finish so we can show this when needed...
    
     //--------------------------------------------------------------------------
     initComponent: function() {
@@ -63,6 +63,8 @@ Ext.define('MyApp.view.Report_ScenarioComparison', {
             	xtype: 'report_comparison_popup'
             },{
             	xtype: 'container',
+            	id: 'DSS_ScenarioComparisonTool',
+            	hidden: true,
             	layout: 'absolute',
             	height: 34,
             	items: [{

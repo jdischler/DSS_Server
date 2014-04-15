@@ -46,10 +46,11 @@ Ext.define('MyApp.view.Report_ComparisonTypePopup.js', {
 					width: 80
             	},{
 					xtype: 'label',
-					id: 'DSS_normalizeTypeDisplay',
+					id: 'DSS_normalizeComparisonTypeDisplay',
 					x: 348,
 					y: 4,
-					text: 'None'
+					html: 'None',
+					width: 200
             	},{
             		xtype: 'tool',
             		x: 460,
@@ -90,7 +91,7 @@ Ext.define('MyApp.view.Report_ComparisonTypePopup.js', {
 						padding: '0 0 -5 0',
 						handler: function(radio, checked) {
 							if (checked) {
-								Ext.getCmp('DSS_ReportDetail').setValueStyle('absolute');
+								Ext.getCmp('DSS_ReportDetail').setComparisonType('selected');
 								Ext.getCmp('DSS_comparisonTypeDisplay').setText('Selected Cells');
 							}
 						}
@@ -100,7 +101,7 @@ Ext.define('MyApp.view.Report_ComparisonTypePopup.js', {
 						padding: '0 0 -5 0',
 						handler: function(radio, checked) {
 							if (checked) {
-								Ext.getCmp('DSS_ReportDetail').setValueStyle('%');
+								Ext.getCmp('DSS_ReportDetail').setComparisonType('all');
 								Ext.getCmp('DSS_comparisonTypeDisplay').setText('All Cells');
 							}
 						}
@@ -122,28 +123,30 @@ Ext.define('MyApp.view.Report_ComparisonTypePopup.js', {
 						padding: '0 0 -5 0',
 						handler: function(radio, checked) {
 							if (checked) {
-								Ext.getCmp('DSS_ReportDetail').setDataStyle('delta');
-								Ext.getCmp('DSS_normalizeTypeDisplay').setText('None');
+								Ext.getCmp('DSS_ReportDetail').setNormalizeComparison('none');
+								Ext.getCmp('DSS_normalizeComparisonTypeDisplay').update('None');
 							}
 						}
 					},{
 						boxLabel: 'Area',
+						disabled: true, // TODO: get AREA working
 						name: 'normalizeStyle',
 						padding: '0 0 -5 0',
 						handler: function(radio, checked) {
 							if (checked) {
-								Ext.getCmp('DSS_ReportDetail').setDataStyle('file1');
-								Ext.getCmp('DSS_normalizeTypeDisplay').setText('Area');
+								Ext.getCmp('DSS_ReportDetail').setNormalizeComparison('area');
+								Ext.getCmp('DSS_normalizeComparisonTypeDisplay').update('Area');
 							}
 						}
 					},{
 						boxLabel: '&#916; Income',
+						disabled: true, // TODO: get delta income working
 						name: 'normalizeStyle',
 						padding: '0 0 -5 0',
 						handler: function(radio, checked) {
 							if (checked) {
-								Ext.getCmp('DSS_ReportDetail').setDataStyle('file2');
-								Ext.getCmp('DSS_dataTypeDisplay').setText('&#916; Income');
+								Ext.getCmp('DSS_ReportDetail').setNormalizeComparison('income');
+								Ext.getCmp('DSS_normalizeComparisonTypeDisplay').update('&#916; Income');
 							}
 						}
 					}]

@@ -231,6 +231,22 @@ Ext.define('MyApp.view.Report_Detail', {
 			comp.setWait();
 		}
 	},
+
+	// valid comparison types: 'selected', 'all' as in, Selected Pixels only, or All pixels (entire landscape)
+    //--------------------------------------------------------------------------
+	setComparisonType: function(newType) {
+		
+		// FIXME: TODO
+		// Need to switch existing field values, etc here!!!!!
+	},
+	
+	// valid comparison types: 'none', 'area', or 'income'
+    //--------------------------------------------------------------------------
+	setNormalizeComparison: function(newNormalizeType) {
+		
+		// FIXME: TODO
+		// Need to switch existing normalize style values, etc here!!!!!
+	},
 	
 	// valid style values: 'delta', 'file1', 'file2'
     //--------------------------------------------------------------------------

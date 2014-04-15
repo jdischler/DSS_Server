@@ -379,7 +379,7 @@ Ext.define('MyApp.view.MainViewport', {
 		});
 		
 		var lpPublicLand = Ext.create('MyApp.view.LayerPanel_Continuous', {
-			title: 'Distanace to Public Land',
+			title: 'Distance to Public Land',
 			DSS_ShortTitle: 'Public Land',
 			DSS_AutoSwapTitles: false,
 		//	DSS_Layer: wmsRivers,//fix

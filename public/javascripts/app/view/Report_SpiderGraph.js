@@ -76,10 +76,10 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 		if (value2 > max) {
 			max = value2;
 		}
+		// FIXME: reversed because we don't know why the data is reversed...blah
 		var result1 = value2 / max * 100;
 		var result2 = value1 / max * 100;
     	if (rec) {
-			// FIXME: reversed because we don't know why the data is reversed...blah
 			rec.set("Current", result1);
 			rec.set("Scenario", result2);
 			rec.commit();
@@ -131,7 +131,6 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 		
 		var rec = this.graphCombinedStore.findRecord('Match', newmatch);
 		if (rec) {
-			// FIXME: reversed because we don't know why the data is reversed...blah
 			var intermediate1 = rec.get('IntermCurrent') + result1;
 			var intermediate2 = rec.get('IntermScenario') + result2;
 			rec.set('IntermCurrent', intermediate1);
@@ -144,8 +143,8 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 			if (intermediate2 > max) {
 				max = intermediate2;
 			}
-			result1 = intermediate2 / max * 100;
-			result2 = intermediate1 / max * 100;
+			result1 = intermediate1 / max * 100;
+			result2 = intermediate2 / max * 100;
   			
 			rec.set('Current', result1);
 			rec.set('Scenario', result2);

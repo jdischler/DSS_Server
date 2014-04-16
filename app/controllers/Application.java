@@ -99,13 +99,16 @@ public class Application extends Controller
 			
 			String line = rd.readLine();
 			if (line != null) {
-				Logger.info(line);
-				String line1 = rd.readLine();
+//				Logger.info(line);
+				wr.close();
+				rd.close();
+				return ok(line);
+/*				String line1 = rd.readLine();
 				if (line1 != null) {
 					wr.close();
 					rd.close();
 					return ok(line1);
-				}
+				}*/
 			}
 			
 			wr.close();

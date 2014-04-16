@@ -9,7 +9,7 @@ var DSS_resizeMethod = 'null';//null; // can be: null, "resize", or ”map-resize”
 //	they appear as different URLs which allows the client to make multiple simultaneous
 //	requests and potentially get results back faster.
 var DSS_GeoServerURLS = [
-'http://pgis.glbrc.org:8080'];/*,
+	'http://pgis.glbrc.org'];/*,
 	'pgis1.wei.wisc.edu:8080',
 	'pgis2.wei.wisc.edu:8080',
 	'pgis3.wei.wisc.edu:8080'];*/

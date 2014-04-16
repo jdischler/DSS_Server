@@ -77,7 +77,7 @@ public class Application extends Controller
 		
 		try 
 		{
-			URL url = new URL("http://pgis.glbrc.org:8080/geoserver/Vector/wms" + 
+			URL url = new URL("http://pgis.glbrc.org/geoserver/Vector/wms" + 
 				"?LAYERS=" + layerName + "&QUERY_LAYERS=" + layerName + 
 				"&STYLES=&SERVICE=WMS&VERSION=1.1.1&SRS=EPSG:900913" +
 				"&REQUEST=GetFeatureInfo&FEATURE_COUNT=10&INFO_FORMAT=application/vnd.ogc.gml/3.1.1" +

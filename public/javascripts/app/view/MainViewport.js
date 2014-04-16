@@ -9,10 +9,10 @@ var DSS_resizeMethod = 'null';//null; // can be: null, "resize", or ”map-resize”
 //	they appear as different URLs which allows the client to make multiple simultaneous
 //	requests and potentially get results back faster.
 var DSS_GeoServerURLS = [
-	'pgis.glbrc.org:8080',
+'http://pgis.glbrc.org:8080'];/*,
 	'pgis1.wei.wisc.edu:8080',
 	'pgis2.wei.wisc.edu:8080',
-	'pgis3.wei.wisc.edu:8080'];
+	'pgis3.wei.wisc.edu:8080'];*/
 
 var DSS_VectorPath = '/geoserver/Vector/wms';
 var DSS_RasterPath = '/geoserver/Raster/wms';
@@ -226,7 +226,7 @@ Ext.define('MyApp.view.MainViewport', {
 			transitionEffect: DSS_resizeMethod,
 			visibility: visible,
 			yx : {
-				projectionType : true
+				'EPSG:3857' : false
 			}
 		};
 		

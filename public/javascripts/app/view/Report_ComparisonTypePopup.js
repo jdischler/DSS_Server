@@ -97,6 +97,7 @@ Ext.define('MyApp.view.Report_ComparisonTypePopup.js', {
 						}
 					},{
 						boxLabel: 'All Cells',
+						disabled: true,
 						name: 'compareStyle',
 						padding: '0 0 -5 0',
 						handler: function(radio, checked) {

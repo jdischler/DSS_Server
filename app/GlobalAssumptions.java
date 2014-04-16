@@ -34,11 +34,11 @@ public class GlobalAssumptions
 		
 		// P - Crop prices into Economic category
 		ObjectNode category = createAssumptionCategory("Economic", "economic_icon.png");
-		createAssumption(category,	"p_corn", 		"Corn Price", 			200.0f, options);
+		createAssumption(category,	"p_corn", 		"Corn Price", 			233.0f, options);
 		createAssumption(category,	"p_stover", 	"Corn Stover Price", 	80.0f, 	options);
-		createAssumption(category,	"p_soy", 		"Soy Price", 			450.0f, options);
+		createAssumption(category,	"p_soy", 		"Soy Price", 			640.0f, options);
 		createAssumption(category,	"p_alfalfa", 	"Alfalfa Price", 		200.0f, options);
-		createAssumption(category,	"p_grass", 		"Grass Price", 			100.0f, options);
+		createAssumption(category,	"p_grass", 		"Grass Price", 			75.0f, options);
 
 		// YIELD MANIPULATION
 		options = JsonNodeFactory.instance.objectNode();

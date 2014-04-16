@@ -5,7 +5,7 @@ import play.Project._
 object ApplicationBuild extends Build {
 
   val appName         = "DSS_Server"
-  val appVersion      = "0.54.2-SNAPSHOT"
+  val appVersion      = "0.54.3-SNAPSHOT"
 
   val appDependencies = Seq(
     // Add your project dependencies here,

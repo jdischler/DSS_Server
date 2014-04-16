@@ -336,8 +336,8 @@ Ext.define('MyApp.view.MainViewport', {
 		});
 
 		var lpRiver = Ext.create('MyApp.view.LayerPanel_Continuous', {
-			title: 'Distance to River',
-			DSS_ShortTitle: 'River',
+			title: 'Distance to Stream',
+			DSS_ShortTitle: 'Stream',
 			DSS_AutoSwapTitles: false,
 			DSS_Layer: wmsRivers,
 			DSS_LayerUnit: 'm',

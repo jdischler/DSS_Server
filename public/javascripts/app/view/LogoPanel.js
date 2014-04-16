@@ -43,8 +43,8 @@ Ext.define('MyApp.view.LogoPanel', {
 				width: 200,
 				border: 1,
 				scale: 'large',
-				text: 'SmartScape DSS',
-				aURL: 'http://www.facebook.com',
+				text: 'SmartScape DSS Help',
+				aURL: 'http://youtu.be/XxZvzqFZTU8',
 				handler: function(self) {
 					javascript:window.open(self.aURL,'_blank');return false;
 				}
@@ -55,9 +55,9 @@ Ext.define('MyApp.view.LogoPanel', {
 				y: 16,
 				width: 200,
 				border: 1,
+				text: 'Gratton Lab',
+				aURL: 'http://gratton.entomology.wisc.edu',
 				scale: 'large',
-				text: 'SmartScape DSS Help',
-				aURL: 'http://www.facebook.com',
 				handler: function(self) {
 					javascript:window.open(self.aURL,'_blank');return false;
 				}
@@ -69,8 +69,8 @@ Ext.define('MyApp.view.LogoPanel', {
 				width: 200,
 				border: 1,
 				scale: 'large',
-				text: 'About SmartScape DSS',
-				aURL: 'http://www.facebook.com',
+				text: 'WEI Homepage',
+				aURL: 'https://energy.wisc.edu',
 				handler: function(self) {
 					javascript:window.open(self.aURL,'_blank');return false;
 				}

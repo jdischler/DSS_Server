@@ -171,7 +171,7 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 
 		var me = this;
 		
-		console.log(event);
+	//	console.log(event);
 		OpenLayers.Element.addClass(globalMap.viewPortDiv, "olCursorWait");
 		var obj = Ext.Ajax.request({
 			url: location.href + 'wmsRequest',
@@ -191,7 +191,7 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 				var gmlParser = new OpenLayers.Format.GML.v3();
 				
 				var obj = gmlParser.read(response.responseText);
-				console.log(obj);
+			//	console.log(obj);
 				OpenLayers.Element.removeClass(globalMap.viewPortDiv, "olCursorWait");
 				// FIXME: pick standard keypress that works for all platforms??
 				//	alt key APPENDS selections...
@@ -237,6 +237,7 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 		
 		viewport.deactivateClickControl();
 		// FIXME: probably want to tie this to the watershed layer visibility?
+		this.DSS_Layer.setVisibility(false);
 		this.DSS_selectionLayer.setVisibility(false);
 	},
 	

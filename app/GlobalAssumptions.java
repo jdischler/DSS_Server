@@ -30,12 +30,12 @@ public class GlobalAssumptions
 		addOptionalRangeProperties(options, 1, 10000);
 		addOptionalStepSizeProperty(options, 20);
 		addOptionalUnitLabelProperty(options, "Pre", "$"); // options are "Pre" and "Post"
-		addOptionalHelpTextProperty(options, "Dollar amount in bushels per acre"); // TODO:validate
+		addOptionalHelpTextProperty(options, "Dollars per dry metric ton");
 		
 		// P - Crop prices into Economic category
 		ObjectNode category = createAssumptionCategory("Economic", "economic_icon.png");
 		createAssumption(category,	"p_corn", 		"Corn Price", 			233.0f, options);
-		createAssumption(category,	"p_stover", 	"Corn Stover Price", 	80.0f, 	options);
+		createAssumption(category,	"p_stover", 	"Corn Stover Price", 	50.0f, 	options);
 		createAssumption(category,	"p_soy", 		"Soy Price", 			640.0f, options);
 		createAssumption(category,	"p_alfalfa", 	"Alfalfa Price", 		200.0f, options);
 		createAssumption(category,	"p_grass", 		"Grass Price", 			75.0f, options);

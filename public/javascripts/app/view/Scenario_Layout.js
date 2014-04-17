@@ -227,16 +227,10 @@ Ext.define('MyApp.view.Scenario_Layout', {
 				me.up().showTransformPopup(me, rowIndex, rectOfClicked);
 			}
 		},
-		beforeselect: function(me, record, index, eOpts) {
-			
-			if (me.selected.getCount() > 0) {
-				var oldRecord = me.getSelection()[0];
-				if (oldRecord) {
-					var query = DSS_ViewSelectToolbar.buildQuery()
-					oldRecord.set('Query', query);
-					oldRecord.commit();
-				}
-			}
+		beforedeselect: function(me, record, index, eOpts) {
+			var query = DSS_ViewSelectToolbar.buildQuery()
+			record.set('Query', query);
+			record.commit();
 		},
 		select: function(me, record, index, eOpts) {
 			var query = record.get('Query');

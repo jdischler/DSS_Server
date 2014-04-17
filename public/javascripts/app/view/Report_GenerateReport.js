@@ -26,7 +26,7 @@ Ext.define('MyApp.view.Report_GenerateReport', {
 				tooltip: {
 					text: 'Store these results so they can be compared with your other scenarios'
 				},
-				x: 100,
+				x: 30,
 				y: 6,
 				height: 24,
 				handler: function(btn) {

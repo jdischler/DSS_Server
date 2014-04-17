@@ -117,7 +117,7 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 		var obj = Ext.Ajax.request({
 			url: location.href + 'query',
 			jsonData: queryJson,
-			timeout: 15000, // in milliseconds
+			timeout: 25000, // in milliseconds
 			
 			success: function(response, opts) {
 				

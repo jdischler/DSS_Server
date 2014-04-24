@@ -54,6 +54,20 @@ public class GlobalAssumptions
 		createAssumption(category,	"ym_alfalfa", 	"Alfalfa Yield", 	0.0f,	options);
 		createAssumption(category,	"ym_grass", 	"Grass Yield", 		0.0f,	options);
 		
+		// Tillage
+		options = JsonNodeFactory.instance.objectNode();
+		addOptionalRangeProperties(options, 0, 2);
+		addOptionalStepSizeProperty(options, 0.5f);
+		addOptionalUnitLabelProperty(options, "Post", "x"); // options are "Pre" and "Post"
+		addOptionalHelpTextProperty(options, "Tillage modification as a multiplier E.g. 2 is a 2 times in tillage.");
+		
+		// YM - Yield modification/multiplier
+		category = createAssumptionCategory("Tillage", "percent_icon.png");
+		createAssumption(category,	"t_corn", 		"Corn", 		2.0f,	options);
+		createAssumption(category,	"t_soy", 		"Soy", 		1.5f,	options);
+		createAssumption(category,	"t_alfalfa", 	"Alfalfa", 	1.25f,	options);
+		createAssumption(category,	"t_grass", 	"Grass", 		1.0f,	options);
+		
 		Logger.info(mHierarchicalAssumptions.toString());
 	}
 

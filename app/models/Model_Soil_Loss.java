@@ -98,6 +98,32 @@ long timeStart = System.currentTimeMillis();
 		float C = 0.0f;
 		// Support practice factor (Dimensionless)
 		float P = 0.0f;
+		// Multiplier
+		float M = 0.0f;
+		
+		// Tillage Multiplier
+		float cornTillageModifier = 1.0f; //
+		float soyTillageModifier = 1.0f; //
+		float alfalfaTillageModifier = 1.0f; //
+		float grassTillageModifier = 1.0f; //
+		
+		// Get user changeable yield scaling values from the client...
+		//----------------------------------------------------------------------
+		try {	
+			// Value comes in as a percent, e.g. -5%...convert to a multipler
+			cornTillageModifier = scenario.mAssumptions.getAssumptionFloat("t_corn");
+			soyTillageModifier = scenario.mAssumptions.getAssumptionFloat("t_soy");
+			alfalfaTillageModifier = scenario.mAssumptions.getAssumptionFloat("t_alfalfa");
+			grassTillageModifier = scenario.mAssumptions.getAssumptionFloat("t_grass");
+		}
+		catch (Exception e) {
+			Logger.info(e.toString());
+		}
+		
+		Logger.info(" Corn yield from client = " + Float.toString(cornTillageModifier) );
+		Logger.info(" Soy yield from client = " + Float.toString(soyTillageModifier) );
+		Logger.info(" Alfalfa yield from client = " + Float.toString(alfalfaTillageModifier));
+		Logger.info(" Grass yield from client = " + Float.toString(grassTillageModifier));
 		
 		// full raster save process...
 Logger.info("  > Allocated memory for Soil_Loss");
@@ -118,6 +144,7 @@ Logger.info("  > Allocated memory for Soil_Loss");
 						C = 0.02f;
 						//P = 0.25f;
 						P = 1.0f;
+						M = grassTillageModifier;
 					} 
 					// Alfalfa
 					else if ((rotationData[y][x] & Alfalfa_Mask) > 0) 
@@ -125,6 +152,7 @@ Logger.info("  > Allocated memory for Soil_Loss");
 						C = 0.02f;
 						//P = 0.25f;
 						P = 1.0f;
+						M = alfalfaTillageModifier;
 					} 
 					// Forest
 					else if ((rotationData[y][x] & Forest_Mask) > 0) 
@@ -132,6 +160,7 @@ Logger.info("  > Allocated memory for Soil_Loss");
 						C = 0.003f;
 						//P = 0.2f;
 						P = 1.0f;
+						M = 1;
 					} 
 					// Agriculture
 					else if ((rotationData[y][x] & Ag_Mask) > 0) 
@@ -139,6 +168,7 @@ Logger.info("  > Allocated memory for Soil_Loss");
 						C = 0.5f;
 						//P = 0.4f;
 						P = 1.0f;
+						M = (cornTillageModifier + soyTillageModifier)/2;
 					}
 					// Other land use classes
 					//else
@@ -151,7 +181,7 @@ Logger.info("  > Allocated memory for Soil_Loss");
 					{
 						// Convert Mg per Ha to Mg per cell
 						// Calculate Soil Loss for each cell in the landscape (Mg per cell per year)
-						Soil_Loss_Data[y][x] = Rainfall_Erosivity[y][x] * Soil_Erodibility[y][x] * LS[y][x] * C * P * 900.0f / 10000.0f;
+						Soil_Loss_Data[y][x] = Rainfall_Erosivity[y][x] * Soil_Erodibility[y][x] * LS[y][x] * C * P * M * 900.0f / 10000.0f;
 						// Calculate Soil Loss in the landscape (Mg per Ha per year)
 						//Soil_Loss_Data[y][x] = Rainfall_Erosivity[y][x] * Soil_Erodibility[y][x] * LS[y][x] * C * P;
 						// Calculate Soil Loss (Mg per Ha per year)

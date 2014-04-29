@@ -478,21 +478,21 @@ public class Application extends Controller
 		String basePath2 = path2;
 		path2 += "selection.sel";
 
-		Logger.info(" ... Going to custom compare files:");
-		Logger.info("  " + path1);
-		Logger.info("  " + path2);
+		Logger.info(" ... Going to custom compare files in:");
+		Logger.info("  " + basePath1);
+		Logger.info("  " + basePath2);
 		
 		File file1 = new File(path1);
 		File file2 = new File(path2);
 		
 		boolean failed = false;
 		
-		if (!file1.exists()) {
+		if (compare1ID >= 0 && !file1.exists()) { // ALLOW load of selection fail if this is for DEFAULT
 			Logger.info(" Error! - file <" + file1.toString() + 
 				"> does not exist");
 			failed = true;
 		}
-		if (!file2.exists()) {
+		if (compare2ID >= 0 && !file2.exists()) { // ALLOW load of selection fail if this is for DEFAULT
 			Logger.info(" Error! - file <" + file2.toString() + 
 				"> does not exist");
 			failed = true;
@@ -503,14 +503,21 @@ public class Application extends Controller
 			return badRequest(); // TODO: add return errors if needed...
 		}
 		
-		Selection sel1 = new Selection(file1);
-		if (!sel1.isValid) {
+		Selection sel1 = null;
+		if (compare1ID >= 0) { // DEFAULT Scenario does not have a selection...
+			sel1 = new Selection(file1);
+		}
+		if (sel1 != null && !sel1.isValid) {
 			Logger.info(" Error! - load of selection from file <" + file1.toString() + 
 				"> failed! Custom comparison aborting.");
 			return badRequest(); // TODO: add return errors if needed...
 		}
-		Selection sel2 = new Selection(file2);
-		if (!sel2.isValid) {
+		
+		Selection sel2 = null;
+		if (compare2ID >= 0) { // DEFAULT Scenario does not have a selection...
+			sel2 = new Selection(file2);
+		}
+		if (sel2 != null && !sel2.isValid) {
 			Logger.info(" Error! - load of selection from file <" + file2.toString() + 
 				"> failed! Custom comparison aborting.");
 			return badRequest(); // TODO: add return errors if needed...
@@ -547,7 +554,8 @@ public class Application extends Controller
 		
 		Analyzer_HistogramNew histogram = new Analyzer_HistogramNew();
 
-		// TODO: FIXME: this isn't going to properly handle the SOC layer?
+		// TODO: FIXME: Comparing against DEFAULT should be able to use in-memory results
+		//	and be faster due to half as much file accessing?
 		File file1 = new File(comparison.mBasePath1 + "/" + file + ".dss");
 		File file2 = new File(comparison.mBasePath2 + "/" + file + ".dss");
 		

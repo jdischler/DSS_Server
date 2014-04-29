@@ -22,9 +22,19 @@ public class CustomComparison
 	public CustomComparison(String basePath1, Selection sel1, 
 							String basePath2, Selection sel2) {
 		mBasePath1 = basePath1;
-		mSelection1 = sel1;
+		if (sel1 == null) { // allow null selecitons, which would typically be the case for a DEFAULT comparison
+			mSelection1 = sel2;
+		}
+		else {
+			mSelection1 = sel1;
+		}
 		mBasePath2 = basePath2;
-		mSelection2 = sel2;
+		if (sel2 == null) { // allow null selecitons, which would typically be the case for a DEFAULT comparison
+			mSelection2 = sel1;
+		}
+		else {
+			mSelection2 = sel2;
+		}
 	}
 
 	// TODO: should we validate that the height/width are the same?

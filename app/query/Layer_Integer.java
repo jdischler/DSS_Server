@@ -49,6 +49,8 @@ public class Layer_Integer extends Layer_Base
 	protected int mNoDataValue;
 	protected int mConvertedNoDataValue;
 	protected EType mLayerDataFormat;
+	protected boolean mbInitedMinMaxCache;
+	protected int mMin, mMax;
 	
 	// Pass true to have the data shifted for mask type comparisons.
 	//--------------------------------------------------------------------------
@@ -101,6 +103,7 @@ public class Layer_Integer extends Layer_Base
 		
 		for (int x = 0; x < width; x++) {
 			mIntData[atY][x] = dataBuffer.getInt();
+			cacheMinMax(mIntData[atY][x]); 
 		}
 	}
 
@@ -123,6 +126,7 @@ public class Layer_Integer extends Layer_Base
 				val = mConvertedNoDataValue;
 			}
 			else {
+				cacheMinMax(val);
 				// Optionally convert to a bit style value for fast/simultaneous compares
 				if (mLayerDataFormat == EType.EPreShiftedIndex) {
 					if (val <= 31) {
@@ -139,9 +143,31 @@ public class Layer_Integer extends Layer_Base
 		}
 	}
 
+	//--------------------------------------------------------------------------
+	final private void cacheMinMax(int value) {
+		
+		if (value != mNoDataValue) {
+			if (!mbInitedMinMaxCache) {
+				mbInitedMinMaxCache = true;
+				mMin = value;
+				mMax = value;
+			}
+		
+			if (value > mMax) {
+				mMax = value;
+			}
+			else if (value < mMin) {
+				mMin = value;
+			}
+		}
+	}
+	
 	// Loads a color key if there is one....
 	//--------------------------------------------------------------------------
 	protected void onLoadEnd() {
+		
+		Logger.info("  Value range is: " + Integer.toString(mMin) + 
+						" to " + Integer.toString(mMax));
 		
 		File colorKeyFile = new File("./layerData/" + mName + ".key");
 		if (!colorKeyFile.exists())

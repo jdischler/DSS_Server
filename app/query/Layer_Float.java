@@ -73,9 +73,9 @@ public class Layer_Float extends Layer_Base
 	}
 	
 	//--------------------------------------------------------------------------
-	private void cacheMinMax(float value) {
+	final private void cacheMinMax(float value) {
 		
-		if (value > -9998.0f) { // FIXME
+		if (value < -9999.1f || value > -9998.9f) { // FIXME
 			if (!mbInitedMinMaxCache) {
 				mbInitedMinMaxCache = true;
 				mMin = value;

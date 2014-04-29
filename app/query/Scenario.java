@@ -210,17 +210,80 @@ public class Scenario
 				
 				if (transformElement == null) {
 					Logger.info("Boooo....transform element was null.");
+					continue; // TODO: signal back to client that an error happened vs. just doing nothing
 				}
 				else if (!transformElement.isObject()) {
 					Logger.info("Booooooo.....transform element is not an object");
+					continue; // TODO: signal back to client that an error happened vs. just doing nothing
 				}
 				
 				// get the new landuse...but remember that it needs to be in the
 				//	format of a bit mask "position" that corresponds to the index
 				//	.vs the index value itself.
-				int newLanduse = transformElement.get("newLandUse").intValue();
-				Logger.info("  + New land use code: " + Integer.toString(newLanduse));
-				newLanduse = Layer_Integer.convertIndexToMask(newLanduse);
+				JsonNode transformConfig = transformElement.get("config");
+				if (transformConfig == null || !transformConfig.isObject()) {
+					Logger.info("Boooo....transform config does not exist or is not an object");
+					continue; // TODO: signal back to client that an error happened vs. just doing nothing
+				}
+				
+				ObjectNode transformConfigObj = (ObjectNode)transformConfig;
+				
+				int newLandUse = transformConfigObj.get("LandUse").intValue();
+				Logger.info("  + New land use code: " + Integer.toString(newLandUse));
+				newLandUse = Layer_Integer.convertIndexToMask(newLandUse);
+				
+				JsonNode managementOptions = transformConfigObj.get("Options");
+				if (managementOptions == null || !managementOptions.isObject()) {
+					Logger.info("  +- No management options came along, currently not an error");
+				}
+				else {
+					Logger.info("  +-- Management Options from Client: " + managementOptions.toString());
+					// Blah, dig in and apply options.
+					// ---- Fertilizer ----
+					JsonNode fertNode = managementOptions.get("Fertilizer");
+					if (fertNode != null && fertNode.isObject()) { 
+						ObjectNode fertilizerOptions = (ObjectNode)fertNode;
+						if (fertilizerOptions.get("Fertilizer").booleanValue()) {
+							Logger.info("  +--- Applying Fertilizer");
+							newLandUse = ManagementOptions.E_Fertilizer.setOn(newLandUse); // else no fertilizer
+							if (fertilizerOptions.get("FertilizerManure").booleanValue()) {
+								Logger.info("  +--- Fertilizer Is Manure");
+								newLandUse = ManagementOptions.E_Manure.setOn(newLandUse); // else is synthetic
+								if (fertilizerOptions.get("FertilizerFallSpread").booleanValue()) {
+									newLandUse = ManagementOptions.E_FallManure.setOn(newLandUse); // else is spread other time
+									Logger.info("  +--- Fertilizer Is Fall Spread Manure");
+								}
+							}
+						}
+						else {
+							Logger.info("  +--- No Fertilizer");
+						}
+					}
+					// ---- Tillage ----
+					JsonNode tillNode = managementOptions.get("Tillage");
+					if (tillNode != null && tillNode.isObject()) {
+						ObjectNode tillageOptions = (ObjectNode)tillNode;
+						if (tillageOptions.get("Tillage").booleanValue()) {
+							newLandUse = ManagementOptions.E_Till.setOn(newLandUse); // else is no-till
+							Logger.info("  +--- Applying Tillage");
+						}
+						else {
+							Logger.info("  +---- Using no-till");
+						}
+					}
+					// ---- Cover Crop ----
+					JsonNode ccnode = managementOptions.get("CoverCrop");
+					if (ccnode != null && ccnode.isObject()) {
+						ObjectNode ccOptions = (ObjectNode)ccnode;
+						if (ccOptions.get("CoverCrop").booleanValue()) {
+							newLandUse = ManagementOptions.E_CoverCrop.setOn(newLandUse); // else is no-covercrop
+							Logger.info("  +--- Applying CoverCrop");
+						}
+						else {
+							Logger.info("  +---- Using no covercrop");
+						}
+					}
+				}
 				
 				try {
 					currentSelection = query.execute(transformElement);
@@ -253,10 +316,11 @@ public class Scenario
 				//	e.g., if this is the second or later query in a series,
 				//	the first (highest priority) transform will trump any subsequent transforms
 				int x, y;
+								
 				for (y = 0; y < currentSelection.mHeight; y++) {
 					for (x = 0; x < currentSelection.mWidth; x++) {
 						if (currentSelection.isSelected(x, y)) {
-							rotationToTransform[y][x] = newLanduse;			
+							rotationToTransform[y][x] = newLandUse;			
 						}
 					}
 				}

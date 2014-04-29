@@ -27,11 +27,52 @@ public class Model_P_LossEpic extends Model_Base
 	//--------------------------------------------------------------------------
 	public List<ModelResult> run(Scenario scenario) 
 	{
-
+		
 //Logger.info(">>> Computing Model Phosphorus Loss");
 Logger.info(">>> Computing P_Loss_EPIC Model");
 long timeStart = System.currentTimeMillis();
+
+		//----------------------------------------------------------------------
+		// Get Client Multipliers
+		//----------------------------------------------------------------------
+		float MM = 1.0f; // manure multiplier
+		float CCM = 1.0f;// cover crop multiplier
+		float NTM = 1.0f;// no till multiplier
 		
+		// Manure values from client
+		float manureAnnualModifier = 1.0f; 
+		float fallManureAnnualModifier = 1.0f; 
+		float covercropAnnualModifier = 1.0f;
+		float notillAnnualModifier = 1.0f;
+
+		float manurePerennialModifier = 1.0f;
+		float fallManurePerennialModifier = 1.0f;		
+	
+		// Get user changeable yield scaling values from the client...
+		//----------------------------------------------------------------------
+		try {	
+			// values come in as straight multiplier
+			manureAnnualModifier = scenario.mAssumptions.getAssumptionFloat("p_m_annuals");
+			fallManureAnnualModifier = scenario.mAssumptions.getAssumptionFloat("p_fm_annuals");
+			covercropAnnualModifier = scenario.mAssumptions.getAssumptionFloat("p_cc_annuals");
+			notillAnnualModifier = scenario.mAssumptions.getAssumptionFloat("p_nt_annuals");
+
+			// values come in as straight multiplier
+			manurePerennialModifier = scenario.mAssumptions.getAssumptionFloat("p_m_perennials");
+			fallManurePerennialModifier = scenario.mAssumptions.getAssumptionFloat("p_fm_perennials");
+		}
+		catch (Exception e) {
+			Logger.info(e.toString());
+		}
+		
+		Logger.info(" PLoss - annuals manure from client = " + Float.toString(manureAnnualModifier) );
+		Logger.info(" PLoss - annuals fall manure from client = " + Float.toString(fallManureAnnualModifier) );
+		Logger.info(" PLoss - annuals cover crop from client = " + Float.toString(covercropAnnualModifier) );
+		Logger.info(" PLoss - annuals no till from client = " + Float.toString(notillAnnualModifier) );
+
+		Logger.info(" PLoss - perennial manure from client = " + Float.toString(manurePerennialModifier) );
+		Logger.info(" PLoss - perennial fall manure from client = " + Float.toString(fallManurePerennialModifier) );
+
 		// Spatial Layers
 		int[][] rotationData = scenario.mNewRotation;
 		int width = scenario.getWidth(), height = scenario.getHeight();
@@ -82,16 +123,26 @@ Logger.info("  > Allocated memory for P_Loss_EPIC");
 		{
 			for (int x = 0; x < width; x++) 
 			{
-				if (rotationData[y][x] > 0)
+				int landCover = rotationData[y][x];
+				MM = 1.0f; // set default multiplier
+				CCM = 1.0f;
+				NTM = 1.0f;
+				
+				if (landCover > 0)
 				{
 					// Kg per Ha
 					// Grass
-					if ((rotationData[y][x] & Grass_Mask) > 0) 
+					if ((landCover & Grass_Mask) > 0) 
 					{
 						if (Grass_p[y][x] > -9999)
 						{
 							Transmission = 0.20f;
 							PhosphorusData[y][x] = Grass_p[y][x];
+							MM = ManagementOptions.getFertilizerMultiplier(landCover, 
+									1.0f, 1.0f, // these values correspond to NO Fert multiplier and synthetic multiplier
+									fallManurePerennialModifier, manurePerennialModifier);
+							NTM = ManagementOptions.E_Till.getIfActiveOn(landCover, 1.0f, notillAnnualModifier);
+							CCM = ManagementOptions.E_CoverCrop.getIfActiveOn(landCover, covercropAnnualModifier, 1.0f);
 						}
 						else
 						{
@@ -99,12 +150,17 @@ Logger.info("  > Allocated memory for P_Loss_EPIC");
 						}
 					}
 					// Corn
-					else if ((rotationData[y][x] & Corn_Mask) > 0) 
+					else if ((landCover & Corn_Mask) > 0) 
 					{
 						if(Corn_p[y][x] > -9999)
 						{
 							Transmission = 0.80f;
 							PhosphorusData[y][x] = Corn_p[y][x];
+							MM = ManagementOptions.getFertilizerMultiplier(landCover, 
+									1.0f, 1.0f, // these values correspond to NO Fert multiplier and synthetic multiplier
+									fallManureAnnualModifier, manureAnnualModifier);
+							NTM = ManagementOptions.E_Till.getIfActiveOn(landCover, 1.0f, notillAnnualModifier);
+							CCM = ManagementOptions.E_CoverCrop.getIfActiveOn(landCover, covercropAnnualModifier, 1.0f);
 						}
 						else
 						{
@@ -112,12 +168,15 @@ Logger.info("  > Allocated memory for P_Loss_EPIC");
 						}
 					}
 					// Soy
-					else if ((rotationData[y][x] & Soy_Mask) > 0) 
+					else if ((landCover & Soy_Mask) > 0) 
 					{
 						if(Soy_p[y][x] > -9999)
 						{
 							Transmission = 0.80f;
 							PhosphorusData[y][x] = Soy_p[y][x];
+							MM = ManagementOptions.getFertilizerMultiplier(landCover, 
+									1.0f, 1.0f, // these values correspond to NO Fert multiplier and synthetic multiplier
+									fallManureAnnualModifier, manureAnnualModifier);
 						}
 						else
 						{
@@ -125,12 +184,15 @@ Logger.info("  > Allocated memory for P_Loss_EPIC");
 						}
 					} 
 					// Alfalfa
-					else if ((rotationData[y][x] & Alfalfa_Mask) > 0) 
+					else if ((landCover & Alfalfa_Mask) > 0) 
 					{
 						if (Alfa_p[y][x] > -9999)
 						{
 							Transmission = 0.30f;
 							PhosphorusData[y][x] = Alfa_p[y][x];
+							MM = ManagementOptions.getFertilizerMultiplier(landCover, 
+									1.0f, 1.0f, // these values correspond to NO Fert multiplier and synthetic multiplier
+									fallManurePerennialModifier, manurePerennialModifier);
 						}
 						else
 						{
@@ -144,7 +206,9 @@ Logger.info("  > Allocated memory for P_Loss_EPIC");
 					// Correct phosphorus Calculation for each cell in the landscape based on the distance
 					// Convert Kg per Ha to Mg per cell
 					Dist = (int)(Rivers[y][x] / 30) + 1;
-					PhosphorusData[y][x] = (PhosphorusData[y][x] * 900.0f * 0.0001f * (float)(Math.pow(Transmission, Dist))) / 1000.0f;
+					PhosphorusData[y][x] = (PhosphorusData[y][x] *
+							MM * NTM * CCM * // apply multipliers for management options that came from client 
+							900.0f * 0.0001f * (float)(Math.pow(Transmission, Dist))) / 1000.0f;
 					
 					// 2st step. Add the calculated cells within a watershed
 					//watershedIdx = watersheds[y][x];

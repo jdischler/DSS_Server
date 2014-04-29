@@ -53,20 +53,39 @@ public class GlobalAssumptions
 		createAssumption(category,	"ym_soy", 		"Soy Yield", 		0.0f,	options);
 		createAssumption(category,	"ym_alfalfa", 	"Alfalfa Yield", 	0.0f,	options);
 		createAssumption(category,	"ym_grass", 	"Grass Yield", 		0.0f,	options);
+				
+		ObjectNode multiplierOptions = JsonNodeFactory.instance.objectNode();
+		addOptionalRangeProperties(multiplierOptions, 0, 2);
+		addOptionalStepSizeProperty(multiplierOptions, 0.1f);
+		addOptionalUnitLabelProperty(multiplierOptions, "Pre", "x"); // options are "Pre" and "Post"
 		
-		// Tillage
-		options = JsonNodeFactory.instance.objectNode();
-		addOptionalRangeProperties(options, 0, 2);
-		addOptionalStepSizeProperty(options, 0.5f);
-		addOptionalUnitLabelProperty(options, "Post", "x"); // options are "Pre" and "Post"
-		addOptionalHelpTextProperty(options, "Tillage modification as a multiplier E.g. 2 is a 2 times in tillage.");
+		// SOIL LOSS MODEL Multipliers
+		category = createAssumptionCategory("Soil Loss Model", "down.png", false); // false means closed category
+		createAssumption(category,	"sl_nt_annuals", 	"No Till - Annual Crops", 		0.9f,	multiplierOptions);
+		createAssumption(category,	"sl_cc_annuals",	"With Cover Crop - Annual Crops",0.7f,	multiplierOptions);
 		
-		// YM - Yield modification/multiplier
-		category = createAssumptionCategory("Tillage", "percent_icon.png");
-		createAssumption(category,	"t_corn", 		"Corn", 		2.0f,	options);
-		createAssumption(category,	"t_soy", 		"Soy", 		1.5f,	options);
-		createAssumption(category,	"t_alfalfa", 	"Alfalfa", 	1.25f,	options);
-		createAssumption(category,	"t_grass", 	"Grass", 		1.0f,	options);
+		// PHOSPHORUS MODEL Multipliers
+		category = createAssumptionCategory("Phosphorus Model", "down.png", false); // false means closed category
+		createAssumption(category,	"p_m_annuals",		"Manure - Annual Crops",		1.05f,	multiplierOptions);
+		createAssumption(category,	"p_fm_annuals",		"Fall Manure - Annual Crops",	1.35f,	multiplierOptions);
+		createAssumption(category,	"p_nt_annuals",		"No Till - Annual Crops",		0.8f,	multiplierOptions);
+		createAssumption(category,	"p_cc_annuals",		"With Cover Crop - Annual Crops",0.7f,	multiplierOptions);
+
+		createAssumption(category,	"p_m_perennials",	"Manure - Perennial Crops",		1.02f,	multiplierOptions);
+		createAssumption(category,	"p_fm_perennials",	"Fall Manure - Perennial Crops",1.15f,	multiplierOptions);
+		
+		// YIELD MODEL Multipliers
+		category = createAssumptionCategory("Yield Model", "down.png", false); // false means closed category
+		// TODO: ADD assumptions to yield model here
+		
+		// SOC MODEL Multipliers
+		category = createAssumptionCategory("Soil Organic Carbon Model", "down.png", false); // false means closed category
+		// TODO: ADD assumptions to SOC model here
+		
+		// N20 MODEL Multipliers
+		category = createAssumptionCategory("Nitrous Oxide Model", "down.png", false); // false means closed category
+		// TODO: ADD assumptions to N20 model here
+		
 		
 		Logger.info(mHierarchicalAssumptions.toString());
 	}
@@ -75,9 +94,17 @@ public class GlobalAssumptions
 	//--------------------------------------------------------------------------
 	private static ObjectNode createAssumptionCategory(String categoryName, String icon)
 	{
+		return createAssumptionCategory(categoryName,icon,true); // default to open
+	}
+
+	// We put properties into Categories, generally, for user convenience in find things...
+	//--------------------------------------------------------------------------
+	private static ObjectNode createAssumptionCategory(String categoryName, String icon, boolean open)
+	{
 		ObjectNode node = JsonNodeFactory.instance.objectNode();
 		node.put("CategoryName", categoryName);
 		node.put("CategoryIcon", icon);
+		node.put("CategoryOpen", open);
 
 		mHierarchicalAssumptions.put(categoryName, node);
 		

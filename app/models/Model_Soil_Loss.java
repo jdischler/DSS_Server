@@ -98,32 +98,28 @@ long timeStart = System.currentTimeMillis();
 		float C = 0.0f;
 		// Support practice factor (Dimensionless)
 		float P = 0.0f;
-		// Multiplier
-		float M = 0.0f;
+		// No Till SoilLoss Multiplier
+		float NT_M = 1.0f;
+		// Cover Crop Multiplier
+		float CC_M = 1.0f;
 		
-		// Tillage Multiplier
-		float cornTillageModifier = 1.0f; //
-		float soyTillageModifier = 1.0f; //
-		float alfalfaTillageModifier = 1.0f; //
-		float grassTillageModifier = 1.0f; //
-		
+		// Multipliers from client variables
+		float annualNoTillageModifier = 1.0f; //
+		float annualCoverCropModifier = 1.0f;		
+
 		// Get user changeable yield scaling values from the client...
 		//----------------------------------------------------------------------
 		try {	
-			// Value comes in as a percent, e.g. -5%...convert to a multipler
-			cornTillageModifier = scenario.mAssumptions.getAssumptionFloat("t_corn");
-			soyTillageModifier = scenario.mAssumptions.getAssumptionFloat("t_soy");
-			alfalfaTillageModifier = scenario.mAssumptions.getAssumptionFloat("t_alfalfa");
-			grassTillageModifier = scenario.mAssumptions.getAssumptionFloat("t_grass");
+			// values come in as straight multiplier
+			annualNoTillageModifier = scenario.mAssumptions.getAssumptionFloat("sl_nt_annuals");
+			annualCoverCropModifier = scenario.mAssumptions.getAssumptionFloat("sl_cc_annuals");		
 		}
 		catch (Exception e) {
 			Logger.info(e.toString());
 		}
 		
-		Logger.info(" Corn yield from client = " + Float.toString(cornTillageModifier) );
-		Logger.info(" Soy yield from client = " + Float.toString(soyTillageModifier) );
-		Logger.info(" Alfalfa yield from client = " + Float.toString(alfalfaTillageModifier));
-		Logger.info(" Grass yield from client = " + Float.toString(grassTillageModifier));
+		Logger.info(" Agricultural no till from client = " + Float.toString(annualNoTillageModifier) );
+		Logger.info(" Agricultural cover crop from client = " + Float.toString(annualCoverCropModifier) );
 		
 		// full raster save process...
 Logger.info("  > Allocated memory for Soil_Loss");
@@ -134,41 +130,43 @@ Logger.info("  > Allocated memory for Soil_Loss");
 		{
 			for (int x = 0; x < width; x++) 
 			{
-				if ((rotationData[y][x] & TotalMask) > 0)
+				int landCover = rotationData[y][x];
+				NT_M = 1.0f;
+				CC_M = 1.0f;
+				if ((landCover & TotalMask) > 0)
 				{
 					// Update C and P factors for different LUCC type
 					// C and P are coming from biophysical table (Invest)
 					// Grass
-					if ((rotationData[y][x] & Grass_Mask) > 0) 
+					if ((landCover & Grass_Mask) > 0) 
 					{
 						C = 0.02f;
 						//P = 0.25f;
 						P = 1.0f;
-						M = grassTillageModifier;
 					} 
 					// Alfalfa
-					else if ((rotationData[y][x] & Alfalfa_Mask) > 0) 
+					else if ((landCover & Alfalfa_Mask) > 0) 
 					{
 						C = 0.02f;
 						//P = 0.25f;
 						P = 1.0f;
-						M = alfalfaTillageModifier;
 					} 
 					// Forest
-					else if ((rotationData[y][x] & Forest_Mask) > 0) 
+					else if ((landCover & Forest_Mask) > 0) 
 					{
 						C = 0.003f;
 						//P = 0.2f;
 						P = 1.0f;
-						M = 1;
 					} 
 					// Agriculture
-					else if ((rotationData[y][x] & Ag_Mask) > 0) 
+					else if ((landCover & Ag_Mask) > 0) 
 					{
 						C = 0.5f;
 						//P = 0.4f;
 						P = 1.0f;
-						M = (cornTillageModifier + soyTillageModifier)/2;
+						// Return tillage modififier if cell is Tilled
+						NT_M = ManagementOptions.E_Till.getIfActiveOn(landCover, 1.0f, annualNoTillageModifier);
+						CC_M = ManagementOptions.E_CoverCrop.getIfActiveOn(landCover, annualCoverCropModifier, 1.0f);
 					}
 					// Other land use classes
 					//else
@@ -181,7 +179,10 @@ Logger.info("  > Allocated memory for Soil_Loss");
 					{
 						// Convert Mg per Ha to Mg per cell
 						// Calculate Soil Loss for each cell in the landscape (Mg per cell per year)
-						Soil_Loss_Data[y][x] = Rainfall_Erosivity[y][x] * Soil_Erodibility[y][x] * LS[y][x] * C * P * M * 900.0f / 10000.0f;
+						Soil_Loss_Data[y][x] = Rainfall_Erosivity[y][x] * Soil_Erodibility[y][x] * LS[y][x] * 
+								C * P * 
+								NT_M * CC_M * // apply multipliers based on management options
+								900.0f / 10000.0f;
 						// Calculate Soil Loss in the landscape (Mg per Ha per year)
 						//Soil_Loss_Data[y][x] = Rainfall_Erosivity[y][x] * Soil_Erodibility[y][x] * LS[y][x] * C * P;
 						// Calculate Soil Loss (Mg per Ha per year)

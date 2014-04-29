@@ -34,12 +34,12 @@ Ext.define('MyApp.view.Assumptions.PropertyElement', {
 				xtype: 'label',
 				x: 0,
 				y: -7,
-				width: 150,
+				width: 200,
 				html: label
 			},{
             	itemId: 'valueField',
 				xtype: 'numberfield',
-				x: 155,
+				x: 205,
 				y: 2,
 				width: 85 - unitPostLabelSpacer, // optionally reserve space for a Post label
 				hideEmptyLabel: true,
@@ -55,7 +55,7 @@ Ext.define('MyApp.view.Assumptions.PropertyElement', {
 			},
 			{
 				xtype: 'label',
-				x: 230,
+				x: 280,
 				y: 2,
 				width: 20,
 				hidden: (typeof this.DSS_elementDefinition.PostLabel === 'undefined'),
@@ -63,7 +63,7 @@ Ext.define('MyApp.view.Assumptions.PropertyElement', {
 			},
 			{
 				xtype: 'button',
-				x: 250,
+				x: 300,
 				y: 2,
 				text: '?',
 				hidden: (typeof this.DSS_elementDefinition.HelpText === 'undefined'),

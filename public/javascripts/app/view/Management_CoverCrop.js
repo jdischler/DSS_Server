@@ -1,6 +1,6 @@
 	
 //------------------------------------------------------------------------------
-Ext.define('MyApp.view.Management_Tillage', {
+Ext.define('MyApp.view.Management_CoverCrop', {
 	extend: 'Ext.container.Container',
 	
 	height: 30,
@@ -16,25 +16,25 @@ Ext.define('MyApp.view.Management_Tillage', {
 		Ext.applyIf(me, {
 			items: [{
 				xtype: 'radiogroup',
-				itemId: 'DSS_Tillage',
+				itemId: 'DSS_CoverCrop',
 				x: 0,
 				y: 0,
 				width: 290,
-				fieldLabel: 'Tillage',
+				fieldLabel: 'Cover Crop',
 				labelAlign: 'right',
 				labelWidth: 70,
 				allowBlank: false,
 				items: [{
 					xtype: 'radiofield',
-					boxLabel: 'Conventional',
+					boxLabel: 'Yes',
 					checked: true,
-					name: 'Tillage',
+					name: 'CoverCrop',
 					inputValue: 0
 				},
 				{
 					xtype: 'radiofield',
-					boxLabel: 'No-Till',
-					name: 'Tillage',
+					boxLabel: 'No',
+					name: 'CoverCrop',
 					inputValue: 1
 				}]
 			}]
@@ -47,10 +47,10 @@ Ext.define('MyApp.view.Management_Tillage', {
 	
 	//--------------------------------------------------------------------------
 	setFromTransform: function(transform) {
-
-		if (transform && transform.Options && transform.Options.Tillage) {
-			var tillageType = this.getComponent('DSS_Tillage');
-			tillageType.setValue({'Tillage': !transform.Options.Tillage.Tillage});
+		
+		if (transform && transform.Options && transform.Options.CoverCrop) {
+			var coverCrop = this.getComponent('DSS_CoverCrop');
+			coverCrop.setValue({'CoverCrop': !transform.Options.CoverCrop.CoverCrop});
 		}
 	},
 	
@@ -58,23 +58,23 @@ Ext.define('MyApp.view.Management_Tillage', {
 	collectChanges: function(transform) {
 		
 		var obj = {
-			Tillage: false,
-			text: '<b>Tillage:</b> '
+			CoverCrop: false,
+			text: '<b>Cover Crop:</b> '
 		};
 		
-		var tillageType = this.getComponent('DSS_Tillage');
-		var value = tillageType.getValue()['Tillage'];
+		var tillageType = this.getComponent('DSS_CoverCrop');
+		var value = tillageType.getValue()['CoverCrop'];
 		console.log(value);
 		
 		if (value == 0) {
-			obj.text += 'Conventional';
-			obj.Tillage = true;
+			obj.text += 'Yes';
+			obj.CoverCrop = true;
 		}
 		else if (value == 1) {
-			obj.text += 'No-Till';
+			obj.text += 'None';
 		}
 		
-		transform['Tillage'] = obj;
+		transform['CoverCrop'] = obj;
 		
 		return obj;
 	}

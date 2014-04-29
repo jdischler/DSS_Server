@@ -17,7 +17,7 @@ public class Global extends GlobalSettings
 	private static final boolean LOAD_DEFAULT_DATA = true;
 	
 	// FIXME: TODO: this will be annoying...investigate automating the version numbering
-	private static final String mServerVersionMessage = "Server version: 0.54.4";
+	private static final String mServerVersionMessage = "Server version: 0.55.0";
 	
 	//--------------------------------------------------------------------------
 	@Override
@@ -33,6 +33,8 @@ public class Global extends GlobalSettings
 		
 		cacheLayers();
 
+		ApplyManagementOptions.now(); // Takes in-memory CDL and adds management options to it...
+		
 		QueuedWriter.beginWatchWriteQueue();
 		conditionalCreateDefaultModelOutputs();		
 		cacheModelDefaults();

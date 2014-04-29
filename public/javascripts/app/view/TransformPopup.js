@@ -4,13 +4,10 @@ var DSS_TransformTypes = Ext.create('Ext.data.Store', {
 		
 	fields: ['index', 'name', 'controls'],
 	data: [
-		{ 'index': 1, 'name': 'Corn', 	'controls': ['Tillage','Fertilizer'] },
-		{ 'index': 16, 'name': 'Soy', 	'controls': ['Tillage','Fertilizer'] },
-		{ 'index': 17, 'name': 'Alfalfa', 'controls': ['Tillage','Fertilizer'] },
-//		{ 'index': 3, 'name': 'Veggies', 			'controls': ['Tillage','Fertilizer'] },
+		{ 'index': 1, 'name': 'Corn', 	'controls': ['Fertilizer','Tillage','CoverCrop'] },
+		{ 'index': 16, 'name': 'Soy', 	'controls': ['Fertilizer','Tillage','CoverCrop'] },
+		{ 'index': 17, 'name': 'Alfalfa', 'controls': ['Fertilizer','Tillage'] },
 		{ 'index': 6, 'name': 'Grass', 	'controls': ['Fertilizer'] }
-//		{ 'index': 10, 'name': 'Suburban' }
-//		{ 'index': 7,'name': 'Woodland' }
 	]
 });
 
@@ -21,9 +18,10 @@ Ext.define('MyApp.view.TransformPopup', {
     requires: [
     	'MyApp.view.Management_Tillage',
     	'MyApp.view.Management_Fertilizer',
+    	'MyApp.view.Management_CoverCrop'
     ],
     
-    height: 310,
+    height: 320,
     width: 330,
     layout: {
         type: 'absolute'
@@ -106,7 +104,7 @@ Ext.define('MyApp.view.TransformPopup', {
 			{
 				xtype: 'button',
 				x: 180,
-				y: 235,
+				y: 245,
 				scale: 'medium',
 				text: 'Cancel',	
 				handler: function(self) {
@@ -117,7 +115,7 @@ Ext.define('MyApp.view.TransformPopup', {
 			{
 				xtype: 'button',
 				x: 240,
-				y: 235,
+				y: 245,
 				scale: 'medium',
 				text: 'Ok / Apply',						
 				handler: function(self) {
@@ -130,8 +128,8 @@ Ext.define('MyApp.view.TransformPopup', {
         me.callParent(arguments);
         
 		var combo = this.getComponent('DSS_transformTypes');
-		if (this.DSS_Transform && this.DSS_Transform.Type) {
-			combo.setValue(this.DSS_Transform.Type);
+		if (this.DSS_TransformIn && this.DSS_TransformIn.LandUse) {
+			combo.setValue(this.DSS_TransformIn.LandUse);
 		}
 
         this.displayCorrectManagementOptions();
@@ -145,29 +143,31 @@ Ext.define('MyApp.view.TransformPopup', {
     			this.DSS_Transform = {};
     		}
     		var combo = this.getComponent('DSS_transformTypes');
-    		this.DSS_Transform.Type = combo.getValue();
+    		this.DSS_Transform.Config = {LandUse: combo.getValue(), Options: {}};
     		this.DSS_Transform.Text = 'To ' + combo.getRawValue();
     		this.DSS_Transform.Management = '<b><i>Management Options:</i></b></br>';
     		
-    		var managementOptions = '';
+    		var managementOptionsText = '';
     		var container = this.getComponent('DSS_managementContainer');
     		var len = container.items.length;
     		for (var idx = 0; idx < len; idx++) {
     			var child = container.items.items[idx];
-    			managementOptions += child.collectChanges(this.DSS_Transform);
+    			var managementOptions = child.collectChanges(this.DSS_Transform.Config.Options);
+    			managementOptionsText += managementOptions.text;
     			if (idx < len - 1) {
-    				managementOptions += '</br>';
+    				managementOptionsText += '</br>';
     			}
     		}
-    		if (managementOptions == '') {
-    			managementOptions = 'None';
+    		if (managementOptionsText == '') {
+    			managementOptionsText = 'None';
     		}
-    		this.DSS_Transform.Management += managementOptions;
+    		this.DSS_Transform.Management += managementOptionsText;
 //    		console.log(this.DSS_Transform.Management);
     	}
     	else {
     		this.DSS_Transform = null;
     	}
+    	console.log(this.DSS_Transform);
     	this.doClose()
     },
     
@@ -185,7 +185,7 @@ Ext.define('MyApp.view.TransformPopup', {
 				if (controls) {
 					for (var idx = 0; idx < controls.length; idx++) {
 						var newManagement = Ext.create('MyApp.view.Management_' + controls[idx], 
-							{DSS_Transform: this.DSS_Transform}); // pass the transform in so they can modify
+							{DSS_Transform: this.DSS_TransformIn}); // pass the transform in so they can modify
 						if (newManagement) {
 							container.add(newManagement);
 						}

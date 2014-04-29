@@ -10,10 +10,11 @@ Ext.define('MyApp.view.Assumptions.PropertyWindow', {
 
     height: 503,
     minHeight: 400,
-    width: 300,
+    width: 350,
     closable: false,
     title: 'Global Assumptions',
-    constrainHeader: true, // keep the header from being dragged out of the app body...otherwise may not be able to close it!
+	overflowY: 'auto',
+	constrainHeader: true, // keep the header from being dragged out of the app body...otherwise may not be able to close it!
     modal: true,
 
 	dockedItems: [{
@@ -39,7 +40,7 @@ Ext.define('MyApp.view.Assumptions.PropertyWindow', {
 		},
 		{
 			xtype: 'tbspacer', 
-			width: 7
+			width: 57
 		},
 		{
 			xtype: 'button',
@@ -74,8 +75,7 @@ Ext.define('MyApp.view.Assumptions.PropertyWindow', {
         Ext.applyIf(me, {
             items: [{
             	itemId: 'DSS_AssumptionCategories',
-				xtype: 'panel',
-				autoScroll: true,
+				xtype: 'container',
 				layout: {
 					type: 'accordion',
 					animate: false,
@@ -112,7 +112,8 @@ Ext.define('MyApp.view.Assumptions.PropertyWindow', {
         	var category = assumptionsObject[categoryName];
         	var panel = Ext.create('MyApp.view.Assumptions.PropertyContainer', {
         		title: category.CategoryName,
-				icon: 'app/images/' + category.CategoryIcon
+				icon: 'app/images/' + category.CategoryIcon,
+				collapsed: !category.CategoryOpen
         	});
         	this.getComponent('DSS_AssumptionCategories').add(panel);
         	

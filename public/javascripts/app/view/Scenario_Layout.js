@@ -2,19 +2,21 @@
  * File: app/view/ScenarioTools.js
  */
 
+var DSS_DefaultScenarioSetup = {
+	Active: true, 
+	SelectionName: 'Double Click to Set Custom Name', 
+	TransformText: 'Double Click to Set Crop',
+	ManagementText: '',
+	Transform: { LandUse: 1, Options: undefined },
+	Query: {}
+};
+
 //------------------------------------------------------------------------------
 var ClearScenarioGridStore = Ext.create('Ext.data.Store', {
 		
     fields: ['Active', 'SelectionName', 'TransformText', 'ManagementText', 'Transform', 'Query'],
     data: {
-        items: [{ 
-        	Active: true, 
-            SelectionName: 'Undefined', 
-        	TransformText: 'Undefined',
-        	ManagementText: '',
-        	Transform: 1,
-        	Query: {}
-        }]
+        items: [DSS_DefaultScenarioSetup]
     },
     proxy: {
         type: 'memory',
@@ -95,14 +97,7 @@ Ext.define('MyApp.view.Scenario_Layout', {
 								up(). // goes up to the panel level....
 								getStore(); 
 							store.removeAll();
-							store.add({
-								Active: true, 
-								SelectionName: 'Undefined', 
-								TransformText: 'Undefined',
-								ManagementText: '',
-								Transform: 1,
-								Query: {}
-							});
+							store.add(DSS_DefaultScenarioSetup);
 							var selModel = self.up().up().getSelectionModel();
 							selModel.select(0);
 					 	 }
@@ -122,14 +117,7 @@ Ext.define('MyApp.view.Scenario_Layout', {
 			handler: function(self) {
 				self.up(). // goes to toolbar level...
 					up(). // goes to panel level, where the functions are...
-					getStore().add({
-						Active: true, 
-						SelectionName: 'Undefined', 
-						TransformText: 'Undefined',
-						ManagementText: '',
-						Transform: 1,
-						Query: {}
-				});
+					getStore().add(DSS_DefaultScenarioSetup);
 			}
 		},
 		{
@@ -248,7 +236,7 @@ Ext.define('MyApp.view.Scenario_Layout', {
 		items:[{
 			dataIndex: 'SelectionName',
 			text: 'User-Named Selection',
-			width: 170,
+			width: 180,
 			resizable: false,
 			editor: {
 				xtype: 'textfield',
@@ -259,7 +247,7 @@ Ext.define('MyApp.view.Scenario_Layout', {
 		{
 			dataIndex: 'TransformText',
 			text: 'Transforms & Managment',
-			width: 190,
+			width: 180,
 			resizable: false,
 			tdCls: 'dss-grey-scenario-grid',
 			renderer: function(value, meta, record) {
@@ -334,12 +322,12 @@ Ext.define('MyApp.view.Scenario_Layout', {
 		var record = grid.getStore().getAt(rowIndex);
 		var transform = record.get('Transform');
 		var window = Ext.create('MyApp.view.TransformPopup', {
-			DSS_Transform: {Type: transform},
+			DSS_TransformIn: transform,
 			listeners: {
 				beforedestroy: {
 					fn: function(win) {
 						if (win.DSS_Transform) {
-							record.set('Transform', win.DSS_Transform.Type);
+							record.set('Transform', win.DSS_Transform.Config);
 							record.set('TransformText', win.DSS_Transform.Text);
 							record.set('ManagementText', win.DSS_Transform.Management);
 							record.commit();
@@ -405,14 +393,14 @@ Ext.define('MyApp.view.Scenario_Layout', {
 					break;
 				}
 				
-				var landUse = rec.get('Transform');
-				if (landUse == null) {
-					landUse = 1; // blurf, set to corn....
+				var trx = rec.get('Transform');
+				if (trx == null) {
+					trx = DSS_DefaultScenarioSetup.Transform; // blurf, set to corn....
 				}
 				
 				var transform = {
 					queryLayers: query.queryLayers,
-					newLandUse: landUse
+					config: trx
 				};
 				requestData.transforms.push(transform);
 				haveQuery = true;

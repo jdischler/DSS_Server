@@ -3,13 +3,11 @@
 Ext.define('MyApp.view.Management_Fertilizer', {
 	extend: 'Ext.container.Container',
 	
-	height: 80,
+	height: 75,
 	width: 290,
 	layout: {
 		type: 'absolute'
 	},
-	
-	disabled: true,
 	
 	//--------------------------------------------------------------------------
 	initComponent: function() {
@@ -18,7 +16,7 @@ Ext.define('MyApp.view.Management_Fertilizer', {
 		Ext.applyIf(me, {
 			items: [{
 				xtype: 'radiogroup',
-				itemId: 'DSS_FertAmount',
+				itemId: 'DSS_FertType',
 				x: 0,
 				y: 0,
 				width: 290,
@@ -26,58 +24,50 @@ Ext.define('MyApp.view.Management_Fertilizer', {
 				labelAlign: 'right',
 				labelWidth: 70,
 				allowBlank: false,
-				columns: 2,
+				columns: 1,
 				items: [{
 					xtype: 'radiofield',
 					boxLabel: 'None',
-					checked: true,
-					name: 'Amount',
-					inputValue: 'None'
-				},
-				{
-					xtype: 'radiofield',
-					boxLabel: 'Low',
-					name: 'Amount',
-					inputValue: 'Low'
-				},
-				{
-					xtype: 'radiofield',
-					boxLabel: 'High',
-					name: 'Amount',
-					inputValue: 'High'
-				},
-				{
-					xtype: 'radiofield',
-					disabled: true,
-					boxLabel: 'Custom',
-					name: 'Amount',
-					inputValue: 'Custom'
-				}]
-			},
-			{
-				xtype: 'radiogroup',
-				itemId: 'DSS_FertType',
-				x: 0,
-				y: 50,
-				width: 290,
-				fieldLabel: 'Type',
-				labelAlign: 'right',
-				labelWidth: 70,
-				allowBlank: false,
-				columns: 2,
-				items: [{
+					name: 'Type',
+					inputValue: 0,
+					handler: function(radio, checked) {
+						if (checked) {
+							me.getComponent('DSS_FallSpread').setDisabled(true);
+						}
+					}
+				},{
 					xtype: 'radiofield',
 					boxLabel: 'Manure',
-					checked: true,
 					name: 'Type',
-					inputValue: 'Manure'
+					inputValue: 1,
+					handler: function(radio, checked) {
+						if (checked) {
+							me.getComponent('DSS_FallSpread').setDisabled(false);
+						}
+					}
 				},
 				{
 					xtype: 'radiofield',
 					boxLabel: 'Synthetic',
 					name: 'Type',
-					inputValue: 'Synthetic'
+					checked: true,
+					inputValue: 2,
+					handler: function(radio, checked) {
+						if (checked) {
+							me.getComponent('DSS_FallSpread').setDisabled(true);
+						}
+					}
 				}]
+			},
+			{
+				xtype: 'checkbox',
+				itemId: 'DSS_FallSpread',
+				x: 165,
+				y: 21,
+				fieldLabel: 'Fall spread?',
+				labelSeparator: '',
+				labelWidth: 70,
+				disabled: true
 			}]
 		});
 		
@@ -85,33 +75,69 @@ Ext.define('MyApp.view.Management_Fertilizer', {
 		
 		this.setFromTransform(this.DSS_Transform);
 	},
+
 	
 	//--------------------------------------------------------------------------
 	setFromTransform: function(transform) {
 		
-		if (transform && transform.Fertilizer) {
-			var fertAmount = this.getComponent('DSS_FertAmount');
-			fertAmount.setValue({'Amount': transform.Fertilizer.Amount});
-			
+		if (transform && transform.Options && transform.Options.Fertilizer) {
 			var fertType = this.getComponent('DSS_FertType');
-			fertType.setValue({'Type': transform.Fertilizer.Type});
+			var value = 0;
+			if (transform.Options.Fertilizer.Fertilizer) {
+				if (transform.Options.Fertilizer.FertilizerManure) {
+					value = 1;
+				}
+				else {
+					value = 2;
+				}
+			}
+			fertType.setValue({'Type': value});
+			
+			if (value == 1) {// manure 
+				this.getComponent('DSS_FallSpread').setDisabled(false);
+				this.getComponent('DSS_FallSpread').setValue(transform.Options.Fertilizer.FertilizerFallSpread);
+			}
 		}
 	},
 	
 	//--------------------------------------------------------------------------
 	collectChanges: function(transform) {
 		
-		var obj = {};
-		
-		var fertAmount = this.getComponent('DSS_FertAmount');
-		obj['Amount'] = fertAmount.getValue()['Amount'];
+		var obj = {
+			Fertilizer: false,
+			FertilizerManure: false,
+			FertilizerFallSpread: false,
+			text: '<b>Fertilizer:</b> '
+		};
 		
 		var fertType = this.getComponent('DSS_FertType');
-		obj['Type'] = fertType.getValue()['Type'];
+		var value = fertType.getValue()['Type'];
+		console.log(value);
 		
+		if (value == 0) {
+			obj.text += 'None';
+		}
+		else
+		{
+			obj.Fertilizer = true;
+			if (value == 1) {
+				obj.FertilizerManure = true;
+				if (this.getComponent('DSS_FallSpread').getValue()) {
+					obj.FertilizerFallSpread = true;
+					obj.text += 'Fall Spread Manure';
+				}
+				else {
+					obj.text += 'Manure';
+				}
+			}
+			else if (value == 2) {
+				obj.text += 'Synthetic';
+			}
+		}
+			
 		transform['Fertilizer'] = obj;
 		
-		return '<b>Fertilizer:</b> ' + obj['Amount'] + ', ' + obj['Type'];
+		return obj;
 	}
 	
 });

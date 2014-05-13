@@ -28,6 +28,7 @@ Ext.define('MyApp.view.TransformPopup', {
     },
 	modal: true,
     resizable: false,
+	constrainHeader: true, // keep the header from being dragged out of the app body...otherwise may not be able to close it!
     // should use Ok/Apply or cancel buttons...	OR...fix the bugs with closing via [X] or Esc
     closable: false,
 	icon: 'app/images/layers_icon.png',

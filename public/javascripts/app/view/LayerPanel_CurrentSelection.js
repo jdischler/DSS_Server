@@ -15,6 +15,8 @@ Ext.define('MyApp.view.LayerPanel_CurrentSelection', {
     DSS_areaText: 'Area Selected: ',
     DSS_areaUnits: ' acres',//km\xb2',
     DSS_percText: '% of study area: ',
+    DSS_hideSelection: 'Hide Selection',
+    DSS_showSelection: 'Show Selection',
     
     //--------------------------------------------------------------------------
     initComponent: function() {
@@ -47,11 +49,11 @@ Ext.define('MyApp.view.LayerPanel_CurrentSelection', {
 					var slider = me.getComponent('DSS_opacitySlider');
 					if (self.pressed) {
 						slider.show();
-						self.setText('Hide Selection');
+						self.setText(me.DSS_hideSelection);
 					}
 					else {
 						slider.hide();
-						self.setText('Show Selection');
+						self.setText(me.DSS_showSelection);
 					}
 					me.DSS_Layer.setVisibility(self.pressed);	
         		}
@@ -103,7 +105,10 @@ Ext.define('MyApp.view.LayerPanel_CurrentSelection', {
 		this.DSS_Layer = selectionLayer;
 		globalMap.addLayer(this.DSS_Layer);
 		
-		this.getComponent('DSS_showSelectionButon').toggle(true);
+		var button = this.getComponent('DSS_showSelectionButon');
+		button.toggle(true);
+		button.setText(this.DSS_hideSelection);
+		
 		var slider = this.getComponent('DSS_opacitySlider');
 		if (slider.getValue() < 10) {
 			slider.setValue(10);

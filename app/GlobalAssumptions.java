@@ -61,32 +61,52 @@ public class GlobalAssumptions
 		
 		// SOIL LOSS MODEL Multipliers
 		category = createAssumptionCategory("Soil Loss Model", "down.png", false); // false means closed category
-		createAssumption(category,	"sl_nt_annuals", 	"No Till - Annual Crops", 		0.9f,	multiplierOptions);
-		createAssumption(category,	"sl_cc_annuals",	"With Cover Crop - Annual Crops",0.7f,	multiplierOptions);
+		createAssumption(category,	"sl_t_annuals_C1", 	"Till - Annual Crops", 		0.12f,	multiplierOptions);
+		createAssumption(category,	"sl_Contouring_P1", 	"With Contouring", 		0.50f,	multiplierOptions);
+		createAssumption(category,	"sl_Terrace_P2",	"With Terrace", 0.65f,	multiplierOptions);
+		createAssumption(category,	"sl_cc_annuals",	"With Cover Crop - Annual Crops", 0.35f,	multiplierOptions);
 		
 		// PHOSPHORUS MODEL Multipliers
 		category = createAssumptionCategory("Phosphorus Model", "down.png", false); // false means closed category
-		createAssumption(category,	"p_m_annuals",		"Manure - Annual Crops",		1.05f,	multiplierOptions);
-		createAssumption(category,	"p_fm_annuals",		"Fall Manure - Annual Crops",	1.35f,	multiplierOptions);
-		createAssumption(category,	"p_nt_annuals",		"No Till - Annual Crops",		0.8f,	multiplierOptions);
-		createAssumption(category,	"p_cc_annuals",		"With Cover Crop - Annual Crops",0.7f,	multiplierOptions);
-
+		createAssumption(category,	"p_m_annuals",		"Manure - Annual Crops",		1.03f,	multiplierOptions);
+		createAssumption(category,	"p_fm_annuals",		"Fall Manure - Annual Crops",	1.06f,	multiplierOptions);
+		createAssumption(category,	"p_t_annuals",		"Till - Annual Crops",		1.35f,	multiplierOptions);
+		createAssumption(category,	"p_cc_annuals",		"With Cover Crop - Annual Crops",0.55f,	multiplierOptions);
 		createAssumption(category,	"p_m_perennials",	"Manure - Perennial Crops",		1.02f,	multiplierOptions);
-		createAssumption(category,	"p_fm_perennials",	"Fall Manure - Perennial Crops",1.15f,	multiplierOptions);
+		createAssumption(category,	"p_fm_perennials",	"Fall Manure - Perennial Crops",1.04f,	multiplierOptions);
 		
 		// YIELD MODEL Multipliers
 		category = createAssumptionCategory("Yield Model", "down.png", false); // false means closed category
+		//createAssumption(category,	"y_m_annuals",		"Manure - Annual Crops",		1.05f,	multiplierOptions);
+		//createAssumption(category,	"y_fm_annuals",		"Fall Manure - Annual Crops",	1.35f,	multiplierOptions);
+		createAssumption(category,	"y_nt_annuals",		"No Till - Annual Crops",		0.90f,	multiplierOptions);
+		createAssumption(category,	"y_cc_annuals",		"With Cover Crop - Annual Crops",1.10f,	multiplierOptions);
+		//createAssumption(category,	"y_m_perennials",	"Manure - Perennial Crops",		1.02f,	multiplierOptions);
+		//createAssumption(category,	"y_fm_perennials",	"Fall Manure - Perennial Crops",1.15f,	multiplierOptions);
+		
 		// TODO: ADD assumptions to yield model here
 		
 		// SOC MODEL Multipliers
 		category = createAssumptionCategory("Soil Organic Carbon Model", "down.png", false); // false means closed category
 		// TODO: ADD assumptions to SOC model here
+		createAssumption(category,	"soc_m_annuals",		"Manure - Annual Crops",		1.40f,	multiplierOptions);
+		createAssumption(category,	"soc_fm_annuals",		"Fall Manure - Annual Crops",	1.45f,	multiplierOptions);
+		// NT increases SOC
+		createAssumption(category,	"soc_nt_annuals",		"No Till - Annual Crops",		1.20f,	multiplierOptions);
+		createAssumption(category,	"soc_cc_annuals",		"With Cover Crop - Annual Crops",1.05f,	multiplierOptions);
+		createAssumption(category,	"soc_m_perennials",	"Manure - Perennial Crops",		1.30f,	multiplierOptions);
+		createAssumption(category,	"soc_fm_perennials",	"Fall Manure - Perennial Crops",1.35f,	multiplierOptions);
 		
 		// N20 MODEL Multipliers
 		category = createAssumptionCategory("Nitrous Oxide Model", "down.png", false); // false means closed category
 		// TODO: ADD assumptions to N20 model here
-		
-		
+		createAssumption(category,	"n_m_annuals",		"Manure - Annual Crops",		1.04f,	multiplierOptions);
+		createAssumption(category,	"n_fm_annuals",		"Fall Manure - Annual Crops",	1.08f,	multiplierOptions);
+		createAssumption(category,	"n_t_annuals",		"Till - Annual Crops",		1.30f,	multiplierOptions);
+		createAssumption(category,	"n_cc_annuals",		"With Cover Crop - Annual Crops",0.90f,	multiplierOptions);
+		createAssumption(category,	"n_m_perennials",	"Manure - Perennial Crops",		1.03f,	multiplierOptions);
+		createAssumption(category,	"n_fm_perennials",	"Fall Manure - Perennial Crops",1.06f,	multiplierOptions);
+
 		Logger.info(mHierarchicalAssumptions.toString());
 	}
 

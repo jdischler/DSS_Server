@@ -49,6 +49,44 @@ Logger.info("  > Allocated memory for SOC");
 		float factor = -1.0f;
 		float adjFactor = -1.0f;
 		
+		// Multipliers from client variables
+		float annualNoTillageModifier = 1.0f;
+		float annualCoverCropModifier = 1.0f;		
+		float annualFertilizerModifier = 1.0f;
+		float perennialFertilizerModifier = 1.0f;
+		float annualFallFertilizerModifier = 1.0f;
+		float perennialFallFertilizerModifier = 1.0f;
+		
+		// Get user changeable yield scaling values from the client...
+		//----------------------------------------------------------------------
+		try 
+		{	
+			// values come in as straight multiplier
+			annualNoTillageModifier = scenario.mAssumptions.getAssumptionFloat("soc_nt_annuals");
+			annualCoverCropModifier = scenario.mAssumptions.getAssumptionFloat("soc_cc_annuals");		
+			annualFertilizerModifier = scenario.mAssumptions.getAssumptionFloat("soc_m_annuals");
+			perennialFertilizerModifier = scenario.mAssumptions.getAssumptionFloat("soc_m_perennials");	
+			annualFallFertilizerModifier = scenario.mAssumptions.getAssumptionFloat("soc_fm_annuals");
+			perennialFallFertilizerModifier = scenario.mAssumptions.getAssumptionFloat("soc_fm_perennials");	
+		}
+		catch (Exception e) {
+			Logger.info(e.toString());
+		}
+		
+		Logger.info(" Agricultural no till from client = " + Float.toString(annualNoTillageModifier) );
+		Logger.info(" Agricultural cover crop from client = " + Float.toString(annualCoverCropModifier) );
+		Logger.info(" Agricultural Fertilizer from client = " + Float.toString(annualFertilizerModifier) );
+		Logger.info(" Perennial Fertilizer from client = " + Float.toString(perennialFertilizerModifier) );
+		Logger.info(" Annual Fall Fertilizer from client = " + Float.toString(annualFallFertilizerModifier) );
+		Logger.info(" Perennial Fall Fertilizer from client = " + Float.toString(perennialFallFertilizerModifier) );
+		
+		// No Till Multiplier
+		float NT_M = 1.0f;
+		// Cover Crop Multiplier
+		float CC_M = 1.0f;
+		// Fertiliezer Multiplier
+		float F_M = 1.0f;
+		
 		int [][] rotationD_Data = Layer_Base.getLayer("cdl_2012").getIntData();
 		// Mg per Ha
 		float[][] SOC = Layer_Base.getLayer("SOC").getFloatData();
@@ -58,6 +96,7 @@ Logger.info("  > Allocated memory for SOC");
 			for (int x = 0; x < width; x++) {
 				if ((rotationD_Data[y][x] & TotalMask) > 0 /*&& scenario.mSelection.mRasterData[y][x] >= 1*/)
 				{
+					int landCover = rotationD_Data[y][x];
 					if (rotationD_Data[y][x] == 0 || rotationT_Data[y][x] == 0 || SOC[y][x] <= 0.0f) {
 						soilCarbonData[y][x] = -9999.0f;
 					}
@@ -68,39 +107,87 @@ Logger.info("  > Allocated memory for SOC");
 						if ((rotationD_Data[y][x] & Corn_Mask) > 0) {
 							if ((rotationT_Data[y][x] & Grass_Mask) > 0) {
 								factor = RSCCF_Corn_Grass; // ...GRASS
+								// Return tillage modififier if cell is Tilled
+								F_M = ManagementOptions.getFertilizerMultiplier(landCover, 
+											1.0f, 1.0f, // these values correspond to NO Fert multiplier and synthetic multiplier
+											perennialFallFertilizerModifier, perennialFertilizerModifier);
 							}
 							else if ((rotationT_Data[y][x] & Alfalfa_Mask) > 0) {
 								factor = RSCCF_Corn_Alfalfa; // ...ALFALFA
+								// Return tillage modififier if cell is Tilled
+								F_M = ManagementOptions.getFertilizerMultiplier(landCover, 
+											1.0f, 1.0f, // these values correspond to NO Fert multiplier and synthetic multiplier
+											perennialFallFertilizerModifier, perennialFertilizerModifier);
 							}
 						} // ---- SOY to...
 						else if ((rotationD_Data[y][x] & Soy_Mask) > 0) {
 							if ((rotationT_Data[y][x] & Grass_Mask) > 0) {
 								factor = RSCCF_Soy_Grass; // ...GRASS
+								// Return tillage modififier if cell is Tilled
+								F_M = ManagementOptions.getFertilizerMultiplier(landCover, 
+											1.0f, 1.0f, // these values correspond to NO Fert multiplier and synthetic multiplier
+											perennialFallFertilizerModifier, perennialFertilizerModifier);
 							}
 							else if ((rotationT_Data[y][x] & Alfalfa_Mask) > 0) {
 								factor = RSCCF_Soy_Alfalfa; // ...ALFALFA
+								// Return tillage modififier if cell is Tilled
+								F_M = ManagementOptions.getFertilizerMultiplier(landCover, 
+											1.0f, 1.0f, // these values correspond to NO Fert multiplier and synthetic multiplier
+											perennialFallFertilizerModifier, perennialFertilizerModifier);
 							}
 						} // ---- ALFALFA to...
 						else if ((rotationD_Data[y][x] & Alfalfa_Mask) > 0) {
 							if ((rotationT_Data[y][x] & Grass_Mask) > 0) {
 								factor = RSCCF_Alfalfa_Grass; // ...GRASS
+								// Return tillage modififier if cell is Tilled
+								F_M = ManagementOptions.getFertilizerMultiplier(landCover, 
+											1.0f, 1.0f, // these values correspond to NO Fert multiplier and synthetic multiplier
+											perennialFallFertilizerModifier, perennialFertilizerModifier);
 							} 
 							else if ((rotationT_Data[y][x] & Corn_Mask) > 0) {
 								factor = -RSCCF_Corn_Alfalfa; // ...CORN
+								// Return tillage modififier if cell is Tilled
+								NT_M = ManagementOptions.E_Till.getIfActiveOn(landCover, 1.0f, annualNoTillageModifier);
+								CC_M = ManagementOptions.E_CoverCrop.getIfActiveOn(landCover, annualCoverCropModifier, 1.0f);
+								F_M = ManagementOptions.getFertilizerMultiplier(landCover, 
+											1.0f, 1.0f, // these values correspond to NO Fert multiplier and synthetic multiplier
+											annualFallFertilizerModifier, annualFertilizerModifier);
 							}
 							else if ((rotationT_Data[y][x] & Soy_Mask) > 0) {
 								factor = -RSCCF_Soy_Alfalfa; // ...SOY
+								// Return tillage modififier if cell is Tilled
+								NT_M = ManagementOptions.E_Till.getIfActiveOn(landCover, 1.0f, annualNoTillageModifier);
+								CC_M = ManagementOptions.E_CoverCrop.getIfActiveOn(landCover, annualCoverCropModifier, 1.0f);
+								F_M = ManagementOptions.getFertilizerMultiplier(landCover, 
+											1.0f, 1.0f, // these values correspond to NO Fert multiplier and synthetic multiplier
+											annualFallFertilizerModifier, annualFertilizerModifier);
 							}
 						} // ---- GRASS to...
 						else if ((rotationD_Data[y][x] & Grass_Mask) > 0) {
 							if ((rotationT_Data[y][x] & Corn_Mask) > 0) {
 								factor = -RSCCF_Corn_Grass; // ...CORN
+								// Return tillage modififier if cell is Tilled
+								NT_M = ManagementOptions.E_Till.getIfActiveOn(landCover, 1.0f, annualNoTillageModifier);
+								CC_M = ManagementOptions.E_CoverCrop.getIfActiveOn(landCover, annualCoverCropModifier, 1.0f);
+								F_M = ManagementOptions.getFertilizerMultiplier(landCover, 
+											1.0f, 1.0f, // these values correspond to NO Fert multiplier and synthetic multiplier
+											annualFallFertilizerModifier, annualFertilizerModifier);
 							}
 							else if ((rotationT_Data[y][x] & Soy_Mask) > 0) {
 								factor = -RSCCF_Soy_Grass; // ...SOY
+								// Return tillage modififier if cell is Tilled
+								NT_M = ManagementOptions.E_Till.getIfActiveOn(landCover, 1.0f, annualNoTillageModifier);
+								CC_M = ManagementOptions.E_CoverCrop.getIfActiveOn(landCover, annualCoverCropModifier, 1.0f);
+								F_M = ManagementOptions.getFertilizerMultiplier(landCover, 
+											1.0f, 1.0f, // these values correspond to NO Fert multiplier and synthetic multiplier
+											annualFallFertilizerModifier, annualFertilizerModifier);
 							}
 							else if ((rotationT_Data[y][x] & Alfalfa_Mask) > 0) {
 								factor = -RSCCF_Alfalfa_Grass; // ...ALFALFA
+								// Return tillage modififier if cell is Tilled
+								F_M = ManagementOptions.getFertilizerMultiplier(landCover, 
+											1.0f, 1.0f, // these values correspond to NO Fert multiplier and synthetic multiplier
+											perennialFallFertilizerModifier, perennialFertilizerModifier);
 							}
 						}
 						
@@ -124,11 +211,52 @@ Logger.info("  > Allocated memory for SOC");
 							soilCarbonData[y][x] = (SOC[y][x] * (1 + (factor * adjFactor) / 20.0f)) * 900.0f / 10000.0f;
 							// Convert from Mg to short tons
 							//soilCarbonData[y][x] = soilCarbonData[y][x] * 1.102f;
+							
+							// Change value using multiplier
+							soilCarbonData[y][x] *=  NT_M * CC_M * F_M;
 						}
 						else
 						{
+							// Corn
+							if ((rotationD_Data[y][x] & Corn_Mask) > 0) {
+								// Return tillage modififier if cell is Tilled
+								NT_M = ManagementOptions.E_Till.getIfActiveOn(landCover, 1.0f, annualNoTillageModifier);
+								CC_M = ManagementOptions.E_CoverCrop.getIfActiveOn(landCover, annualCoverCropModifier, 1.0f);
+								F_M = ManagementOptions.getFertilizerMultiplier(landCover, 
+											1.0f, 1.0f, // these values correspond to NO Fert multiplier and synthetic multiplier
+											annualFallFertilizerModifier, annualFertilizerModifier);
+							}
+							// Soy
+							else if ((rotationT_Data[y][x] & Soy_Mask) > 0) {
+								// Return tillage modififier if cell is Tilled
+								NT_M = ManagementOptions.E_Till.getIfActiveOn(landCover, 1.0f, annualNoTillageModifier);
+								CC_M = ManagementOptions.E_CoverCrop.getIfActiveOn(landCover, annualCoverCropModifier, 1.0f);
+								F_M = ManagementOptions.getFertilizerMultiplier(landCover, 
+											1.0f, 1.0f, // these values correspond to NO Fert multiplier and synthetic multiplier
+											annualFallFertilizerModifier, annualFertilizerModifier);
+							}
+							else if ((rotationT_Data[y][x] & Grass_Mask) > 0) {
+								factor = RSCCF_Corn_Grass; // ...GRASS
+								// Return tillage modififier if cell is Tilled
+								F_M = ManagementOptions.getFertilizerMultiplier(landCover, 
+											1.0f, 1.0f, // these values correspond to NO Fert multiplier and synthetic multiplier
+											perennialFallFertilizerModifier, perennialFertilizerModifier);
+							}
+							else if ((rotationT_Data[y][x] & Alfalfa_Mask) > 0) {
+								factor = RSCCF_Corn_Alfalfa; // ...ALFALFA
+								// Return tillage modififier if cell is Tilled
+								F_M = ManagementOptions.getFertilizerMultiplier(landCover, 
+											1.0f, 1.0f, // these values correspond to NO Fert multiplier and synthetic multiplier
+											perennialFallFertilizerModifier, perennialFertilizerModifier);
+							}
+						}
+							
 							// Mg per Ha and convert to Mg per cell
 							soilCarbonData[y][x] = SOC[y][x] * 900.0f / 10000.0f;
+							
+							// Change value using multiplier
+							soilCarbonData[y][x] *=  NT_M * CC_M * F_M;
+							
 						}
 						//else
 						//{
@@ -141,7 +269,7 @@ Logger.info("  > Allocated memory for SOC");
 							//Logger.info(Float.toString(soilCarbonData[y][x]) + " " + Float.toString(SOC[y][x]));
 						//}
 					}
-				}
+				//}
 				else 
 				{
 					soilCarbonData[y][x] = -9999.0f;

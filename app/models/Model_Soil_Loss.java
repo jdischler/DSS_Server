@@ -95,31 +95,47 @@ long timeStart = System.currentTimeMillis();
 		// Rainfall erosivity index for Dane County
 		//float Rainfall_Erosivity = 150.0f;
 		// Cover management factor (Dimensionless)
+		// Both the growing crops and the residue from the crops affect erosion control
+		// C factor compares erosion from sites with different crops and residue covers to that of bare, un-cropped site
+		// Thus, managemnet decisions about crop rotations and tillage system determine the value of C
+		// Undisturbed grassland and forests have very little erosion and the lowest C value, typically below 0.2
+		// Soil with no plant or residue cover are most susceptible to erosion and have the highest possible C factor
 		float C = 0.0f;
-		// Support practice factor (Dimensionless)
+		// Support practice factor (Dimensionless): 1) Contouring, 2) Strip Cropping, 3) Terrace, 4) grassed waterway and 5) No Practice
+		// Contouring is tilling and planting across slope rather than with it
+		// Strip cropping uses alternate lands of cover and row crops across the slope
+		// Terrace are soil embankment that reshape slopes into a series of short slopes that slow water flow and reduce its erosivity
+		// Terrace that open to grasses waterways further limit erosion
+		// P is 1 for No Practice
 		float P = 0.0f;
-		// No Till SoilLoss Multiplier
-		float NT_M = 1.0f;
+		// Till Multiplier
+		//float T_M = 1.0f;
 		// Cover Crop Multiplier
 		float CC_M = 1.0f;
 		
 		// Multipliers from client variables
-		float annualNoTillageModifier = 1.0f; //
+		float annualTillage_C1 = 1.0f; //
 		float annualCoverCropModifier = 1.0f;		
-
+		float Management_P1 = 1.0f; //
+		float Management_P2 = 1.0f;	
+		
 		// Get user changeable yield scaling values from the client...
 		//----------------------------------------------------------------------
-		try {	
+		try {
 			// values come in as straight multiplier
-			annualNoTillageModifier = scenario.mAssumptions.getAssumptionFloat("sl_nt_annuals");
-			annualCoverCropModifier = scenario.mAssumptions.getAssumptionFloat("sl_cc_annuals");		
+			annualTillage_C1 = scenario.mAssumptions.getAssumptionFloat("sl_t_annuals_C1");
+			annualCoverCropModifier = scenario.mAssumptions.getAssumptionFloat("sl_cc_annuals");
+			Management_P1 = scenario.mAssumptions.getAssumptionFloat("sl_Contouring_P1");
+			Management_P2 = scenario.mAssumptions.getAssumptionFloat("sl_Terrace_P2");
 		}
 		catch (Exception e) {
 			Logger.info(e.toString());
 		}
 		
-		Logger.info(" Agricultural no till from client = " + Float.toString(annualNoTillageModifier) );
+		Logger.info(" Agricultural no till from client = " + Float.toString(annualTillage_C1) );
 		Logger.info(" Agricultural cover crop from client = " + Float.toString(annualCoverCropModifier) );
+		Logger.info(" Agricultural Contouring from client = " + Float.toString(Management_P1) );
+		Logger.info(" Agricultural Terrace from client = " + Float.toString(Management_P2) );
 		
 		// full raster save process...
 Logger.info("  > Allocated memory for Soil_Loss");
@@ -131,7 +147,7 @@ Logger.info("  > Allocated memory for Soil_Loss");
 			for (int x = 0; x < width; x++) 
 			{
 				int landCover = rotationData[y][x];
-				NT_M = 1.0f;
+				//T_M = 1.0f;
 				CC_M = 1.0f;
 				if ((landCover & TotalMask) > 0)
 				{
@@ -142,31 +158,40 @@ Logger.info("  > Allocated memory for Soil_Loss");
 					{
 						C = 0.02f;
 						//P = 0.25f;
-						P = 1.0f;
+						//P = 1.0f;
+						P = ManagementOptions.E_Contour.getIfActiveOn(landCover, Management_P1, 1.0f) *
+						ManagementOptions.E_Terrace.getIfActiveOn(landCover, Management_P2, 1.0f);
 					} 
 					// Alfalfa
 					else if ((landCover & Alfalfa_Mask) > 0) 
 					{
 						C = 0.02f;
 						//P = 0.25f;
-						P = 1.0f;
+						//P = 1.0f;
+						P = ManagementOptions.E_Contour.getIfActiveOn(landCover, Management_P1, 1.0f) *
+						ManagementOptions.E_Terrace.getIfActiveOn(landCover, Management_P2, 1.0f);
 					} 
 					// Forest
 					else if ((landCover & Forest_Mask) > 0) 
 					{
 						C = 0.003f;
 						//P = 0.2f;
-						P = 1.0f;
+						//P = 1.0f;
+						P = ManagementOptions.E_Contour.getIfActiveOn(landCover, Management_P1, 1.0f) *
+						ManagementOptions.E_Terrace.getIfActiveOn(landCover, Management_P2, 1.0f);
 					} 
 					// Agriculture
 					else if ((landCover & Ag_Mask) > 0) 
 					{
 						C = 0.5f;
+						C = C * ManagementOptions.E_Till.getIfActiveOn(landCover, annualTillage_C1, 1.0f);
 						//P = 0.4f;
-						P = 1.0f;
+						//P = 1.0f;
 						// Return tillage modififier if cell is Tilled
-						NT_M = ManagementOptions.E_Till.getIfActiveOn(landCover, 1.0f, annualNoTillageModifier);
+						//NT_M = ManagementOptions.E_Till.getIfActiveOn(landCover, 1.0f, annualNoTillageModifier);
 						CC_M = ManagementOptions.E_CoverCrop.getIfActiveOn(landCover, annualCoverCropModifier, 1.0f);
+						P = ManagementOptions.E_Contour.getIfActiveOn(landCover, Management_P1, 1.0f) *
+						ManagementOptions.E_Terrace.getIfActiveOn(landCover, Management_P2, 1.0f);
 					}
 					// Other land use classes
 					//else
@@ -180,8 +205,7 @@ Logger.info("  > Allocated memory for Soil_Loss");
 						// Convert Mg per Ha to Mg per cell
 						// Calculate Soil Loss for each cell in the landscape (Mg per cell per year)
 						Soil_Loss_Data[y][x] = Rainfall_Erosivity[y][x] * Soil_Erodibility[y][x] * LS[y][x] * 
-								C * P * 
-								NT_M * CC_M * // apply multipliers based on management options
+								C * P * CC_M * // apply multipliers based on management options
 								900.0f / 10000.0f;
 						// Calculate Soil Loss in the landscape (Mg per Ha per year)
 						//Soil_Loss_Data[y][x] = Rainfall_Erosivity[y][x] * Soil_Erodibility[y][x] * LS[y][x] * C * P;

@@ -40,6 +40,8 @@ public class ApplyManagementOptions
 	private static float mAlfalfaCoverCropPercent = 0.5f;
 	private static float mGrassCoverCropPercent = 1.0f; // Treating grass as its own cover crop make sense?
 	
+	private static float mAllContourPercent = 0.5f;
+	private static float mAllTerracePercent = 0.5f;
 	//--------------------------------------------------------------------------
 	public static void now() {
 		
@@ -78,6 +80,10 @@ public class ApplyManagementOptions
 				
 				int rasterCell = rasterData[y][x];
 				int options = 0;
+				if ((rasterCell & totalMask) > 0) {
+					if (rnd.nextFloat() > mAllContourPercent) 		options = ManagementOptions.E_Contour.setOn(options);
+					if (rnd.nextFloat() > mAllTerracePercent) 		options = ManagementOptions.E_Terrace.setOn(options);
+				}
 				if ((rasterCell & cornMask) > 0) {
 					if (rnd.nextFloat() > mCornTillPercent) 		options = ManagementOptions.E_Till.setOn(options);
 					if (rnd.nextFloat() > mCornFertilizedPercent) 	options = ManagementOptions.E_Fertilizer.setOn(options);

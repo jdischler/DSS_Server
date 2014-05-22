@@ -32,6 +32,29 @@ Logger.info(" >> Computing Yield");
 		//int Alfalfa_Mask = 128; // 8	
 		//int TotalMask = Grass_Mask | Corn_Mask | Soy_Mask | Alfalfa_Mask | Corn_Soy_Mask;
 		
+		// No Till SoilLoss Multiplier
+		float NT_M = 1.0f;
+		// Cover Crop Multiplier
+		float CC_M = 1.0f;
+		
+		// Multipliers from client variables
+		float annualNoTillageModifier = 1.0f; //
+		float annualCoverCropModifier = 1.0f;		
+
+		// Get user changeable yield scaling values from the client...
+		//----------------------------------------------------------------------
+		try {	
+			// values come in as straight multiplier
+			annualNoTillageModifier = scenario.mAssumptions.getAssumptionFloat("y_nt_annuals");
+			annualCoverCropModifier = scenario.mAssumptions.getAssumptionFloat("y_cc_annuals");		
+		}
+		catch (Exception e) {
+			Logger.info(e.toString());
+		}
+		
+		Logger.info(" Agricultural no till from client = " + Float.toString(annualNoTillageModifier) );
+		Logger.info(" Agricultural cover crop from client = " + Float.toString(annualCoverCropModifier) );
+		
 		// Mask
 		Layer_Integer cdl = (Layer_Integer)Layer_Base.getLayer("cdl_2012"); 
 		int Grass_Mask = cdl.convertStringsToMask("grass");
@@ -88,14 +111,24 @@ Logger.info("  > Allocated memory for Yield");
 			for (int x = 0; x < width; x++) 
 			{
 				
-				if ((rotationData[y][x] & TotalMask) > 0) 
+				int landCover = rotationData[y][x];
+									
+				if ((landCover & TotalMask) > 0) 
 				{
+				
+					NT_M = 1.0f;
+					CC_M = 1.0f;
+				
 					if (slope[y][x] < 0 || depth[y][x] < 0 || silt[y][x] < 0 || cec[y][x] < 0)
 					{
 						yield[y][x] = -9999.0f;
 					}
-					else if ((rotationData[y][x] & Corn_Mask) > 0) 
+					else if ((landCover & Corn_Mask) > 0) 
 					{
+						// Return tillage modififier if cell is Tilled
+						NT_M = ManagementOptions.E_Till.getIfActiveOn(landCover, 1.0f, annualNoTillageModifier);
+						CC_M = ManagementOptions.E_CoverCrop.getIfActiveOn(landCover, annualCoverCropModifier, 1.0f);
+						
 						// Bushels per Ac
 						Corn_Y = 22.000f - 1.05f * slope[y][x] + 0.190f * depth[y][x] + 0.817f * silt[y][x] + 1.32f * cec[y][x];
 						// Correct for techno advances
@@ -106,8 +139,11 @@ Logger.info("  > Allocated memory for Yield");
 						Yield = Corn_Y * 0.053f;
 						// Factor in yield modifcation from client, which defaults to 0% change, ie * 1.0f
 						Yield *= cornYieldModifier;
+						// Land management factors
+						Yield *= NT_M * CC_M;
+					
 					}
-					else if ((rotationData[y][x] & Grass_Mask) > 0) 
+					else if ((landCover & Grass_Mask) > 0) 
 					{
 						// short tons per Ac
 						Grass_Y = 0.77f - 0.031f * slope[y][x] + 0.008f * depth[y][x] + 0.029f * silt[y][x] + 0.038f * cec[y][x];
@@ -118,8 +154,11 @@ Logger.info("  > Allocated memory for Yield");
 						// Factor in yield modifcation from client, which defaults to 0% change, ie * 1.0f
 						Yield *= grassYieldModifier;
 					}
-					else if ((rotationData[y][x] & Soy_Mask) > 0) 
+					else if ((landCover & Soy_Mask) > 0) 
 					{
+						// Return tillage modififier if cell is Tilled
+						NT_M = ManagementOptions.E_Till.getIfActiveOn(landCover, 1.0f, annualNoTillageModifier);
+						CC_M = ManagementOptions.E_CoverCrop.getIfActiveOn(landCover, annualCoverCropModifier, 1.0f);
 						// Bushels per Ac
 						Soy_Y = 6.37f - 0.34f * slope[y][x] + 0.065f * depth[y][x] + 0.278f * silt[y][x] + 0.437f * cec[y][x];
 						// Correct for techno advances
@@ -130,6 +169,8 @@ Logger.info("  > Allocated memory for Yield");
 						Yield = Soy_Y + Soy_Y * 1.5f;
 						// Factor in yield modifcation from client, which defaults to 0% change, ie * 1.0f
 						Yield *= soyYieldModifier;
+						// Land management factors
+						Yield *= NT_M * CC_M;
 					}
 					/*else if ((rotationData[y][x] & Corn_Soy_Mask) > 0) {
 						// Bushels per Ac
@@ -147,7 +188,7 @@ Logger.info("  > Allocated memory for Yield");
 						// add residue
 						Yield = ((Corn_Y * 0.053f) + (Soy_Y + Soy_Y * 1.5f)) / 2.0f;
 					}*/
-					else if ((rotationData[y][x] & Alfalfa_Mask) > 0) 
+					else if ((landCover & Alfalfa_Mask) > 0) 
 					{
 						// Short tons per Acre
 						Alfalfa_Y = 1.26f - 0.045f * slope[y][x] + 0.007f * depth[y][x] + 0.027f * silt[y][x] + 0.041f * cec[y][x];

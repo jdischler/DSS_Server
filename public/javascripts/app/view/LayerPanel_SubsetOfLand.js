@@ -87,7 +87,15 @@ Ext.define('MyApp.view.LayerPanel_SubsetOfLand', {
 				forceSelection: true,
 				store: DSS_GridSizes,
 				valueField: 'size',
-				value: 21 // 100 acres?
+				value: 21, // 100 acres?
+				listeners: {
+					change: function(self) {
+						self.disable(true);
+						var queryButton = Ext.getCmp('DSS_queryButton');
+						queryButton.DSS_associatedButton = self;
+						queryButton.btnEl.dom.click();
+					}
+				}
 			}]
         });
 

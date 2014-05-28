@@ -48,7 +48,7 @@ public class GlobalAssumptions
 		addOptionalHelpTextProperty(options, "Yield modification as a perfcentage. E.g. 5 is a 5% increase in yield.");
 		
 		// YM - Yield modification/multiplier
-		category = createAssumptionCategory("Yield Modification", "percent_icon.png");
+		category = createAssumptionCategory("Yield Modification", "percent_icon.png", false); // false means closed
 		createAssumption(category,	"ym_corn", 		"Corn Yield", 		0.0f,	options);
 		createAssumption(category,	"ym_soy", 		"Soy Yield", 		0.0f,	options);
 		createAssumption(category,	"ym_alfalfa", 	"Alfalfa Yield", 	0.0f,	options);

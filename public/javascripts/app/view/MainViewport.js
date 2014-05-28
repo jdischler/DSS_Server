@@ -342,13 +342,21 @@ Ext.define('MyApp.view.MainViewport', {
 			DSS_ShortTitle: 'Stream',
 			DSS_AutoSwapTitles: false,
 			DSS_Layer: wmsRivers,
-			DSS_LayerUnit: 'm',
+			DSS_LayerUnit: 'ft',
 			DSS_LayerRangeMin: 0,
-			DSS_LayerRangeMax: 915.5,
-			DSS_ValueDefaultLess: 120,
-			DSS_ValueStep: 15,
+			DSS_LayerRangeMax: 17220,
+			DSS_ValueDefaultLess: 60,
+			DSS_ValueStep: 30,
 			DSS_QueryTable: 'rivers',
-			collapsed: true
+			collapsed: true,
+			DSS_MetricToEnglish: function(unitsIn) {
+				if (!unitsIn) return unitsIn;
+				return unitsIn * 3.28084;// go from meters to feet
+			},
+			DSS_EnglishToMetric: function(unitsIn) {
+				if (!unitsIn) return unitsIn;
+				return unitsIn * 0.3048; // go from ft to meters
+			}
 		});
 
 		var lpWatershed = Ext.create('MyApp.view.LayerPanel_Watershed', {
@@ -385,24 +393,32 @@ Ext.define('MyApp.view.MainViewport', {
 			DSS_ShortTitle: 'Public Land',
 			DSS_AutoSwapTitles: false,
 		//	DSS_Layer: wmsRivers,//fix
-			DSS_LayerUnit: 'm',// fix to mile
+			DSS_LayerUnit: 'mi',
 			DSS_LayerRangeMin: 0,
-			DSS_LayerRangeMax: 14500,
-			DSS_ValueDefaultLess: 1000,
-			DSS_ValueStep: 100,
+			DSS_LayerRangeMax: 9,
+			DSS_ValueDefaultLess: 1,
+			DSS_ValueStep: 0.25,
 			DSS_QueryTable: 'public_land',
-			collapsed: true
+			collapsed: true,
+			DSS_MetricToEnglish: function(unitsIn) {
+				if (!unitsIn) return unitsIn;
+				return unitsIn * 0.000621371;// go from meters to miles
+			},
+			DSS_EnglishToMetric: function(unitsIn) {
+				if (!unitsIn) return unitsIn;
+				return unitsIn * 1609.34; // go from miles to meters
+			}
 		});
 		
 		var lpDairy = Ext.create('MyApp.view.LayerPanel_Continuous', {
-			title: 'Density of Dairy',
-			DSS_ShortTitle: 'Dairy',
+			title: 'Density of Dairies',
+			DSS_ShortTitle: 'Per mi&#178;',
 			DSS_AutoSwapTitles: false,
 		//	DSS_Layer: wmsRivers,//fix
 			DSS_LayerUnit: '',
 			DSS_LayerRangeMin: 0,
 			DSS_LayerRangeMax: 8,
-			DSS_ValueDefaultGreater: 2,
+			DSS_ValueDefaultGreater: 1,
 			DSS_ValueStep: 1,
 			DSS_QueryTable: 'dairy',
 			collapsed: true

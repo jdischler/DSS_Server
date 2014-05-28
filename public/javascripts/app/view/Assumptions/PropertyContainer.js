@@ -12,6 +12,17 @@ Ext.define('MyApp.view.Assumptions.PropertyContainer', {
         type: 'vbox'
     },
 
+	listeners: {
+		afterrender: function(c) {
+			// blah, give space for the collapse tool...
+			var spc = Ext.create('Ext.toolbar.Spacer',
+			{
+				width: 16
+			});
+			c.header.add(spc);
+		}
+	},
+	
 	//--------------------------------------------------------------------------
     initComponent: function() {
         var me = this;

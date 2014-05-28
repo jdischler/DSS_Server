@@ -213,9 +213,17 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 						console.log("layer request object return was null?");
 						return;
 					}
+					
+					// Check to see if we need to convert units from the server....
+					if (typeof this.DSS_MetricToEnglish === 'function') {
+						console.log('Have function to convert server metric units to english...');
+						obj.layerMin = this.DSS_MetricToEnglish(obj.layerMin);
+						obj.layerMax = this.DSS_MetricToEnglish(obj.layerMax);
+					}
+
 					container.DSS_LayerRangeMin = obj.layerMin;
 					container.DSS_LayerRangeMax = obj.layerMax;
-					
+						
 					var rangeLabel = 'Range of values: ' + 
 								obj.layerMin.toFixed(1) + container.DSS_LayerUnit +
 								' to ' + 
@@ -256,6 +264,13 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 		queryLayer.greaterThanTest = gtrTest.text;
 		queryLayer.lessThanValue = lessValue.getValue();
 		queryLayer.greaterThanValue = gtrValue.getValue();
+		
+		// Check to see if we need to convert units for the server.....
+		if (typeof this.DSS_EnglishToMetric === 'function') {
+			console.log('Have function to convert English units to metric for the server...');
+			queryLayer.lessThanValue = this.DSS_EnglishToMetric(queryLayer.lessThanValue);
+			queryLayer.greaterThanValue = this.DSS_EnglishToMetric(queryLayer.greaterThanValue);
+		}
 		
 		return queryLayer;		
     },

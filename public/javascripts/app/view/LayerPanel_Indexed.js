@@ -126,9 +126,9 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
 					if (me.DSS_SavedSetSelectionCriteria) {
 						me.setSelectionCriteria(me.DSS_SavedSetSelectionCriteria);
 					}
-					if (me.header.getComponent('DSS_ShouldQuery').pressed && DSS_DoExpandQueried) {
+					/*if (me.header.getComponent('DSS_ShouldQuery').pressed && DSS_DoExpandQueried) {
 						me.expand();
-					};
+					}*/
 
 					// Layouts were disabled...must turn them back on!!
 					Ext.resumeLayouts(true);

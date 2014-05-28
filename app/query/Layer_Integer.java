@@ -14,6 +14,9 @@ import com.fasterxml.jackson.databind.node.*;
 //------------------------------------------------------------------------------
 public class Layer_Integer extends Layer_Base
 {
+	// Count at which we switch to using a hashset vs. a standard array list...
+	private static final int RAW_BREAK_EVEN_COUNT = 10;
+	
 	public enum EType {
 		EPreShiftedIndex,		// data is shifted at load time
 		EQueryShiftedIndex,		// data is shifted for query testing only
@@ -324,6 +327,28 @@ public class Layer_Integer extends Layer_Base
 	}
 
 	//--------------------------------------------------------------------------
+	private Set<Integer> getCompareSet(JsonNode matchValuesArray) {
+		
+		ArrayNode arNode = (ArrayNode)matchValuesArray;
+		if (arNode != null) {
+			int count = arNode.size();
+			if (count < RAW_BREAK_EVEN_COUNT) return null; // Break even point?
+				
+			Set<Integer> set = new HashSet<Integer>(count);
+			for (int i = 0; i < count; i++) {
+				JsonNode node = arNode.get(i);
+				
+				int val = node.intValue(); // FIXME: default value?
+				set.add(val);
+			}
+			Logger.info(set.toString());
+			return set;
+		}
+		
+		return null;
+	}
+	
+	//--------------------------------------------------------------------------
 	private int[] getCompareArray(JsonNode matchValuesArray) {
 		
 		ArrayNode arNode = (ArrayNode)matchValuesArray;
@@ -352,34 +377,62 @@ public class Layer_Integer extends Layer_Base
 	}
 	
 	//--------------------------------------------------------------------------
+	private Selection doRawQuery(JsonNode queryNode, Selection selection) {
+		
+		Set<Integer> set = getCompareSet(queryNode);
+		
+		// We'll get a set back if we're near the supposed break-even point....
+		if (set != null) {
+			for (int y = 0; y < mHeight; y++) {
+				for (int x = 0; x < mWidth; x++) {
+					boolean found = false;
+					// Only check values that ARE NOT noData and where Selection is 1
+					if (mIntData[y][x] >= 0 && selection.mRasterData[y][x] > 0) {
+						if (set.contains(mIntData[y][x])) {
+							found = true;
+						}
+					}
+					selection.mRasterData[y][x] &= (found ? 1 : 0);
+				}
+			}
+			
+			return selection;
+		}
+		
+		// Else....Doing a slower per-array-element test...
+		int array[] = getCompareArray(queryNode);
+		if (array != null) {
+			for (int y = 0; y < mHeight; y++) {
+				for (int x = 0; x < mWidth; x++) {
+					boolean found = false;
+					// Only check values that ARE NOT noData and where Selection is 1
+					if (mIntData[y][x] >= 0 && selection.mRasterData[y][x] > 0) {
+						for (int i = 0; i < array.length; i++) {
+							if (mIntData[y][x] == array[i]) {
+								found = true;
+								break;
+							}
+						}
+					}
+					selection.mRasterData[y][x] &= (found ? 1 : 0);
+				}
+			}
+		}
+		else {
+			Logger.info("Tried to get a match array but it failed!");
+		}
+		
+		return selection;
+	}
+	
+	//--------------------------------------------------------------------------
 	protected Selection query(JsonNode queryNode, Selection selection) {
 
 		Logger.info("Running indexed query");
 		JsonNode queryValues = queryNode.get("matchValues");
 
 		if (mLayerDataFormat == EType.ERaw) {
-			// Doing a slower per-array-element test...
-			int array[] = getCompareArray(queryValues);
-			if (array != null) {
-				for (int y = 0; y < mHeight; y++) {
-					for (int x = 0; x < mWidth; x++) {
-						boolean found = false;
-						// Only check values that ARE NOT noData
-						if (mIntData[y][x] >= 0) {
-							for (int i = 0; i < array.length; i++) {
-								if (mIntData[y][x] == array[i]) {
-									found = true;
-									break;
-								}
-							}
-						}
-						selection.mRasterData[y][x] &= (found ? 1 : 0);
-					}
-				}
-			}
-			else {
-				Logger.info("Tried to get a match array but it failed!");
-			}
+			selection = doRawQuery(queryValues, selection);
 		}
 		else {
 			// Doing the faster bit-mask check...

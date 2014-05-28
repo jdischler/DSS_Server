@@ -4,10 +4,10 @@ var DSS_TransformTypes = Ext.create('Ext.data.Store', {
 		
 	fields: ['index', 'name', 'controls'],
 	data: [
-		{ 'index': 1, 'name': 'Corn', 	'controls': ['Fertilizer','Tillage','CoverCrop'] },
-		{ 'index': 16, 'name': 'Soy', 	'controls': ['Fertilizer','Tillage','CoverCrop'] },
-		{ 'index': 17, 'name': 'Alfalfa', 'controls': ['Fertilizer','Tillage'] },
-		{ 'index': 6, 'name': 'Grass', 	'controls': ['Fertilizer'] }
+		{ 'index': 1, 'name': 'Corn', 	'controls': ['Fertilizer','Tillage','CoverCrop','Contour','Terraced'] },
+		{ 'index': 16, 'name': 'Soy', 	'controls': ['Fertilizer','Tillage','CoverCrop','Contour','Terraced'] },
+		{ 'index': 17, 'name': 'Alfalfa', 'controls': ['Fertilizer','Tillage','Contour','Terraced'] },
+		{ 'index': 6, 'name': 'Grass', 	'controls': ['Fertilizer','Contour','Terraced'] }
 	]
 });
 
@@ -18,10 +18,12 @@ Ext.define('MyApp.view.TransformPopup', {
     requires: [
     	'MyApp.view.Management_Tillage',
     	'MyApp.view.Management_Fertilizer',
+    	'MyApp.view.Management_Terraced',
+    	'MyApp.view.Management_Contour',
     	'MyApp.view.Management_CoverCrop'
     ],
     
-    height: 320,
+    height: 380,
     width: 330,
     layout: {
         type: 'absolute'
@@ -105,7 +107,7 @@ Ext.define('MyApp.view.TransformPopup', {
 			{
 				xtype: 'button',
 				x: 180,
-				y: 245,
+				y: 305,
 				scale: 'medium',
 				text: 'Cancel',	
 				handler: function(self) {
@@ -116,7 +118,7 @@ Ext.define('MyApp.view.TransformPopup', {
 			{
 				xtype: 'button',
 				x: 240,
-				y: 245,
+				y: 305,
 				scale: 'medium',
 				text: 'Ok / Apply',						
 				handler: function(self) {

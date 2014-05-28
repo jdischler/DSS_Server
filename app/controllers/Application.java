@@ -57,6 +57,66 @@ public class Application extends Controller
 		return badRequest(); // TODO: add return errors if needed...
 	}
 	
+	//--------------------------------------------------------------------------
+	public static Result openLayersProxy() 
+	{
+		BufferedReader rd = null;
+		OutputStreamWriter wr = null;
+		String charset = "UTF-8";
+		String desiredStart = "<wfs:GetFeature";
+		String desiredEnd = "</wfs:GetFeature>";
+		
+		try 
+		{
+			
+			String getUrl = request().uri().replace("/openLayersProxy?", "");
+			getUrl = URLDecoder.decode(getUrl, charset);
+				
+			String body = request().body().toString();
+			int dataStart = body.indexOf(desiredStart);
+			int dataEnd = body.indexOf(desiredEnd);
+			
+			if (dataStart >= 0 && dataEnd >= 0 || dataEnd > dataStart)
+			{
+				String result = body.substring(dataStart, dataEnd + desiredEnd.length());
+				
+//				result = URLEncoder.encode(result, charset);
+//				Logger.info(" Supposedly is: " + result);
+				
+				URL url = new URL(getUrl);
+				URLConnection conn = url.openConnection();
+				conn.setRequestProperty("accept-charset", charset);
+				conn.setRequestProperty("content-type", "application/xml");
+				conn.setDoOutput(true);
+				
+				wr = new OutputStreamWriter(conn.getOutputStream(), charset);
+				wr.write(result);
+				wr.flush();
+				
+				// get the response
+				rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			
+				String line ="";
+				
+//				Logger.info("The result:");
+				while(rd.ready()) {
+					line = rd.readLine();
+//					Logger.info(line);
+				}
+				
+				wr.close();
+				rd.close();
+				return ok(line);
+			}
+		}
+		catch (Exception e) {
+			Logger.info(e.toString());
+		}
+		
+		Logger.info("WMS request failed");
+		return badRequest(); // TODO: add return errors if needed...
+	}
+
 	//----------------------------------------------------------------------
 	public static Result wmsRequest() 
 	{

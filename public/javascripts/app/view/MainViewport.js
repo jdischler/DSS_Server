@@ -26,6 +26,8 @@ var DSS_currentModelRunID = 0;//
 
 var DSS_LogoPanelHeight = 70;
 
+var G_ClickControl = {};
+
 //------------------------------------------------------------------------------
 Ext.define('MyApp.view.MainViewport', {
 //------------------------------------------------------------------------------
@@ -63,7 +65,7 @@ Ext.define('MyApp.view.MainViewport', {
 		OpenLayers.IMAGE_RELOAD_ATTEMPTS = 5;
 		// make OL compute scale according to WMS spec
 		OpenLayers.DOTS_PER_INCH = 25.4 / 0.28;
-		
+
 		var me = this;
 		var projectionType = "EPSG:3857";
 		var bounds = new OpenLayers.Bounds(
@@ -405,7 +407,15 @@ Ext.define('MyApp.view.MainViewport', {
 			DSS_QueryTable: 'dairy',
 			collapsed: true
 		});
-				
+			
+		var lpGrid = Ext.create('MyApp.view.LayerPanel_SubsetOfLand', {
+			title: 'Subset of Land',
+			DSS_shortTitle: 'Subset',
+//			DSS_Layer: DSS_GridLayer,
+			DSS_QueryTable: 'box_selection',
+			collapsed: true
+		});
+		
 		// Speed up the insertion process a bit by suspending the layout engine until the new
 		// 	elements are added...		
 		Ext.suspendLayouts();
@@ -418,6 +428,7 @@ Ext.define('MyApp.view.MainViewport', {
 		dssLeftPanel.add(lpLCS);
 		dssLeftPanel.add(lpPublicLand);
 		dssLeftPanel.add(lpDairy);
+		dssLeftPanel.add(lpGrid);
 		Ext.resumeLayouts(true);
 		
 		// BOO - FIXME
@@ -429,6 +440,7 @@ Ext.define('MyApp.view.MainViewport', {
 		DSS_globalQueryableLayers.push(lpWatershed);
 		DSS_globalQueryableLayers.push(lpPublicLand);
 		DSS_globalQueryableLayers.push(lpDairy);
+		DSS_globalQueryableLayers.push(lpGrid);
 		
 		DSS_globalCollapsibleLayers.push(lpCDL);
 		DSS_globalCollapsibleLayers.push(lpSlope);
@@ -438,28 +450,51 @@ Ext.define('MyApp.view.MainViewport', {
 		DSS_globalCollapsibleLayers.push(lpWatershed);
 		DSS_globalCollapsibleLayers.push(lpPublicLand);
 		DSS_globalCollapsibleLayers.push(lpDairy);
+		DSS_globalCollapsibleLayers.push(lpGrid);
 		
-		// TODO: only add this if linking in a layer type that needs it. E.g. Watershed
 		this.addFeatureClickControl(map);
 	},
 	
 	// Used by vector selection layers (e.g., Watershed)
 	//--------------------------------------------------------------------------
-	activateClickControlWithHandler: function(handler, scope) {
+	activateClickControlWithHandler: function(clickHandler, unClickHandler, protocol, owner) {
 		
+		Ext.getCmp('DSS_selection_toolbar').setDisabled(false);
+		Ext.getCmp('DSS_single_select').toggle(true);
+		
+		console.log('mainViewport::activateClickControlWithHandler');
+		// turn off old handler when activating a new one...
+		if (this.DSS_clickFeatureHandler) {
+			this.DSS_clickFeatureHandler.scope.tryDisableClickSelection();
+		}
+		
+		console.log('mainViewport::settingstuffs');
 		this.DSS_clickFeatureHandler = {
-			handler: handler,
-			scope: scope
+			handler: clickHandler,
+			scope: owner
 		};
-		this.DSS_clickControl.activate();
+		this.DSS_unClickFeatureHandler = {
+			handler: unClickHandler,
+			scope: owner
+		};
+		G_ClickControl.protocol = protocol;
+		G_ClickControl.activate();
+		G_ClickControl.handlers.box.deactivate();
+		
 		OpenLayers.Element.addClass(globalMap.viewPortDiv, "olCursorHand");
 	},
 	
 	//--------------------------------------------------------------------------
 	deactivateClickControl: function() {
+	
+		console.log('Called into deactivateClickControl');
 		
-		this.DSS_clickControl.deactivate();
+		this.DSS_clickFeatureHandler = null;
+		this.DSS_unClickFeatureHandler = null;
+		
+		G_ClickControl.deactivate();
 		OpenLayers.Element.removeClass(globalMap.viewPortDiv, "olCursorHand");
+		Ext.getCmp('DSS_selection_toolbar').setDisabled(true);
 	},
 	
 	// Bah, the OpenLayers click handler doesn't seem terribly configurable with
@@ -476,38 +511,31 @@ Ext.define('MyApp.view.MainViewport', {
 	},
 	
 	//--------------------------------------------------------------------------
+	onUnClick: function(evt) {
+		
+		this.DSS_unClickFeatureHandler.handler.call(
+			this.DSS_unClickFeatureHandler.scope,
+			evt);
+	},
+	
+	//--------------------------------------------------------------------------
 	addFeatureClickControl: function(map) {
 		
 		var me = this;
-		
-		// NOTE: found this in OL code samples. I guess it just creates a click control
-		//	class from the OpenLayer.Control class? ie, it adds a custom click handler?
-		OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {                
-			defaultHandlerOptions: {
-				'single': true,
-				'double': false,
-				'pixelTolerance': 0,
-				'stopSingle': false,
-				'stopDouble': false
-			},
 
-			initialize: function(options) {
-				this.handlerOptions = OpenLayers.Util.extend(
-					{}, this.defaultHandlerOptions
-				);
-				OpenLayers.Control.prototype.initialize.apply(
-					this, arguments
-				); 
-				this.handler = new OpenLayers.Handler.Click(
-					me, {
-						'click': me.onClick
-					}, this.handlerOptions
-				);
-			}
+		G_ClickControl = new OpenLayers.Control.GetFeature({
+		//                protocol: G_protocol,
+			box: true,
+			multipleKey: "shiftKey",
+			toggleKey: Ext.isMac ? 'altKey' : 'ctrlKey'
 		});
-		
-		this.DSS_clickControl = new OpenLayers.Control.Click();
-		map.addControl(this.DSS_clickControl);
+		G_ClickControl.events.register("featureselected", this, function(e) {
+				me.onClick(e);
+		});
+		G_ClickControl.events.register("featureunselected", this, function(e) {
+				me.onUnClick(e);
+		});
+		map.addControl(G_ClickControl);
 	},
 	
 	//--------------------------------------------------------------------------
@@ -532,6 +560,43 @@ Ext.define('MyApp.view.MainViewport', {
 					center: '12,51',
 					zoom: 6,
 					stateId: 'mappanel',
+					dockedItems: [{
+						xtype: 'toolbar',
+						id: 'DSS_selection_toolbar',
+						dock: 'top',
+						disabled: true,
+						items: [{
+							xtype: 'button',
+							id: 'DSS_single_select',
+							text: 'Single Selection',
+							pressed: true,
+							toggleGroup: 'selectionGroup',
+							allowDepress: false,
+							icon: 'app/images/single_point_icon.png',
+							toggleHandler: function(button, pressed) {
+								if (pressed) {
+									console.log('Single select toggleHandler called!!');
+									G_ClickControl.deactivate();
+									G_ClickControl.activate();
+									G_ClickControl.handlers.box.deactivate();
+								}
+							}
+						},{
+							xtype: 'button',
+							text: 'Multi-Selection',
+							toggleGroup: 'selectionGroup',
+							allowDepress: false,
+							icon: 'app/images/box_select_icon.png',
+							toggleHandler: function(button, pressed) {
+								if (pressed) {
+									console.log('Multi select toggleHandler called!!');
+									G_ClickControl.deactivate();
+									G_ClickControl.handlers.box.activate();
+									G_ClickControl.activate();
+								}
+							}
+						}]
+					}],
 					tools: [{
 						type: 'down',
 						tooltip: 'Show/Hide Logo and Meta',

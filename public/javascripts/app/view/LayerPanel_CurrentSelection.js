@@ -64,7 +64,7 @@ Ext.define('MyApp.view.LayerPanel_CurrentSelection', {
 				x: 133,
 				y: 30,
 				padding: 10,
-				value: 100,
+				value: 50,
 				minValue: 0,
 				maxValue: 100,
 				increment: 10,
@@ -110,8 +110,8 @@ Ext.define('MyApp.view.LayerPanel_CurrentSelection', {
 		button.setText(this.DSS_hideSelection);
 		
 		var slider = this.getComponent('DSS_opacitySlider');
-		if (slider.getValue() < 10) {
-			slider.setValue(10);
+		if (slider.getValue() < 5) {
+			slider.setValue(5);
 		}
 		slider.show();
 		this.DSS_Layer.setOpacity(slider.getValue() / 100.0);

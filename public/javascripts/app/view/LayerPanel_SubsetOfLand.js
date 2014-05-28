@@ -1,148 +1,121 @@
 
-// Panel to assist with working with vector layer selection logic, etc.
-//
-// If needed, we could consider generalizing this to any sort of vector selection.
+
+// TODO: verify that these cell sizes, in 30 meter cell widths generate the specified
+//	english unit of area... e.g., does 7x7 30x30 meter cells really equal roughly 10 acres??
+//------------------------------------------------------------------------------
+var DSS_GridSizes = Ext.create('Ext.data.Store', {
+		
+	fields: ['size', 'name'],
+	data: [
+		{ 'size': 7, 'name': '10 Acres'},
+		{ 'size': 21, 'name': '100 Acres'},
+		{ 'size': 38, 'name': '0.5 sq Miles'}
+	]
+});
+
 //------------------------------------------------------------------------------
 Ext.define('MyApp.view.LayerPanel_SubsetOfLand', {
     extend: 'MyApp.view.LayerPanel_Common',
     alias: 'widget.layer_subset',
 
     width: 400,
-    height: 86,
-	DSS_unpressedText: 'Activate Click Selection Tool',
-	DSS_pressedText: 'Deactivate Selection Tool',
-   
+    height: 66,
+    
+    DSS_FractionPosition_X: 70,
+    DSS_FractionPosition_Y: 6,
+    DSS_CellSizePosition_X: 200,
+    
     //--------------------------------------------------------------------------
     initComponent: function() {
     	
         var me = this;
 
-		this.DSS_selectionLayer = new OpenLayers.Layer.Vector("Subset Features", {
-			displayInLayerSwitcher: false, 
-			isBaseLayer: false 
-		});
-		
-		globalMap.addLayer(this.DSS_selectionLayer);
-		
-		this.DSS_watershedSelections = [];
-
         Ext.applyIf(me, {
             items: [{
-				xtype: 'button',
-				itemId: 'DSS_watershedClickActivation',
-				text: 'Activate Click Selection Tool',
-				x: 40,
-				y: 12,
-				height: 28,
-				width: 152,
-				tooltip: {
-					text: 'Click on a watershed to include it in your query'
-				},
-				enableToggle: true,
-				handler: function(button, evt) {
-					var panel = button.up();
-					if (button.pressed) {
-						// Feature became pressed, so change text to 'turn off' and turn on selection
-						button.setText(panel.DSS_pressedText);
-						panel.enableClickSelection();
-					}
-					else {
-						button.setText(panel.DSS_unpressedText);
-						panel.disableClickSelection();
-					}
-				}
-			},{
 				xtype: 'button', 
-				text: 'Clear Selection',
-				x: 200,
-				y: 12,
-				height: 28,
-				tooltip: {
-					text: 'Clear all selected watersheds'
-				},
-				handler: function(button, evt) {
-					var panel = button.up();
-					panel.clearSelection();
-				}
-			},{
-				xtype: 'button', 
-				text: 'Select 25%',
-				x: 300,
-				y: 12,
-				height: 28,
+				text: 'Select',
+				x: me.DSS_FractionPosition_X,
+				y: me.DSS_FractionPosition_Y,
+				width: 55,
 				tooltip: {
 					text: 'Select a fraction of the land'
 				},
 				handler: function(button, evt) {
-					var panel = button.up();
-					panel.selectSubsetOfLand();
+					button.disable(true);
+					button.setText('Reselect');
+					
+					var res = Math.random();
+					res *= 32767.0;
+					res = Math.floor(res);
+					
+					me.DSS_Seed = res;
+
+					var queryButton = Ext.getCmp('DSS_queryButton');
+					queryButton.DSS_associatedButton = button;
+					queryButton.btnEl.dom.click();
 				}
 			},{
-            	xtype: 'button',
-            	x: 390,
-            	y: 4,
-            	width: 23,
-            	icon: 'app/images/go_icon_small.png',
-            	handler: function(self) {
-            		me.createOpacityPopup(self);
-            	},
-            	tooltip: {
-            		text: 'Viewable Layer Overlay'
-            	}
+				xtype: 'numberfield',
+				itemId: 'DSS_FractionOfLand',
+				x: me.DSS_FractionPosition_X + 55,
+				y: me.DSS_FractionPosition_Y,
+				width: 40,
+				hideEmptyLabel: false,
+				hideLabel: true,
+				decimalPrecision: 0,
+				step: 5,
+				value: 50,
+				minValue: 1,
+				maxValue: 99
 			},{
-            	xtype: 'button',
-            	x: 390,
-            	y: 30,
-            	width: 23,
-            	hidden: true,
-            	icon: 'app/images/eye_icon.png',
-            	handler: function(self) {
-            		alert('Query for this layer would be run here...');
-            	},
-            	tooltip: {
-            		text: 'Preview only this criteria selection'
-            	}
+				xtype: 'label',
+				x: me.DSS_FractionPosition_X + 55 + 45,
+				y: me.DSS_FractionPosition_Y + 3,
+				text: '%'
+			},
+			{
+				xtype: 'combobox',
+				itemId: 'DSS_CellScales',
+				x: me.DSS_CellSizePosition_X,
+				y: me.DSS_FractionPosition_Y,
+				width: 200,
+				fieldLabel: 'Approx Scale',
+				labelAlign: 'right',
+				labelWidth: 90,
+				labelPad: 5,
+				displayField: 'name',
+				forceSelection: true,
+				store: DSS_GridSizes,
+				valueField: 'size',
+				value: 21 // 100 acres?
 			}]
         });
 
         me.callParent(arguments);
-        
-        me.on('collapse', function(panel) {
-			var button = panel.getComponent('DSS_watershedClickActivation');
-			button.toggle(false);
-			button.setText(panel.DSS_unpressedText);
-
-			panel.clearSelection();
-			panel.disableClickSelection();
-			panel.DSS_Layer.setVisibility(false);
-		});
     },
 	
-    //--------------------------------------------------------------------------
-    clearSelection: function() {
-    	
-		this.DSS_selectionLayer.removeAllFeatures();
-		this.DSS_watershedSelections = [];
+	//--------------------------------------------------------------------------
+	resetLayer: function() {
+		
+		this.header.getComponent('DSS_ShouldQuery').toggle(false);
 	},
-
+	
     //--------------------------------------------------------------------------
     getSelectionCriteria: function() {
     	
+    	var scale = 21;
+		var combo = this.getComponent('DSS_CellScales');
+		if (combo.getValue()) {
+			scale = combo.getValue();
+		}
+
 		var queryLayer = { 
-			name: this.DSS_QueryTable,
-			type: 'indexed',
-			matchValues: []
+			name: 'proceduralFraction',
+			fraction: this.getComponent('DSS_FractionOfLand').getValue(),
+			gridCellSize: scale,
+			seed: this.DSS_Seed
 		};
 		
-		var addedElement = false;
-		for (var i = 0; i < this.DSS_watershedSelections.length; i++) {
-			// FIXME: BS, minus one because the geoserver gives the index back 1 based vs. zero based
-			queryLayer.matchValues.push(parseInt(this.DSS_watershedSelections[i])-1);
-			addedElement = true;
-		}
-        if (!addedElement) {
-        	return;
-        }
         return queryLayer;
     },
 
@@ -162,124 +135,13 @@ Ext.define('MyApp.view.LayerPanel_SubsetOfLand', {
 			if (queryElement.name == this.DSS_QueryTable) {
 				// yup
 				this.header.getComponent('DSS_ShouldQuery').toggle(true);
-				
-				// start with a clean slate, then select only the ones that need it
-				this.clearSelection();
-				// get each match value in the query...
-				for (var j = 0; j < queryElement.matchValues.length; j++) {
-					this.DSS_watershedSelections.push(queryElement.matchValues[j]);
-					
-					// FIXME: TODO: Need to somehow get the relevant feature vectors!!!??
-				}
 				return;
         	}
         }
 				
 		// Nope, mark as not queried
 		this.header.getComponent('DSS_ShouldQuery').toggle(false);
-    },
-
-	//--------------------------------------------------------------------------
-	clickSelection: function(event) {
-
-		var me = this;
-		
-	//	console.log(event);
-		OpenLayers.Element.addClass(globalMap.viewPortDiv, "olCursorWait");
-		var obj = Ext.Ajax.request({
-			url: location.href + 'wmsRequest',
-			method: 'POST',
-			jsonData: {
-				layer: 'Vector:Box_Select',
-				x: event.xy.x,
-				y: event.xy.y,
-				width: globalMap.getSize().w,
-				height: globalMap.getSize().h,
-				bbox: globalMap.getExtent().toBBOX()
-			},
-			timeout: 15000, // in milliseconds
-			
-			success: function(response, opts) {
-				
-				var gmlParser = new OpenLayers.Format.GML.v3();
-				
-				var obj = gmlParser.read(response.responseText);
-			//	console.log(obj);
-				OpenLayers.Element.removeClass(globalMap.viewPortDiv, "olCursorWait");
-				// FIXME: pick standard keypress that works for all platforms??
-				//	alt key APPENDS selections...
-				if (event.altKey == false) {
-					// so if it ISN'T pressed, clear the selection so we can add new stuffs....
-					me.clearSelection();
-				}
-				var add = []; // track the vector features to add....
-				for (var i = 0; i < obj.length; i++) {
-					var idxs = obj[i].fid.split(".");
-					var pos = me.DSS_watershedSelections.indexOf(idxs[1]);
-					if (pos < 0) {
-						add.push(obj[i]);
-						me.DSS_watershedSelections.push(idxs[1]);
-					}
-				}
-				me.DSS_selectionLayer.addFeatures(add);
-			},
-			
-			failure: function(respose, opts) {
-				OpenLayers.Element.removeClass(globalMap.viewPortDiv, "olCursorWait");
-			}
-		});
-	},
-	
-	//--------------------------------------------------------------------------
-	enableClickSelection: function() {
-		
-		var viewport = Ext.getCmp('DSS_MainViewport');
-		viewport.activateClickControlWithHandler(this.clickSelection, this);
-		// FIXME: probably want to tie this to the watershed layer visibility?
-		this.DSS_selectionLayer.setVisibility(true);
-		
-		// When click selection is on, show the layer...Make sense?
-		this.DSS_Layer.setVisibility(true);
-		this.DSS_Layer.setOpacity(0.6);		
-	},
-
-	//--------------------------------------------------------------------------
-	disableClickSelection: function() {
-		
-		var viewport = Ext.getCmp('DSS_MainViewport');
-		
-		viewport.deactivateClickControl();
-		// FIXME: probably want to tie this to the watershed layer visibility?
-		this.DSS_Layer.setVisibility(false);
-		this.DSS_selectionLayer.setVisibility(false);
-	},
-	
-	//--------------------------------------------------------------------------
-	resetLayer: function() {
-		
-		// TODO: RESET everything...
-		this.header.getComponent('DSS_ShouldQuery').toggle(false);
-		this.clearSelection();
-	},
-	
-	//--------------------------------------------------------------------------
-	selectSubsetOfLand: function() {
-
-		this.DSS_watershedSelections = [];
-		
-		var tempList = [];
-		for (var i = 0; i < 5000; i++) {
-			tempList.push(i);
-		}
-		
-		for (var i = 0; i < 1250; i++) {
-			var idx = Math.floor((Math.random()*tempList.length));
-			var val = tempList[idx];
-			tempList.splice(idx, 1);
-			
-			this.DSS_watershedSelections.push(val);
-		}
-	}
+    }
 	
 });
 

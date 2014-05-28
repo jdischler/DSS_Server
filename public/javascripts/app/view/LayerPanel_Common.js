@@ -51,18 +51,14 @@ Ext.define('MyApp.view.LayerPanel_Common', {
 					listeners: {
 						toggle: function(self, pressed) {
 							if (self.pressed) {
-								c.expand();
-//								self.setIcon('app/images/minus_icon.png');
 								self.setText('Remove');
-//								c.header.setIcon('app/images/active_block_icon.png');
-//								console.log(c.header);
+								c.tryEnableClickSelection();
+								c.expand();
 							}
 							else {
-								c.collapse();
 								self.setText('Add');
-//								self.setIcon('app/images/plus_icon.png');
-//								c.header.setIcon('app/images/block_icon.png');
-//								console.log(c.header);
+								c.tryDisableClickSelection();
+								c.collapse();
 							}
 						}
 					}
@@ -76,8 +72,23 @@ Ext.define('MyApp.view.LayerPanel_Common', {
 				width: 16
 			});
 			c.header.add(spc);
-		}
+		},
+		
+/*		collapse: function(panel) {
+        	panel.tryDisableClickSelection();
+		},
+		
+		expand: function(panel) {
+        	panel.tryEnableClickSelection();
+		}*/
 	},
+	
+    //--------------------------------------------------------------------------
+    initComponent: function() {
+        var me = this;
+        
+        me.callParent(arguments);
+    },
 	
 	// closefunc and scope are optional
     //--------------------------------------------------------------------------
@@ -131,8 +142,41 @@ Ext.define('MyApp.view.LayerPanel_Common', {
 				}
 			}]
 		}).showAt(rect.left - 8, rect.top);
-	},
+    },
+	
+    tryDisableClickSelection: function() {
+    },
+    
+//--------------------------------------------------------------------------
+    tryEnableClickSelection: function() {
+    	// Blah, brutal hax
+		var viewport = Ext.getCmp('DSS_MainViewport');
+		if (viewport.DSS_clickFeatureHandler) {
+			viewport.DSS_clickFeatureHandler.scope.tryDisableClickSelection();
+		}
+    	
+    },
+    
+/*	//--------------------------------------------------------------------------
+    onCollapse: function(panel) {
+    },
 
+	//--------------------------------------------------------------------------
+	onExpand: function(panel) {
+	},
+*/	
+    //--------------------------------------------------------------------------
+    triggerRequery: function(localButton) {
+    	
+		var queryButton = Ext.getCmp('DSS_queryButton');
+		// let the query button managed enabling us...
+		if (localButton) {
+			localButton.disable(true);
+		}
+		queryButton.DSS_associatedButton = localButton;
+		queryButton.btnEl.dom.click();
+    },
+    
     //--------------------------------------------------------------------------
     adjustOpacity: function(slider) {
     	
@@ -142,13 +186,6 @@ Ext.define('MyApp.view.LayerPanel_Common', {
 		else if (value > 0.9999) value = 0.99999; // blugh, value of 1 is more transparent than 0.99??
 		
     	this.DSS_Layer.setOpacity(value);
-    },
-    
-    //--------------------------------------------------------------------------
-    initComponent: function() {
-        var me = this;
-        
-        me.callParent(arguments);
     },
     
     //--------------------------------------------------------------------------

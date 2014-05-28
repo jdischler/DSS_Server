@@ -29,6 +29,9 @@ public abstract class Layer_Base
 	// TODO: move noDataValue into subclasses? Is that even possible? Considering float might store NaN
 	protected int mNoDataValue;
 	
+	// FIXME: refactoring base class so no need for a procedural flag...
+	protected boolean mbIsProcedural;
+	
 	// Return the Layer_Base object when asked for it by name
 	//--------------------------------------------------------------------------
 	public static Layer_Base getLayer(String name) {
@@ -62,6 +65,22 @@ public abstract class Layer_Base
 		mLayers.clear();
 	}
 	
+	//--------------------------------------------------------------------------
+	// Functions that must be in the subclass. 
+	// TODO: adding a procedural layer type kind of changes the pattern and needs here...
+	//	Consider refactoring the base such that there is a Layer_Data type class that
+	//	is the base for disk related layers?
+	//--------------------------------------------------------------------------
+	abstract protected void onLoadEnd();
+	abstract protected void processASC_Line(int y, String lineElementsArray[]);
+	abstract protected void allocMemory();
+	abstract protected Selection query(JsonNode queryNode, Selection selection);
+	// Copies a file read bytebuffer into the internal native float array...
+	abstract protected void readCopy(ByteBuffer dataBuffer, int width, int atY);
+	// Copies the native float data into a bytebuffer that is set up to recieve it (by the caller)
+	abstract protected void writeCopy(ByteBuffer dataBuffer, int width, int atY);
+	
+	//--------------------------------------------------------------------------
 	// Base constructor
 	//--------------------------------------------------------------------------
 	public Layer_Base(String name) {
@@ -73,6 +92,7 @@ public abstract class Layer_Base
 	//--------------------------------------------------------------------------
 	public Layer_Base(String name, boolean temporary) {
 	
+		mbIsProcedural = false; // most layers are not procedural but based off of on-disk data
 		mName = name.toLowerCase();
 		if (!temporary) {
 			if (mLayers == null) {
@@ -102,6 +122,13 @@ public abstract class Layer_Base
 	
 	//--------------------------------------------------------------------------
 	public void init() {
+		
+		if (mbIsProcedural) {
+			// TODO: for procedural layers, may need to eventually have some kind of 
+			//	ProceduralInit function...however, do not need this at this time...
+			onLoadEnd();
+			return;
+		}
 		
 		try {
 			// TODO: FIXME: binary format reading or writing has an issue, not sure which
@@ -208,9 +235,6 @@ public abstract class Layer_Base
 		Logger.info(" ");
 	}
 	
-	//--------------------------------------------------------------------------
-	abstract protected void allocMemory();
-	
 	// Generally comes from a client request for data about this layer...
 	//	this could be layer width/height, maybe cell size (30m), maybe the layer
 	//	ranges, in the case of indexed layers...the key/legend for the layer
@@ -240,17 +264,7 @@ public abstract class Layer_Base
 		
 		return ret;
 	}
-	
-	// Functions that must be in the subclass. 
-	//--------------------------------------------------------------------------
-	abstract protected void onLoadEnd();
-	abstract protected void processASC_Line(int y, String lineElementsArray[]);
-	abstract protected Selection query(JsonNode queryNode, Selection selection);
-		// Copies a file read bytebuffer into the internal native float array...
-	abstract protected void readCopy(ByteBuffer dataBuffer, int width, int atY);
-		// Copies the native float data into a bytebuffer that is set up to recieve it (by the caller)
-	abstract protected void writeCopy(ByteBuffer dataBuffer, int width, int atY);
-		
+			
 	//--------------------------------------------------------------------------
 	public static void execQuery(JsonNode layerList, Selection selection) {
 

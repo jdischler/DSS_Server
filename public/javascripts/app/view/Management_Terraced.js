@@ -1,6 +1,6 @@
 	
 //------------------------------------------------------------------------------
-Ext.define('MyApp.view.Management_CoverCrop', {
+Ext.define('MyApp.view.Management_Terraced', {
 	extend: 'Ext.container.Container',
 	
 	height: 30,
@@ -16,25 +16,25 @@ Ext.define('MyApp.view.Management_CoverCrop', {
 		Ext.applyIf(me, {
 			items: [{
 				xtype: 'radiogroup',
-				itemId: 'DSS_CoverCrop',
+				itemId: 'DSS_Terraced',
 				x: 0,
 				y: 0,
 				width: 290,
-				fieldLabel: 'Cover Crop',
+				fieldLabel: 'Terraced',
 				labelAlign: 'right',
 				labelWidth: 70,
 				allowBlank: false,
 				items: [{
 					xtype: 'radiofield',
 					boxLabel: 'Yes',
-					name: 'CoverCrop',
+					name: 'Terraced',
 					inputValue: 0
 				},
 				{
 					xtype: 'radiofield',
 					boxLabel: 'No',
 					checked: true,
-					name: 'CoverCrop',
+					name: 'Terraced',
 					inputValue: 1
 				}]
 			}]
@@ -48,9 +48,9 @@ Ext.define('MyApp.view.Management_CoverCrop', {
 	//--------------------------------------------------------------------------
 	setFromTransform: function(transform) {
 		
-		if (transform && transform.Options && transform.Options.CoverCrop) {
-			var coverCrop = this.getComponent('DSS_CoverCrop');
-			coverCrop.setValue({'CoverCrop': !transform.Options.CoverCrop.CoverCrop});
+		if (transform && transform.Options && transform.Options.Terraced) {
+			var terraced = this.getComponent('DSS_Terraced');
+			terraced.setValue({'Terraced': !transform.Options.Terraced.Terraced});
 		}
 	},
 	
@@ -58,23 +58,22 @@ Ext.define('MyApp.view.Management_CoverCrop', {
 	collectChanges: function(transform) {
 		
 		var obj = {
-			CoverCrop: false,
-			text: '<b>Cover Crop:</b> '
+			Terraced: false,
+			text: '<b>Terraced:</b> '
 		};
 		
-		var tillageType = this.getComponent('DSS_CoverCrop');
-		var value = tillageType.getValue()['CoverCrop'];
-		console.log(value);
+		var terraced = this.getComponent('DSS_Terraced');
+		var value = terraced.getValue()['Terraced'];
 		
 		if (value == 0) {
 			obj.text += 'Yes';
-			obj.CoverCrop = true;
+			obj.Terraced = true;
 		}
 		else if (value == 1) {
 			obj.text += 'None';
 		}
 		
-		transform['CoverCrop'] = obj;
+		transform['Terraced'] = obj;
 		
 		return obj;
 	}

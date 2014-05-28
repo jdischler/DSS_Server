@@ -1,6 +1,6 @@
 	
 //------------------------------------------------------------------------------
-Ext.define('MyApp.view.Management_CoverCrop', {
+Ext.define('MyApp.view.Management_Contour', {
 	extend: 'Ext.container.Container',
 	
 	height: 30,
@@ -16,25 +16,25 @@ Ext.define('MyApp.view.Management_CoverCrop', {
 		Ext.applyIf(me, {
 			items: [{
 				xtype: 'radiogroup',
-				itemId: 'DSS_CoverCrop',
+				itemId: 'DSS_Contour',
 				x: 0,
 				y: 0,
 				width: 290,
-				fieldLabel: 'Cover Crop',
+				fieldLabel: 'Contour',
 				labelAlign: 'right',
 				labelWidth: 70,
 				allowBlank: false,
 				items: [{
 					xtype: 'radiofield',
 					boxLabel: 'Yes',
-					name: 'CoverCrop',
+					name: 'Contour',
 					inputValue: 0
 				},
 				{
 					xtype: 'radiofield',
 					boxLabel: 'No',
 					checked: true,
-					name: 'CoverCrop',
+					name: 'Contour',
 					inputValue: 1
 				}]
 			}]
@@ -48,9 +48,9 @@ Ext.define('MyApp.view.Management_CoverCrop', {
 	//--------------------------------------------------------------------------
 	setFromTransform: function(transform) {
 		
-		if (transform && transform.Options && transform.Options.CoverCrop) {
-			var coverCrop = this.getComponent('DSS_CoverCrop');
-			coverCrop.setValue({'CoverCrop': !transform.Options.CoverCrop.CoverCrop});
+		if (transform && transform.Options && transform.Options.Contour) {
+			var contour = this.getComponent('DSS_Contour');
+			contour.setValue({'Contour': !transform.Options.Contour.Contour});
 		}
 	},
 	
@@ -58,23 +58,22 @@ Ext.define('MyApp.view.Management_CoverCrop', {
 	collectChanges: function(transform) {
 		
 		var obj = {
-			CoverCrop: false,
-			text: '<b>Cover Crop:</b> '
+			Contour: false,
+			text: '<b>Contour:</b> '
 		};
 		
-		var tillageType = this.getComponent('DSS_CoverCrop');
-		var value = tillageType.getValue()['CoverCrop'];
-		console.log(value);
+		var contour = this.getComponent('DSS_Contour');
+		var value = contour.getValue()['Contour'];
 		
 		if (value == 0) {
 			obj.text += 'Yes';
-			obj.CoverCrop = true;
+			obj.Contour = true;
 		}
 		else if (value == 1) {
 			obj.text += 'None';
 		}
 		
-		transform['CoverCrop'] = obj;
+		transform['Contour'] = obj;
 		
 		return obj;
 	}

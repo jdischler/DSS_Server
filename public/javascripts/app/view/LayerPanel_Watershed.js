@@ -30,7 +30,7 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
             items: [{
 				xtype: 'button',
 				itemId: 'DSS_watershedClickActivation',
-				text: 'Activate Click Selection Tool',
+				text: me.DSS_unpressedText,
 				x: 70,
 				y: 12,
 				height: 28,
@@ -40,15 +40,13 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 				},
 				enableToggle: true,
 				handler: function(button, evt) {
-					var panel = button.up();
 					if (button.pressed) {
 						// Feature became pressed, so change text to 'turn off' and turn on selection
-						button.setText(panel.DSS_pressedText);
-						panel.enableClickSelection();
+//						button.setText(me.DSS_pressedText);
+						me.tryEnableClickSelection();
 					}
 					else {
-						button.setText(panel.DSS_unpressedText);
-						panel.disableClickSelection();
+						me.tryDisableClickSelection();
 					}
 				}
 			},{
@@ -63,6 +61,7 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 				handler: function(button, evt) {
 					var panel = button.up();
 					panel.clearSelection();
+					panel.triggerRequery(button, true);
 				}
 			},{
             	xtype: 'button',
@@ -93,17 +92,41 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
         });
 
         me.callParent(arguments);
-        
-        me.on('collapse', function(panel) {
-			var button = panel.getComponent('DSS_watershedClickActivation');
-			button.toggle(false);
-			button.setText(panel.DSS_unpressedText);
-
-			panel.clearSelection();
-			panel.disableClickSelection();
-			panel.DSS_Layer.setVisibility(false);
-		});
+        me.prepareGetFeatureProtocol();
     },
+
+	//--------------------------------------------------------------------------
+    onCollapse: function(panel) {
+		this.tryDisableClickSelection();
+    },
+
+	//--------------------------------------------------------------------------
+	onExpand: function(panel) {
+		this.tryEnableClickSelection();
+	},
+	
+    //--------------------------------------------------------------------------
+    triggerRequery: function(localButton, force) {
+    	
+		if (force || this.DSS_watershedSelections.length > 0) {		
+			// let the query button managed enabling us...
+			if (localButton) {
+				localButton.disable(true);
+			}
+			
+			var queryButton = Ext.getCmp('DSS_queryButton');
+			queryButton.DSS_associatedButton = localButton;
+			queryButton.btnEl.dom.click();
+		}
+    },
+    
+	//--------------------------------------------------------------------------
+	resetLayer: function() {
+		
+		// TODO: RESET everything...
+		this.header.getComponent('DSS_ShouldQuery').toggle(false);
+		this.clearSelection();
+	},
 	
     //--------------------------------------------------------------------------
     clearSelection: function() {
@@ -167,61 +190,41 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
     },
 
 	//--------------------------------------------------------------------------
-	clickSelection: function(event) {
+    prepareGetFeatureProtocol: function() {
+    	
+		var protocol = OpenLayers.Protocol.WFS.fromWMSLayer(this.DSS_Layer);
+        
+        // BLAH, route through the proxy...Not sure why this doesn't automatically work?
+        var urls = protocol.url.slice(0);
+        urls[0] = location.href + "openLayersProxy?" + urls[0]; 
+        protocol.url = urls;
+        protocol.options.url = urls;
+        
+        this.DSS_protocol = protocol;
+    },
 
-		var me = this;
-		
-	//	console.log(event);
-		OpenLayers.Element.addClass(globalMap.viewPortDiv, "olCursorWait");
-		var obj = Ext.Ajax.request({
-			url: location.href + 'wmsRequest',
-			method: 'POST',
-			jsonData: {
-				layer: 'Vector:Watershed-New',
-				x: event.xy.x,
-				y: event.xy.y,
-				width: globalMap.getSize().w,
-				height: globalMap.getSize().h,
-				bbox: globalMap.getExtent().toBBOX()
-			},
-			timeout: 15000, // in milliseconds
-			
-			success: function(response, opts) {
-				
-				var gmlParser = new OpenLayers.Format.GML.v3();
-				
-				var obj = gmlParser.read(response.responseText);
-			//	console.log(obj);
-				OpenLayers.Element.removeClass(globalMap.viewPortDiv, "olCursorWait");
-				// FIXME: pick standard keypress that works for all platforms??
-				//	alt key APPENDS selections...
-				if (event.altKey == false) {
-					// so if it ISN'T pressed, clear the selection so we can add new stuffs....
-					me.clearSelection();
-				}
-				var add = []; // track the vector features to add....
-				for (var i = 0; i < obj.length; i++) {
-					var idxs = obj[i].fid.split(".");
-					var pos = me.DSS_watershedSelections.indexOf(idxs[1]);
-					if (pos < 0) {
-						add.push(obj[i]);
-						me.DSS_watershedSelections.push(idxs[1]);
-					}
-				}
-				me.DSS_selectionLayer.addFeatures(add);
-			},
-			
-			failure: function(respose, opts) {
-				OpenLayers.Element.removeClass(globalMap.viewPortDiv, "olCursorWait");
-			}
-		});
+	//--------------------------------------------------------------------------
+	tryEnableClickSelection: function() {
+
+		console.log('WaterShed::tryEnableClickSelection');
+		var button = this.getComponent('DSS_watershedClickActivation');
+		if (!button.pressed) {
+//			button.btnEl.dom.click();
+			button.toggle(true, true);
+		}
+			button.setText(this.DSS_pressedText);
+			this.enableClickSelection();
+	//	}
 	},
 	
 	//--------------------------------------------------------------------------
 	enableClickSelection: function() {
 		
+		console.log('WaterShed::enableClickSelection');
 		var viewport = Ext.getCmp('DSS_MainViewport');
-		viewport.activateClickControlWithHandler(this.clickSelection, this);
+		viewport.activateClickControlWithHandler(this.clickSelection, this.unClickSelection, 
+			this.DSS_protocol, this);
+		
 		// FIXME: probably want to tie this to the watershed layer visibility?
 		this.DSS_selectionLayer.setVisibility(true);
 		
@@ -231,10 +234,24 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 	},
 
 	//--------------------------------------------------------------------------
+	tryDisableClickSelection: function() {
+
+		console.log('WaterShed::tryDisableClickSelection');
+		var button = this.getComponent('DSS_watershedClickActivation');
+		if (button.pressed) {
+//			button.btnEl.dom.click();
+			button.toggle(false, true);
+		}
+			button.setText(this.DSS_unpressedText);
+			this.disableClickSelection();
+		//}
+	},
+	
+	//--------------------------------------------------------------------------
 	disableClickSelection: function() {
 		
+		console.log('WaterShed::disableClickSelection');
 		var viewport = Ext.getCmp('DSS_MainViewport');
-		
 		viewport.deactivateClickControl();
 		// FIXME: probably want to tie this to the watershed layer visibility?
 		this.DSS_Layer.setVisibility(false);
@@ -242,12 +259,36 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 	},
 	
 	//--------------------------------------------------------------------------
-	resetLayer: function() {
-		
-		// TODO: RESET everything...
-		this.header.getComponent('DSS_ShouldQuery').toggle(false);
-		this.clearSelection();
+	clickSelection: function(event) {
+
+		console.log('WaterShed::clickSelection');
+		var feature = event.feature;
+		var idxs = feature.fid.split(".");
+		var pos = this.DSS_watershedSelections.indexOf(idxs[1]);
+		if (pos < 0) {
+			this.DSS_selectionLayer.addFeatures(feature);
+			this.DSS_watershedSelections.push(idxs[1]);
+		}
+		else if (event.object.modifiers.toggle == true) {
+			this.DSS_watershedSelections.splice(pos,1);
+			var featureObj = this.DSS_selectionLayer.getFeatureBy('fid',feature.fid);
+			this.DSS_selectionLayer.removeFeatures(featureObj);
+		}
+	},
+
+	//--------------------------------------------------------------------------
+	unClickSelection: function(event) {
+
+		console.log('WaterShed::unClickSelection');
+		var feature = event.feature;
+		var idxs = feature.fid.split(".");
+		var pos = this.DSS_watershedSelections.indexOf(idxs[1]);
+		if (pos >= 0) {
+			this.DSS_watershedSelections.splice(pos,1);
+			var featureObj = this.DSS_selectionLayer.getFeatureBy('fid', feature.fid);
+			this.DSS_selectionLayer.removeFeatures(featureObj);
+		}
 	}
-	
+		
 });
 

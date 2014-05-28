@@ -283,6 +283,30 @@ public class Scenario
 							Logger.info("  +---- Using no covercrop");
 						}
 					}
+					// ---- Contour ----
+					JsonNode cnode = managementOptions.get("Contour");
+					if (cnode != null && cnode.isObject()) {
+						ObjectNode cOptions = (ObjectNode)cnode;
+						if (cOptions.get("Contour").booleanValue()) {
+							newLandUse = ManagementOptions.E_Contour.setOn(newLandUse); // else is no-contour
+							Logger.info("  +--- Applying Contouring");
+						}
+						else {
+							Logger.info("  +---- Using no contour");
+						}
+					}
+					// ---- Terraced ----
+					JsonNode tnode = managementOptions.get("Terraced");
+					if (tnode != null && tnode.isObject()) {
+						ObjectNode tOptions = (ObjectNode)tnode;
+						if (tOptions.get("Terraced").booleanValue()) {
+							newLandUse = ManagementOptions.E_Terrace.setOn(newLandUse); // else is no-terraces
+							Logger.info("  +--- Applying Terracing");
+						}
+						else {
+							Logger.info("  +---- Using no terraces");
+						}
+					}
 				}
 				
 				try {

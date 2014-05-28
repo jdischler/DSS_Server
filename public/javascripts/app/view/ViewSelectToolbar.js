@@ -40,7 +40,7 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 			},
 			{
 				xtype: 'button',
-				itemId: 'DSS_queryButton',
+				id: 'DSS_queryButton',
 				scale: 'medium',
 				text: 'View Selection',
 				icon: 'app/images/eye_icon.png',
@@ -110,7 +110,7 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
     submitQuery: function(queryJson) {
     	
     	var me = this;
-		var button = this.getComponent('DSS_queryButton');
+		var button = Ext.getCmp('DSS_queryButton');
 		button.setIcon('app/images/spinner_16a.gif');
 		button.setDisabled(true);
 
@@ -122,8 +122,8 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 			success: function(response, opts) {
 				
 				var obj = JSON.parse(response.responseText);
-				console.log("success: ");
-				console.log(obj);
+//				console.log("success: ");
+//				console.log(obj);
 
 				me.tryCreateSelectionLayer(obj, 0);			
 			},
@@ -131,6 +131,9 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 			failure: function(respose, opts) {
 				button.setIcon('app/images/eye_icon.png');
 				button.setDisabled(false);
+				if (button.DSS_associatedButton) {
+					button.DSS_associatedButton.setDisabled(false);
+				}
 				alert("Query failed, request timed out?");
 			}
 		});
@@ -146,7 +149,7 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 	tryCreateSelectionLayer: function(json, tryCount) {
 		
     	var me = this;
-		var button = this.getComponent('DSS_queryButton');
+		var button = Ext.getCmp('DSS_queryButton');
 		
 		console.log('Doing a try create selection layer');
 		
@@ -170,7 +173,7 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 					new OpenLayers.Size(2113.0,-2113.0),
 					{
 						buffer: 0,
-						opacity: 1.0,
+						opacity: 0.5,
 						isBaseLayer: false,
 						displayInLayerSwitcher: false,
 						transitionEffect: "resize",
@@ -190,7 +193,9 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 				
 				button.setIcon('app/images/eye_icon.png');
 				button.setDisabled(false);
-				
+				if (button.DSS_associatedButton) {
+					button.DSS_associatedButton.setDisabled(false);
+				}
 			};
 			// Set up a failure handler...
 			//-----------------------
@@ -203,6 +208,9 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 					console.log(' Image not ready yet...and lets give up...');
 					button.setIcon('app/images/eye_icon.png');
 					button.setDisabled(false);
+					if (button.DSS_associatedButton) {
+						button.DSS_associatedButton.setDisabled(false);
+					}
 				}
 			};
 			

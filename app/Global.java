@@ -16,8 +16,11 @@ public class Global extends GlobalSettings
 	private static final boolean LOAD_ALL_LAYERS_FOR_DEV = true;
 	private static final boolean LOAD_DEFAULT_DATA = true;
 	
+	// mostly for DEV, production servers should always recompute this data to be safe...
+	private static final boolean FORCE_COMPUTE_DEFAULT_DATA = true;
+	
 	// FIXME: TODO: this will be annoying...investigate automating the version numbering
-	private static final String mServerVersionMessage = "Server version: 0.55.0";
+	private static final String mServerVersionMessage = "Server version: 0.56.0";
 	
 	//--------------------------------------------------------------------------
 	@Override
@@ -111,10 +114,12 @@ public class Global extends GlobalSettings
 			}
 			
 			// Queryable layers...though some of these are also used by model computations..
+			layer = new Layer_ProceduralFraction(); layer.init();// really has no data...init may not also be needed?
 			layer = new Layer_Integer("cdl_2012"); layer.init();
 			layer = new Layer_Float("slope"); layer.init();
 			layer = new Layer_Float("rivers"); layer.init();
 			layer = new Layer_Integer("watersheds", Layer_Integer.EType.ERaw); layer.init();
+//			layer = new Layer_Integer("box_selection", Layer_Integer.EType.ERaw); layer.init();
 			
 			// Layers for model computation
 			layer = new Layer_Float("cec"); layer.init();
@@ -188,9 +193,18 @@ public class Global extends GlobalSettings
 		//	DEFAULT folder otherwise they will not be recalculated with how this is coded
 		//	The default folder also cannot exist for first generation (even if empty...)
 		File Output = new File("./layerData/default");
-		if(!Output.exists()) {
+		if(!Output.exists() || Play.isProd() || FORCE_COMPUTE_DEFAULT_DATA) {
+
+			if (FORCE_COMPUTE_DEFAULT_DATA) {
+				Logger.info("Forcing Defaults to be recalculated!");
+			}
+			else if (Play.isProd()) {
+				Logger.info("Server starting in production mode - recalculating Default scenario folder!");
+			}
+			else {
+				Logger.info("Default scenario folder does not exist, creating it and default model files!");
+			}
 			
-			Logger.info("Default scenario folder does not exist, creating it and default model files!");
 			// Rotation
 			Layer_Base layer = Layer_Base.getLayer("cdl_2012");
 			int width = layer.getWidth();

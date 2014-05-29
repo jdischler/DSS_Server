@@ -24,22 +24,67 @@ public class GlobalAssumptions
 	{
 		mHierarchicalAssumptions = JsonNodeFactory.instance.objectNode();
 
-		// CROP PRICING
+		// Net Income Model
 		// Create some options that control how Crop prices can be tweaked on the client		
 		ObjectNode options = JsonNodeFactory.instance.objectNode();
 		addOptionalRangeProperties(options, 1, 10000);
 		addOptionalStepSizeProperty(options, 20);
 		addOptionalUnitLabelProperty(options, "Pre", "$"); // options are "Pre" and "Post"
-		addOptionalHelpTextProperty(options, "Dollars per dry metric ton");
+		addOptionalHelpTextProperty(options, "Sell price per dry metric ton");
 		
-		// P - Crop prices into Economic category
-		ObjectNode category = createAssumptionCategory("Economic", "economic_icon.png");
-		createAssumption(category,	"p_corn", 		"Corn Price", 			233.0f, options);
-		createAssumption(category,	"p_stover", 	"Corn Stover Price", 	50.0f, 	options);
-		createAssumption(category,	"p_soy", 		"Soy Price", 			640.0f, options);
-		createAssumption(category,	"p_alfalfa", 	"Alfalfa Price", 		200.0f, options);
-		createAssumption(category,	"p_grass", 		"Grass Price", 			75.0f, options);
-
+		// P - Crop prices into Net Income Model
+		ObjectNode category = createAssumptionCategory("Net Income Model", "economic_icon.png");
+		// Sell -> Price per tonne
+		createAssumption(category,	"p_corn_s", 	"Corn Price", 			233.0f, options);
+		createAssumption(category,	"p_stover_s", 	"Corn Stover Price", 	50.0f, 	options);
+		createAssumption(category,	"p_soy_s", 		"Soy Price", 			640.0f, options);
+		createAssumption(category,	"p_alfalfa_s", 	"Alfalfa Price", 		200.0f, options);
+		createAssumption(category,	"p_grass_s", 	"Grass Price", 			75.0f, options);
+		
+		options = JsonNodeFactory.instance.objectNode();
+		addOptionalRangeProperties(options, 1, 10000);
+		addOptionalStepSizeProperty(options, 20);
+		addOptionalUnitLabelProperty(options, "Pre", "$"); // options are "Pre" and "Post"
+		addOptionalHelpTextProperty(options, "Production price per dry metric Ha");
+		
+		// Cost -> $ per ha cost
+		createAssumption(category,	"p_corn_p", 	"Corn Production Cost", 		1135.0f, options);
+		createAssumption(category,	"p_stover_p", 	"Corn Stover Production Cost", 	412.0f, options);
+		createAssumption(category,	"p_soy_p", 		"Soy Production Cost", 			412.0f, options);
+		createAssumption(category,	"p_alfalfa_p", 	"Alfalfa Production Cost", 		627.0f, options);
+		createAssumption(category,	"p_grass_p", 	"Grass Production Cost", 		620.0f, options);
+		
+		// Net Energy Model
+		// Create some options that control how input and output can be tweaked on the client		
+		options = JsonNodeFactory.instance.objectNode();
+		addOptionalRangeProperties(options, 1, 10000);
+		addOptionalStepSizeProperty(options, 20);
+		addOptionalUnitLabelProperty(options, "Pre", ""); // options are "Pre" and "Post"
+		addOptionalHelpTextProperty(options, "Net Energy Input at Farm metric MJ/Ha");
+		
+		// Energy Input at Farm
+		category = createAssumptionCategory("Net Energy Model", "energy_icon.png", false);
+		createAssumption(category,	"e_corn", 		"Corn Energy at Farm", 			18151.0f, options);
+		createAssumption(category,	"e_stover", 	"Corn Stover Energy at Farm", 	2121.0f, 	options);
+		createAssumption(category,	"e_soy", 		"Soy Energy at Farm", 			6096.0f, options);
+		createAssumption(category,	"e_alfalfa", 	"Alfalfa Energy at Farm", 		9075.0f, options);
+		createAssumption(category,	"e_grass", 		"Grass Energy at Farm", 		7411.0f, options);
+		
+		//  Conversion Efficiency (L per Mg)
+		options = JsonNodeFactory.instance.objectNode();
+		addOptionalRangeProperties(options, 1, 10000);
+		addOptionalStepSizeProperty(options, 10);
+		addOptionalUnitLabelProperty(options, "Pre", ""); // options are "Pre" and "Post"
+		addOptionalHelpTextProperty(options, "Conversion Efficiency metric L/Mg");
+		
+		// Cost -> $ per ha cost
+		createAssumption(category,	"e_corn_ce", 		"Corn Conversion Efficiency", 		400.0f, options);
+		createAssumption(category,	"e_stover_ce", 	"Corn Stover Conversion Efficiency", 	380.0f, options);
+		createAssumption(category,	"e_soy_ce", 		"Soy Conversion Efficiency", 		200.0f, options);
+		createAssumption(category,	"e_alfalfa_ce", 	"Alfalfa Conversion Efficiency", 	380.0f, options);
+		createAssumption(category,	"e_grass_ce", 		"Grass Conversion Efficiency", 		380.0f, options);
+		
+		
 		// YIELD MANIPULATION
 		options = JsonNodeFactory.instance.objectNode();
 		addOptionalRangeProperties(options, -99, 100);

@@ -57,9 +57,9 @@ Logger.info("  > Allocated memory for NetEnergy, NetIncom, Fuel");
 		// Energy Input at Farm (MJ per Ha)
 		float EI_CF = 18151f; // HILL
 		float EI_CSF = 2121f; // HILL 1/4 fuel use for stover harvest
-		float EI_GF = 7411f; // EBAMM
 		float EI_SF = 6096f; // Hill
 		float EI_AF = 9075f; // Corn Grain Hill * 1/2
+		float EI_GF = 7411f; // EBAMM
 		
 		// Energy Input in Processing (MJ per L)
 		float EI_CP = 13.99f; // HILL
@@ -78,19 +78,21 @@ Logger.info("  > Allocated memory for NetEnergy, NetIncom, Fuel");
 		// Conversion Efficiency (L per Mg)
 		float CEO_C = 400; // HILL
 		float CEO_CS = 380; // EBAMM cellulosic
-		float CEO_G = 380; // EBAMM cellulosic
 		float CEO_S = 200; // Hill
 		float CEO_A = 380; // EBAMM cellulosic
-		
+		float CEO_G = 380; // EBAMM cellulosic
+				
 		float returnAmount;	// Gross return
 		
+		// Net Income 
+		// Price for production
 		float PC_Cost = 1135; // $ per ha cost for Corn
 		float PCS_Cost = 412; // $ per ha cost for Corn Stover
 		float PG_Cost = 412; // $ per ha cost for Grass
 		float PS_Cost = 627; // $ per ha cost for Soy
 		float PA_Cost = 620; // $ per ha cost for Alfalfa
 		
-		// Price per tonne
+		// Price per tonne for sell
 		float P_Per_Corn = 274;
 		float P_Per_Stover = 70;
 		float P_Per_Grass = 107;
@@ -99,17 +101,54 @@ Logger.info("  > Allocated memory for NetEnergy, NetIncom, Fuel");
 
 		// Get user changeable values from the client...
 		//----------------------------------------------------------------------
-		try {	
-			P_Per_Corn = scenario.mAssumptions.getAssumptionFloat("p_corn");
-			P_Per_Stover = scenario.mAssumptions.getAssumptionFloat("p_stover");
-			P_Per_Grass = scenario.mAssumptions.getAssumptionFloat("p_grass");
-			P_Per_Soy = scenario.mAssumptions.getAssumptionFloat("p_soy");
-			P_Per_Alfalfa = scenario.mAssumptions.getAssumptionFloat("p_alfalfa");
+		// Net Income
+		try {
+			// Production
+			PC_Cost = scenario.mAssumptions.getAssumptionFloat("p_corn_p");
+			PCS_Cost = scenario.mAssumptions.getAssumptionFloat("p_stover_p");
+			PG_Cost = scenario.mAssumptions.getAssumptionFloat("p_grass_p");
+			PS_Cost = scenario.mAssumptions.getAssumptionFloat("p_soy_p");
+			PA_Cost = scenario.mAssumptions.getAssumptionFloat("p_alfalfa_p");
+			// Sell
+			P_Per_Corn = scenario.mAssumptions.getAssumptionFloat("p_corn_s");
+			P_Per_Stover = scenario.mAssumptions.getAssumptionFloat("p_stover_s");
+			P_Per_Grass = scenario.mAssumptions.getAssumptionFloat("p_grass_s");
+			P_Per_Soy = scenario.mAssumptions.getAssumptionFloat("p_soy_s");
+			P_Per_Alfalfa = scenario.mAssumptions.getAssumptionFloat("p_alfalfa_s");
 		}
 		catch (Exception e) {
 			Logger.info(e.toString());
 		}
 		
+		// Net Energy
+		try {
+			// Energy Input at Farm
+			EI_CF = scenario.mAssumptions.getAssumptionFloat("e_corn");
+			EI_CSF = scenario.mAssumptions.getAssumptionFloat("e_stover");
+			EI_GF = scenario.mAssumptions.getAssumptionFloat("e_grass");
+			EI_SF = scenario.mAssumptions.getAssumptionFloat("e_soy");
+			EI_AF = scenario.mAssumptions.getAssumptionFloat("e_alfalfa");
+			// Conversion Efficiency
+			CEO_C = scenario.mAssumptions.getAssumptionFloat("e_corn_ec");
+			CEO_CS = scenario.mAssumptions.getAssumptionFloat("e_stover_ec");
+			CEO_G = scenario.mAssumptions.getAssumptionFloat("e_grass_ec");
+			CEO_S = scenario.mAssumptions.getAssumptionFloat("e_soy_ec");
+			CEO_A = scenario.mAssumptions.getAssumptionFloat("e_alfalfa_ec");
+		}
+		
+		catch (Exception e) {
+			Logger.info(e.toString());
+		}
+		
+		// Net Income
+		// Production
+		Logger.info(" Corn production price from client = " + Float.toString(PC_Cost) );
+		Logger.info(" Stover production price from client = " + Float.toString(PCS_Cost) );
+		Logger.info(" Grass production price from client = " + Float.toString(PG_Cost) );
+		Logger.info(" Soy production price from client = " + Float.toString(PS_Cost) );
+		Logger.info(" Alfalfa production price from client = " + Float.toString(PA_Cost) );
+		
+		// Sell
 		Logger.info(" Corn price from client = " + Float.toString(P_Per_Corn) );
 		Logger.info(" Stover price from client = " + Float.toString(P_Per_Stover) );
 		Logger.info(" Grass price from client = " + Float.toString(P_Per_Grass) );

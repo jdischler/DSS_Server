@@ -21,5 +21,4 @@ GET		/files/:file			controllers.FileService.getFile(file: String)
 GET		/app/file/*file			controllers.Assets.at(path="/public/file", file)
 GET		/app/stylesheets/*file	controllers.Assets.at(path="/public/stylesheets", file)
 GET		/app/*file				controllers.Assets.at(path="/public/javascripts/app", file)
-GET		/help/*file				controllers.Assets.at(path="/public/help", file)
 

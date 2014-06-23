@@ -51,7 +51,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_UnitLabel: '$Million/Yr',
 					DSS_Label: 'Net Income',
 					DSS_GraphTitle: 'Net Income',
-					DSS_InfoHTML: 'http://www.sciencedirect.com/science/article/pii/S0305750X11000933',
+					DSS_InfoHTML: 'help/yield_ethanol_net_energy_net_income.htm',
 					DSS_DetailReportContainer: me
 				},{
 					itemId: 'result_ethanol',
@@ -61,7 +61,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					//DSS_UnitLabel: 'Gl/Yr',
 					DSS_Label: 'Gross Biofuel',
 					DSS_GraphTitle: 'Biofuel Production',
-					DSS_InfoHTML: 'http://www.sciencedirect.com/science/article/pii/S0305750X11000933',
+					DSS_InfoHTML: 'help/yield_ethanol_net_energy_net_income.htm',
 					DSS_DetailReportContainer: me
 				},{
 					itemId: 'result_net_energy',
@@ -71,7 +71,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_UnitLabel: 'MBtu/Yr',
 					DSS_Label: 'Net Energy',
 					DSS_GraphTitle: 'Net Energy',
-					DSS_InfoHTML: 'http://www.sciencedirect.com/science/article/pii/S0305750X11000933',
+					DSS_InfoHTML: 'help/yield_ethanol_net_energy_net_income.htm',
 					DSS_DetailReportContainer: me
 				},/*{
 					itemId: 'result_water_quality',
@@ -81,7 +81,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_UnitLabel: 'ton/Yr',
 					DSS_Label: 'Water Quality',
 					DSS_GraphTitle: 'Water Quality',
-					DSS_InfoHTML: 'http://www.epa.gov/airquality/modeling.html',
+					DSS_InfoHTML: 'help/Phosphorous.htm',
 					DSS_DetailReportContainer: me
 				},*/{
 					itemId: 'result_phosphorus_epic',
@@ -91,7 +91,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_UnitLabel: 'ton/Yr',
 					DSS_Label: 'Phosphorus',
 					DSS_GraphTitle: 'Phosphorus Epic',
-					DSS_InfoHTML: 'http://water.epa.gov/scitech/datait/models/index.cfm',
+					DSS_InfoHTML: 'help/phosphorous.htm',
 					DSS_DetailReportContainer: me
 				},{
 					itemId: 'result_soil_loss',
@@ -101,7 +101,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_UnitLabel: 'ton/Yr',
 					DSS_Label: 'Soil Loss',
 					DSS_GraphTitle: 'Soil Loss',
-					DSS_InfoHTML: 'http://www.epa.gov/airquality/modeling.html',
+					DSS_InfoHTML: 'help/soil_loss.htm',
 					DSS_DetailReportContainer: me
 				},
 /*				{ // TODO: Soil Loss Model Goes Here as Per Order Tim Would Like!!!
@@ -112,7 +112,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_UnitLabel: '??',
 					DSS_Label: 'Soil Loss',
 					DSS_GraphTitle: 'Soil Loss',
-					DSS_InfoHTML: 'http://water.epa.gov/scitech/datait/models/index.cfm',
+					DSS_InfoHTML: 'help/Phosphorous.htm',
 					DSS_DetailReportContainer: me
 				},
 */
@@ -124,7 +124,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					//DSS_UnitLabel: 'Mg/Yr',
 					DSS_UnitLabel: 'ton/Yr',
 					DSS_GraphTitle: 'Soil Carbon',
-					DSS_InfoHTML: 'http://www.epa.gov/airquality/modeling.html',
+					DSS_InfoHTML: 'help/soil_carbon.htm',
 					DSS_DetailReportContainer: me
 				},{
 					itemId: 'result_nitrous_oxide',
@@ -134,7 +134,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_UnitLabel: 'ton/Yr',
 					DSS_Label: 'Nitrous Oxide',
 					DSS_GraphTitle: 'Nitrous Oxide Emissions',
-					DSS_InfoHTML: 'http://www.epa.gov/airquality/modeling.html',
+					DSS_InfoHTML: 'help/nitrous_oxide_emission.htm',
 					DSS_DetailReportContainer: me
 				},{
 					itemId: 'result_pollinators',
@@ -143,8 +143,8 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_UnitLabelDelta: '0 to 1',
 					DSS_UnitLabelFile: '0 to 1',
 					DSS_Label: 'Pollinators',
-					DSS_GraphTitle: 'Key Pollinators',
-					DSS_InfoHTML: 'http://ncp-dev.stanford.edu/~dataportal/invest-releases/documentation/current_release/croppollination.html',
+					DSS_GraphTitle: 'Pollinators',
+					DSS_InfoHTML: 'help/pollinator.htm',
 					DSS_DetailReportContainer: me
 				},{
 					itemId: 'result_pest',
@@ -154,7 +154,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_UnitLabelFile: '0 to 1',
 					DSS_Label: 'Biocontrol',
 					DSS_GraphTitle: 'Biocontrol / Crop Pest Supression',
-					DSS_InfoHTML: 'http://ncp-dev.stanford.edu/~dataportal/invest-releases/documentation/current_release/croppollination.html',
+					DSS_InfoHTML: 'help/pest_suppression.htm',
 					DSS_DetailReportContainer: me
 				},{
 					itemId: 'result_habitat_index',
@@ -164,7 +164,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_UnitLabelFile: '0 to 1',
 					DSS_Label: 'Bird Habitat',
 					DSS_GraphTitle: 'Bird Habitat Index',
-					DSS_InfoHTML: 'http://www.chjv.org/chjv_forest_bird_hsi_modeling_p.html',
+					DSS_InfoHTML: 'help/biodiversity.htm',
 					DSS_DetailReportContainer: me
 				}]
 			}]

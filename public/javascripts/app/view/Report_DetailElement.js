@@ -88,7 +88,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			},{
 			    itemId: 'information_button',
 			    xtype: 'button',
-			    disabled: true,
+			    disabled: false,
 			    x: 415,
 			    y: 5,
 			    width: 30,

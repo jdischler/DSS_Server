@@ -114,7 +114,7 @@ long timeStart = System.currentTimeMillis();
 		float CC_M = 1.0f;
 		
 		// Multipliers from client variables
-		float annualTillage_C1 = 1.0f; //
+		//float annualTillage_C1 = 1.0f; //
 		float annualCoverCropModifier = 1.0f;		
 		float Management_P1 = 1.0f; //
 		float Management_P2 = 1.0f;	
@@ -123,7 +123,7 @@ long timeStart = System.currentTimeMillis();
 		//----------------------------------------------------------------------
 		try {
 			// values come in as straight multiplier
-			annualTillage_C1 = scenario.mAssumptions.getAssumptionFloat("sl_t_annuals_C1");
+			//annualTillage_C1 = scenario.mAssumptions.getAssumptionFloat("sl_t_annuals_C1");
 			annualCoverCropModifier = scenario.mAssumptions.getAssumptionFloat("sl_cc_annuals");
 			Management_P1 = scenario.mAssumptions.getAssumptionFloat("sl_Contouring_P1");
 			Management_P2 = scenario.mAssumptions.getAssumptionFloat("sl_Terrace_P2");
@@ -132,7 +132,7 @@ long timeStart = System.currentTimeMillis();
 			Logger.info(e.toString());
 		}
 		
-		Logger.info(" Agricultural no till from client = " + Float.toString(annualTillage_C1) );
+		//Logger.info(" Agricultural no till from client = " + Float.toString(annualTillage_C1) );
 		Logger.info(" Agricultural cover crop from client = " + Float.toString(annualCoverCropModifier) );
 		Logger.info(" Agricultural Contouring from client = " + Float.toString(Management_P1) );
 		Logger.info(" Agricultural Terrace from client = " + Float.toString(Management_P2) );
@@ -183,8 +183,8 @@ Logger.info("  > Allocated memory for Soil_Loss");
 					// Agriculture
 					else if ((landCover & Ag_Mask) > 0) 
 					{
-						C = 0.5f;
-						C = C * ManagementOptions.E_Till.getIfActiveOn(landCover, annualTillage_C1, 1.0f);
+						C = 0.3f;
+						//C = C * ManagementOptions.E_Till.getIfActiveOn(landCover, annualTillage_C1, 1.0f);
 						//P = 0.4f;
 						//P = 1.0f;
 						// Return tillage modififier if cell is Tilled

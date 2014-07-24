@@ -268,8 +268,11 @@ public abstract class Layer_Base
 	//--------------------------------------------------------------------------
 	public static void execQuery(JsonNode layerList, Selection selection) {
 
+		String cdlTest = "cdl_2012";
+		
 		if (layerList.isArray()) {
 	
+			boolean queriedCDL = false;
 			ArrayNode arNode = (ArrayNode)layerList;
 			int count = arNode.size();
 			for (int i = 0; i < count; i++) {
@@ -279,8 +282,31 @@ public abstract class Layer_Base
 				if (arElem != null && layerName != null) {
 					Layer_Base layer = Layer_Base.getLayer(layerName.textValue());
 					if (layer != null) {
+						if (cdlTest.equalsIgnoreCase(layerName.textValue())) {
+							queriedCDL = true;
+						}
 						layer.query(arElem, selection);
 					}
+				}
+			}
+			
+			// If a CDL query item didn't come from the client, crutch one up that
+			//	auto-selects all (currently) four options...
+			if (!queriedCDL) {
+				Logger.info("Did not have a CDL query so creating one with our four main landcover types");
+				Layer_Integer layer = (Layer_Integer)Layer_Base.getLayer(cdlTest);
+				if (layer != null) {
+					
+					ObjectNode fakeQueryObj = JsonNodeFactory.instance.objectNode();
+					ArrayNode queryParms = JsonNodeFactory.instance.arrayNode();
+			
+					queryParms.add(layer.getIndexForString("corn"));
+					queryParms.add(layer.getIndexForString("grass"));
+					queryParms.add(layer.getIndexForString("soy"));
+					queryParms.add(layer.getIndexForString("alfalfa"));
+					fakeQueryObj.put("matchValues", queryParms);
+			
+					layer.query(fakeQueryObj, selection);
 				}
 			}
 		}

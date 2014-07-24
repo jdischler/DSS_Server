@@ -29,9 +29,9 @@ Ext.define('MyApp.view.Report_MasterLayout', {
 	collapsed: true,
 	animCollapse: false,
 	bodystyle: 'border-color:#000; border-width:2px',
-	dockedItems: [{
+	/*dockedItems: [{
 			xtype: 'scenariocompare' // docked top
-	}],
+	}],*/
 	
 	//--------------------------------------------------------------------------    
 	listeners: {

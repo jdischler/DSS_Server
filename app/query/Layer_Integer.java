@@ -256,7 +256,7 @@ public class Layer_Integer extends Layer_Base
 		
 		if (index <= 0 || index > 31) {
 			Logger.info("Bad index in convertIndexToMask: " + Integer.toString(index));
-			return 1;
+			return 0;
 		}
 		
 		return (1 << (index-1));
@@ -276,6 +276,19 @@ public class Layer_Integer extends Layer_Base
 		return result;
 	}
 
+	//--------------------------------------------------------------------------
+	public int getIndexForString(String indexName) {
+		
+		for (int t=0; t < mLayerKey.size(); t++) {
+			Layer_Key key = mLayerKey.get(t);
+			if (key != null && key.mLabel.equalsIgnoreCase(indexName)) {
+				return key.mIndex;
+			}
+		}
+		
+		return 0;
+	}
+	
 	// Takes a variable number of String arguments...can be called like these: 
 	//	int mask1 = Layer_Indexed.convertStringsToMask("corn","soy","woodland");
 	//	int mask2 = Layer_Indexed.convertStringsToMask("corn");
@@ -284,13 +297,7 @@ public class Layer_Integer extends Layer_Base
 		
 		int result = 0;
 		for (int i=0; i < nameList.length; i++) {
-			for (int t=0; t < mLayerKey.size(); t++) {
-				Layer_Key key = mLayerKey.get(t);
-				if (key != null && key.mLabel.equalsIgnoreCase(nameList[i])) {
-					result |= convertIndexToMask(key.mIndex);
-					break;
-				}
-			}
+			result |= convertIndexToMask(getIndexForString(nameList[i]));
 		}
 		
 		return result;

@@ -88,7 +88,8 @@ Ext.define('MyApp.view.Report_Detail', {
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'p_loss_epic',
 					//DSS_UnitLabel: 'Kg/Yr',
-					DSS_UnitLabel: 'ton/Yr',
+					//DSS_UnitLabel: 'ton/Yr',
+					DSS_UnitLabel: 'lb/Yr',
 					DSS_Label: 'Phosphorus',
 					DSS_GraphTitle: 'Phosphorus Epic',
 					DSS_InfoHTML: 'help/phosphorous.htm',
@@ -359,7 +360,7 @@ Ext.define('MyApp.view.Report_Detail', {
 			c.getComponent('result_net_energy').setData(val1, val2, totalVal, base);
 		}	
 
-		if (obj.phosphorus) {
+		/*if (obj.phosphorus) {
 			var base = obj.phosphorus.selection;
 //			var base = obj.phosphorus.landscape;
 			// Units are Mg per Ha
@@ -368,12 +369,12 @@ Ext.define('MyApp.view.Report_Detail', {
 			// Kg
 			//var val1 = base.file1.sum;
 			//var val2 = base.file2.sum;
-			// Convert Mg to Short tons
-			var val1 = base.file1.sum * 1.102;
-			var val2 = base.file2.sum * 1.102;
+			// Convert Mg to Short tons then to lb
+			var val1 = base.file1.sum * 1.102 * 2000;
+			var val2 = base.file2.sum * 1.102 * 2000;
 			var totalVal = val2 - val1;
 			c.getComponent('result_phosphorus').setData(val1, val2, totalVal, base);
-		}
+		}*/
 		if (obj.p_loss_epic) {
 			var base = obj.p_loss_epic.selection;
 //			var base = obj.P_Loss_EPIC.landscape;
@@ -386,8 +387,8 @@ Ext.define('MyApp.view.Report_Detail', {
 			//val1 = val1 * 0.44597329;
 			//val2 = val2 * 0.44597329;
 			// Convert Mg to Short tons per Year
-			var val1 = base.file1.sum * 1.102;
-			var val2 = base.file2.sum * 1.102;
+			var val1 = base.file1.sum * 1.102 * 2000;
+			var val2 = base.file2.sum * 1.102 * 2000;
 			var totalVal = val2 - val1;
 			c.getComponent('result_phosphorus_epic').setData(val1, val2, totalVal, base);
 		}	
@@ -450,7 +451,7 @@ Ext.define('MyApp.view.Report_Detail', {
     		var max = base.range.max;
 //			Calculate average index using entire landscape
 			var val1 = base.file1.sum / (base.file1.count * max);
-			var val2 = base.file2.sum / (base.file1.count * max);
+			var val2 = base.file2.sum / (base.file2.count * max);
 			var totalVal = val2 - val1;
 			c.getComponent('result_pollinators').setData(val1, val2, totalVal, base);
 		}	

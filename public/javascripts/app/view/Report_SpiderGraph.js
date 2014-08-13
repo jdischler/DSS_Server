@@ -76,9 +76,34 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 		if (value2 > max) {
 			max = value2;
 		}
+		
+		// Fix negative value problem
+		if (value1 < 0 & value2 < 0){
+			value1 = -value1;
+			value2 = -value2;
+			
+			var max = value1;
+			if (value2 > max) {
+				max = value2;
+			}
+		}
+		else if (value1 < 0){
+			max = value2 - 2 * value1;
+			value1 = -value1;
+			value2 = max;
+		}
+		else if (value2 < 0){
+			max = value1 - 2 * value2;
+			value2 = -value2;
+			value1 = max;
+		}
+		
+
+		
 		// FIXME: reversed because we don't know why the data is reversed...blah
 		var result1 = value2 / max * 100;
 		var result2 = value1 / max * 100;
+		
     	if (rec) {
 			rec.set("Current", result1);
 			rec.set("Scenario", result2);

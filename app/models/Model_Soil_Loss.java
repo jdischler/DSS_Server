@@ -211,6 +211,11 @@ Logger.info("  > Allocated memory for Soil_Loss");
 						//Soil_Loss_Data[y][x] = Rainfall_Erosivity[y][x] * Soil_Erodibility[y][x] * LS[y][x] * C * P;
 						// Calculate Soil Loss (Mg per Ha per year)
 						//Soil_Loss_Data[y][x] = Rainfall_Erosivity[y][x] * Soil_Erodibility[y][x] * LS[y][x] * C * P;
+						
+						//if (Soil_Loss_Data[y][x] > 3)
+						//{
+						//	Soil_Loss_Data[y][x] = 3;
+						//}
 					}
 					else
 					{

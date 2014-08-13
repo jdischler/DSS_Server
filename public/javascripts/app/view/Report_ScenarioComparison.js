@@ -59,9 +59,9 @@ Ext.define('MyApp.view.Report_ScenarioComparison', {
         var me = this;
 
         Ext.applyIf(me, {
-            items: [{
+            items: [/*{
             	xtype: 'report_comparison_popup'
-            },{
+            },*/{
             	xtype: 'container',
             	id: 'DSS_ScenarioComparisonTool',
             	hidden: true,

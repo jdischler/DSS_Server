@@ -9,6 +9,7 @@ Ext.define('MyApp.view.Report_GraphPopUp', {
 	icon: 'app/images/graph_icon.png',
     layout: 'fit',
     constrainHeader: true, // keep the header from being dragged out of the app body...otherwise may not be able to close it!
+    maximizable: true,
 
     initComponent: function() {
         var me = this;

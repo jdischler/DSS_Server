@@ -345,7 +345,7 @@ Ext.define('MyApp.view.MainViewport', {
 			DSS_LayerUnit: 'ft',
 			DSS_LayerRangeMin: 0,
 			DSS_LayerRangeMax: 17220,
-			DSS_ValueDefaultLess: 60,
+			DSS_ValueDefaultLess: 100,
 			DSS_ValueStep: 30,
 			DSS_QueryTable: 'rivers',
 			collapsed: true,

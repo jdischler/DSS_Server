@@ -34,3 +34,5 @@ dist
 *.dir
 *.xlsx
 *.sel
+
+conf/routes~

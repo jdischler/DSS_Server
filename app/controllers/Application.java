@@ -30,6 +30,18 @@ public class Application extends Controller
 	static int mHeatCount = 0;
 	
 	//--------------------------------------------------------------------------
+	public static String getVersion() {
+		play.Configuration config = Play.application().configuration();
+		return config.getString("application.version");
+    }
+
+	//--------------------------------------------------------------------------
+	public static String getApplicationName() {
+		play.Configuration config = Play.application().configuration();
+		return config.getString("application.name");
+    }
+    
+	//--------------------------------------------------------------------------
 	public static Result index() 
 	{
 		return ok(index.render());

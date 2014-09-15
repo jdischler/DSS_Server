@@ -156,7 +156,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
             	y: 4,
             	width: 23,
             	// if no WMS layer bound, just hide this control
-            	hidden: (typeof me.DSS_Layer === 'undefined'), 
+            	hidden: true,//(typeof me.DSS_Layer === 'undefined'), 
             	icon: 'app/images/go_icon_small.png',
             	handler: function(self) {
             		me.createOpacityPopup(self);
@@ -293,24 +293,34 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 			var queryElement = jsonQuery.queryLayers[i];
 			
 			// in query?
-			if (queryElement.name == this.DSS_QueryTable) {
+			if (queryElement && queryElement.name == this.DSS_QueryTable) {
 				// yup
+				this.show();
 				this.header.getComponent('DSS_ShouldQuery').toggle(true);
-				var gtrTest = this.getComponent('DSS_GreaterThanTest');
-				var gtrValue = this.getComponent('DSS_GreaterThanValue');
-				var lessTest = this.getComponent('DSS_LessThanTest');
-				var lessValue = this.getComponent('DSS_LessThanValue');
+				var gtrTestComp = this.getComponent('DSS_GreaterThanTest');
+				var gtrValueComp = this.getComponent('DSS_GreaterThanValue');
+				var lessTestComp = this.getComponent('DSS_LessThanTest');
+				var lessValueComp = this.getComponent('DSS_LessThanValue');
 		
-				lessTest.setText(queryElement.lessThanTest);
-				gtrTest.setText(queryElement.greaterThanTest);
-				lessValue.setValue(queryElement.lessThanValue);
-				gtrValue.setValue(queryElement.greaterThanValue);
+				var lessValue = queryElement.lessThanValue;
+				var gtrValue = queryElement.greaterThanValue;
+				
+				// Check to see if we need to convert units for the server.....
+				if (typeof this.DSS_MetricToEnglish === 'function') {
+					lessValue = this.DSS_MetricToEnglish(lessValue);
+					gtrValue = this.DSS_MetricToEnglish(gtrValue);
+				}
+				lessTestComp.setText(queryElement.lessThanTest);
+				gtrTestComp.setText(queryElement.greaterThanTest);
+				lessValueComp.setValue(lessValue);
+				gtrValueComp.setValue(gtrValue);
 				return;
 			}
 		}
 		
 		// Nope, mark as not queried
 		this.header.getComponent('DSS_ShouldQuery').toggle(false);
+		this.hide();
     },
     
     // turns layer off and resets it to the defaults....

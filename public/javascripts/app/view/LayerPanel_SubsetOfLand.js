@@ -140,14 +140,16 @@ Ext.define('MyApp.view.LayerPanel_SubsetOfLand', {
 			var queryElement = jsonQuery.queryLayers[i];
 			
 			// in query?
-			if (queryElement.name == this.DSS_QueryTable) {
+			if (queryElement && queryElement.name == this.DSS_QueryTable) {
 				// yup
+				this.show();
 				this.header.getComponent('DSS_ShouldQuery').toggle(true);
 				return;
         	}
         }
 				
 		// Nope, mark as not queried
+		this.hide();
 		this.header.getComponent('DSS_ShouldQuery').toggle(false);
     }
 	

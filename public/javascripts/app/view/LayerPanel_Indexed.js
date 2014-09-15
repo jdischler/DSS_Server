@@ -38,7 +38,7 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
             	y: 4,
             	width: 23,
             	// if no WMS layer bound, just hide this control
-            	hidden: (typeof me.DSS_Layer === 'undefined'), 
+            	hidden: true,//(typeof me.DSS_Layer === 'undefined'), 
             	icon: 'app/images/go_icon_small.png',
             	handler: function(self) {
             		me.showColorChips();
@@ -200,9 +200,9 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
         	}
         }
         
-        if (!addedElement) {
-        	return;
-        }
+      //  if (!addedElement) {
+       // 	return;
+       // }
         return queryLayer;
     },
 
@@ -211,6 +211,7 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
 
     	if (!jsonQuery || !jsonQuery.queryLayers) {
 			this.header.getComponent('DSS_ShouldQuery').toggle(false);
+			this.hide();
 			this.clearChecks();
     		return;
     	}
@@ -225,8 +226,9 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
 			var queryElement = jsonQuery.queryLayers[i];
 			
 			// in query?
-			if (queryElement.name == this.DSS_QueryTable) {
+			if (queryElement && queryElement.name == this.DSS_QueryTable) {
 				// yup
+				this.show();
 				this.header.getComponent('DSS_ShouldQuery').toggle(true);
 				
 				// start with a clean slate, then check only the ones that need it
@@ -250,6 +252,7 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
         }
 				
 		// Nope, mark as not queried
+    	this.hide();
 		this.header.getComponent('DSS_ShouldQuery').toggle(false);
     },
 

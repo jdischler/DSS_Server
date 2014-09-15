@@ -10,6 +10,7 @@ Ext.define('MyApp.view.LayerPanel_Google', {
     title: 'Map Options',
 	icon: 'app/images/active_block_icon.png',
     hideCollapseTool: true,
+	hidden: false,
 	
     bodyPadding: '0 0 10 0',
     bodyStyle: {'background-color': '#fafcff'},

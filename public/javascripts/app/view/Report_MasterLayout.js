@@ -13,7 +13,7 @@ Ext.define('MyApp.view.Report_MasterLayout', {
 	],
 	
 	dock: 'right',
-	title: 'Simulation Results Viewer / Comparison',//Simulation Results / Reports',
+	title: 'Step 3: View Simulation Results / Comparison',//Simulation Results / Reports',
 	icon: 'app/images/magnify_icon.png',
 	width: 500,
 	autoScroll: true,

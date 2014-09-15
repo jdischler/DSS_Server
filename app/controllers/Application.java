@@ -210,7 +210,7 @@ public class Application extends Controller
 	{
 		ObjectNode sendback = JsonNodeFactory.instance.objectNode();
 		// FIXME: should ultimately have accounts with log in?
-		sendback.put("DSS_clientID", RandomString.get(6));
+		sendback.put("DSS_clientID", RandomString.get(10));
 		
 		return ok(sendback);
 	}

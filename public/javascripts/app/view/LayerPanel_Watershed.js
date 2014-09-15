@@ -146,8 +146,7 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 		
 		var addedElement = false;
 		for (var i = 0; i < this.DSS_watershedSelections.length; i++) {
-			// FIXME: BS, minus one because the geoserver gives the index back 1 based vs. zero based
-			queryLayer.matchValues.push(parseInt(this.DSS_watershedSelections[i])-1);
+			queryLayer.matchValues.push(parseInt(this.DSS_watershedSelections[i]));
 			addedElement = true;
 		}
         if (!addedElement) {
@@ -160,6 +159,7 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
     setSelectionCriteria: function(jsonQuery) {
 
     	if (!jsonQuery || !jsonQuery.queryLayers) {
+    		console.log('Saying to hide watershed!');
 			this.header.getComponent('DSS_ShouldQuery').toggle(false);
     		return;
     	}
@@ -169,8 +169,9 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 			var queryElement = jsonQuery.queryLayers[i];
 			
 			// in query?
-			if (queryElement.name == this.DSS_QueryTable) {
+			if (queryElement && queryElement.name == this.DSS_QueryTable) {
 				// yup
+				this.show();
 				this.header.getComponent('DSS_ShouldQuery').toggle(true);
 				
 				// start with a clean slate, then select only the ones that need it
@@ -186,7 +187,9 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
         }
 				
 		// Nope, mark as not queried
-		this.header.getComponent('DSS_ShouldQuery').toggle(false);
+//		console.log('Saying to hide watershed!');
+//		this.header.getComponent('DSS_ShouldQuery').toggle(false);
+//		this.hide();
     },
 
 	//--------------------------------------------------------------------------
@@ -264,10 +267,12 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 		console.log('WaterShed::clickSelection');
 		var feature = event.feature;
 		var idxs = feature.fid.split(".");
-		var pos = this.DSS_watershedSelections.indexOf(idxs[1]);
+		// FIXME: BS, minus one because the geoserver gives the index back 1 based vs. zero based
+		var realIdx = idxs[1] - 1;
+		var pos = this.DSS_watershedSelections.indexOf(realIdx);
 		if (pos < 0) {
 			this.DSS_selectionLayer.addFeatures(feature);
-			this.DSS_watershedSelections.push(idxs[1]);
+			this.DSS_watershedSelections.push(realIdx);
 		}
 		else if (event.object.modifiers.toggle == true) {
 			this.DSS_watershedSelections.splice(pos,1);
@@ -282,7 +287,9 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 		console.log('WaterShed::unClickSelection');
 		var feature = event.feature;
 		var idxs = feature.fid.split(".");
-		var pos = this.DSS_watershedSelections.indexOf(idxs[1]);
+		// FIXME: BS, minus one because the geoserver gives the index back 1 based vs. zero based
+		var realIdx = idxs[1] - 1;
+		var pos = this.DSS_watershedSelections.indexOf(realIdx);
 		if (pos >= 0) {
 			this.DSS_watershedSelections.splice(pos,1);
 			var featureObj = this.DSS_selectionLayer.getFeatureBy('fid', feature.fid);

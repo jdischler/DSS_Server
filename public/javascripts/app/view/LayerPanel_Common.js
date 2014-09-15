@@ -22,6 +22,7 @@ Ext.define('MyApp.view.LayerPanel_Common', {
     	}
     },
     hideCollapseTool: true,
+    hidden: true,
     
 	//--------------------------------------------------------------------------    
 	listeners: {
@@ -53,12 +54,14 @@ Ext.define('MyApp.view.LayerPanel_Common', {
 							if (self.pressed) {
 								self.setText('Remove');
 								c.tryEnableClickSelection();
+								c.show();
 								c.expand();
 							}
 							else {
 								self.setText('Add');
 								c.tryDisableClickSelection();
-								c.collapse();
+//								c.collapse();
+								c.hide();
 							}
 						}
 					}
@@ -191,8 +194,8 @@ Ext.define('MyApp.view.LayerPanel_Common', {
     //--------------------------------------------------------------------------
     includeInQuery: function() {
     
-    	var queryToggleButton = this.header.getComponent('DSS_ShouldQuery');
-    	return queryToggleButton.pressed;
+//    	var queryToggleButton = this.header.getComponent('DSS_ShouldQuery');
+    	return !this.isHidden();//queryToggleButton.pressed;
     }
 	
 });

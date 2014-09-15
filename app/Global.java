@@ -19,17 +19,19 @@ public class Global extends GlobalSettings
 	// mostly for DEV, production servers should always recompute this data to be safe...
 	private static final boolean FORCE_COMPUTE_DEFAULT_DATA = false;
 	
-	// FIXME: TODO: this will be annoying...investigate automating the version numbering
-	private static final String mServerVersionMessage = "Server version: 0.57.2";
-	
 	//--------------------------------------------------------------------------
 	@Override
 	public void onStart(play.Application app) 
 	{
-		systemReport("Application has started");
+		systemReport(app, "Application has started");
+		
+		UserDB.prepareDatabase();
+		
+//		SendEmail.to("jdischler.72@gmail.com");
 		
 		// Create all of the assumptions the server knows about, these will be fed to clients
 		GlobalAssumptions.initAssumptions();
+		
 		
 		// create any computed layers (currently don't have any in here?)
 		computeLayers();
@@ -42,7 +44,7 @@ public class Global extends GlobalSettings
 		conditionalCreateDefaultModelOutputs();		
 		cacheModelDefaults();
 		
-		systemReport("Data Layers Cached");
+		systemReport(app, "Data Layers Cached");
 	}
 
 	//--------------------------------------------------------------------------
@@ -51,20 +53,25 @@ public class Global extends GlobalSettings
 		
 		Layer_Base.removeAllLayers();
 		System.gc();
-		systemReport("Application stopped, Garbage Collection call made");
+		systemReport(app, "Application stopped, Garbage Collection call made");
 	}
 	
 	//--------------------------------------------------------------------------
-	private void systemReport(String customMessage) {
+	private void systemReport(play.Application app, String customMessage) {
 		
+		play.Configuration config = app.configuration();
+		String appVersionInfo = config.getString("application.name") + " v" 
+				+ config.getString("application.version");
+				
 		float unitConversion = (1024.0f * 1024.0f); // bytes -> MB
 		File apPath = Play.application().path();
 		String unitName = "MB";
 		
 		Logger.info("+-------------------------------------------------------+");
+		Logger.info("| " + appVersionInfo);
 		Logger.info("| " + customMessage);
-		Logger.info("| " + mServerVersionMessage);
 		Logger.info("+-------------------------------------------------------+");
+		Logger.info("|  Application Path: " + apPath.toString());
 		Logger.info("|  Available Processors: " + 
 			Integer.toString(Runtime.getRuntime().availableProcessors()));
 		Logger.info("|  Total Free Memory: " + 
@@ -79,7 +86,6 @@ public class Global extends GlobalSettings
 			String.format("%.2f", 
 				(float)(Runtime.getRuntime().maxMemory() / unitConversion)) +
 				unitName);
-		Logger.info("| Application Path: " + apPath.toString());
 
 		Logger.info("+-------------------------------------------------------+");
 		Logger.info("");

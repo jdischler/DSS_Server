@@ -36,3 +36,5 @@ dist
 *.sel
 
 conf/routes~
+
+*.db

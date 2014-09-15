@@ -16,7 +16,7 @@ Ext.define('MyApp.view.Report_GraphPopUp', {
 
 		Ext.define('Habitat_Index', {
 			extend: 'Ext.data.Model',
-			fields: ['Current', 'Scenario', 'Bin']
+			fields: ['Current', 'Scenario', 'Delta', 'Bin']
 		});
 	
         this.graphstore = Ext.create('Ext.data.Store', {
@@ -41,7 +41,12 @@ Ext.define('MyApp.view.Report_GraphPopUp', {
 					type: 'Numeric',
 					position: 'left',
 					fields: ['Current', 'Scenario']
-				},
+				}/*,{
+					title: 'km\xb2', // square kilometers
+					type: 'Numeric',
+					position: 'right',
+					fields: ['Delta']
+				}*/,
 				{
 					title: 'Value',
 					type: 'Numeric',
@@ -83,7 +88,24 @@ Ext.define('MyApp.view.Report_GraphPopUp', {
 							this.setTitle(freq + '<br />' + bin);
 						}
 					}
-				}]
+				}/*,{
+					type: 'line',
+					xField: 'Bin',
+					yField: 'Delta',
+					smooth: 3,
+					tips: {
+						trackMouse: true,
+						width: 120,
+						height: 40,
+						renderer: function(store, item) {
+							var areaUnits = ' km\xb2'; // km2
+							var freq = 'Area: ' + store.get('Delta').toFixed(2) + areaUnits;
+							var bin = 'Value: ' + store.get('Bin').toFixed(3);
+
+							this.setTitle(freq + '<br />' + bin);
+						}
+					}
+				}*/]
 			}]
         });
 
@@ -104,8 +126,12 @@ Ext.define('MyApp.view.Report_GraphPopUp', {
 		var array = [];
 		for (var i = 0; i < data1.length; i++)
 		{
-			array.push({ 	Current: data1[i] * 900 / 1000000, 
-							Scenario: data2[i] * 900 / 1000000, 
+			var cr = data1[i] * 900 / 1000000;
+			var sc = data2[i] * 900 / 1000000;
+			
+			array.push({ 	Current: cr, 
+							Scenario: sc,
+							Delta: sc - cr,
 							Bin: (max-min)/(data1.length) * i + min });
 		}
 		

@@ -50,6 +50,8 @@ Ext.define('MyApp.view.Scenario_Layout', {
   
 	autoScroll: true,
  
+	hidden: true,
+	
     id: 'DSS_ScenarioSummary',
     height: 250,
     minHeight: 250,
@@ -57,7 +59,7 @@ Ext.define('MyApp.view.Scenario_Layout', {
     width: 300,
 	dock: 'bottom',
     
-	title: 'Scenario Management',
+	title: 'Step 2: Build Scenario - Manage Land Transformations',
 	viewConfig: {
 		stripeRows: true
 	},
@@ -224,10 +226,15 @@ Ext.define('MyApp.view.Scenario_Layout', {
 			var query = record.get('Query');
 			DSS_ViewSelectToolbar.setUpSelectionFromQuery(query);
 			var dssLeftPanel = Ext.getCmp('DSS_LeftPanel');
-			dssLeftPanel.up().DSS_SetTitle(record.get('SelectionName'));
-
+			var panel = dssLeftPanel.up();
+			panel.DSS_SetTitle(record.get('SelectionName'), panel.getCollapsed());
 		},
 		viewready: function(me, eOpts ) {
+			var query = DSS_ViewSelectToolbar.buildQuery()
+			var record = me.getStore().getAt(0);
+			record.set('Query', query);
+			record.commit();
+			
 			me.getSelectionModel().select(0);
 		}
 	},
@@ -236,7 +243,7 @@ Ext.define('MyApp.view.Scenario_Layout', {
 		items:[{
 			dataIndex: 'SelectionName',
 			text: 'User-Named Selection',
-			width: 180,
+			width: 180 + 23,
 			resizable: false,
 			editor: {
 				xtype: 'textfield',
@@ -263,7 +270,7 @@ Ext.define('MyApp.view.Scenario_Layout', {
 			resizable: false,
 			tdCls: 'dss-grey-scenario-grid'
 		},
-		{
+		/*{
 			xtype: 'actioncolumn',
 			width: 23,
 			resizable: false,
@@ -277,7 +284,7 @@ Ext.define('MyApp.view.Scenario_Layout', {
 					DSS_ViewSelectToolbar.submitQuery(query);
 				}
 			}
-		},
+		},*/
 		{
 			xtype: 'actioncolumn',
 			width: 23,

@@ -317,6 +317,7 @@ Ext.define('MyApp.view.MainViewport', {
 		
 		var lpCDL = Ext.create('MyApp.view.LayerPanel_Indexed', {
 			title: 'Landcover',
+			DSS_Description: 'Match land by landcover, example: select rowcrops such as corn or soybeans',
 			DSS_Layer: wmsCDL,
 			minHeight: 90,
 			maxHeight: 400,
@@ -327,6 +328,7 @@ Ext.define('MyApp.view.MainViewport', {
 		// Slope is greater than or equal to 10.2 degrees and less than or equal to 20.3 degrees
 		var lpSlope = Ext.create('MyApp.view.LayerPanel_Continuous', {
 			title: 'Slope',
+			DSS_Description: 'Match land by range of slope, example: select land on steep slopes',
 			DSS_Layer: wmsSlope,
 			DSS_LayerUnit: '%',//'\xb0',
 			DSS_LayerRangeMin: 0,
@@ -339,6 +341,7 @@ Ext.define('MyApp.view.MainViewport', {
 
 		var lpRiver = Ext.create('MyApp.view.LayerPanel_Continuous', {
 			title: 'Distance to Stream',
+			DSS_Description: 'Match land by distance to water, example: select land close to streams',
 			DSS_ShortTitle: 'Stream',
 			DSS_AutoSwapTitles: false,
 			DSS_Layer: wmsRivers,
@@ -361,6 +364,7 @@ Ext.define('MyApp.view.MainViewport', {
 
 		var lpWatershed = Ext.create('MyApp.view.LayerPanel_Watershed', {
 			title: 'Watershed',
+			DSS_Description: 'Match land by watershed, example: select land in specific watersheds',
 			DSS_Layer: wmsWatershed,
 			DSS_QueryTable: 'watersheds',
 			collapsed: true
@@ -368,6 +372,7 @@ Ext.define('MyApp.view.MainViewport', {
 
 		var lpLCC = Ext.create('MyApp.view.LayerPanel_Indexed', {
 			title: 'Land Capability Class',
+			DSS_Description: 'Match land by capability, example: select poor quality crop land',
 			DSS_ShortTitle: 'LCC',
 			DSS_AutoSwapTitles: true,
 			DSS_Layer: wmsLCC,
@@ -379,6 +384,7 @@ Ext.define('MyApp.view.MainViewport', {
 		
 		var lpLCS = Ext.create('MyApp.view.LayerPanel_Indexed', {
 			title: 'Land Capability Subclass',
+			DSS_Description: 'Match land by capability subclass, example: select soils that are prone to saturation',
 			DSS_ShortTitle: 'LCS',
 			DSS_AutoSwapTitles: true,
 			DSS_Layer: wmsLCS,
@@ -390,6 +396,7 @@ Ext.define('MyApp.view.MainViewport', {
 		
 		var lpPublicLand = Ext.create('MyApp.view.LayerPanel_Continuous', {
 			title: 'Distance to Public Land',
+			DSS_Description: 'Match public lands, example: select lands that are adjacent to public lands',
 			DSS_ShortTitle: 'Public Land',
 			DSS_AutoSwapTitles: false,
 		//	DSS_Layer: wmsRivers,//fix
@@ -412,6 +419,7 @@ Ext.define('MyApp.view.MainViewport', {
 		
 		var lpDairy = Ext.create('MyApp.view.LayerPanel_Continuous', {
 			title: 'Density of Dairies',
+			DSS_Description: 'Match land by dairy density, example: select lands with a high density of dairy farms',
 			DSS_ShortTitle: 'Per mi&#178;',
 			DSS_AutoSwapTitles: false,
 		//	DSS_Layer: wmsRivers,//fix
@@ -426,6 +434,7 @@ Ext.define('MyApp.view.MainViewport', {
 			
 		var lpGrid = Ext.create('MyApp.view.LayerPanel_SubsetOfLand', {
 			title: 'Subset of Land',
+			DSS_Description: 'Match land by percentage, example: select a random subset of land to simulate less-than-100% practice adoption rates',
 			DSS_shortTitle: 'Subset',
 //			DSS_Layer: DSS_GridLayer,
 			DSS_QueryTable: 'box_selection',
@@ -569,7 +578,7 @@ Ext.define('MyApp.view.MainViewport', {
 				items: [{
 					xtype: 'gx_mappanel',
 					id: 'DSS_map_panel',
-					title: 'Landscape Viewer',
+					title: 'Landscape Map',
 					icon: 'app/images/globe_icon.png',
 					map: map,
 					border: 0,
@@ -649,24 +658,28 @@ Ext.define('MyApp.view.MainViewport', {
 						icon: 'app/images/magnify_icon.png',
 					},
 					manageHeight: false,
-					title: 'Select Landscape',
+					title: 'Step 1: Select Land to Transform',
 					DSS_NamedQuery: 'Untitled',
 					listeners: {
 						collapse: function(p, eOpts) { 
-							p.setTitle('Select Landscape / Scenario Tools - "' + p.DSS_NamedQuery + '"');
+							p.DSS_SetTitle(p.DSS_NamedQuery, true);
 						},
 						beforeexpand: function(p, animated, eOpts) {
-							p.setTitle('Select Landscape - "' + p.DSS_NamedQuery + '"');
+							p.DSS_SetTitle(p.DSS_NamedQuery, false);
 						},
 					},
 
-					DSS_SetTitle: function(queryName) {
+					DSS_SetTitle: function(queryName, collapsed) {
 						this.DSS_NamedQuery = queryName;
-						if (this.getCollapsed()) {
-							this.setTitle('Select Landscape / Scenario Tools - "' + this.DSS_NamedQuery + '"');
+						if (queryName == 'Double Click to Set Custom Name') {
+							queryName = 'Unnamed Transform';
+						}
+						queryName = ' - "' + queryName + '"'; 
+						if (collapsed) {
+							this.setTitle('Step 1: Select Land to Transform / Scenario Tools' + queryName);
 						}
 						else {
-							this.setTitle('Select Landscape - "' + this.DSS_NamedQuery + '"');
+							this.setTitle('Step 1: Select Land to Transform' + queryName);
 						}
 					},
 					layout: {

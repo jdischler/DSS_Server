@@ -6,7 +6,7 @@ Ext.define('MyApp.view.Report_GenerateReport', {
 
     height: 64,
     width: 300,
-    title: 'Store/Print Results',
+    title: 'Step 4: Store Results',
 	icon: 'app/images/new_icon.png',
 	//collapsed: true,
 	

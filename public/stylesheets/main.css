@@ -128,7 +128,7 @@
   padding: 4px 4px 4px 4px;
   border-width: 1px;
   border-style: solid;
-  background-color: #c0dbc9; 
+//  background-color: #c0dbc9; 
 }
   
 .x-panel-header-default-left,
@@ -204,11 +204,6 @@
   font-size: 18px;
   color: white;
   text-shadow: 0 1px 2px #000;
-}
-
-.x-panel-collapsed .x-window-header-default,
-.x-panel-collapsed .x-panel-header-default {
-  border-color: #58e; 
 }
   
 .x-btn-default-toolbar-small {

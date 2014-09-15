@@ -14,6 +14,10 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
     	'background-color': '#ADC5B5'
     },
 
+    requires: [
+    	'MyApp.view.AddCriteriaPopup'
+    ],
+    	
     //--------------------------------------------------------------------------
     initComponent: function() {
         var me = this;
@@ -24,25 +28,27 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 			items: [{
 				xtype: 'button',
 				scale: 'medium',
-				text: 'Reset Selection',
-				icon: 'app/images/revert_icon.png',
+				text: 'Add Criteria to Land Selection',
+				icon: 'app/images/add_icon.png',
 				tooltip: {
-					text: 'Clears all selection criteria'
+					text: "View a list of criteria that can be added to refine what land you wish to transform"
 				},
 				border: 1,
 				handler: function(button) {
-					button.up().resetAllLayers();
+					button.setIcon('app/images/24_drop_icon.png');
+					button.up().tryShowCriteriaLayers(button);
 				}
 			},
 			{
 				xtype: 'tbspacer', 
-				width: 214
+				width: 131
 			},
 			{
 				xtype: 'button',
 				id: 'DSS_queryButton',
+				hidden: true,
 				scale: 'medium',
-				text: 'View Selection',
+				text: 'Preview Selection',
 				icon: 'app/images/eye_icon.png',
 				iconAlign: 'right',
 				tooltip: {
@@ -53,7 +59,6 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 					var panel = button.up();
 					var query = panel.buildQuery();
 					if (query) {
-						console.log(query);
 						panel.submitQuery(query);
 					}
 					else {
@@ -93,7 +98,7 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
     		
     		if (DSS_globalQueryableLayers[i].includeInQuery()) {
     			var queryComp = DSS_globalQueryableLayers[i].getSelectionCriteria();
-    			requestData.queryLayers.push(queryComp);
+				requestData.queryLayers.push(queryComp);
     			query = true;
     		}
     	}
@@ -227,6 +232,7 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
     		
     		var layer = DSS_globalQueryableLayers[i];
 			layer.resetLayer();
+			layer.hide();
 		}
 		// Hide the selection layer...
 		var selContainer = Ext.getCmp('DSS_CurrentSelectionLayer');
@@ -248,6 +254,7 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
     		
     		var layer = DSS_globalQueryableLayers[i];
 			layer.expand();
+			layer.show();
 		}
 		Ext.resumeLayouts(true);
 	},
@@ -263,9 +270,11 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
     		var layer = DSS_globalQueryableLayers[i];
     		if (layer.includeInQuery()) {
     			layer.expand();
+    			layer.show();
     		}
     		else {
     			layer.collapse();
+    			layer.hide();
     		}
 		}
 		Ext.resumeLayouts(true);
@@ -282,9 +291,16 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
     		var layer = DSS_globalCollapsibleLayers[i];
     		if (layer.DSS_noCollapseTool == false) {
     			layer.collapse();
+    			layer.hide();
     		}
 		}
 		Ext.resumeLayouts(true);
+	},
+	
+	//--------------------------------------------------------------------------
+	tryShowCriteriaLayers: function(button) {
+
+		var window = Ext.create('MyApp.view.AddCriteriaPopup').showBy(button.getEl(), "tl-bl?", [4,2]);
 	}
 
 });

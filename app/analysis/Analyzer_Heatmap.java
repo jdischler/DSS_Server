@@ -554,7 +554,7 @@ public class Analyzer_Heatmap {
 		}
 		Logger.info("Setting palette entries");
 		
-		if (minMax.mMax < 0.1f) {		// entire value range negative?
+		if (minMax.mMax <= 0.0f) {		// entire value range negative?
 			palette.setEntry(0, 60, 0, 22); // dark magenta
 			palette.setEntry(1, 100, 8, 50); 
 			palette.setEntry(2, 170, 12, 88); // magenta
@@ -563,7 +563,7 @@ public class Analyzer_Heatmap {
 			palette.setEntry(5, 255, 200, 220);
 			palette.setEntry(6, 255, 255, 255); // white
 		}
-		else if (minMax.mMin > -0.1f) {	// entire value range positive?
+		else if (minMax.mMin >= 0.0f) {	// entire value range positive?
 			palette.setEntry(0, 255, 255, 255); // white
 			palette.setEntry(1, 210, 255, 160);
 			palette.setEntry(2, 145, 235, 80); // lime green

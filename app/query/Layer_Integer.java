@@ -30,13 +30,20 @@ public class Layer_Integer extends Layer_Base
 		public int mIndex;
 		public String mLabel, mHexColor;
 		
+		// NOTE: if no color, string will come in as NULL
 		public Layer_Key(int index, String label, String hexColor) {
 			mIndex = index;
 			mLabel = label;
 			mHexColor = hexColor;
 		}
 
+		// NOTE: returns NULL if color string is NULL
 		public JsonNode getAsJson() {
+			
+			if (mHexColor == null) {
+				return null;
+			}
+			
 			ObjectNode ret = JsonNodeFactory.instance.objectNode();
 			
 			ret.put("index", mIndex);
@@ -190,16 +197,20 @@ public class Layer_Integer extends Layer_Base
 				if (!line.startsWith(";") && line.length() > 0) {
 					String split[] = line.split(",");
 				
-					if (split.length != 3) {
-						Logger.info("  Parse error reading /layerData/" + mName + ".key");
-						Logger.info("  Error: <read>" + line);
-						Logger.info("    Expected Line Format: Index, Display Name, Display Color (hex)");
+					if (split.length < 2 || split.length > 3) {
+						Logger.error("  Parse error reading /layerData/" + mName + ".key");
+						Logger.error("  Error: <read>" + line);
+						Logger.error("    Expected Line Format: Index, Display Name, Display Color (hex)");
 						throw new Exception();
 					}
 					else {
 						int index = Integer.parseInt(split[0].trim());
 						String label = split[1].trim();
-						String color = split[2].trim();
+						
+						String color = null;
+						if (split.length == 3) {
+							color = split[2].trim();
+						}
 								
 						Layer_Key keyItem = new Layer_Key(index, label, color);
 						mLayerKey.add(keyItem);
@@ -208,7 +219,7 @@ public class Layer_Integer extends Layer_Base
 			}
 		}
 		catch (Exception e) {
-			Logger.info("  " + e.toString());
+			Logger.warn("  " + e.toString());
 		}
 		finally {
 			if (br != null) {
@@ -216,7 +227,7 @@ public class Layer_Integer extends Layer_Base
 					br.close();
 				}
 				catch (Exception e) {
-					Logger.info("  " + e.toString());
+					Logger.warn("  " + e.toString());
 				}
 			}
 		}
@@ -243,7 +254,14 @@ public class Layer_Integer extends Layer_Base
 		ArrayNode ret = JsonNodeFactory.instance.arrayNode();
 		
 		for (int i = 0; i < mLayerKey.size(); i++) {
-			ret.add(mLayerKey.get(i).getAsJson());
+			
+			// NOTE: some color keys may have a NULL color hex string which
+			//	means that they do not get sent to the client.
+			//	They can still be queried from the JAVA code...
+			JsonNode val = mLayerKey.get(i).getAsJson();
+			if (val != null) {
+				ret.add(val);
+			}
 		}
 		
 		return ret;
@@ -255,7 +273,7 @@ public class Layer_Integer extends Layer_Base
 	public static int convertIndexToMask(int index) {
 		
 		if (index <= 0 || index > 31) {
-			Logger.info("Bad index in convertIndexToMask: " + Integer.toString(index));
+			Logger.warn("Bad index in convertIndexToMask: " + Integer.toString(index));
 			return 0;
 		}
 		
@@ -311,7 +329,7 @@ public class Layer_Integer extends Layer_Base
 		ArrayNode arNode = (ArrayNode)matchValuesArray;
 		if (arNode != null) {
 			int count = arNode.size();
-			Logger.info("Query Index Array count: " + Integer.toString(count));
+			Logger.debug("Query Index Array count: " + Integer.toString(count));
 			StringBuffer debug = new StringBuffer();
 			debug.append("Query Indices: ");
 			for (int i = 0; i < count; i++) {
@@ -325,7 +343,7 @@ public class Layer_Integer extends Layer_Base
 				queryMask |= convertIndexToMask(val);
 			}
 			
-			Logger.info(debug.toString());
+			Logger.debug(debug.toString());
 			Logger.info("Final Query Mask: " + Integer.toString(queryMask));
 			return queryMask;
 		}
@@ -362,7 +380,7 @@ public class Layer_Integer extends Layer_Base
 		if (arNode != null) {
 			int count = arNode.size();
 			int array[] = new int [count];
-			Logger.info("Query Index Array count: " + Integer.toString(count));
+			Logger.debug("Query Index Array count: " + Integer.toString(count));
 			StringBuffer debug = new StringBuffer();
 			debug.append("Query Indices: ");
 			for (int i = 0; i < count; i++) {
@@ -376,7 +394,7 @@ public class Layer_Integer extends Layer_Base
 				array[i] = val;
 			}
 			
-			Logger.info(debug.toString());
+			Logger.debug(debug.toString());
 			return array;
 		}
 		
@@ -426,7 +444,7 @@ public class Layer_Integer extends Layer_Base
 			}
 		}
 		else {
-			Logger.info("Tried to get a match array but it failed!");
+			Logger.warn("Tried to get a match array but it failed!");
 		}
 		
 		return selection;
@@ -462,7 +480,7 @@ public class Layer_Integer extends Layer_Base
 				}
 			}
 			else {
-				Logger.info("Unhandled and known integer layer type!");
+				Logger.error("Unhandled and known integer layer type!");
 			}
 		}
 		

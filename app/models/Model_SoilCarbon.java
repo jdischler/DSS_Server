@@ -62,12 +62,12 @@ Logger.info("  > Allocated memory for SOC");
 		try 
 		{	
 			// values come in as straight multiplier
-			annualNoTillageModifier = scenario.mAssumptions.getAssumptionFloat("soc_nt_annuals") / 20;
-			annualCoverCropModifier = scenario.mAssumptions.getAssumptionFloat("soc_cc_annuals") / 20;		
-			annualFertilizerModifier = scenario.mAssumptions.getAssumptionFloat("soc_m_annuals") / 20;
-			perennialFertilizerModifier = scenario.mAssumptions.getAssumptionFloat("soc_m_perennials") / 20;	
-			annualFallFertilizerModifier = scenario.mAssumptions.getAssumptionFloat("soc_fm_annuals") / 20;
-			perennialFallFertilizerModifier = scenario.mAssumptions.getAssumptionFloat("soc_fm_perennials") / 20;	
+			annualNoTillageModifier = 1 + (scenario.mAssumptions.getAssumptionFloat("soc_nt_annuals") - 1) / 20;
+			annualCoverCropModifier = 1 + (scenario.mAssumptions.getAssumptionFloat("soc_cc_annuals") - 1) / 20;		
+			annualFertilizerModifier = 1 + (scenario.mAssumptions.getAssumptionFloat("soc_m_annuals") - 1) / 20;
+			perennialFertilizerModifier = 1 + (scenario.mAssumptions.getAssumptionFloat("soc_m_perennials") - 1) / 20;	
+			annualFallFertilizerModifier = 1 + (scenario.mAssumptions.getAssumptionFloat("soc_fm_annuals") - 1) / 20;
+			perennialFallFertilizerModifier = 1 + (scenario.mAssumptions.getAssumptionFloat("soc_fm_perennials") - 1) / 20; 	
 		}
 		catch (Exception e) {
 			Logger.info(e.toString());

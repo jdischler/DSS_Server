@@ -117,7 +117,7 @@ Logger.info("  > Allocated memory for NetEnergy, NetIncom, Fuel");
 			P_Per_Alfalfa = scenario.mAssumptions.getAssumptionFloat("p_alfalfa_s");
 		}
 		catch (Exception e) {
-			Logger.info(e.toString());
+			Logger.warn(e.toString());
 		}
 		
 		// Net Energy
@@ -129,31 +129,31 @@ Logger.info("  > Allocated memory for NetEnergy, NetIncom, Fuel");
 			EI_SF = scenario.mAssumptions.getAssumptionFloat("e_soy");
 			EI_AF = scenario.mAssumptions.getAssumptionFloat("e_alfalfa");
 			// Conversion Efficiency
-			CEO_C = scenario.mAssumptions.getAssumptionFloat("e_corn_ec");
-			CEO_CS = scenario.mAssumptions.getAssumptionFloat("e_stover_ec");
-			CEO_G = scenario.mAssumptions.getAssumptionFloat("e_grass_ec");
-			CEO_S = scenario.mAssumptions.getAssumptionFloat("e_soy_ec");
-			CEO_A = scenario.mAssumptions.getAssumptionFloat("e_alfalfa_ec");
+			CEO_C = scenario.mAssumptions.getAssumptionFloat("e_corn_ce");
+			CEO_CS = scenario.mAssumptions.getAssumptionFloat("e_stover_ce");
+			CEO_G = scenario.mAssumptions.getAssumptionFloat("e_grass_ce");
+			CEO_S = scenario.mAssumptions.getAssumptionFloat("e_soy_ce");
+			CEO_A = scenario.mAssumptions.getAssumptionFloat("e_alfalfa_ce");
 		}
 		
 		catch (Exception e) {
-			Logger.info(e.toString());
+			Logger.warn(e.toString());
 		}
 		
 		// Net Income
 		// Production
-		Logger.info(" Corn production price from client = " + Float.toString(PC_Cost) );
-		Logger.info(" Stover production price from client = " + Float.toString(PCS_Cost) );
-		Logger.info(" Grass production price from client = " + Float.toString(PG_Cost) );
-		Logger.info(" Soy production price from client = " + Float.toString(PS_Cost) );
-		Logger.info(" Alfalfa production price from client = " + Float.toString(PA_Cost) );
+		Logger.debug(" Corn production price from client = " + Float.toString(PC_Cost) );
+		Logger.debug(" Stover production price from client = " + Float.toString(PCS_Cost) );
+		Logger.debug(" Grass production price from client = " + Float.toString(PG_Cost) );
+		Logger.debug(" Soy production price from client = " + Float.toString(PS_Cost) );
+		Logger.debug(" Alfalfa production price from client = " + Float.toString(PA_Cost) );
 		
 		// Sell
-		Logger.info(" Corn price from client = " + Float.toString(P_Per_Corn) );
-		Logger.info(" Stover price from client = " + Float.toString(P_Per_Stover) );
-		Logger.info(" Grass price from client = " + Float.toString(P_Per_Grass) );
-		Logger.info(" Soy price from client = " + Float.toString(P_Per_Soy) );
-		Logger.info(" Alfalfa price from client = " + Float.toString(P_Per_Alfalfa) );
+		Logger.debug(" Corn price from client = " + Float.toString(P_Per_Corn) );
+		Logger.debug(" Stover price from client = " + Float.toString(P_Per_Stover) );
+		Logger.debug(" Grass price from client = " + Float.toString(P_Per_Grass) );
+		Logger.debug(" Soy price from client = " + Float.toString(P_Per_Soy) );
+		Logger.debug(" Alfalfa price from client = " + Float.toString(P_Per_Alfalfa) );
 		//----------------------------------------------------------------------		
 
 		for (int y = 0; y < height; y++) {
@@ -232,14 +232,14 @@ Logger.info("  > Allocated memory for NetEnergy, NetIncom, Fuel");
 		
 		List<ModelResult> results = new ArrayList<ModelResult>();
 		
-		results.add(new ModelResult("yeild", scenario.mOutputDir, calculatedYield, width, height));
+		results.add(new ModelResult("yield", scenario.mOutputDir, calculatedYield, width, height));
 		results.add(new ModelResult("ethanol", scenario.mOutputDir, ethanolData, width, height));
 		results.add(new ModelResult("net_energy", scenario.mOutputDir, netEnergyData, width, height));
 		results.add(new ModelResult("net_income", scenario.mOutputDir, netIncomeData, width, height));
 
 long timeEnd = System.currentTimeMillis();
 float timeSec = (timeEnd - timeStart) / 1000.0f;
-Logger.info(">>> Model Ethanol / Net Energy / Net Income is finished - timing: " + Float.toString(timeSec));
+Logger.debug(">>> Model Ethanol / Net Energy / Net Income is finished - timing: " + Float.toString(timeSec));
 
 		return results;
 	}

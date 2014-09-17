@@ -122,7 +122,7 @@ public class Application extends Controller
 			}
 		}
 		catch (Exception e) {
-			Logger.info(e.toString());
+			Logger.warn(e.toString());
 		}
 		
 		Logger.info("WMS request failed");
@@ -187,7 +187,7 @@ public class Application extends Controller
 			rd.close();
 		}
 		catch (Exception e) {
-			Logger.info(e.toString());
+			Logger.warn(e.toString());
 		}
 		
 		Logger.info("WMS request failed");
@@ -264,7 +264,7 @@ public class Application extends Controller
 		String model = request.get("model").textValue();
 
 		if (model == null) {
-			Logger.info("Tried to find a model data file but none was passed. Aborting heatmap.");
+			Logger.warn("Tried to find a model data file but none was passed. Aborting heatmap.");
 			return badRequest(); // TODO: add return errors if needed...
 		}
 
@@ -279,7 +279,7 @@ public class Application extends Controller
 		String subtype = request.get("subtype").textValue();
 
 		if (type == null) {
-			Logger.info("Tried to find a heatmap 'type' key but didn't. Assuming 'delta'");
+			Logger.warn("Tried to find a heatmap 'type' key but didn't. Assuming 'delta'");
 			type = "delta";
 		}
 		
@@ -325,24 +325,24 @@ public class Application extends Controller
 		if (type.equals("delta")) {
 			// for 'delta' type, both files must exist!
 			if (!file1.exists() || !file2.exists()) {
-				Logger.info("Wanted to open files for 'delta' heatmap but one of the files did not exist");
+				Logger.error("Wanted to open files for 'delta' heatmap but one of the files did not exist");
 				return badRequest(); // TODO: add return errors if needed...
 			}
 		}
 		else if (type.equals("file1")) {
 			if (!file1.exists()) {
-				Logger.info("Wanted to open file for 'file1' heatmap but that file did not exist");
+				Logger.error("Wanted to open file for 'file1' heatmap but that file did not exist");
 				return badRequest(); // TODO: add return errors if needed...
 			}
 		}
 		else if (type.equals("file2")) {
 			if (!file2.exists()) {
-				Logger.info("Wanted to open file for 'file2' heatmap but that file did not exist");
+				Logger.error("Wanted to open file for 'file2' heatmap but that file did not exist");
 				return badRequest(); // TODO: add return errors if needed...
 			}
 		}
 		else {
-			Logger.info("Error, unknown heatmap type: <" + type + ">");
+			Logger.error("Error, unknown heatmap type: <" + type + ">");
 			return badRequest(); // TODO: add return errors if needed...
 		}
 
@@ -482,7 +482,7 @@ public class Application extends Controller
 						// other layer is in memory so compare with that.
 						float[][] data1 = layer.getFloatData();
 						if (data1 == null) {
-							Logger.info("could not get layer in runModelCluster");
+							Logger.error("could not get layer in runModelCluster");
 						}
 						else {
 							sendBack.put(res.mName, 
@@ -504,10 +504,10 @@ public class Application extends Controller
 										res.mWidth, res.mHeight, res.mRasterData, scenario.mSelection));
 			}
 		}
-		Logger.info("Done processing list of results, queuing results for file writer");
+		Logger.debug("Done processing list of results, queuing results for file writer");
 		QueuedWriter.queueResults(results);
 
-		Logger.info(sendBack.toString());
+		Logger.debug(sendBack.toString());
 		return ok(sendBack);
 	}
  
@@ -560,18 +560,18 @@ public class Application extends Controller
 		boolean failed = false;
 		
 		if (compare1ID >= 0 && !file1.exists()) { // ALLOW load of selection fail if this is for DEFAULT
-			Logger.info(" Error! - file <" + file1.toString() + 
+			Logger.error(" Error! - file <" + file1.toString() + 
 				"> does not exist");
 			failed = true;
 		}
 		if (compare2ID >= 0 && !file2.exists()) { // ALLOW load of selection fail if this is for DEFAULT
-			Logger.info(" Error! - file <" + file2.toString() + 
+			Logger.error(" Error! - file <" + file2.toString() + 
 				"> does not exist");
 			failed = true;
 		}
 
 		if (failed) {
-			Logger.info(" Error! - custom comparison aborting.");
+			Logger.error(" Error! - custom comparison aborting.");
 			return badRequest(); // TODO: add return errors if needed...
 		}
 		
@@ -580,7 +580,7 @@ public class Application extends Controller
 			sel1 = new Selection(file1);
 		}
 		if (sel1 != null && !sel1.isValid) {
-			Logger.info(" Error! - load of selection from file <" + file1.toString() + 
+			Logger.error(" Error! - load of selection from file <" + file1.toString() + 
 				"> failed! Custom comparison aborting.");
 			return badRequest(); // TODO: add return errors if needed...
 		}
@@ -590,7 +590,7 @@ public class Application extends Controller
 			sel2 = new Selection(file2);
 		}
 		if (sel2 != null && !sel2.isValid) {
-			Logger.info(" Error! - load of selection from file <" + file2.toString() + 
+			Logger.error(" Error! - load of selection from file <" + file2.toString() + 
 				"> failed! Custom comparison aborting.");
 			return badRequest(); // TODO: add return errors if needed...
 		}

@@ -84,7 +84,7 @@ Logger.info("  > Allocated memory for Habitat Index");
 		
 long timeEnd = System.currentTimeMillis();
 float timeSec = (timeEnd - timeStart) / 1000.0f;
-Logger.info(">>> Model_Habitat_Index is finished - timing: " + Float.toString(timeSec));
+Logger.debug(">>> Model_Habitat_Index is finished - timing: " + Float.toString(timeSec));
 
 		return results;
 	}	

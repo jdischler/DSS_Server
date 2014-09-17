@@ -49,11 +49,11 @@ Logger.info(" >> Computing Yield");
 			annualCoverCropModifier = scenario.mAssumptions.getAssumptionFloat("y_cc_annuals");		
 		}
 		catch (Exception e) {
-			Logger.info(e.toString());
+			Logger.warn(e.toString());
 		}
 		
-		Logger.info(" Agricultural no till from client = " + Float.toString(annualNoTillageModifier) );
-		Logger.info(" Agricultural cover crop from client = " + Float.toString(annualCoverCropModifier) );
+		Logger.debug(" Agricultural no till from client = " + Float.toString(annualNoTillageModifier) );
+		Logger.debug(" Agricultural cover crop from client = " + Float.toString(annualCoverCropModifier) );
 		
 		// Mask
 		Layer_Integer cdl = (Layer_Integer)Layer_Base.getLayer("cdl_2012"); 
@@ -87,13 +87,13 @@ Logger.info(" >> Computing Yield");
 			grassYieldModifier = scenario.mAssumptions.getAssumptionFloat("ym_grass") / 100.0f + 1.0f;
 		}
 		catch (Exception e) {
-			Logger.info(e.toString());
+			Logger.warn(e.toString());
 		}
 		
-		Logger.info(" Corn yield from client = " + Float.toString(cornYieldModifier) );
-		Logger.info(" Soy yield from client = " + Float.toString(soyYieldModifier) );
-		Logger.info(" Alfalfa yield from client = " + Float.toString(alfalfaYieldModifier) );
-		Logger.info(" Grass yield from client = " + Float.toString(grassYieldModifier) );
+		Logger.debug(" Corn yield from client = " + Float.toString(cornYieldModifier) );
+		Logger.debug(" Soy yield from client = " + Float.toString(soyYieldModifier) );
+		Logger.debug(" Alfalfa yield from client = " + Float.toString(alfalfaYieldModifier) );
+		Logger.debug(" Grass yield from client = " + Float.toString(grassYieldModifier) );
 		//----------------------------------------------------------------------		
 		
 		// Define separate arrays to keep corn and grass production

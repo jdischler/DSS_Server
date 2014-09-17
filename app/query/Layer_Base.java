@@ -42,7 +42,7 @@ public abstract class Layer_Base
 		}
 		String name_low = name.toLowerCase();
 		if (!mLayers.containsKey(name_low)) {
-			Logger.info("getLayer called looking for: " + name_low + "  but layer doesn't exist");
+			Logger.error("getLayer called looking for: " + name_low + "  but layer doesn't exist");
 			return null;
 		}
 		return mLayers.get(name_low);
@@ -52,7 +52,7 @@ public abstract class Layer_Base
 	//--------------------------------------------------------------------------
 	public static void removeLayer(String name) {
 
-		Logger.info("A call was made to remove layer: " + name + " from memory");
+		Logger.warn("A call was made to remove layer: " + name + " from memory");
 		name = name.toLowerCase();
 		mLayers.remove(name);
 	}

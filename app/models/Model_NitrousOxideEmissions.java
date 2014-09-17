@@ -63,15 +63,15 @@ Logger.info("  > Allocated memory for N2O");
 			perennialFallFertilizerModifier = scenario.mAssumptions.getAssumptionFloat("n_fm_perennials");	
 		}
 		catch (Exception e) {
-			Logger.info(e.toString());
+			Logger.warn(e.toString());
 		}
 		
-		Logger.info(" Agricultural till from client = " + Float.toString(annualTillageModifier) );
-		Logger.info(" Agricultural cover crop from client = " + Float.toString(annualCoverCropModifier) );
-		Logger.info(" Agricultural Fertilizer from client = " + Float.toString(annualFertilizerModifier) );
-		Logger.info(" Perennial Fertilizer from client = " + Float.toString(perennialFertilizerModifier) );
-		Logger.info(" Annual Fall Fertilizer from client = " + Float.toString(annualFallFertilizerModifier) );
-		Logger.info(" Perennial Fall Fertilizer from client = " + Float.toString(perennialFallFertilizerModifier) );
+		Logger.debug(" Agricultural till from client = " + Float.toString(annualTillageModifier) );
+		Logger.debug(" Agricultural cover crop from client = " + Float.toString(annualCoverCropModifier) );
+		Logger.debug(" Agricultural Fertilizer from client = " + Float.toString(annualFertilizerModifier) );
+		Logger.debug(" Perennial Fertilizer from client = " + Float.toString(perennialFertilizerModifier) );
+		Logger.debug(" Annual Fall Fertilizer from client = " + Float.toString(annualFallFertilizerModifier) );
+		Logger.debug(" Perennial Fall Fertilizer from client = " + Float.toString(perennialFallFertilizerModifier) );
 		
 		// Till SoilLoss Multiplier
 		float T_M = 1.0f;
@@ -175,7 +175,7 @@ Logger.info("  > Allocated memory for N2O");
 
 long timeEnd = System.currentTimeMillis();
 float timeSec = (timeEnd - timeStart) / 1000.0f;
-Logger.info(">>> Model Nitrous Oxide - timing: " + Float.toString(timeSec));
+Logger.debug(">>> Model Nitrous Oxide - timing: " + Float.toString(timeSec));
 
 		return results;
 	}

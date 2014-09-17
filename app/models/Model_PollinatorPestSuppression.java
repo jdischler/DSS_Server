@@ -111,7 +111,7 @@ long timeStart = System.currentTimeMillis();
 		
 long timeEnd = System.currentTimeMillis();
 float timeSec = (timeEnd - timeStart) / 1000.0f;
-Logger.info(">>> Model_PollinatorPestSuppression_New is finished - timing: " + Float.toString(timeSec));
+Logger.debug(">>> Model_PollinatorPestSuppression_New is finished - timing: " + Float.toString(timeSec));
 
 		return results;
 	}	

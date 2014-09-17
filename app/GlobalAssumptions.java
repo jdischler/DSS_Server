@@ -264,14 +264,17 @@ public class GlobalAssumptions
 
 		JsonNode res = mClientSentAssumptions.findValue(variableName);
 		if (res == null) {
+			Logger.warn(" ..getAssumptionFloat: " + variableName + " failed - does not exist");
 			throw new Exception();
 		}
 		if (!res.isObject()) {
+			Logger.warn(" ..getAssumptionFloat: " + variableName + " failed - does not exist");
 			throw new Exception();
 		}
 
 		res = ((ObjectNode)res).get("DefaultValue");
 		if (!res.isNumber()) {
+			Logger.warn(" ..getAssumptionFloat: " + variableName + " failed - is not a number");
 			throw new Exception();
 		}
 		
@@ -287,14 +290,17 @@ public class GlobalAssumptions
 
 		JsonNode res = mClientSentAssumptions.findValue(variableName);
 		if (res == null) {
+			Logger.warn(" ..getAssumptionInt: " + variableName + " failed - does not exist");
 			throw new Exception();
 		}
 		if (!res.isObject()) {
+			Logger.warn(" ..getAssumptionInt: " + variableName + " failed - does not exist");
 			throw new Exception();
 		}
 
 		res = ((ObjectNode)res).get("DefaultValue");
 		if (!res.isNumber()) {
+			Logger.warn(" ..getAssumptionInt: " + variableName + " failed - as not Number");
 			throw new Exception();
 		}
 		
@@ -310,14 +316,17 @@ public class GlobalAssumptions
 
 		JsonNode res = mClientSentAssumptions.findValue(variableName);
 		if (res == null) {
+			Logger.warn(" ..getAssumptionString: " + variableName + " failed - does not exist");
 			throw new Exception();
 		}
 		if (!res.isObject()) {
+			Logger.warn(" ..getAssumptionString: " + variableName + " failed - does not exist");
 			throw new Exception();
 		}
 
 		res = ((ObjectNode)res).get("DefaultValue");
 		if (!res.isTextual()) {
+			Logger.warn(" ..getAssumptionString: " + variableName + " failed - is not textual");
 			throw new Exception();
 		}
 		

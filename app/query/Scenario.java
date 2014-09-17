@@ -102,7 +102,7 @@ public class Scenario
 		for (Map.Entry<String, Scenario> entry : mCachedScenarios.entrySet()) {
 			Scenario value = entry.getValue();
 			if (roughlyNow - value.mCachedAtTime > expireHours) {
-				Logger.info("Warning - removing potentially stale scenario. " +
+				Logger.warn("Warning - removing potentially stale scenario. " +
 					"Anything caching a scenario should be remove cached scenario when " +
 					"done using that scenario!");
 				String key = entry.getKey();
@@ -115,12 +115,12 @@ public class Scenario
 	public static final Scenario getCachedScenario(String cacheStringID) {
 		
 		if (mCachedScenarios == null) {
-			Logger.info("Attempting to fetch a scenario but the cache has not been initialized!");
+			Logger.warn("Attempting to fetch a scenario but the cache has not been initialized!");
 			return null;
 		}
 		Scenario res = mCachedScenarios.get(cacheStringID);
 		if (res == null) {
-			Logger.info("Attempting to fetch scenario named <" + cacheStringID + 
+			Logger.warn("Attempting to fetch scenario named <" + cacheStringID + 
 							"> but that does not appear to be cached");
 			return null;
 		}
@@ -132,13 +132,13 @@ public class Scenario
 	public static final void releaseCachedScenario(String cacheStringID) {
 		
 		if (mCachedScenarios == null) {
-			Logger.info("Attempting to uncache a scenario but the cache has not been initialized!");
+			Logger.warn("Attempting to uncache a scenario but the cache has not been initialized!");
 			return;
 		}
 		
 		Scenario res = mCachedScenarios.get(cacheStringID);
 		if (res == null) {
-			Logger.info("Attempting to uncache scenario named <" + cacheStringID + 
+			Logger.warn("Attempting to uncache scenario named <" + cacheStringID + 
 							"> but that does not appear to be cached");
 			return;
 		}
@@ -209,11 +209,11 @@ public class Scenario
 				JsonNode transformElement = transformArray.get(i);
 				
 				if (transformElement == null) {
-					Logger.info("Boooo....transform element was null.");
+					Logger.warn("Boooo....transform element was null.");
 					continue; // TODO: signal back to client that an error happened vs. just doing nothing
 				}
 				else if (!transformElement.isObject()) {
-					Logger.info("Booooooo.....transform element is not an object");
+					Logger.warn("Booooooo.....transform element is not an object");
 					continue; // TODO: signal back to client that an error happened vs. just doing nothing
 				}
 				
@@ -222,7 +222,7 @@ public class Scenario
 				//	.vs the index value itself.
 				JsonNode transformConfig = transformElement.get("config");
 				if (transformConfig == null || !transformConfig.isObject()) {
-					Logger.info("Boooo....transform config does not exist or is not an object");
+					Logger.warn("Boooo....transform config does not exist or is not an object");
 					continue; // TODO: signal back to client that an error happened vs. just doing nothing
 				}
 				

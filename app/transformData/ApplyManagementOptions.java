@@ -55,7 +55,7 @@ public class ApplyManagementOptions
 				cdl = new Layer_Integer("cdl_2012"); cdl.init();
 			}
 			catch (Exception e) {
-				Logger.info(e.toString());
+				Logger.warn(e.toString());
 				return;
 			}
 		}

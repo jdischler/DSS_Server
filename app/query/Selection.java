@@ -150,7 +150,7 @@ public class Selection
 							+ "  Height: " + Integer.toString(mHeight));
 		}
 		catch (Exception e) {
-			Logger.info(e.toString());
+			Logger.warn(e.toString());
 			return false;
 		}
 		
@@ -165,7 +165,7 @@ public class Selection
 				lineBuffer.rewind();
 			}
 			catch (Exception e) {
-				Logger.info(e.toString());
+				Logger.warn(e.toString());
 			}
 			
 			for (int x = 0; x < mWidth; x++) {
@@ -180,7 +180,7 @@ public class Selection
 			fileStream = null;
 		}
 		catch (Exception e) {
-			Logger.info(e.toString());
+			Logger.warn(e.toString());
 		}
 		finally {
 			if (fileStream != null) {
@@ -188,7 +188,7 @@ public class Selection
 					fileStream.close();
 				}
 				catch (Exception e) {
-					Logger.info(e.toString());
+					Logger.warn(e.toString());
 					return false;
 				}
 			}

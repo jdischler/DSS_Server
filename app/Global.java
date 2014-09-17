@@ -159,7 +159,7 @@ public class Global extends GlobalSettings
 			}
 		}
 		catch (Exception e) {
-			Logger.info(e.toString());
+			Logger.error(e.toString());
 		}
 	}
 	
@@ -183,7 +183,7 @@ public class Global extends GlobalSettings
 				layer = new Layer_Float("default/soc"); layer.init();
 			}
 			catch (Exception e) {
-				Logger.info(e.toString());
+				Logger.error(e.toString());
 			}
 		}
 		else {
@@ -306,7 +306,7 @@ public class Global extends GlobalSettings
 						} 
 						catch (Exception err) 
 						{
-							Logger.info(err.toString());
+							Logger.warn(err.toString());
 						}
 						
 						if (ascOut != null) {	
@@ -337,12 +337,12 @@ public class Global extends GlobalSettings
 								ascOut.close();
 							}
 							catch (Exception err) {
-								Logger.info(err.toString());
+								Logger.warn(err.toString());
 							}
 						}
 					}
 					else {
-						Logger.info("File read problem with file: " + sourceBinary.toString());
+						Logger.warn("File read problem with file: " + sourceBinary.toString());
 					}
 				}
 				Logger.info(destFile);

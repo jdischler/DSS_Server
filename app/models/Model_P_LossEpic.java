@@ -62,16 +62,16 @@ long timeStart = System.currentTimeMillis();
 			fallManurePerennialModifier = scenario.mAssumptions.getAssumptionFloat("p_fm_perennials");
 		}
 		catch (Exception e) {
-			Logger.info(e.toString());
+			Logger.warn(e.toString());
 		}
 		
-		Logger.info(" PLoss - annuals manure from client = " + Float.toString(manureAnnualModifier) );
-		Logger.info(" PLoss - annuals fall manure from client = " + Float.toString(fallManureAnnualModifier) );
-		Logger.info(" PLoss - annuals cover crop from client = " + Float.toString(covercropAnnualModifier) );
-		Logger.info(" PLoss - annuals till from client = " + Float.toString(tillAnnualModifier) );
+		Logger.debug(" PLoss - annuals manure from client = " + Float.toString(manureAnnualModifier) );
+		Logger.debug(" PLoss - annuals fall manure from client = " + Float.toString(fallManureAnnualModifier) );
+		Logger.debug(" PLoss - annuals cover crop from client = " + Float.toString(covercropAnnualModifier) );
+		Logger.debug(" PLoss - annuals till from client = " + Float.toString(tillAnnualModifier) );
 
-		Logger.info(" PLoss - perennial manure from client = " + Float.toString(manurePerennialModifier) );
-		Logger.info(" PLoss - perennial fall manure from client = " + Float.toString(fallManurePerennialModifier) );
+		Logger.debug(" PLoss - perennial manure from client = " + Float.toString(manurePerennialModifier) );
+		Logger.debug(" PLoss - perennial fall manure from client = " + Float.toString(fallManurePerennialModifier) );
 
 		// Spatial Layers
 		int[][] rotationData = scenario.mNewRotation;
@@ -256,7 +256,7 @@ Logger.info("  > Allocated memory for P_Loss_EPIC");
 		
 long timeEnd = System.currentTimeMillis();
 float timeSec = (timeEnd - timeStart) / 1000.0f;
-Logger.info(">>> P_Loss_EPIC Model is finished - timing: " + Float.toString(timeSec));
+Logger.debug(">>> P_Loss_EPIC Model is finished - timing: " + Float.toString(timeSec));
 
 		return results;
 	}

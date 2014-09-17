@@ -33,8 +33,8 @@ public class Query {
 		mWidth = tmp.getWidth();
 		mHeight = tmp.getHeight();
 		
-		Logger.info("Called into query");
-		Logger.info(requestBody.toString());
+		Logger.debug("Called into query");
+		Logger.debug(requestBody.toString());
 		
 		int ctr = mCounter++;
 		String partialPath = "/public/dynamicFiles/selection" + String.valueOf(ctr) + ".png";
@@ -44,7 +44,7 @@ public class Query {
 //			partialPath = "/target/scala-2.10/classes" + partialPath;
 		}
 		String urlPath = "/files/selection" + String.valueOf(ctr) + ".png";
-		Logger.info("File write path: " + partialPath);
+		Logger.debug("File write path: " + partialPath);
 		
 		// 8 bits per pixel, one channel (indexed), file path where the png is saved
 		// Since this is the file we are saving, it will be smaller than the actual

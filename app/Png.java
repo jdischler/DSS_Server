@@ -53,7 +53,7 @@ public class Png {
 			Logger.info(" --  Attempting directory creation....");
 			dir.mkdirs();
 			if (!dir.exists()) {
-				Logger.info(" -- Critical failure!...the directory was not created!");
+				Logger.warn(" -- Critical failure!...the directory was not created!");
 			}
 		}
 		
@@ -62,7 +62,7 @@ public class Png {
 			outputStream = new FileOutputStream(outputFile);
 		}
 		catch (Exception e) {
-			Logger.info(e.toString());
+			Logger.warn(e.toString());
 		}
 		
 		mPngWriter = new PngWriter(outputStream, mImageInfo);
@@ -185,7 +185,7 @@ public class Png {
 				}
 			}
 			
-			Logger.info("Max: " + Double.toString(max));
+			Logger.debug("Max: " + Double.toString(max));
 			if (max < 0.00001) {
 				max = 1.0;
 			}
@@ -203,7 +203,7 @@ public class Png {
 			
 			int y = 0;
 			
-			Logger.info("Generating IDX array");
+			Logger.debug("Generating IDX array");
 			
 			// Now generate the full resolution heatmap image
 			while (file1.ready() && file2.ready()) {
@@ -232,17 +232,17 @@ public class Png {
 			file1.close();
 			file2.close();
 			
-			Logger.info("Creating png");
+			Logger.info("Creating heatmap png");
 
 			String file = "./public/file/heat_2.png";
 //			Png image = new Png(width, height, 8, 4, file);
 			Png png = new Png(width, height, 
 				8, 1, file);
 		
-			Logger.info("Creating palette");
+			Logger.debug("Creating palette");
 			
 			PngChunkPLTE palette = png.createPalette(9);
-			Logger.info("Setting palette entries");
+			Logger.debug("Setting palette entries");
 			// colors from....http://colorbrewer2.org
 			
 			// MAGENTA to WHITE to LIME GREEN
@@ -261,7 +261,7 @@ public class Png {
 				4, 247, 247, 247,	// white
 				8, 140, 81, 10);	// brown
 			
-			Logger.info("Setting transparent");
+			Logger.debug("Setting transparent");
 			// set index 4 as transparent
 			int[] alpha = new int[9];
 			alpha[0] = 255; alpha[1] = 255; alpha[2] = 255; alpha[3] = 255;
@@ -291,7 +291,7 @@ public class Png {
 			png.mPngWriter.end();
 		}
 		catch (Exception e) {
-			Logger.info(e.toString());
+			Logger.warn(e.toString());
 		}
 	}
 
@@ -331,8 +331,8 @@ heatmapPngStart = System.currentTimeMillis();
 				}
 			}
 			
-			Logger.info("Min: " + Float.toString(min) + "   Max: " + Float.toString(max));
-			Logger.info("Generating IDX array");
+			Logger.debug("Min: " + Float.toString(min) + "   Max: " + Float.toString(max));
+			Logger.debug("Generating IDX array");
 	
 			byte[][] idx = new byte[newHeight][newWidth];
 
@@ -343,14 +343,14 @@ heatmapPngStart = System.currentTimeMillis();
 				}
 			}
 		
-			Logger.info("Creating png");
+			Logger.info("Creating heatmap png");
 			String file = "./public/file/heat_3.png";
 			Png png = new Png(newWidth, newHeight, 
 				8, 1, file);
 		
-			Logger.info("Creating palette");
+			Logger.debug("Creating palette");
 			PngChunkPLTE palette = png.createPalette(9);
-			Logger.info("Setting palette entries");
+			Logger.debug("Setting palette entries");
 			
 			interpolatePaletteEntries(palette, 
 				0, 128, 0, 255,		// purple
@@ -370,17 +370,17 @@ heatmapPngStart = System.currentTimeMillis();
 heatmapPngEnd = System.currentTimeMillis();
 		}
 		catch (Exception e) {
-			Logger.info(e.toString());
+			Logger.warn(e.toString());
 		}
 long heatmapBuildEnd = System.currentTimeMillis();
 float timeSec = (heatmapBuildEnd - heatmapBuildStart) / 1000.0f;
-Logger.info(">>> Heatmap generation timing: " + Float.toString(timeSec));
+Logger.debug(">>> Heatmap generation timing: " + Float.toString(timeSec));
 
 timeSec = (heatmapResampleEnd - heatmapResampleStart) / 1000.0f;
-Logger.info(">>> Heatmap resample timing: " + Float.toString(timeSec));
+Logger.debug(">>> Heatmap resample timing: " + Float.toString(timeSec));
 
 timeSec = (heatmapPngEnd - heatmapPngStart) / 1000.0f;
-Logger.info(">>> Heatmap PNG creation/write timing: " + Float.toString(timeSec));
+Logger.debug(">>> Heatmap PNG creation/write timing: " + Float.toString(timeSec));
 	}
 
 	//--------------------------------------------------------------------------
@@ -428,8 +428,8 @@ heatmapPngStart = System.currentTimeMillis();
 				}
 			}
 			
-			Logger.info("Min: " + Float.toString(min) + "   Max: " + Float.toString(max));
-			Logger.info("Generating IDX array");
+			Logger.debug("Min: " + Float.toString(min) + "   Max: " + Float.toString(max));
+			Logger.debug("Generating IDX array");
 	
 			byte[][] idx = new byte[newHeight][newWidth];
 
@@ -443,14 +443,14 @@ heatmapPngStart = System.currentTimeMillis();
 				}
 			}
 		
-			Logger.info("Creating png");
+			Logger.info("Creating heatmap png");
 			String file = "./public/file/heat_max.png";
 			Png png = new Png(newWidth, newHeight, 
 				8, 1, file);
 		
-			Logger.info("Creating palette");
+			Logger.debug("Creating palette");
 			PngChunkPLTE palette = png.createPalette(9);
-			Logger.info("Setting palette entries");
+			Logger.debug("Setting palette entries");
 			
 			interpolatePaletteEntries(palette, 
 				0, 128, 0, 255,		// purple
@@ -465,7 +465,7 @@ heatmapPngStart = System.currentTimeMillis();
 				6, 0, 255, 0,		// green
 				8, 0, 128, 255);	// blue
 
-			Logger.info("Setting transparent");
+			Logger.debug("Setting transparent");
 			// set index 4 as transparent
 			int[] alpha = new int[9];
 			alpha[0] = 255; alpha[1] = 255; alpha[2] = 255; alpha[3] = 255;
@@ -479,17 +479,17 @@ heatmapPngStart = System.currentTimeMillis();
 heatmapPngEnd = System.currentTimeMillis();
 		}
 		catch (Exception e) {
-			Logger.info(e.toString());
+			Logger.warn(e.toString());
 		}
 long heatmapBuildEnd = System.currentTimeMillis();
 float timeSec = (heatmapBuildEnd - heatmapBuildStart) / 1000.0f;
-Logger.info(">>> Heatmap generation timing: " + Float.toString(timeSec));
+Logger.debug(">>> Heatmap generation timing: " + Float.toString(timeSec));
 
 timeSec = (heatmapResampleEnd - heatmapResampleStart) / 1000.0f;
-Logger.info(">>> Heatmap resample timing: " + Float.toString(timeSec));
+Logger.debug(">>> Heatmap resample timing: " + Float.toString(timeSec));
 
 timeSec = (heatmapPngEnd - heatmapPngStart) / 1000.0f;
-Logger.info(">>> Heatmap PNG creation/write timing: " + Float.toString(timeSec));
+Logger.debug(">>> Heatmap PNG creation/write timing: " + Float.toString(timeSec));
 	}
 }
 

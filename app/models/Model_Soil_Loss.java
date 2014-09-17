@@ -129,13 +129,13 @@ long timeStart = System.currentTimeMillis();
 			Management_P2 = scenario.mAssumptions.getAssumptionFloat("sl_Terrace_P2");
 		}
 		catch (Exception e) {
-			Logger.info(e.toString());
+			Logger.warn(e.toString());
 		}
 		
 		//Logger.info(" Agricultural no till from client = " + Float.toString(annualTillage_C1) );
-		Logger.info(" Agricultural cover crop from client = " + Float.toString(annualCoverCropModifier) );
-		Logger.info(" Agricultural Contouring from client = " + Float.toString(Management_P1) );
-		Logger.info(" Agricultural Terrace from client = " + Float.toString(Management_P2) );
+		Logger.debug(" Agricultural cover crop from client = " + Float.toString(annualCoverCropModifier) );
+		Logger.debug(" Agricultural Contouring from client = " + Float.toString(Management_P1) );
+		Logger.debug(" Agricultural Terrace from client = " + Float.toString(Management_P2) );
 		
 		// full raster save process...
 Logger.info("  > Allocated memory for Soil_Loss");
@@ -268,7 +268,7 @@ Logger.info("  > Allocated memory for Soil_Loss");
 		
 long timeEnd = System.currentTimeMillis();
 float timeSec = (timeEnd - timeStart) / 1000.0f;
-Logger.info(">>> Model_Soil_Loss is finished - timing: " + Float.toString(timeSec));
+Logger.debug(">>> Model_Soil_Loss is finished - timing: " + Float.toString(timeSec));
 
 		return results;
 	}

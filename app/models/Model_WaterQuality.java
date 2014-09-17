@@ -193,7 +193,7 @@ Logger.info("  > Allocated memory for Water_Quality");
 		
 long timeEnd = System.currentTimeMillis();
 float timeSec = (timeEnd - timeStart) / 1000.0f;
-Logger.info(">>> Model_Water_Quality is finished - timing: " + Float.toString(timeSec));
+Logger.debug(">>> Model_Water_Quality is finished - timing: " + Float.toString(timeSec));
 
 		return results;
 	}

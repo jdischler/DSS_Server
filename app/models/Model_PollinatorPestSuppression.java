@@ -52,9 +52,11 @@ long timeStart = System.currentTimeMillis();
 		// Ag
 		int Corn_Mask = cdl.convertStringsToMask("corn");
 		int Soy_Mask = cdl.convertStringsToMask("soy");
-		int mAgMask = 1 + 2 + 4 + 8 + 16384 + 32768 + 131072 + 262144;
+		int mAgMask = Corn_Mask | Soy_Mask;
+		//int mAgMask = 1 + 2 + 4 + 8 + 16384 + 32768 + 131072 + 262144;
 		// Total Mask
-		int TotalMask = mAgMask | mGrassMask;
+		//int TotalMask = mAgMask | mGrassMask;
+		int TotalMask = Grass_Mask | Corn_Mask | Soy_Mask | Alfalfa_Mask;
 		
 		// full raster save process...
 		float [][] pestData = new float[height][width];
@@ -77,6 +79,7 @@ long timeStart = System.currentTimeMillis();
 						// Calculate visitation index and normalize value by max
 						float pollinatorIndex = (float)Math.pow(0.6617f + (2.98f * proportionForest) 
 																		+ (1.83f * proportionGrass), 2.0f);
+						//float pollinatorIndex = (float)Math.pow(0.6617f + 1.83f * proportionGrass, 2.0f);
 						
 						pollinatorData[point.mY][point.mX] = pollinatorIndex;
 						

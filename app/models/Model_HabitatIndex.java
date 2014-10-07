@@ -43,10 +43,12 @@ Logger.info("  > Allocated memory for Habitat Index");
 		// Ag
 		int Corn_Mask = cdl.convertStringsToMask("corn");
 		int Soy_Mask = cdl.convertStringsToMask("soy");
-		int mAgMask = 1 + 2 + 4 + 8 + 16384 + 32768 + 131072 + 262144;
+		int mAgMask = Corn_Mask | Soy_Mask;
+		//int mAgMask = 1 + 2 + 4 + 8 + 16384 + 32768 + 131072 + 262144;
 		// Total Mask
 		int TotalMask = mAgMask | mGrassMask;
-
+		//int TotalMask = Grass_Mask | Corn_Mask | Soy_Mask | Alfalfa_Mask;
+		
 		// --- Model specific code starts here
 		Moving_Z_Window zWin = new Moving_Z_Window(mWindowSizeInCells, rotationData, width, height);
 		

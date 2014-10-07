@@ -12,7 +12,7 @@ import java.lang.reflect.Array;
 // This program uses corn, soy, grass and alfalfa production to calculate Soil Carbon 
 // This model is from unpublished work by Tim University of Wisconsin Madison
 // Inputs are corn, soy, grass and alfalfa layers and crop rotation layer 
-// Outputs are ASCII map of Net Energy
+// Output is ASCII map of SOC
 // Version 08/20/2013
 //
 //------------------------------------------------------------------------------
@@ -40,6 +40,7 @@ Logger.info("  > Allocated memory for SOC");
 		// Defining variables based on the selected layer
 		// Mask
 		Layer_Integer cdl = (Layer_Integer)Layer_Base.getLayer("cdl_2012"); 
+		//Logger.debug(" CDL from erver = " + cdl );
 		int Grass_Mask = cdl.convertStringsToMask("grass");
 		int Corn_Mask = cdl.convertStringsToMask("corn");
 		int Soy_Mask = cdl.convertStringsToMask("soy");
@@ -102,7 +103,7 @@ Logger.info("  > Allocated memory for SOC");
 					//if (landCover_D != landCover_T)
 					//{
 					// NoData
-					if (landCover_D == 0 || landCover_T == 0 || SOC[y][x] <= 0.0f) 
+					if (landCover_D == 0 || landCover_T == 0 || SOC[y][x] < 0.0f) 
 					{
 						soilCarbonData[y][x] = -9999.0f;
 					}
@@ -198,6 +199,10 @@ Logger.info("  > Allocated memory for SOC");
 											perennialFallFertilizerModifier, perennialFertilizerModifier);
 							}
 						}
+						else
+						{
+							factor = 1;
+						}
 						
 						// Calculate equation based on calculated factor and SOC layer
 						adjFactor = -0.5938f * (float)(Math.log(SOC[y][x] * 0.1f)) + 1.6524f;
@@ -209,8 +214,8 @@ Logger.info("  > Allocated memory for SOC");
 							adjFactor = 1.2f;
 						}
 						
-						if(factor > -1.0f && adjFactor > -1.0f)
-						{
+						//if(factor > -1.0f && adjFactor > -1.0f)
+						//{
 							// Convert the change from 20 years to 1 year
 							//soilCarbonData[y][x] = SOC[y][x] + (SOC[y][x] * factor * adjFactor) / 20.0f;
 							//soilCarbonData[y][x] = SOC[y][x] * adjFactor + SOC[y][x] * factor * adjFactor;
@@ -222,7 +227,7 @@ Logger.info("  > Allocated memory for SOC");
 							
 							// Change value using multiplier
 							soilCarbonData[y][x] *=  NT_M * CC_M * F_M;
-						}
+						//}
 					}
 					//}
 					// Default

@@ -66,14 +66,19 @@ long timeStart = System.currentTimeMillis();
 		int Grass_Mask = cdl.convertStringsToMask("grass");
 		// Alfalfa
 		int Alfalfa_Mask = cdl.convertStringsToMask("alfalfa");
-		//int mGrassMask = Grass_Mask | Alfalfa_Mask;	
+		int mGrassMask = Grass_Mask | Alfalfa_Mask;	
 		// Forest
-		int Forest_Mask = cdl.convertStringsToMask("woodland");
+		//int Forest_Mask = cdl.convertStringsToMask("woodland");
 		// Ag
+		int Corn_Mask = cdl.convertStringsToMask("corn");
+		int Soy_Mask = cdl.convertStringsToMask("soy");
+		//int mAgMask = Corn_Mask | Soy_Mask;
+		int Ag_Mask = Corn_Mask | Soy_Mask;
 		//inGRAINS = 2, inVEGGIES = 3, inTREECROP = 4, inOTHERCROP = 15, inSOY =  16, inCORN_GRAIN = 18, inSOY_GRAIN = 19, inOIL = 21;
-		int Ag_Mask = 1 + 2 + 4 + 8 + 16384 + 32768 + 131072 + 262144 + 1048576;
+		//int Ag_Mask = 1 + 2 + 4 + 8 + 16384 + 32768 + 131072 + 262144 + 1048576;
 		// Total mask
-		int TotalMask = Grass_Mask | Alfalfa_Mask | Forest_Mask | Ag_Mask;
+		//int TotalMask = Grass_Mask | Alfalfa_Mask | Forest_Mask | Ag_Mask;
+		int TotalMask = Grass_Mask | Corn_Mask | Soy_Mask | Alfalfa_Mask;
 		// Urban
 		//int Urban_Mask = cdl.convertStringsToMask("urban");
 		//int SubUrban_Mask = cdl.convertStringsToMask("suburban");
@@ -172,14 +177,14 @@ Logger.info("  > Allocated memory for Soil_Loss");
 						ManagementOptions.E_Terrace.getIfActiveOn(landCover, Management_P2, 1.0f);
 					} 
 					// Forest
-					else if ((landCover & Forest_Mask) > 0) 
-					{
-						C = 0.003f;
+					//else if ((landCover & Forest_Mask) > 0) 
+					//{
+					//	C = 0.003f;
 						//P = 0.2f;
 						//P = 1.0f;
-						P = ManagementOptions.E_Contour.getIfActiveOn(landCover, Management_P1, 1.0f) *
-						ManagementOptions.E_Terrace.getIfActiveOn(landCover, Management_P2, 1.0f);
-					} 
+						//P = ManagementOptions.E_Contour.getIfActiveOn(landCover, Management_P1, 1.0f) *
+						//ManagementOptions.E_Terrace.getIfActiveOn(landCover, Management_P2, 1.0f);
+					//} 
 					// Agriculture
 					else if ((landCover & Ag_Mask) > 0) 
 					{

@@ -101,7 +101,8 @@ long timeStart = System.currentTimeMillis();
 		int Corn_Mask = cdl.convertStringsToMask("corn");
 		// Soy
 		int Soy_Mask = cdl.convertStringsToMask("soy");
-		
+		// Total Mask
+		int TotalMask = Grass_Mask | Corn_Mask | Soy_Mask | Alfalfa_Mask;
 		// Arrays to sum phosphorus within each watershed
 		//int[] CountCellsInWatershed = new int[mNumWatersheds];
 		// Arrays to save phosphorus at watershed scale
@@ -128,7 +129,7 @@ Logger.info("  > Allocated memory for P_Loss_EPIC");
 				CCM = 1.0f;
 				TM = 1.0f;
 				
-				if (landCover > 0)
+				if ((landCover & TotalMask) > 0)
 				{
 					// Kg per Ha
 					// Grass

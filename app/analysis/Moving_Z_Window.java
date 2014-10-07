@@ -91,7 +91,8 @@ public final class Moving_Z_Window
 		// Ag
 		int Corn_Mask = cdl.convertStringsToMask("corn");
 		int Soy_Mask = cdl.convertStringsToMask("soy");
-		mAgMask = 1 + 2 + 4 + 8 + 16384 + 32768 + 131072 + 262144;
+		int mAgMask = Corn_Mask | Soy_Mask;
+		//mAgMask = 1 + 2 + 4 + 8 + 16384 + 32768 + 131072 + 262144;
 		// Total Mask
 		int TotalMask = mAgMask | mGrassMask;
 		

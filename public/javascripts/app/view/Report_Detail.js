@@ -73,7 +73,7 @@ Ext.define('MyApp.view.Report_Detail', {
 						DSS_ResultsPostUnits: 'kl/yr'
 					},{
 						DSS_ConversionLabel: '<b>x</b>  price per Gal',
-						DSS_ConversionFactor: '4.00', // TODO: AMIN Validate
+						DSS_ConversionFactor: '2.00', // TODO: AMIN Validate
 						DSS_ResultsPreUnits: '$',
 						DSS_ResultsPostUnits: ''
 					}],
@@ -124,7 +124,7 @@ Ext.define('MyApp.view.Report_Detail', {
 						DSS_ResultsPostUnits: 'kg/yr'
 					},{
 						DSS_ConversionLabel: '<b>x</b>  price per lb',
-						DSS_ConversionFactor: '0.40', // TODO: AMIN Validate
+						DSS_ConversionFactor: '20.00', // TODO: AMIN Validate
 						DSS_ResultsPreUnits: '$',
 						DSS_ResultsPostUnits: ''
 					}],

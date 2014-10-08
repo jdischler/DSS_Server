@@ -6,12 +6,10 @@ Ext.define('MyApp.view.Report_Detail', {
     
     id: "DSS_ReportDetail",
     
- //   height: 380,
     width: 500,
-    layout: 'vbox',
+ //   layout: 'vbox',
     title: 'Simulation Detail',
 	icon: 'app/images/magnify_icon.png',
-    activeTab: 0,
 
     requires : [
     	'MyApp.view.Report_ValueTypePopup',
@@ -21,26 +19,27 @@ Ext.define('MyApp.view.Report_Detail', {
         'MyApp.view.Report_HeatmapLegendPopUp'
     ],
     
- /*   tools:[{
-		type: 'help',
-		qtip: 'Simulation Results Help',
-		handler: function(event, target, owner, tool) {
-			var help = Ext.create('MyApp.view.LayerHelpWindow').show();
-		}
-    }],*/
-    
     //--------------------------------------------------------------------------
     initComponent: function() {
         var me = this;
 	
+        // Common conversion tranform definitions...
+        var ton_to_megagram = {
+			DSS_HiddenConversion: true,
+			DSS_ConversionLabel: '<i>conversion to megagrams</i>',
+			DSS_ConversionFactor: '0.90718474', // TODO: AMIN Validate
+			DSS_ResultsPreUnits: '',
+			DSS_ResultsPostUnits: 'mg/yr'
+		};
+		
         Ext.applyIf(me, {
             items: [{
 				xtype: 'container', 
 				itemId: 'results_container',
 				padding: '0 0 3 0', // just really need to pad bottom to maintain spacing there
-				layout: {
+				/*layout: { 
 					type: 'vbox'
-				},
+				},*/
 				items: [{
 					xtype: 'report_value_popup'
 				},
@@ -60,6 +59,24 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_UnitLabel: 'Gal/Yr',
 					//DSS_UnitLabel: 'Gl/Yr',
 					DSS_Label: 'Gross Biofuel',
+					DSS_calculators: [{
+						DSS_HiddenConversion: true,
+						DSS_ConversionLabel: '<i>conversion to liters</i>',
+						DSS_ConversionFactor: '3.78541', // TODO: AMIN Validate
+						DSS_ResultsPreUnits: '',
+						DSS_ResultsPostUnits: 'l/yr'
+					},{
+						DSS_HiddenConversion: true,
+						DSS_ConversionLabel: '<i>conversion to kiloliters</i>',
+						DSS_ConversionFactor: '0.00378541178', // TODO: AMIN Validate
+						DSS_ResultsPreUnits: '',
+						DSS_ResultsPostUnits: 'kl/yr'
+					},{
+						DSS_ConversionLabel: '<b>x</b>  price per Gal',
+						DSS_ConversionFactor: '4.00', // TODO: AMIN Validate
+						DSS_ResultsPreUnits: '$',
+						DSS_ResultsPostUnits: ''
+					}],
 					DSS_GraphTitle: 'Biofuel Production',
 					DSS_InfoHTML: 'help/yield_ethanol_net_energy_net_income.htm',
 					DSS_DetailReportContainer: me
@@ -70,20 +87,22 @@ Ext.define('MyApp.view.Report_Detail', {
 					//DSS_UnitLabel: 'TJ/Yr',
 					DSS_UnitLabel: 'MBtu/Yr',
 					DSS_Label: 'Net Energy',
+					DSS_calculators: [{
+						DSS_HiddenConversion: true,
+						DSS_ConversionLabel: '<i>conversion to megajoules</i>', // TODO: AMIN validate - use Tera, Giga, Mega?
+						DSS_ConversionFactor: '1.1', // TODO: AMIN Validate - use Tera, Giga, Mega?
+						DSS_ResultsPreUnits: '',
+						DSS_ResultsPostUnits: 'mj/yr' // TODO: Amin - use Tera, Giga, Mega?
+					},{
+						DSS_ConversionLabel: '<b>x</b>  price per mbtu',
+						DSS_ConversionFactor: '4.00', // TODO: AMIN Validate
+						DSS_ResultsPreUnits: '$',
+						DSS_ResultsPostUnits: ''
+					}],
 					DSS_GraphTitle: 'Net Energy',
 					DSS_InfoHTML: 'help/yield_ethanol_net_energy_net_income.htm',
 					DSS_DetailReportContainer: me
-				},/*{
-					itemId: 'result_water_quality',
-					xtype: 'report_detail_item',
-					DSS_FieldString: 'water_quality',
-					DSS_UnitLabel: 'Kg/Yr',
-					DSS_UnitLabel: 'ton/Yr',
-					DSS_Label: 'Water Quality',
-					DSS_GraphTitle: 'Water Quality',
-					DSS_InfoHTML: 'help/Phosphorous.htm',
-					DSS_DetailReportContainer: me
-				},*/{
+				},{
 					itemId: 'result_phosphorus_epic',
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'p_loss_epic',
@@ -91,6 +110,24 @@ Ext.define('MyApp.view.Report_Detail', {
 					//DSS_UnitLabel: 'ton/Yr',
 					DSS_UnitLabel: 'lb/Yr',
 					DSS_Label: 'Phosphorus',
+					DSS_calculators: [{
+						DSS_HiddenConversion: true,
+						DSS_ConversionLabel: '<i>conversion to short tons</i>',
+						DSS_ConversionFactor: '0.0005', // TODO: AMIN Validate
+						DSS_ResultsPreUnits: '',
+						DSS_ResultsPostUnits: 'ton/yr'
+					},{
+						DSS_HiddenConversion: true,
+						DSS_ConversionLabel: '<i>conversion to kilograms</i>',
+						DSS_ConversionFactor: '0.453592', // TODO: AMIN Validate
+						DSS_ResultsPreUnits: '',
+						DSS_ResultsPostUnits: 'kg/yr'
+					},{
+						DSS_ConversionLabel: '<b>x</b>  price per lb',
+						DSS_ConversionFactor: '0.40', // TODO: AMIN Validate
+						DSS_ResultsPreUnits: '$',
+						DSS_ResultsPostUnits: ''
+					}],
 					DSS_GraphTitle: 'Phosphorus Epic',
 					DSS_InfoHTML: 'help/phosphorous.htm',
 					DSS_DetailReportContainer: me
@@ -101,29 +138,25 @@ Ext.define('MyApp.view.Report_Detail', {
 					//DSS_UnitLabel: 'Mg/Yr',
 					DSS_UnitLabel: 'ton/Yr',
 					DSS_Label: 'Soil Loss',
+					DSS_calculators: [ton_to_megagram],
 					DSS_GraphTitle: 'Soil Loss',
 					DSS_InfoHTML: 'help/soil_loss.htm',
 					DSS_DetailReportContainer: me
-				},
-/*				{ // TODO: Soil Loss Model Goes Here as Per Order Tim Would Like!!!
-
-					itemId: 'result_soil_loss',
-					xtype: 'report_detail_item',
-					DSS_FieldString: 'soil_loss',
-					DSS_UnitLabel: '??',
-					DSS_Label: 'Soil Loss',
-					DSS_GraphTitle: 'Soil Loss',
-					DSS_InfoHTML: 'help/Phosphorous.htm',
-					DSS_DetailReportContainer: me
-				},
-*/
-				{
+				},{
 					itemId: 'result_soc',
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'soc',
 					DSS_Label: 'Soil Carbon',
 					//DSS_UnitLabel: 'Mg/Yr',
 					DSS_UnitLabel: 'ton/Yr',
+					DSS_calculators: [ton_to_megagram,
+					{
+						DSS_ConversionLabel: '<b>x</b>  price per lb C',
+						DSS_ConversionFactor: '0.40', // TODO: AMIN Validate
+						DSS_ExtraFactor: 298,			// TODO: AMIN Validate
+						DSS_ResultsPreUnits: '$',
+						DSS_ResultsPostUnits: ''
+					}],
 					DSS_GraphTitle: 'Soil Carbon',
 					DSS_InfoHTML: 'help/soil_carbon.htm',
 					DSS_DetailReportContainer: me
@@ -134,6 +167,20 @@ Ext.define('MyApp.view.Report_Detail', {
 					//DSS_UnitLabel: 'Mg/Yr',
 					DSS_UnitLabel: 'ton/Yr',
 					DSS_Label: 'Nitrous Oxide',
+					DSS_calculators: [ton_to_megagram,
+					{
+						DSS_HiddenConversion: true,
+						DSS_ConversionLabel: '<i>conversion to CO<sub>2</sub> equiv (GMW)</i>',
+						DSS_ConversionFactor: '298', // TODO: AMIN Validate
+						DSS_ResultsPreUnits: '',
+						DSS_ResultsPostUnits: 'CO<sub>2</sub> equiv'
+					},{
+						DSS_ConversionLabel: '<b>x</b>  price per lb C',
+						DSS_ConversionFactor: '0.40', // TODO: AMIN Validate
+						DSS_ExtraFactor: 298,	// TODO: AMIN Validate
+						DSS_ResultsPreUnits: '$',
+						DSS_ResultsPostUnits: ''
+					}],
 					DSS_GraphTitle: 'Nitrous Oxide Emissions',
 					DSS_InfoHTML: 'help/nitrous_oxide_emission.htm',
 					DSS_DetailReportContainer: me

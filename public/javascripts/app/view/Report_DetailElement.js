@@ -13,7 +13,8 @@ Ext.define('MyApp.view.Report_DetailElement', {
 
     requires : [
     	'MyApp.view.Report_GraphPopUp',
-    	'MyApp.view.Info_PopUp_HTML'
+    	'MyApp.view.Info_PopUp_HTML',
+    	'MyApp.view.Report_CalculatorPopUp'
     ],
     
     width: 500,
@@ -21,17 +22,21 @@ Ext.define('MyApp.view.Report_DetailElement', {
 	layout: {
         type: 'absolute'
     },
-    
+	
     //--------------------------------------------------------------------------
     initComponent: function() {
         var me = this;
 	
         // set's this as the default, ie, where is the data source? Delta? File1? File2?
-        this.DSS_FieldDataType = 'delta'; 
+        me.DSS_FieldDataType = 'delta'; 
         // set's this as the default, ie, how is the value displayed? Absolute? %?
-        this.DSS_FieldValueType = 'absolute';
+        me.DSS_FieldValueType = 'absolute';
         
-        this.DSS_SubStyleType = 'quantile';
+        me.DSS_SubStyleType = 'quantile';
+        
+        if (!me.DSS_calculators) {
+        	me.DSS_calculators = false;
+        }
         
         Ext.applyIf(me, {
             items: [
@@ -43,7 +48,9 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			    width: 240,
 			    fieldLabel: me.DSS_Label,
 			    labelWidth: 100,
-			    labelAlign: 'right'
+			    labelAlign: 'right',
+			    readOnly: true,
+				value: '0'
 			},{
 				xtype: 'label',
 				itemId: 'DSS_UnitsLabel',
@@ -54,15 +61,38 @@ Ext.define('MyApp.view.Report_DetailElement', {
 					color: '#888'
 				}
 			},{
-			    itemId: 'graph_button',
+			    itemId: 'calculator_button',
 			    xtype: 'button',
 			    x: 335,
+			    y: 3,
+			    width: 30,
+			    disabled: !me.DSS_calculators,
+			    padding: '3 0 3 6',
+			    icon: 'app/images/calculator_16.png',
+			    tooltip: {
+			    	text: 'CONVERT this value to other units, such as dollar amounts or metric'
+			    },
+			    handler: function (self) {
+					var mypopup = Ext.create("MyApp.view.Report_CalculatorPopUp", {
+						title: me.DSS_GraphTitle,
+						DSS_initialValue: me.getComponent('DSS_ValueField').getValue(),
+						DSS_Label: me.DSS_Label,
+						DSS_UnitLabel: me.DSS_UnitLabel,
+						DSS_calculators: me.DSS_calculators // array of calulators to add...
+					});
+					mypopup.show();
+			    }
+			},{
+			},{
+			    itemId: 'graph_button',
+			    xtype: 'button',
+			    x: 370,
 			    y: 3,
 			    width: 30,
 			    padding: '3 0 3 6',
 			    icon: 'app/images/graph_icon.png',
 			    tooltip: {
-			    	text: 'View a histogram graph of the two result sets'
+			    	text: 'GRAPH the results, showing a histogram of this result set'
 			    },
 			    handler: function (self) {
 					var mypopup = Ext.create("MyApp.view.Report_GraphPopUp", {title: me.DSS_GraphTitle});
@@ -72,14 +102,14 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			},{
 			    itemId: 'heat_delta_button',
 			    xtype: 'button',
-			    x: 370,
+			    x: 405,
 			    y: 3,
 			    width: 30,
 			    enableToggle: true,
 			    padding: '3 0 3 6',
 			    icon: 'app/images/map_small_icon.png',
 			    tooltip: {
-			    	text: 'View a data / heatmap overlay calculated from the data sets'
+			    	text: 'MAP the results, showing a heatmap overlay of this result set'
 			    },
 			    handler: function(self) {
 			    	me.showHeatmap(self, me.DSS_FieldDataType, me.DSS_SubStyleType);
@@ -89,12 +119,13 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			    itemId: 'information_button',
 			    xtype: 'button',
 			    disabled: false,
-			    x: 415,
-			    y: 5,
+			    x: 440,
+			    y: 3,
 			    width: 30,
-			    text: '?',
+			    padding: '3 0 3 6',
+			    icon: 'app/images/question_mark_16.png',
 			    tooltip: {
-			    	text: 'View information about this model result'
+			    	text: 'HELP, view information about this model result'
 			    },
 			    handler: function(self) {
 			    	var mypopup = Ext.create('MyApp.view.Info_PopUp_HTML', {

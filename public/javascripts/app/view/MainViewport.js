@@ -265,25 +265,25 @@ Ext.define('MyApp.view.MainViewport', {
 	addMapLayers: function(map) {
 	
 		//-- CDL -----------------------------------------------
-		var wmsCDL = new OpenLayers.Layer.WMS('cdl_2012', 
+		/*var wmsCDL = new OpenLayers.Layer.WMS('cdl_2012', 
 			this.getGeoserverURLs(DSS_RasterPath),
 			this.getLayerSettings(map, 'Raster:CDL_2012'),
 			this.getWMS_Settings(false, 0.5)
-		);
+		);*/
 		
 		//-- Rivers ----------------------------------------------
-		var wmsRivers = new OpenLayers.Layer.WMS("Rivers", 
+		/*var wmsRivers = new OpenLayers.Layer.WMS("Rivers", 
 			this.getGeoserverURLs(DSS_VectorPath),
 			this.getLayerSettings(map, 'Vector:Rivers-B'),
 			this.getWMS_Settings(false, 1)
-		);
+		);*/
 
 		//-- Slope ----------------------------------------------
-		var wmsSlope = new OpenLayers.Layer.WMS("Slope", 
+		/*var wmsSlope = new OpenLayers.Layer.WMS("Slope", 
 			this.getGeoserverURLs(DSS_RasterPath),
 			this.getLayerSettings(map, 'Raster:Slope-b'),
 			this.getWMS_Settings(false, 0.5)
-		);
+		);*/
 
 		//-- Watersheds ----------------------------------------------
 		var wmsWatershed = new OpenLayers.Layer.WMS("Watersheds", 
@@ -292,33 +292,41 @@ Ext.define('MyApp.view.MainViewport', {
 			this.getWMS_Settings(false, 1)
 		);
 		
+		//-- Ag Lands ----------------------------------------------
+		var wmsAg_Lands = new OpenLayers.Layer.WMS("Ag Lands", 
+			this.getGeoserverURLs(DSS_VectorPath),
+			this.getLayerSettings(map, 'Vector:Ag_Lands'),
+			this.getWMS_Settings(false, 1)
+		);
+		
 		//-- LCC ----------------------------------------------
-		var wmsLCC = new OpenLayers.Layer.WMS("lcc", 
+		/*var wmsLCC = new OpenLayers.Layer.WMS("lcc", 
 			this.getGeoserverURLs(DSS_RasterPath),
 			this.getLayerSettings(map, 'Raster:LCC'),
 			this.getWMS_Settings(false, 0.5)
-		);
+		);*/
 		
 		//-- LCS ----------------------------------------------
-		var wmsLCS = new OpenLayers.Layer.WMS("lcs",
+		/*var wmsLCS = new OpenLayers.Layer.WMS("lcs",
 			this.getGeoserverURLs(DSS_RasterPath),
 			this.getLayerSettings(map, 'Raster:LCS'),
 			this.getWMS_Settings(false, 0.5)
-		);
+		);*/
 		
 		map.addLayers([
-			wmsCDL,
-			wmsSlope,
-			wmsRivers,
+			//wmsCDL,
+			//wmsSlope,
+			//wmsRivers,
 			wmsWatershed,
-			wmsLCC,
-			wmsLCS
+			wmsAg_Lands,
+			//wmsLCC,
+			//wmsLCS
 			]);
 		
 		var lpCDL = Ext.create('MyApp.view.LayerPanel_Indexed', {
 			title: 'Landcover',
 			DSS_Description: 'Match land by landcover, example: select rowcrops such as corn or soybeans',
-			DSS_Layer: wmsCDL,
+			//DSS_Layer: wmsCDL,
 			minHeight: 90,
 			maxHeight: 400,
 			DSS_QueryTable: 'cdl_2012',
@@ -329,7 +337,7 @@ Ext.define('MyApp.view.MainViewport', {
 		var lpSlope = Ext.create('MyApp.view.LayerPanel_Continuous', {
 			title: 'Slope',
 			DSS_Description: 'Match land by range of slope, example: select land on steep slopes',
-			DSS_Layer: wmsSlope,
+			//DSS_Layer: wmsSlope,
 			DSS_LayerUnit: '%',//'\xb0',
 			DSS_LayerRangeMin: 0,
 			DSS_LayerRangeMax: 45.5,
@@ -344,7 +352,7 @@ Ext.define('MyApp.view.MainViewport', {
 			DSS_Description: 'Match land by distance to water, example: select land close to streams',
 			DSS_ShortTitle: 'Stream',
 			DSS_AutoSwapTitles: false,
-			DSS_Layer: wmsRivers,
+			//DSS_Layer: wmsRivers,
 			DSS_LayerUnit: 'ft',
 			DSS_LayerRangeMin: 0,
 			DSS_LayerRangeMax: 17220,
@@ -370,12 +378,20 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 
+		var lpAg_Lands = Ext.create('MyApp.view.LayerPanel_Watershed', {
+			title: 'Ag_Lands',
+			DSS_Description: 'Match land by Ag_Lands, example: select land in specific Ag_Lands',
+			DSS_Layer: wmsAg_Lands,
+			DSS_QueryTable: 'Ag_Lands',
+			collapsed: true
+		});
+		
 		var lpLCC = Ext.create('MyApp.view.LayerPanel_Indexed', {
 			title: 'Land Capability Class',
 			DSS_Description: 'Match land by capability, example: select poor quality crop land',
 			DSS_ShortTitle: 'LCC',
 			DSS_AutoSwapTitles: true,
-			DSS_Layer: wmsLCC,
+			//DSS_Layer: wmsLCC,
 			minHeight: 90,
 			maxHeight: 400,
 			DSS_QueryTable: 'lcc',
@@ -387,7 +403,7 @@ Ext.define('MyApp.view.MainViewport', {
 			DSS_Description: 'Match land by capability subclass, example: select soils that are prone to saturation',
 			DSS_ShortTitle: 'LCS',
 			DSS_AutoSwapTitles: true,
-			DSS_Layer: wmsLCS,
+			//DSS_Layer: wmsLCS,
 			minHeight: 90,
 			maxHeight: 400,
 			DSS_QueryTable: 'lcs',
@@ -449,6 +465,7 @@ Ext.define('MyApp.view.MainViewport', {
 		dssLeftPanel.add(lpRiver);
 		dssLeftPanel.add(lpSlope);
 		dssLeftPanel.add(lpWatershed);
+		dssLeftPanel.add(lpAg_Lands);
 		dssLeftPanel.add(lpLCC);
 		dssLeftPanel.add(lpLCS);
 		dssLeftPanel.add(lpPublicLand);
@@ -463,6 +480,7 @@ Ext.define('MyApp.view.MainViewport', {
 		DSS_globalQueryableLayers.push(lpLCC);
 		DSS_globalQueryableLayers.push(lpLCS);
 		DSS_globalQueryableLayers.push(lpWatershed);
+		DSS_globalQueryableLayers.push(lpAg_Lands);
 		DSS_globalQueryableLayers.push(lpPublicLand);
 		DSS_globalQueryableLayers.push(lpDairy);
 		DSS_globalQueryableLayers.push(lpGrid);
@@ -473,6 +491,7 @@ Ext.define('MyApp.view.MainViewport', {
 		DSS_globalCollapsibleLayers.push(lpLCC);
 		DSS_globalCollapsibleLayers.push(lpLCS);
 		DSS_globalCollapsibleLayers.push(lpWatershed);
+		DSS_globalCollapsibleLayers.push(lpAg_Lands);
 		DSS_globalCollapsibleLayers.push(lpPublicLand);
 		DSS_globalCollapsibleLayers.push(lpDairy);
 		DSS_globalCollapsibleLayers.push(lpGrid);

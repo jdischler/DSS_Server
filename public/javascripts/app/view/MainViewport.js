@@ -38,6 +38,7 @@ Ext.define('MyApp.view.MainViewport', {
 		'GeoExt.panel.Map',
 		'MyApp.view.LayerPanel_Google',
         'MyApp.view.LayerPanel_Indexed',
+        'MyApp.view.LayerPanel_PickOne',
         'MyApp.view.LayerPanel_Continuous',
         'MyApp.view.LayerPanel_Watershed',
         'MyApp.view.LogoPanel',
@@ -379,10 +380,30 @@ Ext.define('MyApp.view.MainViewport', {
 		});
 
 		var lpAg_Lands = Ext.create('MyApp.view.LayerPanel_Watershed', {
-			title: 'Ag_Lands',
-			DSS_Description: 'Match land by Ag_Lands, example: select land in specific Ag_Lands',
+			title: 'Dane County Ag Lands',
+			DSS_Description: 'Match land by Dane County agricultural land, example: select specific parcels',
 			DSS_Layer: wmsAg_Lands,
-			DSS_QueryTable: 'Ag_Lands',
+			DSS_QueryTable: 'ag_lands',
+			collapsed: true
+		});
+
+		var lpCRP_Land = Ext.create('MyApp.view.LayerPanel_PickOne', {
+			title: 'CRP Land',
+			DSS_ShortTitle: 'CRP Land',
+			DSS_QueryTable: 'crp',
+			DSS_AtX: 30,
+			DSS_Label: '',
+			DSS_UniqueRadioGroupName: 'isCRP',
+			DSS_RadioColums: 2,
+			// Array of radio button options. Can use most radio button properties in here...
+			DSS_RadioOptions: [{
+				boxLabel: 'Is CRP',
+				inputValue: 1,
+				checked: true
+			},{
+				boxLabel: 'Is NOT CRP',
+				inputValue: 0,
+			}],
 			collapsed: true
 		});
 		
@@ -466,6 +487,7 @@ Ext.define('MyApp.view.MainViewport', {
 		dssLeftPanel.add(lpSlope);
 		dssLeftPanel.add(lpWatershed);
 		dssLeftPanel.add(lpAg_Lands);
+		dssLeftPanel.add(lpCRP_Land);
 		dssLeftPanel.add(lpLCC);
 		dssLeftPanel.add(lpLCS);
 		dssLeftPanel.add(lpPublicLand);
@@ -481,6 +503,7 @@ Ext.define('MyApp.view.MainViewport', {
 		DSS_globalQueryableLayers.push(lpLCS);
 		DSS_globalQueryableLayers.push(lpWatershed);
 		DSS_globalQueryableLayers.push(lpAg_Lands);
+		DSS_globalQueryableLayers.push(lpCRP_Land);
 		DSS_globalQueryableLayers.push(lpPublicLand);
 		DSS_globalQueryableLayers.push(lpDairy);
 		DSS_globalQueryableLayers.push(lpGrid);
@@ -492,6 +515,7 @@ Ext.define('MyApp.view.MainViewport', {
 		DSS_globalCollapsibleLayers.push(lpLCS);
 		DSS_globalCollapsibleLayers.push(lpWatershed);
 		DSS_globalCollapsibleLayers.push(lpAg_Lands);
+		DSS_globalCollapsibleLayers.push(lpCRP_Land);
 		DSS_globalCollapsibleLayers.push(lpPublicLand);
 		DSS_globalCollapsibleLayers.push(lpDairy);
 		DSS_globalCollapsibleLayers.push(lpGrid);

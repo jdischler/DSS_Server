@@ -64,10 +64,13 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 					panel.triggerRequery(button, true);
 				}
 			},{
+				// FIXME: this feature causes problems with the click selection tool
+				//	until it can be fixed, causes less confusion to toggle this off...
             	xtype: 'button',
             	x: 390,
             	y: 4,
             	width: 23,
+            	hidden: true,
             	icon: 'app/images/go_icon_small.png',
             	handler: function(self) {
             		me.createOpacityPopup(self);

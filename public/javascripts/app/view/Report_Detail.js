@@ -62,18 +62,18 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_calculators: [{
 						DSS_HiddenConversion: true,
 						DSS_ConversionLabel: '<i>conversion to liters</i>',
-						DSS_ConversionFactor: '3.78541', // TODO: AMIN Validate
+						DSS_ConversionFactor: '3.78541',
 						DSS_ResultsPreUnits: '',
 						DSS_ResultsPostUnits: 'l/yr'
 					},{
 						DSS_HiddenConversion: true,
 						DSS_ConversionLabel: '<i>conversion to kiloliters</i>',
-						DSS_ConversionFactor: '0.00378541178', // TODO: AMIN Validate
+						DSS_ConversionFactor: '0.00378541178',
 						DSS_ResultsPreUnits: '',
 						DSS_ResultsPostUnits: 'kl/yr'
 					},{
 						DSS_ConversionLabel: '<b>x</b>  price per Gal',
-						DSS_ConversionFactor: '2.00', // TODO: AMIN Validate
+						DSS_ConversionFactor: '2.00',
 						DSS_ResultsPreUnits: '$',
 						DSS_ResultsPostUnits: ''
 					}],
@@ -94,8 +94,8 @@ Ext.define('MyApp.view.Report_Detail', {
 						DSS_ResultsPreUnits: '',
 						DSS_ResultsPostUnits: 'mj/yr' // TODO: Amin - use Tera, Giga, Mega?
 					},{
-						DSS_ConversionLabel: '<b>x</b>  price per mbtu',
-						DSS_ConversionFactor: '4.00', // TODO: AMIN Validate
+						DSS_ConversionLabel: '<b>x</b>  price per million BTU',
+						DSS_ConversionFactor: '4.00',
 						DSS_ResultsPreUnits: '$',
 						DSS_ResultsPostUnits: ''
 					}],
@@ -113,18 +113,18 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_calculators: [{
 						DSS_HiddenConversion: true,
 						DSS_ConversionLabel: '<i>conversion to short tons</i>',
-						DSS_ConversionFactor: '0.0005', // TODO: AMIN Validate
+						DSS_ConversionFactor: '0.0005',
 						DSS_ResultsPreUnits: '',
 						DSS_ResultsPostUnits: 'ton/yr'
 					},{
 						DSS_HiddenConversion: true,
 						DSS_ConversionLabel: '<i>conversion to kilograms</i>',
-						DSS_ConversionFactor: '0.453592', // TODO: AMIN Validate
+						DSS_ConversionFactor: '0.453592',
 						DSS_ResultsPreUnits: '',
 						DSS_ResultsPostUnits: 'kg/yr'
 					},{
 						DSS_ConversionLabel: '<b>x</b>  price per lb',
-						DSS_ConversionFactor: '20.00', // TODO: AMIN Validate
+						DSS_ConversionFactor: '20.00',
 						DSS_ResultsPreUnits: '$',
 						DSS_ResultsPostUnits: ''
 					}],
@@ -151,9 +151,15 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_UnitLabel: 'ton/Yr',
 					DSS_calculators: [ton_to_megagram,
 					{
-						DSS_ConversionLabel: '<b>x</b>  price per lb C',
-						DSS_ConversionFactor: '0.40', // TODO: AMIN Validate
-						DSS_ExtraFactor: 298,			// TODO: AMIN Validate
+						DSS_HiddenConversion: true,
+						DSS_ConversionLabel: '<i>conversion to tons CO<sub>2</sub></i>',
+						DSS_ConversionFactor: 3.67,
+						DSS_ResultsPreUnits: '',
+						DSS_ResultsPostUnits: 'tons CO<sub>2</sub>'
+					},{
+						DSS_ConversionLabel: '<b>x</b>  $ per megagram CO<sub>2</sub>',
+						DSS_ConversionFactor: '12.00',
+						DSS_ExtraFactor: 3.67 * 0.90718474, // convert to C02, then to megagrams
 						DSS_ResultsPreUnits: '$',
 						DSS_ResultsPostUnits: ''
 					}],
@@ -170,14 +176,14 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_calculators: [ton_to_megagram,
 					{
 						DSS_HiddenConversion: true,
-						DSS_ConversionLabel: '<i>conversion to CO<sub>2</sub> equiv (GMW)</i>',
+						DSS_ConversionLabel: '<i>conversion to tons CO<sub>2</sub> equiv (GMW)</i>',
 						DSS_ConversionFactor: '298', // TODO: AMIN Validate
 						DSS_ResultsPreUnits: '',
-						DSS_ResultsPostUnits: 'CO<sub>2</sub> equiv'
+						DSS_ResultsPostUnits: 'tons CO<sub>2</sub> equiv'
 					},{
-						DSS_ConversionLabel: '<b>x</b>  price per lb C',
-						DSS_ConversionFactor: '0.40', // TODO: AMIN Validate
-						DSS_ExtraFactor: 298,	// TODO: AMIN Validate
+						DSS_ConversionLabel: '<b>x</b>  $ per megagram CO<sub>2</sub>',
+						DSS_ConversionFactor: '12.00',
+						DSS_ExtraFactor: 298 * 0.90718474, // convert to C02, then to megagrams
 						DSS_ResultsPreUnits: '$',
 						DSS_ResultsPostUnits: ''
 					}],

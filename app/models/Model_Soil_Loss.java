@@ -164,8 +164,7 @@ Logger.info("  > Allocated memory for Soil_Loss");
 						C = 0.02f;
 						//P = 0.25f;
 						//P = 1.0f;
-						P = ManagementOptions.E_Contour.getIfActiveOn(landCover, Management_P1, 1.0f) *
-						ManagementOptions.E_Terrace.getIfActiveOn(landCover, Management_P2, 1.0f);
+						P = ManagementOptions.E_Terrace.getIfActiveOn(landCover, Management_P2, 1.0f);
 					} 
 					// Alfalfa
 					else if ((landCover & Alfalfa_Mask) > 0) 
@@ -173,8 +172,7 @@ Logger.info("  > Allocated memory for Soil_Loss");
 						C = 0.02f;
 						//P = 0.25f;
 						//P = 1.0f;
-						P = ManagementOptions.E_Contour.getIfActiveOn(landCover, Management_P1, 1.0f) *
-						ManagementOptions.E_Terrace.getIfActiveOn(landCover, Management_P2, 1.0f);
+						P = ManagementOptions.E_Terrace.getIfActiveOn(landCover, Management_P2, 1.0f);
 					} 
 					// Forest
 					//else if ((landCover & Forest_Mask) > 0) 

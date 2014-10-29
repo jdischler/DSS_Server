@@ -142,8 +142,8 @@ Logger.info("  > Allocated memory for P_Loss_EPIC");
 							MM = ManagementOptions.getFertilizerMultiplier(landCover, 
 									1.0f, 1.0f, // these values correspond to NO Fert multiplier and synthetic multiplier
 									fallManurePerennialModifier, manurePerennialModifier);
-							TM = ManagementOptions.E_Till.getIfActiveOn(landCover, tillAnnualModifier, 1.0f);
-							CCM = ManagementOptions.E_CoverCrop.getIfActiveOn(landCover, covercropAnnualModifier, 1.0f);
+							//TM = ManagementOptions.E_Till.getIfActiveOn(landCover, tillAnnualModifier, 1.0f);
+							//CCM = ManagementOptions.E_CoverCrop.getIfActiveOn(landCover, covercropAnnualModifier, 1.0f);
 						}
 						else
 						{

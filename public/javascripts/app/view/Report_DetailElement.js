@@ -43,18 +43,19 @@ Ext.define('MyApp.view.Report_DetailElement', {
             {
 			    itemId: 'DSS_ValueField',  
 			    xtype: 'textfield',
-			    x: 20,
+			    x: 5,
 			    y: 5,
-			    width: 240,
+			    width: 260,
 			    fieldLabel: me.DSS_Label,
-			    labelWidth: 100,
+			    fieldStyle: 'text-align: right;',
+			    labelWidth: 120,
 			    labelAlign: 'right',
 			    readOnly: true,
 				value: '0'
 			},{
 				xtype: 'label',
 				itemId: 'DSS_UnitsLabel',
-				x: 262,
+				x: 272,
 				y: 9,
 				text: me.DSS_UnitLabelDelta ? me.DSS_UnitLabelDelta : me.DSS_UnitLabel,
 				style: {

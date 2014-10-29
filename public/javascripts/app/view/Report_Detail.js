@@ -109,7 +109,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					//DSS_UnitLabel: 'Kg/Yr',
 					//DSS_UnitLabel: 'ton/Yr',
 					DSS_UnitLabel: 'lb/Yr',
-					DSS_Label: 'Phosphorus',
+					DSS_Label: 'Phosphorus Loading',
 					DSS_calculators: [{
 						DSS_HiddenConversion: true,
 						DSS_ConversionLabel: '<i>conversion to short tons</i>',
@@ -128,7 +128,7 @@ Ext.define('MyApp.view.Report_Detail', {
 						DSS_ResultsPreUnits: '$',
 						DSS_ResultsPostUnits: ''
 					}],
-					DSS_GraphTitle: 'Phosphorus Epic',
+					DSS_GraphTitle: 'Epic Phosphorus Loading',
 					DSS_InfoHTML: 'help/phosphorous.htm',
 					DSS_DetailReportContainer: me
 				},{
@@ -146,7 +146,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					itemId: 'result_soc',
 					xtype: 'report_detail_item',
 					DSS_FieldString: 'soc',
-					DSS_Label: 'Soil Carbon',
+					DSS_Label: 'Soil Carbon Sequest.',
 					//DSS_UnitLabel: 'Mg/Yr',
 					DSS_UnitLabel: 'ton/Yr',
 					DSS_calculators: [ton_to_megagram,
@@ -163,7 +163,7 @@ Ext.define('MyApp.view.Report_Detail', {
 						DSS_ResultsPreUnits: '$',
 						DSS_ResultsPostUnits: ''
 					}],
-					DSS_GraphTitle: 'Soil Carbon',
+					DSS_GraphTitle: 'Soil Carbon Sequestration',
 					DSS_InfoHTML: 'help/soil_carbon.htm',
 					DSS_DetailReportContainer: me
 				},{
@@ -196,8 +196,8 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_FieldString: 'pollinator',
 					DSS_UnitLabelDelta: '0 to 1',
 					DSS_UnitLabelFile: '0 to 1',
-					DSS_Label: 'Pollinators',
-					DSS_GraphTitle: 'Pollinators',
+					DSS_Label: 'Pollinator Index',
+					DSS_GraphTitle: 'Pollinator Index',
 					DSS_InfoHTML: 'help/pollinator.htm',
 					DSS_DetailReportContainer: me
 				},{
@@ -206,8 +206,8 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_FieldString: 'pest',
 					DSS_UnitLabelDelta: '0 to 1',
 					DSS_UnitLabelFile: '0 to 1',
-					DSS_Label: 'Biocontrol',
-					DSS_GraphTitle: 'Biocontrol / Crop Pest Supression',
+					DSS_Label: 'Biocontrol Index',
+					DSS_GraphTitle: 'Biocontrol / Pest Supression Index',
 					DSS_InfoHTML: 'help/pest_suppression.htm',
 					DSS_DetailReportContainer: me
 				},{
@@ -216,7 +216,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_FieldString: 'habitat_index',
 					DSS_UnitLabelDelta: '0 to 1',
 					DSS_UnitLabelFile: '0 to 1',
-					DSS_Label: 'Bird Habitat',
+					DSS_Label: 'Bird Habitat Index',
 					DSS_GraphTitle: 'Bird Habitat Index',
 					DSS_InfoHTML: 'help/biodiversity.htm',
 					DSS_DetailReportContainer: me

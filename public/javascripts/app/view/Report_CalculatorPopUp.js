@@ -70,13 +70,18 @@ Ext.define('MyApp.view.Report_CalculatorPopUp', {
 			if (extraFactor && Ext.isNumeric(extraFactor)) {
 				result *= extraFactor;
 			}
-			var places = 1;
-			if (Math.abs(result) < 100) places++;
-			if (Math.abs(result) < 25) places++;
-			if (Math.abs(result) < 10) places++;
-			if (Math.abs(result) <= 1) places++;
+			var format = '0,0.0';
+			// If dollars, use fixed decimal places regardless of amount
+			if (preLabel =='$') {
+				format = '0,0.00';
+			} else {
+				if (Math.abs(result) < 100) format += '0';
+				if (Math.abs(result) < 25) format += '0';
+				if (Math.abs(result) < 10) format += '0';
+				if (Math.abs(result) <= 1) format += '0';
+			}
 			
-			return '= ' + preLabel + result.toFixed(places) + ' ' + postLabel;
+			return '= ' + preLabel + Ext.util.Format.number(result,format) + ' ' + postLabel;
 		}
 		
 		return '= not a number';

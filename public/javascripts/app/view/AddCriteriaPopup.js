@@ -7,7 +7,7 @@ Ext.define('MyApp.view.AddCriteriaPopup', {
     	'MyApp.view.AddCriteriaWidget'
     ],
     
-    height: 318,
+    height: 382,
 //    height: 600,
     width: 330,
 	layout: {
@@ -30,10 +30,11 @@ Ext.define('MyApp.view.AddCriteriaPopup', {
 			Ext.Msg.show({
 				title:'Step 1 Help',
 				maxWidth: 750,
-				maxHeight: 700,
+				maxHeight: 800,
+				constrainHeader: true,
 //				msg: 'In Step 1, land is selected based on the <i>intersection</i> of the critera you specify. In Step 2, once you choose land based on your criteria, you can then transform this land into a <i>new</i> landcover type. In Step 3, you request a model simulation to be run and then you will be presented with an analysis of possible impacts of this hypothetical land use change.<br /><br />' +
 				msg: '<div style="height: 600px; text-align:justify; padding-right: 30px;">' +
-				'<b>Step 1:</b><br /><br />Land is selected based on the <i>intersection</i> of the critera you specify.<br /><br />' +
+				'<b>Step 1:</b> Land is selected based on the <i>intersection</i> of the critera you specify.<br /><br />' +
 				'For example, to start, you could ask the question: "I am concerned about water quality; where are erosion prone rowcrops located in the landscape?".<br /><br />' +
 				'In the SmartScape software, one way you could think about this question is as the intersection of three things: "Landcover", "Distance to Streams", and "Land Capability Subclass".<br /><br />' +
 				'Add these three criteria to your selection, confirm with the "OK" button, you will then be presented with options for specifying the <i>details</i> of your criteria.<br /><br />' +
@@ -42,8 +43,7 @@ Ext.define('MyApp.view.AddCriteriaPopup', {
 				'&#8226; We want rowcrops, so check "Corn" and/or "Soy" for our "Landcover" critera.<br />' +
 				'&#8226; We want land close to water, so specify "<= 200 feet" for our "Distance to Stream" critera.<br />' +
 				'&#8226; Check "Erosion Prone" for our "Land Capability Subclass" critera.<br />' +
-				'</div><br />' +
-				'Which looks like this:<br />' +
+				'</div>' +
 				'<img src="app/images/step_1_help.png" alt="step 1" width="465" height="275"><br /><br />' +
 				'in <b>Step 2</b>, you can transform these specific areas with rowcrops on erosion prone land into a more stable perennial crop.' +
 				'</div>',

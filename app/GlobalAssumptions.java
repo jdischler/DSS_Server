@@ -35,11 +35,11 @@ public class GlobalAssumptions
 		// P - Crop prices into Net Income Model
 		ObjectNode category = createAssumptionCategory("Net Income Model", "economic_icon.png");
 		// Sell -> Price per tonne
-		createAssumption(category,	"p_corn_s", 	"Corn Price", 			233.0f, options);
+		createAssumption(category,	"p_corn_s", 	"Corn Price", 			163.0f, options);
 		createAssumption(category,	"p_stover_s", 	"Corn Stover Price", 	50.0f, 	options);
-		createAssumption(category,	"p_soy_s", 		"Soy Price", 			640.0f, options);
-		createAssumption(category,	"p_alfalfa_s", 	"Alfalfa Price", 		200.0f, options);
-		createAssumption(category,	"p_grass_s", 	"Grass Price", 			75.0f, options);
+		createAssumption(category,	"p_soy_s", 		"Soy Price", 			400.0f, options);
+		createAssumption(category,	"p_alfalfa_s", 	"Alfalfa Price", 		254.0f, options);
+		createAssumption(category,	"p_grass_s", 	"Grass Price", 			100.0f, options);
 		
 		options = JsonNodeFactory.instance.objectNode();
 		addOptionalRangeProperties(options, 1, 10000);

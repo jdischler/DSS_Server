@@ -108,7 +108,8 @@ public class GlobalAssumptions
 		category = createAssumptionCategory("Soil Loss Model", "down.png", false); // false means closed category
 		//createAssumption(category,	"sl_t_annuals_C1", 	"Till - Annual Crops", 			1.30f,	multiplierOptions);
 		createAssumption(category,	"sl_Contouring_P1", 	"With Contouring", 				0.90f,	multiplierOptions);
-		createAssumption(category,	"sl_Terrace_P2",	"With Terrace", 					0.85f,	multiplierOptions);
+		// Terracing currently made to have no effect whatsoever
+		createAssumption(category,	"sl_Terrace_P2",	"With Terrace", 					1.0f,	multiplierOptions);
 		createAssumption(category,	"sl_cc_annuals",	"With Cover Crop - Annual Crops", 	0.75f,	multiplierOptions);
 		
 		// PHOSPHORUS MODEL Multipliers

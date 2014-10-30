@@ -32,10 +32,12 @@ Ext.define('MyApp.view.Report_CalculatorPopUp', {
 				y: 5,
 				width: 240,
 				fieldLabel: me.DSS_Label,
-				labelWidth: 100,
+				labelWidth: 120,
+			    fieldStyle: 'text-align: right;',
 				labelAlign: 'right',
+				labelSeparator: '',
 				readOnly: true,
-				value: me.DSS_initialValue
+				value: me.DSS_formattedValue
 			},{
 				xtype: 'label',
 				itemId: 'DSS_UnitsLabel',
@@ -81,7 +83,18 @@ Ext.define('MyApp.view.Report_CalculatorPopUp', {
 				if (Math.abs(result) <= 1) format += '0';
 			}
 			
-			return '= ' + preLabel + Ext.util.Format.number(result,format) + ' ' + postLabel;
+			// workaround comma formatting issue for negative numbers		
+			var isNegative = false;
+			if (result < 0) {
+				isNegative = true;
+				result = Math.abs(result);
+			}
+			var result = Ext.util.Format.number(result,format);
+			if (isNegative) {
+				result = '-' + result;
+			}
+			
+			return '= ' + preLabel + result + ' ' + postLabel;
 		}
 		
 		return '= not a number';

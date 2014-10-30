@@ -31,7 +31,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
         me.DSS_FieldDataType = 'delta'; 
         // set's this as the default, ie, how is the value displayed? Absolute? %?
         me.DSS_FieldValueType = 'absolute';
-        
+        me.DSS_UnformatedValue = 0;
         me.DSS_SubStyleType = 'quantile';
         
         if (!me.DSS_calculators) {
@@ -50,6 +50,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			    fieldStyle: 'text-align: right;',
 			    labelWidth: 120,
 			    labelAlign: 'right',
+				labelSeparator: '',
 			    readOnly: true,
 				value: '0'
 			},{
@@ -76,7 +77,8 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			    handler: function (self) {
 					var mypopup = Ext.create("MyApp.view.Report_CalculatorPopUp", {
 						title: me.DSS_GraphTitle,
-						DSS_initialValue: me.getComponent('DSS_ValueField').getValue(),
+						DSS_formattedValue: me.getComponent('DSS_ValueField').getValue(),
+						DSS_initialValue: me.getComponent('DSS_ValueField').DSS_UnformatedValue,
 						DSS_Label: me.DSS_Label,
 						DSS_UnitLabel: me.DSS_UnitLabel,
 						DSS_calculators: me.DSS_calculators // array of calulators to add...
@@ -209,7 +211,30 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			}
     	}
     	
-		this.getComponent('DSS_ValueField').setValue(res.toFixed(4));
+		this.getComponent('DSS_ValueField').DSS_UnformatedValue = res;
+
+		// workaround comma formatting issue for negative numbers		
+		var isNegative = false;
+		if (res < 0) {
+			isNegative = true;
+			res = Math.abs(res);
+		}
+    	if (res >= 10000) {
+    		res = Ext.util.Format.number(res, '0,000');
+    	}
+    	else if (res >= 1000) {
+    		res = Ext.util.Format.number(res, '0,000.0');
+    	}
+    	else if (res > 100) {
+    		res = Ext.util.Format.number(res, '0.00');
+    	}
+    	else {
+    		res = Ext.util.Format.number(res, '0.000');
+    	}
+    	if (isNegative) {
+			res = '-' + res;
+    	}
+		this.getComponent('DSS_ValueField').setValue(res);
 		this.getComponent('DSS_UnitsLabel').setText(unitsLabel);
     },
   

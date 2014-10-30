@@ -4,10 +4,10 @@ var DSS_TransformTypes = Ext.create('Ext.data.Store', {
 		
 	fields: ['index', 'name', 'controls'],
 	data: [
-		{ 'index': 1, 'name': 'Corn', 	'controls': ['Fertilizer','Tillage','CoverCrop','Contour','Terraced'] },
-		{ 'index': 16, 'name': 'Soy', 	'controls': ['Fertilizer','Tillage','CoverCrop','Contour','Terraced'] },
-		{ 'index': 17, 'name': 'Alfalfa', 'controls': ['Fertilizer','Tillage','Contour','Terraced'] },
-		{ 'index': 6, 'name': 'Grass', 	'controls': ['Fertilizer','Contour','Terraced'] }
+		{ 'index': 1, 'name': 'Corn', 	'controls': ['Fertilizer','Tillage','CoverCrop','Contour'] },
+		{ 'index': 16, 'name': 'Soy', 	'controls': ['Fertilizer','Tillage','CoverCrop','Contour'] },
+		{ 'index': 17, 'name': 'Alfalfa', 'controls': ['Fertilizer'] },
+		{ 'index': 6, 'name': 'Grass', 	'controls': ['Fertilizer'] }
 	]
 });
 

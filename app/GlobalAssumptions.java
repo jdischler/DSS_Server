@@ -35,7 +35,7 @@ public class GlobalAssumptions
 		// P - Crop prices into Net Income Model
 		ObjectNode category = createAssumptionCategory("Net Income Model", "economic_icon.png");
 		// Sell -> Price per tonne
-		createAssumption(category,	"p_corn_s", 	"Corn Price", 			163.0f, options);
+		createAssumption(category,	"p_corn_s", 	"Corn Price", 			240.0f, options);
 		createAssumption(category,	"p_stover_s", 	"Corn Stover Price", 	50.0f, 	options);
 		createAssumption(category,	"p_soy_s", 		"Soy Price", 			400.0f, options);
 		createAssumption(category,	"p_alfalfa_s", 	"Alfalfa Price", 		254.0f, options);
@@ -107,16 +107,16 @@ public class GlobalAssumptions
 		// SOIL LOSS MODEL Multipliers
 		category = createAssumptionCategory("Soil Loss Model", "down.png", false); // false means closed category
 		//createAssumption(category,	"sl_t_annuals_C1", 	"Till - Annual Crops", 			1.30f,	multiplierOptions);
-		createAssumption(category,	"sl_Contouring_P1", 	"With Contouring", 				0.50f,	multiplierOptions);
-		createAssumption(category,	"sl_Terrace_P2",	"With Terrace", 					0.65f,	multiplierOptions);
-		createAssumption(category,	"sl_cc_annuals",	"With Cover Crop - Annual Crops", 	0.35f,	multiplierOptions);
+		createAssumption(category,	"sl_Contouring_P1", 	"With Contouring", 				0.90f,	multiplierOptions);
+		createAssumption(category,	"sl_Terrace_P2",	"With Terrace", 					0.85f,	multiplierOptions);
+		createAssumption(category,	"sl_cc_annuals",	"With Cover Crop - Annual Crops", 	0.75f,	multiplierOptions);
 		
 		// PHOSPHORUS MODEL Multipliers
 		category = createAssumptionCategory("Phosphorus Model", "down.png", false); // false means closed category
 		createAssumption(category,	"p_m_annuals",		"Manure - Annual Crops",		1.03f,	multiplierOptions);
 		createAssumption(category,	"p_fm_annuals",		"Fall Manure - Annual Crops",	1.06f,	multiplierOptions);
-		createAssumption(category,	"p_t_annuals",		"Till - Annual Crops",			1.35f,	multiplierOptions);
-		createAssumption(category,	"p_cc_annuals",		"With Cover Crop - Annual Crops",0.55f,	multiplierOptions);
+		createAssumption(category,	"p_t_annuals",		"Till - Annual Crops",			1.25f,	multiplierOptions);
+		createAssumption(category,	"p_cc_annuals",		"With Cover Crop - Annual Crops",0.85f,	multiplierOptions);
 		createAssumption(category,	"p_m_perennials",	"Manure - Perennial Crops",		1.02f,	multiplierOptions);
 		createAssumption(category,	"p_fm_perennials",	"Fall Manure - Perennial Crops",1.04f,	multiplierOptions);
 		

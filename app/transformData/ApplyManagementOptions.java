@@ -15,41 +15,61 @@ public class ApplyManagementOptions
 	// Could do a global tillage percentage but maybe more flexible this way?
 	private static float mCornTillPercent = 0.64f;
 	private static float mSoyTillPercent = 0.64f;
-	private static float mAlfalfaTillPercent = 0.64f;
-	private static float mGrassTillPercent = 0.0f;
+	//private static float mAlfalfaTillPercent = 0.64f;
+	private static float mAlfalfaTillPercent = 0.20f;
+	//private static float mGrassTillPercent = 0.0f;
+	private static float mGrassTillPercent = 0.05f;
 
-	private static float mCornFertilizedPercent = 0.99f;
-	private static float mSoyFertilizedPercent = 0.99f;
-	private static float mAlfalfaFertilizedPercent = 0.9f;
-	private static float mGrassFertilizedPercent = 0.5f;
-
-	// Scale manure chance by density of dairy...
-	private static float mLowManureMult = 2.0f;
-	private static float mMedManureMult = 5.0f; 	
-	private static float mHighManureMult = 8.0f; 
+	//private static float mCornFertilizedPercent = 0.99f;
+	//private static float mSoyFertilizedPercent = 0.99f;
+	//private static float mAlfalfaFertilizedPercent = 0.9f;
+	//private static float mGrassFertilizedPercent = 0.5f;
+	private static float mCornFertilizedPercent = 1.0f;
+	private static float mSoyFertilizedPercent = 0.60f;
+	private static float mAlfalfaFertilizedPercent = 0.20f;
+	private static float mGrassFertilizedPercent = 0.20f;
 	
-	private static float mCornManurePercent = 0.1f;
-	private static float mSoyManurePercent = 0.1f;
-	private static float mAlfalfaManurePercent = 0.04f;
-	private static float mGrassManurePercent = 0.01f;
+	// Scale manure chance by density of dairy...
+	private static float mLowManureMult = 1.2f;
+	private static float mMedManureMult = 1.4f; 	
+	private static float mHighManureMult = 1.8f; 
+	
+	//private static float mCornManurePercent = 0.1f;
+	//private static float mSoyManurePercent = 0.1f;
+	//private static float mAlfalfaManurePercent = 0.04f;
+	//private static float mGrassManurePercent = 0.01f;
+	private static float mCornManurePercent = 0.20f;
+	private static float mSoyManurePercent = 0.10f;
+	private static float mAlfalfaManurePercent = 0.20f;
+	private static float mGrassManurePercent = 0.20f;
 	
 	// Note: fall manure percentages ONLY kick in if manure is used in the first place.
-	private static float mCornFallManurePercent = 0.5f;
-	private static float mSoyFallManurePercent = 0.5f;
-	private static float mAlfalfaFallManurePercent = 0.5f;
-	private static float mGrassFallManurePercent = 0.1f;
+	//private static float mCornFallManurePercent = 0.5f;
+	//private static float mSoyFallManurePercent = 0.5f;
+	//private static float mAlfalfaFallManurePercent = 0.5f;
+	//private static float mGrassFallManurePercent = 0.1f;
+	private static float mCornFallManurePercent = 0.25f;
+	private static float mSoyFallManurePercent = 0.15f;
+	private static float mAlfalfaFallManurePercent = 0.15f;
+	private static float mGrassFallManurePercent = 0.15f;
 	
-	private static float mCornCoverCropPercent = 0.07f;
-	private static float mSoyCoverCropPercent = 0.07f;
+	//private static float mCornCoverCropPercent = 0.07f;
+	//private static float mSoyCoverCropPercent = 0.07f;
+	//private static float mAlfalfaCoverCropPercent = 1.0f;
+	//private static float mGrassCoverCropPercent = 1.0f;
+	private static float mCornCoverCropPercent = 0.10f;
+	private static float mSoyCoverCropPercent = 0.10f;
 	private static float mAlfalfaCoverCropPercent = 1.0f;
 	private static float mGrassCoverCropPercent = 1.0f;
 	
-	private static float mSteepSlopeGrade = 7; // 7%
-	private static float mSteepContourPercent = 0.75f;
-	private static float mSteepTerracePercent = 0.25f;
-	private static float mModerateSlopeGrade = 3; // 3%
-	private static float mModerateContourPercent = 0.3f;
-	private static float mModerateTerracePercent = 0.1f;
+	private static float mSteepSlopeGrade = 5; // >=5%
+	private static float mSteepContourPercent = 0.30f;
+	private static float mSteepTerracePercent = 0.30f;
+	private static float mModerateSlopeGrade = 0; // <5%
+	//private static float mModerateContourPercent = 0.3f;
+	//private static float mModerateTerracePercent = 0.1f;
+	private static float mModerateContourPercent = 0.10f;
+	private static float mModerateTerracePercent = 0.10f;
 	
 	//--------------------------------------------------------------------------
 	public static void now() {

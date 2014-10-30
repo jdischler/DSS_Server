@@ -138,7 +138,7 @@ public class ApplyManagementOptions
 					}
 				}
 				// manure modifier
-				float manureChance = 1.0f;
+				float manureChance = 0.0f;
 				if ((rasterCell & cornMask) > 0) {
 					manureChance = mCornManurePercent;
 					if (rnd.nextFloat() < mCornTillPercent) 		options = ManagementOptions.E_Till.setOn(options);

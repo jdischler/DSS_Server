@@ -68,7 +68,7 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
     },
     
     //--------------------------------------------------------------------------
-    setSpiderDataElement: function(value1, value2, element) {
+    setSpiderDataElement: function(value1, value2, element, invert) {
 
     	// Fill in detailed spider data
     	var rec = this.graphDetailStore.findRecord('Match', element);
@@ -98,11 +98,16 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 			value1 = max;
 		}
 		
-
-		
 		// FIXME: reversed because we don't know why the data is reversed...blah
-		var result1 = value2 / max * 100;
-		var result2 = value1 / max * 100;
+		//	Except then for inverted ones, we do want to use them reversed..blah
+		var result1, result2;
+		if (invert) {
+			result1 = value1 / max * 100;
+			result2 = value2 / max * 100;
+		} else {
+			result1 = value2 / max * 100;
+			result2 = value1 / max * 100;
+		}
 		
     	if (rec) {
 			rec.set("Current", result1);

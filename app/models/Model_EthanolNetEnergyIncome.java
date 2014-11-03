@@ -232,7 +232,7 @@ Logger.info("  > Allocated memory for NetEnergy, NetIncom, Fuel");
 		
 		List<ModelResult> results = new ArrayList<ModelResult>();
 		
-		results.add(new ModelResult("yield", scenario.mOutputDir, calculatedYield, width, height));
+//		results.add(new ModelResult("yield", scenario.mOutputDir, calculatedYield, width, height));
 		results.add(new ModelResult("ethanol", scenario.mOutputDir, ethanolData, width, height));
 		results.add(new ModelResult("net_energy", scenario.mOutputDir, netEnergyData, width, height));
 		results.add(new ModelResult("net_income", scenario.mOutputDir, netIncomeData, width, height));

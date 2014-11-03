@@ -52,8 +52,12 @@ Ext.define('MyApp.view.Report_ScenarioComparison', {
     bodyStyle: {
     	'background-color': '#f4f8ff'
     },
-//    hidden: true, // FIXME: finish so we can show this when needed...
-   
+	// NOTE: these strings MUST be synchronized with the server, or else the server will
+	//	not know which files to compare. 
+	// More specifically, these are the FILE names that the model process would be writing out
+	DSS_CompareFiles: ['net_income','ethanol','net_energy','p_loss_epic','soil_loss',
+					'soc','nitrous_oxide','pollinator','pest','habitat_index'],
+
     //--------------------------------------------------------------------------
     initComponent: function() {
         var me = this;
@@ -139,6 +143,7 @@ Ext.define('MyApp.view.Report_ScenarioComparison', {
 		var combo2 = Ext.getCmp('DSS_ScenarioCompareCombo_2');
 		var requestData = {
 			clientID: 1234, //temp
+			compareCount: this.DSS_CompareFiles.length,
 			compare1ID: combo1.getValue(),//-1, // default
 			compare2ID: combo2.getValue()
 		};
@@ -189,13 +194,7 @@ Ext.define('MyApp.view.Report_ScenarioComparison', {
 	 
 		var button = Ext.getCmp('DSS_runModelButton');
 		
-		// NOTE: these strings MUST be synchronized with the server, or else the server will
-		//	not know which files to compare. 
-		// More specifically, these are the FILE names that the model process would be writing out
-		var files = ['net_income','ethanol','net_energy','p_loss_epic','soil_loss',
-						'soc','nitrous_oxide','pollinator','pest','habitat_index'];
-		
-		var requestCount = files.length;
+		var requestCount = this.DSS_CompareFiles.length;
 		var successCount = 0;
 		
 		Ext.getCmp('DSS_ReportDetail').setWaitFields();
@@ -203,9 +202,9 @@ Ext.define('MyApp.view.Report_ScenarioComparison', {
 		// Disable the save button until all models complete...
 		Ext.getCmp('DSS_ScenarioSaveButton').setDisabled(true);
 
-		for (var i = 0; i < files.length; i++) {
+		for (var i = 0; i < this.DSS_CompareFiles.length; i++) {
 			var request = newRequest;
-			request.file = files[i];
+			request.file = this.DSS_CompareFiles[i];
 			
 			var obj = Ext.Ajax.request({
 				url: location.href + 'runComparison',
@@ -247,8 +246,8 @@ Ext.define('MyApp.view.Report_ScenarioComparison', {
 					if (requestCount <=0) {
 						button.setIcon('app/images/go_icon.png');
 						button.setDisabled(false);
+						alert("Comparison failed, request timed out?");
 					}
-					alert("Comparison failed, request timed out?");
 				}
 			});
 		}

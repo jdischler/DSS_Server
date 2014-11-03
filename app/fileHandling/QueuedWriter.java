@@ -192,6 +192,7 @@ public class QueuedWriter implements Runnable {
 					}
 					
 					//--- TODO: other formats if desired? E.g., ArcGIS native-ish formats?
+					result.mRasterData = null;
 				}
 				
 				if (mScenarioSetupsToWrite.size() > 0) {
@@ -233,6 +234,7 @@ public class QueuedWriter implements Runnable {
 							writer.writeLine();
 						}
 						writer.close();
+						result.mSelectionData = null;
 					}
 					
 					// ---WRITE BINARY DSS for New Transformed Landscape?
@@ -298,6 +300,7 @@ public class QueuedWriter implements Runnable {
 							}
 						}
 					}
+					result.mLandscapeData = null;
 				}
 			}
 		}

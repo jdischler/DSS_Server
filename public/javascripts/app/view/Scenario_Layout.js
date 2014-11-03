@@ -72,6 +72,8 @@ Ext.define('MyApp.view.Scenario_Layout', {
     sortableColumns: false,
     columnLines: true,
     
+	DSS_modelTypes: ['yield', 'pest_pol', 'soc', 'nitrous', 'habitat_index', 
+						  'soil_loss', 'epic_phosphorus'],
 	dockedItems: [{
 		xtype: 'toolbar',
 		dock: 'bottom',
@@ -355,6 +357,7 @@ Ext.define('MyApp.view.Scenario_Layout', {
 		var haveQuery = false;
 		var requestData = {
 			clientID: 1234, //temp
+			modelRequestCount: this.DSS_modelTypes.length,
 			compare1ID: scCombo1,//-1, // default
 			assumptions: DSS_AssumptionsAdjustable.Assumptions,
 			transforms: []
@@ -467,11 +470,8 @@ Ext.define('MyApp.view.Scenario_Layout', {
 		
 		// NOTE: these strings MUST be synchronized with the server, or else the server will
 		//	not know which models to run. FIXME: should maybe set this up in a more robust fashion?? How?
-//		var modelTypes = ['yield', 'n_p', 'pest_pol', 'soc', 'nitrous', 'habitat_index', 'water_quality'];
-		var modelTypes = ['yield', 'pest_pol', 'soc', 'nitrous', 'habitat_index', 
-						  'soil_loss', /*'water_quality',*/ 'epic_phosphorus'];
 		
-		var requestCount = modelTypes.length;
+		var requestCount = this.DSS_modelTypes.length;
 		var successCount = 0;
 		
 		Ext.getCmp('DSS_ReportDetail').setWaitFields();
@@ -479,9 +479,9 @@ Ext.define('MyApp.view.Scenario_Layout', {
 		// Disable the save button until all models complete...
 		Ext.getCmp('DSS_ScenarioSaveButton').setDisabled(true);
 
-		for (var i = 0; i < modelTypes.length; i++) {
+		for (var i = 0; i < this.DSS_modelTypes.length; i++) {
 			var request = queryJson;
-			request.modelType = modelTypes[i];
+			request.modelType = this.DSS_modelTypes[i];
 			
 			var obj = Ext.Ajax.request({
 				url: location.href + 'modelCluster',
@@ -521,8 +521,8 @@ Ext.define('MyApp.view.Scenario_Layout', {
 					if (requestCount <=0) {
 						button.setIcon('app/images/go_icon.png');
 						button.setDisabled(false);
+						alert("Model run failed, request timed out?");
 					}
-					alert("Model run failed, request timed out?");
 				}
 			});
 		}

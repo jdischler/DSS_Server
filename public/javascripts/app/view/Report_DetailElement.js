@@ -274,13 +274,14 @@ Ext.define('MyApp.view.Report_DetailElement', {
 	//			.count
 	//			.min
 	//			.max
+	// Can optionally be inverted on the spider graph for values that want to be smaller=better
     //--------------------------------------------------------------------------
-    setData: function(val1, val2, totalVal, data) // send in something like: obj.habitat_index
+    setData: function(val1, val2, totalVal, data, invert) // send in something like: obj.habitat_index
     {
     	this.DSS_FieldData = {val1: val1, val2: val2, total: totalVal};
     	
 		this.clearWait();
-		Ext.getCmp('DSS_SpiderGraphPanel').setSpiderDataElement(val1, val2, this.DSS_FieldString);
+		Ext.getCmp('DSS_SpiderGraphPanel').setSpiderDataElement(val1, val2, this.DSS_FieldString, invert);
 		this.setValueField();
 		this.DSS_GraphData = data;
     },

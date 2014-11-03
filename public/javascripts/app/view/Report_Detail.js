@@ -443,7 +443,7 @@ Ext.define('MyApp.view.Report_Detail', {
 			var val1 = base.file1.sum * 1.102 * 2000;
 			var val2 = base.file2.sum * 1.102 * 2000;
 			var totalVal = val2 - val1;
-			c.getComponent('result_phosphorus_epic').setData(val1, val2, totalVal, base);
+			c.getComponent('result_phosphorus_epic').setData(val1, val2, totalVal, base, true);
 		}	
 		/*if (obj.water_quality) {
 			var base = obj.water_quality.selection;
@@ -469,7 +469,7 @@ Ext.define('MyApp.view.Report_Detail', {
 			var val1 = base.file1.sum * 1.102;
 			var val2 = base.file2.sum * 1.102;
 			var totalVal = val2 - val1;
-			c.getComponent('result_soil_loss').setData(val1, val2, totalVal, base);
+			c.getComponent('result_soil_loss').setData(val1, val2, totalVal, base, true);
 		}	
     	
     	if (obj.ethanol) {
@@ -525,7 +525,7 @@ Ext.define('MyApp.view.Report_Detail', {
 			//val1 = val1 * 1.1023;
 			//val2 = val2 * 1.1023;
 			var totalVal = val2 - val1;
-			c.getComponent('result_nitrous_oxide').setData(val1, val2, totalVal, base);
+			c.getComponent('result_nitrous_oxide').setData(val1, val2, totalVal, base, true);
 		}	
     }
 

@@ -17,10 +17,13 @@ public class CustomComparison
 	
 	public Selection mSelection1, mSelection2; 
 	public String mBasePath1, mBasePath2;
+	public int mRefCounts;
 	
 	//--------------------------------------------------------------------------
-	public CustomComparison(String basePath1, Selection sel1, 
+	public CustomComparison(int refCountStart, String basePath1, Selection sel1, 
 							String basePath2, Selection sel2) {
+	
+		mRefCounts = refCountStart;
 		mBasePath1 = basePath1;
 		if (sel1 == null) { // allow null selecitons, which would typically be the case for a DEFAULT comparison
 			mSelection1 = sel2;
@@ -87,7 +90,7 @@ public class CustomComparison
 	}
 	
 	//--------------------------------------------------------------------------
-	private static final void checkPurgeStaleComparisons() {
+	public static final void checkPurgeStaleComparisons() {
 		
 		if (mCachedCustomComparison == null) {
 			return;
@@ -97,9 +100,10 @@ public class CustomComparison
 		long expireHours = 0 * 5 * 60 * 1000; // 0 hour -> minutes -> seconds -> milliseconds
 		long roughlyNow = System.currentTimeMillis();
 		for (Map.Entry<String, CustomComparison> entry : mCachedCustomComparison.entrySet()) {
+			Logger.warn("Have possibly stale comparison objects hanging around...");
 			CustomComparison value = entry.getValue();
 			if (roughlyNow - value.mCachedAtTime > expireHours) {
-				Logger.info("Warning - removing potentially stale customComparison. " +
+				Logger.error("Error - removing potentially stale customComparison. " +
 					"Anything caching a customComparison should be remove cached customComparison when " +
 					"done using that customComparison!");
 				String key = entry.getKey();
@@ -139,9 +143,15 @@ public class CustomComparison
 							"> but that does not appear to be cached");
 			return;
 		}
+		res.mRefCounts--;
+		if(res.mRefCounts > 0) {
+			return;
+		}
+		
 		Logger.info(" - releasing cache for comparison, cache string named <" + cacheStringID + ">");
-		mCachedCustomComparison.put(cacheStringID, null);
-		mCachedCustomComparison.remove(cacheStringID);
+		CustomComparison cc = mCachedCustomComparison.remove(cacheStringID);
+		cc.mSelection1 = null;
+		cc.mSelection2 = null;
 	}
 }
 

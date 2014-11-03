@@ -218,6 +218,14 @@ public class Application extends Controller
 	//----------------------------------------------------------------------
 	public static Result setUpScenario() throws Exception
 	{
+		// NOTE: sanity check...
+		// Derp, probably needs to be in a process that runs every now and then...
+		//	Just to validate that all the code in place is sufficient to not be leaking memory..
+		//	And only putting it here for now because this is the main memory using process...
+		//	And these are the main offenders that could be holding onto a lot of memory...
+		CustomComparison.checkPurgeStaleComparisons();
+		Scenario.checkPurgeStaleScenarios();
+		
 		Logger.info("----- Initializing scenario ----");
 		// Create a new scenario and get a transformed crop rotation layer from it...
 		JsonNode request = request().body().asJson();
@@ -225,7 +233,8 @@ public class Application extends Controller
 		// TODO: validate that this can't contain anything that could be used as an attack?
 		String clientID = request.get("clientID").textValue();
 //		String folder = "client_" + clientID;
-
+		int modelRequestCount = request.get("modelRequestCount").asInt();
+		
 		int saveID = request.get("saveID").asInt();
 		if (saveID < 0) saveID = 0;
 		else if (saveID > 9) {
@@ -239,7 +248,7 @@ public class Application extends Controller
 		scenario.getTransformedRotation(request);
 		scenario.mOutputDir = folder;
 		
-		String cacheID = Scenario.cacheScenario(scenario, clientID);
+		String cacheID = Scenario.cacheScenario(scenario, clientID, modelRequestCount);
 
 		ObjectNode sendback = JsonNodeFactory.instance.objectNode();
 		sendback.put("scenarioID", cacheID);
@@ -410,7 +419,8 @@ public class Application extends Controller
 		int[][] defaultRotation = layer.getIntData();
 		int width = layer.getWidth(), height = layer.getHeight();
 */		
-		Scenario scenario = Scenario.getCachedScenario(request.get("scenarioID").textValue());
+		String scenarioID = request.get("scenarioID").textValue();
+		Scenario scenario = Scenario.getCachedScenario(scenarioID);
 		
 		if (scenario == null) {
 			return badRequest();
@@ -503,6 +513,8 @@ public class Application extends Controller
 						histogram.run(new File(path1), scenario.mSelection,
 										res.mWidth, res.mHeight, res.mRasterData, scenario.mSelection));
 			}
+			// decrement ref count and remove it for real if not needed...
+			Scenario.releaseCachedScenario(scenarioID);
 		}
 		Logger.debug("Done processing list of results, queuing results for file writer");
 		QueuedWriter.queueResults(results);
@@ -523,7 +535,8 @@ public class Application extends Controller
 
 		int compare1ID = request.get("compare1ID").asInt(); // -1 is default
 		int compare2ID = request.get("compare2ID").asInt(); // -1 is default
-
+		int compareCount = request.get("compareCount").asInt(); // number of models, for ref counting
+		
 		String path1 = "./layerData/";
 		if (compare1ID == -1) {
 			path1 += "default/";
@@ -595,7 +608,7 @@ public class Application extends Controller
 			return badRequest(); // TODO: add return errors if needed...
 		}
 		
-		CustomComparison customCompare = new CustomComparison(basePath1, sel1, basePath2, sel2);
+		CustomComparison customCompare = new CustomComparison(compareCount, basePath1, sel1, basePath2, sel2);
 		
 		String cacheID = CustomComparison.cacheCustomComparions(customCompare, clientID);
 
@@ -637,7 +650,9 @@ public class Application extends Controller
 		sendBack.put(file, 
 				histogram.run(file1, comparison.mSelection1, 
 								file2, comparison.mSelection2));
-
+		// Decrement ref count, will actually release when hits zero
+		CustomComparison.releaseCachedComparison(compareID);
+		
 		Logger.info(sendBack.toString());
 		return ok(sendBack);
 	}

@@ -15,6 +15,8 @@ public class Scenario
 	private static Map<String, Scenario>	mCachedScenarios;
 	private long mCachedAtTime;
 	
+	public int mRefCounts;
+	
 	public GlobalAssumptions mAssumptions;
 //	public String mClientID; // NOTE: not currently used?
 	public Selection mSelection; 
@@ -33,7 +35,6 @@ public class Scenario
 */
 	//--------------------------------------------------------------------------
 	public Scenario() {
-		
 	}
 
 	//--------------------------------------------------------------------------
@@ -66,12 +67,13 @@ public class Scenario
 	
 	// Returns a cacheStringID, which should be saved and returned to free the scenario...
 	//--------------------------------------------------------------------------
-	public static final String cacheScenario(Scenario theScenario, String clientID) {
+	public static final String cacheScenario(Scenario theScenario, String clientID, int requestCount) {
 		
 		if (mCachedScenarios == null) {
 			mCachedScenarios = new HashMap<String, Scenario>();
 		}
 		
+		theScenario.mRefCounts = requestCount;
 		RandomString uniqueID = new RandomString();
 		int tryCount = 0;
 		while(tryCount < 1000) {
@@ -90,19 +92,19 @@ public class Scenario
 	}
 	
 	//--------------------------------------------------------------------------
-	private static final void checkPurgeStaleScenarios() {
+	public static final void checkPurgeStaleScenarios() {
 		
 		if (mCachedScenarios == null) {
 			return;
 		}
-
 		// giving 5 minutes 		
 		long expireHours = 0 * 5 * 60 * 1000; // 0 hour -> minutes -> seconds -> milliseconds
 		long roughlyNow = System.currentTimeMillis();
 		for (Map.Entry<String, Scenario> entry : mCachedScenarios.entrySet()) {
+			Logger.warn("Have possibly stale scenario objects hanging around...");
 			Scenario value = entry.getValue();
 			if (roughlyNow - value.mCachedAtTime > expireHours) {
-				Logger.warn("Warning - removing potentially stale scenario. " +
+				Logger.error("Error - removing potentially stale scenario. " +
 					"Anything caching a scenario should be remove cached scenario when " +
 					"done using that scenario!");
 				String key = entry.getKey();
@@ -142,9 +144,16 @@ public class Scenario
 							"> but that does not appear to be cached");
 			return;
 		}
+		
+		res.mRefCounts--;
+		if (res.mRefCounts > 0) {
+			return;
+		}
 		Logger.info(" - releasing cache for scenario, cache string named <" + cacheStringID + ">");
-		mCachedScenarios.put(cacheStringID, null);
-		mCachedScenarios.remove(cacheStringID);
+		Scenario scen = mCachedScenarios.remove(cacheStringID);
+		scen.mAssumptions = null;
+		scen.mSelection = null; 
+		scen.mNewRotation = null; 
 	}
 	
 	

@@ -76,10 +76,6 @@ public final class Moving_Z_Window
 		mbMovingLeft = false; // window moves right first...
 		mbShouldAdvance_Y = false; // only gets set once per line once an edge is hit
 		
-		//mAgMask = 1 + 2 + 4 + 8 + 16 + 32 + 64 + 512; // 1, 2, 3, 4, 5, 6, 7, 10
-		//mForestMask = 1024; // 11
-		//mGrassMask = 128 + 256; // 8 and 9
-
 		// Mask
 		Layer_Integer cdl = (Layer_Integer)Layer_Base.getLayer("cdl_2012"); 
 		// Grass

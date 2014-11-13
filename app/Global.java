@@ -19,6 +19,10 @@ public class Global extends GlobalSettings
 	// mostly for DEV, production servers should always recompute this data to be safe...
 	private static final boolean FORCE_COMPUTE_DEFAULT_DATA = false;
 	
+	// CRP data and Dane country ag lands. The client will ask for this and disable options
+	//	that will not work anwyay because the server didn't load this data...
+	private static final boolean USE_RESTRICTED_DATA = false;
+	
 	//--------------------------------------------------------------------------
 	@Override
 	public void onStart(play.Application app) 
@@ -146,12 +150,19 @@ public class Global extends GlobalSettings
 			layer = new Layer_Float("soy_p"); layer.init();
 			layer = new Layer_Float("grass_p"); layer.init();
 			
-			// Ag_Lands
-			layer = new Layer_Integer("ag_lands", Layer_Integer.EType.ERaw); layer.init();
-			// CRP
-			layer = new Layer_Integer("crp", Layer_Integer.EType.ERaw); // don't do fancy shift/match tricks...there is only two values possible here...
-			((Layer_Integer)layer).setNoDataConversion(0);// work around a data issue - conversion -9999 to zeros
-			layer.init();
+			// NOTE:  The CRP data is very sensitive, apparently...The Dane County land, less so...
+			//			but without a way to authenticate users and prevent certain people from accessing
+			//			this restricted-ish data, it's going to just be disabled...
+			if (USE_RESTRICTED_DATA) {
+				Logger.warn("Server is loading restricted data, clients connecting to this server will have access to query it!");
+				// Ag_Lands
+				layer = new Layer_Integer("ag_lands", Layer_Integer.EType.ERaw); layer.init();
+				// CRP
+				layer = new Layer_Integer("crp", Layer_Integer.EType.ERaw); // don't do fancy shift/match tricks...there is only two values possible here...
+				((Layer_Integer)layer).setNoDataConversion(0);// work around a data issue - conversion -9999 to zeros
+				layer.init();
+			}
+
 			// NOTE: am putting low-priority (rarely used) data layers here so that
 			//	we can have them skip loading in DEVELOPMENT mode. Ie, faster loads
 			//	and less memory usage...

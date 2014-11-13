@@ -17,6 +17,15 @@ import java.io.*;
 public class Model_CropYield
 {
 	//--------------------------------------------------------------------------
+	private static final boolean DETAILED_DEBUG_LOGGING = false;
+	private static final void detailedLog(String detailedMessage) {
+		
+		if (DETAILED_DEBUG_LOGGING) {
+			Logger.debug(detailedMessage);
+		}
+	}
+	
+	//--------------------------------------------------------------------------
 	public float[][] run(Scenario scenario) {
 
 		int[][] rotationData = scenario.mNewRotation;
@@ -24,14 +33,6 @@ public class Model_CropYield
 		
 Logger.info(" >> Computing Yield");
 
-		// Defining variables based on the selected layer
-		//int Grass_Mask = 256; // 9
-		//int Corn_Mask = 1; // 1	
-		//int Soy_Mask = 2; // 2	
-		//int Corn_Soy_Mask = 4; // 3
-		//int Alfalfa_Mask = 128; // 8	
-		//int TotalMask = Grass_Mask | Corn_Mask | Soy_Mask | Alfalfa_Mask | Corn_Soy_Mask;
-		
 		// No Till SoilLoss Multiplier
 		float NT_M = 1.0f;
 		// Cover Crop Multiplier
@@ -52,8 +53,8 @@ Logger.info(" >> Computing Yield");
 			Logger.warn(e.toString());
 		}
 		
-		Logger.debug(" Agricultural no till from client = " + Float.toString(annualNoTillageModifier) );
-		Logger.debug(" Agricultural cover crop from client = " + Float.toString(annualCoverCropModifier) );
+		detailedLog(" Agricultural no till from client = " + Float.toString(annualNoTillageModifier) );
+		detailedLog(" Agricultural cover crop from client = " + Float.toString(annualCoverCropModifier) );
 		
 		// Mask
 		Layer_Integer cdl = (Layer_Integer)Layer_Base.getLayer("cdl_2012"); 
@@ -90,10 +91,10 @@ Logger.info(" >> Computing Yield");
 			Logger.warn(e.toString());
 		}
 		
-		Logger.debug(" Corn yield from client = " + Float.toString(cornYieldModifier) );
-		Logger.debug(" Soy yield from client = " + Float.toString(soyYieldModifier) );
-		Logger.debug(" Alfalfa yield from client = " + Float.toString(alfalfaYieldModifier) );
-		Logger.debug(" Grass yield from client = " + Float.toString(grassYieldModifier) );
+		detailedLog(" Corn yield from client = " + Float.toString(cornYieldModifier) );
+		detailedLog(" Soy yield from client = " + Float.toString(soyYieldModifier) );
+		detailedLog(" Alfalfa yield from client = " + Float.toString(alfalfaYieldModifier) );
+		detailedLog(" Grass yield from client = " + Float.toString(grassYieldModifier) );
 		//----------------------------------------------------------------------		
 		
 		// Define separate arrays to keep corn and grass production
@@ -106,25 +107,19 @@ Logger.info("  > Allocated memory for Yield");
 		float depth[][] = Layer_Base.getLayer("Depth").getFloatData();
 		float cec[][] = Layer_Base.getLayer("CEC").getFloatData();
 		
-		for (int y = 0; y < height; y++) 
-		{
-			for (int x = 0; x < width; x++) 
-			{
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
 				
 				int landCover = rotationData[y][x];
 									
-				if ((landCover & TotalMask) > 0) 
-				{
-				
+				if ((landCover & TotalMask) > 0) {
 					NT_M = 1.0f;
 					CC_M = 1.0f;
 				
-					if (slope[y][x] < 0 || depth[y][x] < 0 || silt[y][x] < 0 || cec[y][x] < 0)
-					{
+					if (slope[y][x] < 0 || depth[y][x] < 0 || silt[y][x] < 0 || cec[y][x] < 0) {
 						yield[y][x] = -9999.0f;
 					}
-					else if ((landCover & Corn_Mask) > 0) 
-					{
+					else if ((landCover & Corn_Mask) > 0) {
 						// Return tillage modififier if cell is Tilled
 						NT_M = ManagementOptions.E_Till.getIfActiveOn(landCover, 1.0f, annualNoTillageModifier);
 						CC_M = ManagementOptions.E_CoverCrop.getIfActiveOn(landCover, annualCoverCropModifier, 1.0f);
@@ -141,10 +136,8 @@ Logger.info("  > Allocated memory for Yield");
 						Yield *= cornYieldModifier;
 						// Land management factors
 						Yield *= NT_M * CC_M;
-					
 					}
-					else if ((landCover & Grass_Mask) > 0) 
-					{
+					else if ((landCover & Grass_Mask) > 0) {
 						// short tons per Ac
 						Grass_Y = 0.77f - 0.031f * slope[y][x] + 0.008f * depth[y][x] + 0.029f * silt[y][x] + 0.038f * cec[y][x];
 						// Correct for techno advances
@@ -154,8 +147,7 @@ Logger.info("  > Allocated memory for Yield");
 						// Factor in yield modifcation from client, which defaults to 0% change, ie * 1.0f
 						Yield *= grassYieldModifier;
 					}
-					else if ((landCover & Soy_Mask) > 0) 
-					{
+					else if ((landCover & Soy_Mask) > 0) {
 						// Return tillage modififier if cell is Tilled
 						NT_M = ManagementOptions.E_Till.getIfActiveOn(landCover, 1.0f, annualNoTillageModifier);
 						CC_M = ManagementOptions.E_CoverCrop.getIfActiveOn(landCover, annualCoverCropModifier, 1.0f);
@@ -172,24 +164,7 @@ Logger.info("  > Allocated memory for Yield");
 						// Land management factors
 						Yield *= NT_M * CC_M;
 					}
-					/*else if ((rotationData[y][x] & Corn_Soy_Mask) > 0) {
-						// Bushels per Ac
-						Corn_Y = 22.000f - 1.05f * slope[y][x] + 0.190f * depth[y][x] + 0.817f * silt[y][x] + 1.32f * cec[y][x];
-						// Correct for techno advances
-						Corn_Y = Corn_Y * 1.30f;
-						// add stover
-						Corn_Y = Corn_Y + Corn_Y;
-						// Bushels per Ac
-						Soy_Y = 6.37f - 0.34f * slope[y][x] + 0.065f * depth[y][x] + 0.278f * silt[y][x] + 0.437f * cec[y][x];
-						// Correct for techno advances
-						Soy_Y = Soy_Y * 1.2f;
-						// Tonnes per Hec
-						Soy_Y = Soy_Y * 0.0585f;
-						// add residue
-						Yield = ((Corn_Y * 0.053f) + (Soy_Y + Soy_Y * 1.5f)) / 2.0f;
-					}*/
-					else if ((landCover & Alfalfa_Mask) > 0) 
-					{
+					else if ((landCover & Alfalfa_Mask) > 0) {
 						// Short tons per Acre
 						Alfalfa_Y = 1.26f - 0.045f * slope[y][x] + 0.007f * depth[y][x] + 0.027f * silt[y][x] + 0.041f * cec[y][x];
 						// Yield Correction Factor for modern yield
@@ -200,22 +175,18 @@ Logger.info("  > Allocated memory for Yield");
 						Yield *= alfalfaYieldModifier;
 					}
 					
-					// Set Min and Max
-					if(Yield < 0)
-					{
+					// Ensure sane range
+					if (Yield < 0) {
 						yield[y][x] = 0.0f;
 					}
-					else if (Yield > 25) 
-					{
+					else if (Yield > 25) {
 						yield[y][x] = 25.0f;
 					}
-					else 
-					{
+					else {
 						yield[y][x] = Yield;
 					}
 				}
-				else 
-				{
+				else {
 					yield[y][x] = -9999.0f;
 				}
 				

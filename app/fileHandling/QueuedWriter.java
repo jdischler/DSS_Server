@@ -12,6 +12,14 @@ import org.apache.commons.io.FileUtils;
 //------------------------------------------------------------------------------
 public class QueuedWriter implements Runnable {
 
+	private static final boolean DETAILED_DEBUG_LOGGING = false;
+	private static final void detailedLog(String detailedMessage) {
+		
+		if (DETAILED_DEBUG_LOGGING) {
+			Logger.debug(detailedMessage);
+		}
+	}
+
 	private static List<ScenarioSetupResult> mScenarioSetupsToWrite;
 	private static List<ModelResult> mResultsToWrite;
 
@@ -24,7 +32,7 @@ public class QueuedWriter implements Runnable {
 	private static final boolean mbWriteBinary_DSS = true; 
 	private static final boolean mbWriteText_ASC = false;
 	
-	private static final boolean mbWriteLandscape = true; // thinking this is mostly for debugging at this point?
+	private static final boolean mbWriteLandscape = false; // thinking this is mostly for debugging at this point?
 	
 	//--------------------------------------------------------------------------
 	public final static void beginWatchWriteQueue() {
@@ -41,11 +49,12 @@ public class QueuedWriter implements Runnable {
 				mResultsToWrite = new ArrayList<ModelResult>();
 			}
 			mThreadHandle = new Thread(mWriter);
-			Logger.info(" ...Queued writer priority is: " + Integer.toString(mThreadHandle.getPriority()));
+			detailedLog(" ...Queued writer priority is: " + Integer.toString(mThreadHandle.getPriority()));
+			// Sanity check, seems to almost never happen? 
 			if (mThreadHandle.getPriority() > Thread.NORM_PRIORITY) {
-				Logger.info(" ...Thread priority pretty, high, reducing to Normal");
+				detailedLog(" ...Thread priority pretty, high, reducing to Normal");
 				mThreadHandle.setPriority(Thread.NORM_PRIORITY);
-				Logger.info(" ...Queued writer priority is now: " + Integer.toString(mThreadHandle.getPriority()));
+				detailedLog(" ...Queued writer priority is now: " + Integer.toString(mThreadHandle.getPriority()));
 			}
 			
 			mThreadHandle.start();
@@ -74,7 +83,7 @@ public class QueuedWriter implements Runnable {
 	//--------------------------------------------------------------------------
 	private synchronized final void queueResultsInternal(List<ModelResult> results) {
 		
-		Logger.info(" ... Adding ModelResults to writer queue. Notify queue to wake up.....");
+		detailedLog(" ... Adding ModelResults to writer queue. Notify queue to wake up.....");
 		mResultsToWrite.addAll(results);
 		notifyAll();
 	}
@@ -83,7 +92,7 @@ public class QueuedWriter implements Runnable {
 	//--------------------------------------------------------------------------
 	private synchronized final void queueResultsInternal(ScenarioSetupResult result) {
 		
-		Logger.info(" ... Adding ScenarioSetupResult to writer queue. Notify queue to wake up.....");
+		detailedLog(" ... Adding ScenarioSetupResult to writer queue. Notify queue to wake up.....");
 		mScenarioSetupsToWrite.add(result);
 		notifyAll();
 	}
@@ -114,7 +123,7 @@ public class QueuedWriter implements Runnable {
 					ModelResult result = mResultsToWrite.remove(0);
 					File writeFolder = new File("./layerData/" + result.mDestinationFolder + "/");
 					if (writeFolder.exists() == false) {
-						Logger.info(" ... Writer queue creating directory: " + writeFolder.toString());
+						detailedLog(" ... Writer queue creating directory: " + writeFolder.toString());
 						try {
 							FileUtils.forceMkdir(writeFolder);
 						}
@@ -123,14 +132,14 @@ public class QueuedWriter implements Runnable {
 						}
 						//writeFolder.mkdirs();
 						if (writeFolder.exists() == false) {
-							Logger.info(" Error - Writer queue directory creation failed!!");
+							Logger.error(" Error - Writer queue directory creation failed!!");
 						}
 					}
 					
 					// ---WRITE BINARY DSS?
 					if (mbWriteBinary_DSS) {
 						File writeFile = new File(writeFolder, result.mName + ".dss");
-						Logger.info(" ... Writer queue writing DSS: " + writeFile.toString());
+						detailedLog(" ... Writer queue writing DSS: " + writeFile.toString());
 						
 						Binary_Writer writer = new Binary_Writer(writeFile, result.mWidth, result.mHeight);
 						ByteBuffer writeBuffer = writer.writeHeader();
@@ -150,7 +159,7 @@ public class QueuedWriter implements Runnable {
 						int width = result.mWidth, height = result.mHeight;
 						try {
 							File writeFile = new File(writeFolder, result.mName + ".asc");
-							Logger.info(" ... Writer queue writing ASC: " + writeFile.toString());
+							detailedLog(" ... Writer queue writing ASC: " + writeFile.toString());
 							ascOut = new PrintWriter(new BufferedWriter(new FileWriter(writeFile)));
 							ascOut.println("ncols         " + Integer.toString(width));
 							ascOut.println("nrows         " + Integer.toString(height));
@@ -207,7 +216,7 @@ public class QueuedWriter implements Runnable {
 					}
 					
 					if (writeFolder.exists() == false) {
-						Logger.info(" ... Writer queue creating directory: " + writeFolder.toString());
+						detailedLog(" ... Writer queue creating directory: " + writeFolder.toString());
 						try {
 							FileUtils.forceMkdir(writeFolder);
 						}
@@ -215,14 +224,14 @@ public class QueuedWriter implements Runnable {
 							Logger.info(err.toString());
 						}
 						if (writeFolder.exists() == false) {
-							Logger.info(" Error - Writer queue directory creation failed!!");
+							Logger.error(" Error - Writer queue directory creation failed!!");
 						}
 					}
 
 					// ---WRITE Selection in Binary --- 
 					if (true) {
 						File writeFile = new File(writeFolder, "selection.sel");
-						Logger.info(" ... Writer queue writing sel: " + writeFile.toString());
+						detailedLog(" ... Writer queue writing sel: " + writeFile.toString());
 						
 						Binary_Writer writer = new Binary_Writer(writeFile, result.mWidth, result.mHeight);
 						ByteBuffer writeBuffer = writer.writeHeader(1);
@@ -240,7 +249,7 @@ public class QueuedWriter implements Runnable {
 					// ---WRITE BINARY DSS for New Transformed Landscape?
 					if (mbWriteBinary_DSS && mbWriteLandscape) {
 						File writeFile = new File(writeFolder, "cdl_transformed.dss");
-						Logger.info(" ... Writer queue writing DSS: " + writeFile.toString());
+						detailedLog(" ... Writer queue writing DSS: " + writeFile.toString());
 						
 						Binary_Writer writer = new Binary_Writer(writeFile, result.mWidth, result.mHeight);
 						ByteBuffer writeBuffer = writer.writeHeader();
@@ -260,7 +269,7 @@ public class QueuedWriter implements Runnable {
 						int width = result.mWidth, height = result.mHeight;
 						try {
 							File writeFile = new File(writeFolder, "cdl_transformed.asc");
-							Logger.info(" ... Writer queue writing ASC: " + writeFile.toString());
+							detailedLog(" ... Writer queue writing ASC: " + writeFile.toString());
 							ascOut = new PrintWriter(new BufferedWriter(new FileWriter(writeFile)));
 							ascOut.println("ncols         " + Integer.toString(width));
 							ascOut.println("nrows         " + Integer.toString(height));

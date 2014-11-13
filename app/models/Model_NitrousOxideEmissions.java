@@ -17,6 +17,15 @@ import java.io.*;
 public class Model_NitrousOxideEmissions
 {
 	//--------------------------------------------------------------------------
+	private static final boolean DETAILED_DEBUG_LOGGING = false;
+	private static final void detailedLog(String detailedMessage) {
+		
+		if (DETAILED_DEBUG_LOGGING) {
+			Logger.debug(detailedMessage);
+		}
+	}
+
+	//--------------------------------------------------------------------------
 	public List<ModelResult> run(Scenario scenario) {
 
 		int[][] rotationData = scenario.mNewRotation;
@@ -52,8 +61,7 @@ Logger.info("  > Allocated memory for N2O");
 		
 		// Get user changeable yield scaling values from the client...
 		//----------------------------------------------------------------------
-		try 
-		{	
+		try {	
 			// values come in as straight multiplier
 			annualTillageModifier = scenario.mAssumptions.getAssumptionFloat("n_t_annuals");
 			annualCoverCropModifier = scenario.mAssumptions.getAssumptionFloat("n_cc_annuals");		
@@ -66,12 +74,12 @@ Logger.info("  > Allocated memory for N2O");
 			Logger.warn(e.toString());
 		}
 		
-		Logger.debug(" Agricultural till from client = " + Float.toString(annualTillageModifier) );
-		Logger.debug(" Agricultural cover crop from client = " + Float.toString(annualCoverCropModifier) );
-		Logger.debug(" Agricultural Fertilizer from client = " + Float.toString(annualFertilizerModifier) );
-		Logger.debug(" Perennial Fertilizer from client = " + Float.toString(perennialFertilizerModifier) );
-		Logger.debug(" Annual Fall Fertilizer from client = " + Float.toString(annualFallFertilizerModifier) );
-		Logger.debug(" Perennial Fall Fertilizer from client = " + Float.toString(perennialFallFertilizerModifier) );
+		detailedLog(" Agricultural till from client = " + Float.toString(annualTillageModifier) );
+		detailedLog(" Agricultural cover crop from client = " + Float.toString(annualCoverCropModifier) );
+		detailedLog(" Agricultural Fertilizer from client = " + Float.toString(annualFertilizerModifier) );
+		detailedLog(" Perennial Fertilizer from client = " + Float.toString(perennialFertilizerModifier) );
+		detailedLog(" Annual Fall Fertilizer from client = " + Float.toString(annualFallFertilizerModifier) );
+		detailedLog(" Perennial Fall Fertilizer from client = " + Float.toString(perennialFallFertilizerModifier) );
 		
 		// Till SoilLoss Multiplier
 		float T_M = 1.0f;
@@ -88,14 +96,17 @@ Logger.info("  > Allocated memory for N2O");
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				
-				if (texture[y][x] > -9999.0f && OM_SOC[y][x] > -9999.0f &&
+				int landCover = rotationData[y][x];
+				
+				// Only process pixels for the landcover types we care about. Skip any cell that would
+				//	have a no-data value as any part of the computation
+				if ((landCover & TotalMask) > 0 &&
+					texture[y][x] > -9999.0f && OM_SOC[y][x] > -9999.0f &&
 					drainage[y][x] > -9999.0f && pH[y][x] > -9999.0f)
 				{
-					int landCover = rotationData[y][x];
 					fertRate = 0.0f;
 					
-					if ((landCover & Corn_Mask) > 0) // CORN
-					{
+					if ((landCover & Corn_Mask) > 0) { // CORN
 						cropRotation = 0.0f;
 						fertRate = 168.0f;
 						
@@ -106,8 +117,7 @@ Logger.info("  > Allocated memory for N2O");
 									1.0f, 1.0f, // these values correspond to NO Fert multiplier and synthetic multiplier
 									annualFallFertilizerModifier, annualFertilizerModifier);
 					}
-					else if ((landCover & Grass_Mask) > 0) // GRASS
-					{
+					else if ((landCover & Grass_Mask) > 0) { // GRASS
 						cropRotation = -1.268f;
 						// Is that right or this belongs to Soy?
 						fertRate = 56.0f;
@@ -117,8 +127,7 @@ Logger.info("  > Allocated memory for N2O");
 									1.0f, 1.0f, // these values correspond to NO Fert multiplier and synthetic multiplier
 									perennialFallFertilizerModifier, perennialFertilizerModifier);
 					}
-					else if ((landCover & Soy_Mask) > 0) // SOY
-					{
+					else if ((landCover & Soy_Mask) > 0) { // SOY
 						cropRotation = -1.023f;
 						
 						// Return tillage modififier if cell is Tilled
@@ -128,8 +137,7 @@ Logger.info("  > Allocated memory for N2O");
 									1.0f, 1.0f, // these values correspond to NO Fert multiplier and synthetic multiplier
 									annualFallFertilizerModifier, annualFertilizerModifier);
 					}
-					else if ((landCover & Alfalfa_Mask) > 0) // ALFALFA
-					{
+					else if ((landCover & Alfalfa_Mask) > 0) { // ALFALFA
 						cropRotation = -1.023f;
 						
 						// Return tillage modififier if cell is Tilled
@@ -137,32 +145,15 @@ Logger.info("  > Allocated memory for N2O");
 									1.0f, 1.0f, // these values correspond to NO Fert multiplier and synthetic multiplier
 									perennialFallFertilizerModifier, perennialFertilizerModifier);
 					}
-					/*else if ((landCover & Corn_Soy_Mask) > 0) // Corn_Soy
-					{
-						cropRotation = -0.5115f;
-						fertRate = 84.0f;
-					}*/
-					else // OTHER crops
-					{
-						cropRotation = 0.0f;
-					}
 					
-					if ((landCover & TotalMask) > 0)
-					{
-						// Calculate Nitrous Oxide Emissions in Kg per Ha and then convert to Mg per cell per year
-						nitrousOxideData[y][x] = ((float)(Math.exp(0.414f + 0.825f + fertRate * 0.005f + cropRotation +
-							texture[y][x] + OM_SOC[y][x] + drainage[y][x] + pH[y][x]))) * 900.0f * 0.0001f * 0.001f;
-						
-						// Change value using multiplier
-						nitrousOxideData[y][x] *=  T_M * CC_M * F_M;
-					}
-					else
-					{
-						nitrousOxideData[y][x] = -9999.0f;
-					}
+					// Calculate Nitrous Oxide Emissions in Kg per Ha and then convert to Mg per cell per year
+					nitrousOxideData[y][x] = ((float)(Math.exp(0.414f + 0.825f + fertRate * 0.005f + cropRotation +
+						texture[y][x] + OM_SOC[y][x] + drainage[y][x] + pH[y][x]))) * 900.0f * 0.0001f * 0.001f;
+					
+					// Change value using multiplier
+					nitrousOxideData[y][x] *=  T_M * CC_M * F_M;
 				}
-				else 
-				{
+				else { // else not a landcover type we care about or one of the 4 input cells had no-data
 					nitrousOxideData[y][x] = -9999.0f;
 				}
 			}

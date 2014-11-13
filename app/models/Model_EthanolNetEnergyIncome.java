@@ -20,6 +20,14 @@ import java.lang.reflect.Array;
 //------------------------------------------------------------------------------
 public class Model_EthanolNetEnergyIncome extends Model_Base
 {
+	private static final boolean DETAILED_DEBUG_LOGGING = false;
+	private static final void detailedLog(String detailedMessage) {
+		
+		if (DETAILED_DEBUG_LOGGING) {
+			Logger.debug(detailedMessage);
+		}
+	}
+	
 	private static String mEthanolModelFile = "ethanol";
 	private static String mNetEnergyModelFile = "net_energy";
 	private static String mNetIncomeModelFile = "net_income";
@@ -142,22 +150,23 @@ Logger.info("  > Allocated memory for NetEnergy, NetIncom, Fuel");
 		
 		// Net Income
 		// Production
-		Logger.debug(" Corn production price from client = " + Float.toString(PC_Cost) );
-		Logger.debug(" Stover production price from client = " + Float.toString(PCS_Cost) );
-		Logger.debug(" Grass production price from client = " + Float.toString(PG_Cost) );
-		Logger.debug(" Soy production price from client = " + Float.toString(PS_Cost) );
-		Logger.debug(" Alfalfa production price from client = " + Float.toString(PA_Cost) );
+		detailedLog(" Corn production price from client = " + Float.toString(PC_Cost) );
+		detailedLog(" Stover production price from client = " + Float.toString(PCS_Cost) );
+		detailedLog(" Grass production price from client = " + Float.toString(PG_Cost) );
+		detailedLog(" Soy production price from client = " + Float.toString(PS_Cost) );
+		detailedLog(" Alfalfa production price from client = " + Float.toString(PA_Cost) );
 		
 		// Sell
-		Logger.debug(" Corn price from client = " + Float.toString(P_Per_Corn) );
-		Logger.debug(" Stover price from client = " + Float.toString(P_Per_Stover) );
-		Logger.debug(" Grass price from client = " + Float.toString(P_Per_Grass) );
-		Logger.debug(" Soy price from client = " + Float.toString(P_Per_Soy) );
-		Logger.debug(" Alfalfa price from client = " + Float.toString(P_Per_Alfalfa) );
+		detailedLog(" Corn price from client = " + Float.toString(P_Per_Corn) );
+		detailedLog(" Stover price from client = " + Float.toString(P_Per_Stover) );
+		detailedLog(" Grass price from client = " + Float.toString(P_Per_Grass) );
+		detailedLog(" Soy price from client = " + Float.toString(P_Per_Soy) );
+		detailedLog(" Alfalfa price from client = " + Float.toString(P_Per_Alfalfa) );
 		//----------------------------------------------------------------------		
 
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
+				
 				float yield = calculatedYield[y][x];
 				float ethanol = 0, netEnergy = 0, netIncome = 0;
 				if (yield > -9999.0f) {
@@ -193,16 +202,6 @@ Logger.info("  > Allocated memory for NetEnergy, NetIncom, Fuel");
 						// Net Income $ per Ha
 						netIncome = returnAmount  - PS_Cost;
 					}
-					/*else if ((rotationData[y][x] & Corn_Soy_Mask) > 0) {
-						// Tonnes per pixel
-						ethanol = (yield * 0.5f * CEO_C + yield * 0.25f * CEO_CS + yield * CEO_S) / 2;
-						// MJ per Ha
-						netEnergy = (((yield * 0.5f * CEO_C * EO_C) - (EI_CF + EI_CP * yield * 0.5f * CEO_C) + (yield * Prop_Stover_Harvest * 0.5f * CEO_CS * EO_CS) - (EI_CSF + EI_CSP * yield * Prop_Stover_Harvest * 0.5f * CEO_CS)) + ((yield * 0.40f * CEO_S * EO_S) - (EI_SF + EI_SP * yield * CEO_S))) / 2;
-						// Gross inc return $ per hec
-						returnAmount = P_Per_Corn * 0.5f * yield + P_Per_Stover * Prop_Stover_Harvest * 0.5f * yield + P_Per_Soy * yield;
-						// Net Income $ per hec
-						netIncome = returnAmount - PC_Cost - PCS_Cost - PS_Cost;
-					}*/
 					else if ((rotationData[y][x] & Alfalfa_Mask) > 0) {
 						// L per Ha
 						ethanol = yield * CEO_A;
@@ -232,14 +231,14 @@ Logger.info("  > Allocated memory for NetEnergy, NetIncom, Fuel");
 		
 		List<ModelResult> results = new ArrayList<ModelResult>();
 		
-//		results.add(new ModelResult("yield", scenario.mOutputDir, calculatedYield, width, height));
 		results.add(new ModelResult("ethanol", scenario.mOutputDir, ethanolData, width, height));
 		results.add(new ModelResult("net_energy", scenario.mOutputDir, netEnergyData, width, height));
 		results.add(new ModelResult("net_income", scenario.mOutputDir, netIncomeData, width, height));
 
 long timeEnd = System.currentTimeMillis();
 float timeSec = (timeEnd - timeStart) / 1000.0f;
-Logger.debug(">>> Model Ethanol / Net Energy / Net Income is finished - timing: " + Float.toString(timeSec));
+Logger.info(">>> Model Ethanol / Net Energy / Net Income finished");
+Logger.debug(" Execution timing: " + Float.toString(timeSec));
 
 		return results;
 	}

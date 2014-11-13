@@ -13,6 +13,15 @@ import com.fasterxml.jackson.databind.node.*;
 //------------------------------------------------------------------------------
 public abstract class Layer_Base
 {
+	//--------------------------------------------------------------------------
+	private static boolean DETAILED_DEBUG_LOGGING = false;
+	protected static void detailedLog(String detailedMessage) {
+		
+		if (DETAILED_DEBUG_LOGGING) {
+			Logger.debug(detailedMessage);
+		}
+	}
+	
 	// STATIC DATA --------------------------
 	// NOTE: Width, height, cellSize, and corners were deliberately made static because
 	//	no code can currently handle layers of different dimensions or data density.
@@ -276,7 +285,7 @@ public abstract class Layer_Base
 			ArrayNode arNode = (ArrayNode)layerList;
 			int count = arNode.size();
 			for (int i = 0; i < count; i++) {
-				Logger.info("Processing one array element in the queryLayers layer list");
+				detailedLog("Processing one array element in the queryLayers layer list");
 				JsonNode arElem = arNode.get(i);
 				JsonNode layerName = arElem.get("name");
 				if (arElem != null && layerName != null) {
@@ -293,7 +302,7 @@ public abstract class Layer_Base
 			// If a CDL query item didn't come from the client, crutch one up that
 			//	auto-selects all (currently) four options...
 			if (!queriedCDL) {
-				Logger.info("Did not have a CDL query so creating one with our four main landcover types");
+				detailedLog("Did not have a CDL query so creating one with our four main landcover types");
 				Layer_Integer layer = (Layer_Integer)Layer_Base.getLayer(cdlTest);
 				if (layer != null) {
 					

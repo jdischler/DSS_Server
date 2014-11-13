@@ -11,6 +11,15 @@ import com.fasterxml.jackson.databind.node.*;
 //------------------------------------------------------------------------------
 public class Scenario 
 {
+	//--------------------------------------------------------------------------
+	private static final boolean DETAILED_DEBUG_LOGGING = true;
+	private static final void detailedLog(String detailedMessage) {
+		
+		if (DETAILED_DEBUG_LOGGING) {
+			Logger.debug(detailedMessage);
+		}
+	}
+	
 	// Scenarios can be cached for sharing amongst other threads
 	private static Map<String, Scenario>	mCachedScenarios;
 	private long mCachedAtTime;
@@ -18,21 +27,11 @@ public class Scenario
 	public int mRefCounts;
 	
 	public GlobalAssumptions mAssumptions;
-//	public String mClientID; // NOTE: not currently used?
 	public Selection mSelection; 
 	public String mOutputDir;
 	private JsonNode mConfiguration;
 	public int[][] mNewRotation; // copy of Rotation layer, but selection transformed
 	
-	
-	// NOTE: unused constructor??
-/*	//--------------------------------------------------------------------------
-	public Scenario(JsonNode configuration, String outputDir) {
-		
-		mConfiguration = configuration;
-		mOutputDir = outputDir;
-	}
-*/
 	//--------------------------------------------------------------------------
 	public Scenario() {
 	}
@@ -98,7 +97,7 @@ public class Scenario
 			return;
 		}
 		// giving 5 minutes 		
-		long expireHours = 0 * 5 * 60 * 1000; // 0 hour -> minutes -> seconds -> milliseconds
+		long expireHours = 0 * 10 * 60 * 1000; // 0 hour -> minutes -> seconds -> milliseconds
 		long roughlyNow = System.currentTimeMillis();
 		for (Map.Entry<String, Scenario> entry : mCachedScenarios.entrySet()) {
 			Logger.warn("Have possibly stale scenario objects hanging around...");
@@ -149,11 +148,12 @@ public class Scenario
 		if (res.mRefCounts > 0) {
 			return;
 		}
-		Logger.info(" - releasing cache for scenario, cache string named <" + cacheStringID + ">");
+		detailedLog(" - releasing cache for scenario, cache string named <" + cacheStringID + ">");
 		Scenario scen = mCachedScenarios.remove(cacheStringID);
-		scen.mAssumptions = null;
+/*		scen.mAssumptions = null;
 		scen.mSelection = null; 
-		scen.mNewRotation = null; 
+		scen.mNewRotation = null;
+*/		
 	}
 	
 	
@@ -173,12 +173,12 @@ public class Scenario
 		
 		mConfiguration = configuration;
 		
-		Logger.info("Beginning transform rotation...");
-		Logger.info("...Current rotation duplicating...");
+		detailedLog("Beginning transform rotation...");
+		detailedLog("...Current rotation duplicating...");
 		mNewRotation = duplicateRotation();
-		Logger.info("...Duplicated rotation transforming...");
+		detailedLog("...Duplicated rotation transforming...");
 		mNewRotation = transformRotation(mNewRotation);
-		Logger.info("...Transform complete!!");
+		detailedLog("...Transform complete!!");
 		
 		return mNewRotation;
 	}
@@ -208,13 +208,13 @@ public class Scenario
 		JsonNode transformQueries = mConfiguration.get("transforms");
 		if (transformQueries != null && transformQueries.isArray()) {
 			
-			Logger.info("...Has Transforms array...");
+			detailedLog("...Has Transforms array...");
 			Selection currentSelection = null, oldSelection = null;
 			ArrayNode transformArray = (ArrayNode)transformQueries;
 			int count = transformArray.size();
 			
 			for (int i = 0; i < count; i++) {
-				Logger.info("...Processing one array element in the transform list...");
+				detailedLog("...Processing one array element in the transform list...");
 				JsonNode transformElement = transformArray.get(i);
 				
 				if (transformElement == null) {
@@ -238,34 +238,34 @@ public class Scenario
 				ObjectNode transformConfigObj = (ObjectNode)transformConfig;
 				
 				int newLandUse = transformConfigObj.get("LandUse").intValue();
-				Logger.info("  + New land use code: " + Integer.toString(newLandUse));
+				detailedLog("  + New land use code: " + Integer.toString(newLandUse));
 				newLandUse = Layer_Integer.convertIndexToMask(newLandUse);
 				
 				JsonNode managementOptions = transformConfigObj.get("Options");
 				if (managementOptions == null || !managementOptions.isObject()) {
-					Logger.info("  +- No management options came along, currently not an error");
+					detailedLog("  +- No management options came along, currently not an error");
 				}
 				else {
-					Logger.info("  +-- Management Options from Client: " + managementOptions.toString());
+					detailedLog("  +-- Management Options from Client: " + managementOptions.toString());
 					// Blah, dig in and apply options.
 					// ---- Fertilizer ----
 					JsonNode fertNode = managementOptions.get("Fertilizer");
 					if (fertNode != null && fertNode.isObject()) { 
 						ObjectNode fertilizerOptions = (ObjectNode)fertNode;
 						if (fertilizerOptions.get("Fertilizer").booleanValue()) {
-							Logger.info("  +--- Applying Fertilizer");
+							detailedLog("  +--- Applying Fertilizer");
 							newLandUse = ManagementOptions.E_Fertilizer.setOn(newLandUse); // else no fertilizer
 							if (fertilizerOptions.get("FertilizerManure").booleanValue()) {
-								Logger.info("  +--- Fertilizer Is Manure");
+								detailedLog("  +--- Fertilizer Is Manure");
 								newLandUse = ManagementOptions.E_Manure.setOn(newLandUse); // else is synthetic
 								if (fertilizerOptions.get("FertilizerFallSpread").booleanValue()) {
 									newLandUse = ManagementOptions.E_FallManure.setOn(newLandUse); // else is spread other time
-									Logger.info("  +--- Fertilizer Is Fall Spread Manure");
+									detailedLog("  +--- Fertilizer Is Fall Spread Manure");
 								}
 							}
 						}
 						else {
-							Logger.info("  +--- No Fertilizer");
+							detailedLog("  +--- No Fertilizer");
 						}
 					}
 					// ---- Tillage ----
@@ -274,10 +274,10 @@ public class Scenario
 						ObjectNode tillageOptions = (ObjectNode)tillNode;
 						if (tillageOptions.get("Tillage").booleanValue()) {
 							newLandUse = ManagementOptions.E_Till.setOn(newLandUse); // else is no-till
-							Logger.info("  +--- Applying Tillage");
+							detailedLog("  +--- Applying Tillage");
 						}
 						else {
-							Logger.info("  +---- Using no-till");
+							detailedLog("  +---- Using no-till");
 						}
 					}
 					// ---- Cover Crop ----
@@ -286,10 +286,10 @@ public class Scenario
 						ObjectNode ccOptions = (ObjectNode)ccnode;
 						if (ccOptions.get("CoverCrop").booleanValue()) {
 							newLandUse = ManagementOptions.E_CoverCrop.setOn(newLandUse); // else is no-covercrop
-							Logger.info("  +--- Applying CoverCrop");
+							detailedLog("  +--- Applying CoverCrop");
 						}
 						else {
-							Logger.info("  +---- Using no covercrop");
+							detailedLog("  +---- Using no covercrop");
 						}
 					}
 					// ---- Contour ----
@@ -298,10 +298,10 @@ public class Scenario
 						ObjectNode cOptions = (ObjectNode)cnode;
 						if (cOptions.get("Contour").booleanValue()) {
 							newLandUse = ManagementOptions.E_Contour.setOn(newLandUse); // else is no-contour
-							Logger.info("  +--- Applying Contouring");
+							detailedLog("  +--- Applying Contouring");
 						}
 						else {
-							Logger.info("  +---- Using no contour");
+							detailedLog("  +---- Using no contour");
 						}
 					}
 					// ---- Terraced ----
@@ -310,10 +310,10 @@ public class Scenario
 						ObjectNode tOptions = (ObjectNode)tnode;
 						if (tOptions.get("Terraced").booleanValue()) {
 							newLandUse = ManagementOptions.E_Terrace.setOn(newLandUse); // else is no-terraces
-							Logger.info("  +--- Applying Terracing");
+							detailedLog("  +--- Applying Terracing");
 						}
 						else {
-							Logger.info("  +---- Using no terraces");
+							detailedLog("  +---- Using no terraces");
 						}
 					}
 				}
@@ -338,11 +338,11 @@ public class Scenario
 //					Logger.info("  Num pixels selected after removing old selection: " +
 //						Integer.toString(currentSelection.countSelectedPixels()));
 					perc = actualPixelsSelectedFromQuery / (float)pixelsSelectedFromQuery;
-					Logger.info("  Pixels removed from selection: " +
+					detailedLog("  Pixels removed from selection: " +
 						Integer.toString(pixelsSelectedFromQuery - actualPixelsSelectedFromQuery));
 				}
 				
-				Logger.info("  Actual selection percentage: " + 
+				detailedLog("  Actual selection percentage: " + 
 					Float.toString(perc * 100));
 				
 				// Run the transform on a (possibly) reduced selection

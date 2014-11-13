@@ -27,6 +27,15 @@ import javax.xml.bind.DatatypeConverter;
 //------------------------------------------------------------------------------
 public class Application extends Controller 
 {
+	//--------------------------------------------------------------------------
+	private static final boolean DETAILED_DEBUG_LOGGING = false;
+	private static final void detailedLog(String detailedMessage) {
+		
+		if (DETAILED_DEBUG_LOGGING) {
+			Logger.debug(detailedMessage);
+		}
+	}
+	
 	static int mHeatCount = 0;
 	
 	//--------------------------------------------------------------------------
@@ -78,9 +87,7 @@ public class Application extends Controller
 		String desiredStart = "<wfs:GetFeature";
 		String desiredEnd = "</wfs:GetFeature>";
 		
-		try 
-		{
-			
+		try {
 			String getUrl = request().uri().replace("/openLayersProxy?", "");
 			getUrl = URLDecoder.decode(getUrl, charset);
 				
@@ -260,165 +267,12 @@ public class Application extends Controller
 	}
 	
 	//----------------------------------------------------------------------
-	public static Result getHeatmap() throws Exception 
-	{
-		// Open up request from client...
-		JsonNode request = request().body().asJson();
-		Logger.info("---- getHeatmap request ----");
-		Logger.info(request.toString());
-		
-		// model can be: (TODO: verify list)
-		//	habitat_index, soc, nitrogen, phosphorus, pest, pollinator(s?), net_energy,
-		//		net_income, ethanol, nitrous_oxide
-		String model = request.get("model").textValue();
-
-		if (model == null) {
-			Logger.warn("Tried to find a model data file but none was passed. Aborting heatmap.");
-			return badRequest(); // TODO: add return errors if needed...
-		}
-
-		// type can be: 
-		//	delta - shows change between file1 and file2
-		//	file1 - shows file1 as an absolute map
-		//	file2 - shows file2 as an absolute map		
-		String type = request.get("type").textValue();
-		// subtype can be:
-		//	equal - equal interval map
-		//	quantile - quantiled...
-		String subtype = request.get("subtype").textValue();
-
-		if (type == null) {
-			Logger.warn("Tried to find a heatmap 'type' key but didn't. Assuming 'delta'");
-			type = "delta";
-		}
-		
-		String clientID = request.get("clientID").textValue();
-		String folder = "client_" + clientID;
-
-		int compare1ID = request.get("compare1ID").asInt(); // -1 is default, otherwise 0-9, validated below
-		int compare2ID = request.get("compare2ID").asInt(); // -1 is default, otherwise 0-9, validated below
-	
-		String path1 = "./layerData/";
-		if (compare1ID == -1) {
-			path1 += "default/";
-		}
-		else if (compare1ID < 0 || compare1ID > 9) {
-			return badRequest(); // TODO: add return errors if needed...
-		}
-		else {
-			path1 += folder + "/" + Integer.toString(compare1ID) + "/";
-		}
-		path1 += model + ".dss";
-		
-		String path2 = "./layerData/";
-		if (compare2ID == -1) {
-			path2 += "default/";
-		}
-		else if (compare2ID < 0 || compare2ID > 9) {
-			return badRequest(); // TODO: add return errors if needed...
-		}
-		else {
-			path2 += folder + "/" + Integer.toString(compare2ID) + "/";
-		}
-		path2 += model + ".dss";
-		
-		// BLURF, crutching up for SOC layer being handled/stored kind of differently...
-
-		Logger.info("Going to heatmap files:");
-		Logger.info("  " + path1);
-		Logger.info("  " + path2);
-		
-		File file1 = new File(path1);
-		File file2 = new File(path2);
-		
-		if (type.equals("delta")) {
-			// for 'delta' type, both files must exist!
-			if (!file1.exists() || !file2.exists()) {
-				Logger.error("Wanted to open files for 'delta' heatmap but one of the files did not exist");
-				return badRequest(); // TODO: add return errors if needed...
-			}
-		}
-		else if (type.equals("file1")) {
-			if (!file1.exists()) {
-				Logger.error("Wanted to open file for 'file1' heatmap but that file did not exist");
-				return badRequest(); // TODO: add return errors if needed...
-			}
-		}
-		else if (type.equals("file2")) {
-			if (!file2.exists()) {
-				Logger.error("Wanted to open file for 'file2' heatmap but that file did not exist");
-				return badRequest(); // TODO: add return errors if needed...
-			}
-		}
-		else {
-			Logger.error("Error, unknown heatmap type: <" + type + ">");
-			return badRequest(); // TODO: add return errors if needed...
-		}
-
-		String outputPath = "/public/dynamicFiles/heat_max_" + model + "_" + Integer.toString(mHeatCount++) + ".png";
-		
-		// FIXME: not sure why play doesn't hand me back the expected directory path in production?
-		if (Play.isProd()) {
-			// FIXME: blugh, like this won't be totally fragile? :)
-//			outputPath = "/target/scala-2.10/classes" + outputPath;
-		}
-		outputPath = "." + outputPath;
-		
-		File outputFile = new File(outputPath);
-		ObjectNode sendBack = null;
-		
-		if (type.equals("delta")) { // TWO file heatmap
-			if (subtype.equals("equal")) {
-				sendBack = Analyzer_Heatmap.runEqualInterval(file1, file2, 
-							outputFile, 
-							10);
-			}
-			else {
-				sendBack = Analyzer_Heatmap.runQuantile(file1, file2, 
-							outputFile, 
-							10);
-			}
-		}
-		else
-		{
-			File fileToMap = file1;
-			
-			if (type.equals("file2")) { // ONE file absolute map
-				fileToMap = file2;
-			}
-			
-			if (subtype.equals("equal")) {
-				sendBack = Analyzer_Heatmap.runAbsolute(fileToMap, 
-								outputFile, 
-								10);
-			}
-			else {
-				sendBack = Analyzer_Heatmap.runAbsoluteQuantiled(fileToMap, 
-								outputFile, 
-								10);
-			}
-		}
-
-		if (sendBack != null) {
-			sendBack.put("heatFile", "/files/" + outputFile.getName());
-		}
-		return ok(sendBack);
-	}
-	
-	//----------------------------------------------------------------------
 	public static Result runModelCluster() throws Exception 
 	{
 		Logger.info("----- Model Cluster Process Started ----");
 
 		JsonNode request = request().body().asJson();
 		
-/*		// NOTE: Seems to not be needed? TODO: verify...
-
-		// Rotation
-		Layer_Base layer = Layer_Base.getLayer("cdl_2012");
-		int[][] defaultRotation = layer.getIntData();
-		int width = layer.getWidth(), height = layer.getHeight();
-*/		
 		String scenarioID = request.get("scenarioID").textValue();
 		Scenario scenario = Scenario.getCachedScenario(scenarioID);
 		
@@ -430,36 +284,42 @@ public class Application extends Controller
 		List<ModelResult> results = null;
 		
 		if (modelType.equals("yield")) {
-			Model_EthanolNetEnergyIncome ethanolEnergyIncome = new Model_EthanolNetEnergyIncome();
-			results = ethanolEnergyIncome.run(scenario);
+			Model_EthanolNetEnergyIncome model = new Model_EthanolNetEnergyIncome();
+			results = model.run(scenario);
 		}
 		else if (modelType.equals("epic_phosphorus")) {
-			Model_P_LossEpic ple = new Model_P_LossEpic();
-			results = ple.run(scenario);
+			Model_P_LossEpic model = new Model_P_LossEpic();
+			results = model.run(scenario);
 		}
+/*		// Model not used from client
 		else if (modelType.equals("water_quality")) {
 			Model_WaterQuality wq = new Model_WaterQuality();
 			results = wq.run(scenario);
 		}
+*/
 		else if (modelType.equals("soc")) {
-			Model_SoilCarbon soc = new Model_SoilCarbon();
-			results = soc.run(scenario);
+			Model_SoilCarbon model = new Model_SoilCarbon();
+			results = model.run(scenario);
 		}
 		else if (modelType.equals("pest_pol")) {
-			Model_PollinatorPestSuppression pp = new Model_PollinatorPestSuppression();
-			results = pp.run(scenario);
+			Model_PollinatorPestSuppression model = new Model_PollinatorPestSuppression();
+			results = model.run(scenario);
 		}
 		else if (modelType.equals("nitrous")) {
-			Model_NitrousOxideEmissions n20 = new Model_NitrousOxideEmissions();
-			results = n20.run(scenario);
+			Model_NitrousOxideEmissions model = new Model_NitrousOxideEmissions();
+			results = model.run(scenario);
 		}
 		else if (modelType.equals("soil_loss")) {
-			Model_Soil_Loss sl = new Model_Soil_Loss();
-			results = sl.run(scenario);
+			Model_Soil_Loss model = new Model_Soil_Loss();
+			results = model.run(scenario);
 		}
-		else {//(modelType.equals("habitat_index")) {
-			Model_HabitatIndex hi = new Model_HabitatIndex();
-			results = hi.run(scenario);
+		else if (modelType.equals("habitat_index")) { // Bird habitat
+			Model_HabitatIndex model = new Model_HabitatIndex();
+			results = model.run(scenario);
+		}
+		else {
+			Logger.error(" Bad model type in runModelCluster: " + modelType);
+			return badRequest();
 		}
 		
 		// SendBack to Client
@@ -473,7 +333,7 @@ public class Application extends Controller
 			for (int i = 0; i < results.size(); i++) {
 				
 				ModelResult res = results.get(i);
-				Logger.info("Procesing results for " + res.mName);
+				detailedLog("Procesing results for " + res.mName);
 				
 				String clientID = request.get("clientID").textValue();
 				String clientFolder = "client_" + clientID + "/";
@@ -516,10 +376,10 @@ public class Application extends Controller
 			// decrement ref count and remove it for real if not needed...
 			Scenario.releaseCachedScenario(scenarioID);
 		}
-		Logger.debug("Done processing list of results, queuing results for file writer");
+		detailedLog("Done processing list of results, queuing results for file writer");
 		QueuedWriter.queueResults(results);
 
-		Logger.debug(sendBack.toString());
+		detailedLog(sendBack.toString());
 		return ok(sendBack);
 	}
  
@@ -654,6 +514,152 @@ public class Application extends Controller
 		CustomComparison.releaseCachedComparison(compareID);
 		
 		Logger.info(sendBack.toString());
+		return ok(sendBack);
+	}
+	
+	//----------------------------------------------------------------------
+	public static Result getHeatmap() throws Exception 
+	{
+		// Open up request from client...
+		JsonNode request = request().body().asJson();
+		Logger.info("---- getHeatmap request ----");
+		Logger.info(request.toString());
+		
+		// model can be: (TODO: verify list)
+		//	habitat_index, soc, nitrogen, phosphorus, pest, pollinator(s?), net_energy,
+		//		net_income, ethanol, nitrous_oxide
+		String model = request.get("model").textValue();
+
+		if (model == null) {
+			Logger.warn("Tried to find a model data file but none was passed. Aborting heatmap.");
+			return badRequest(); // TODO: add return errors if needed...
+		}
+
+		// type can be: 
+		//	delta - shows change between file1 and file2
+		//	file1 - shows file1 as an absolute map
+		//	file2 - shows file2 as an absolute map		
+		String type = request.get("type").textValue();
+		// subtype can be:
+		//	equal - equal interval map
+		//	quantile - quantiled...
+		String subtype = request.get("subtype").textValue();
+
+		if (type == null) {
+			Logger.warn("Tried to find a heatmap 'type' key but didn't. Assuming 'delta'");
+			type = "delta";
+		}
+		
+		String clientID = request.get("clientID").textValue();
+		String folder = "client_" + clientID;
+
+		int compare1ID = request.get("compare1ID").asInt(); // -1 is default, otherwise 0-9, validated below
+		int compare2ID = request.get("compare2ID").asInt(); // -1 is default, otherwise 0-9, validated below
+	
+		String path1 = "./layerData/";
+		if (compare1ID == -1) {
+			path1 += "default/";
+		}
+		else if (compare1ID < 0 || compare1ID > 9) {
+			return badRequest(); // TODO: add return errors if needed...
+		}
+		else {
+			path1 += folder + "/" + Integer.toString(compare1ID) + "/";
+		}
+		path1 += model + ".dss";
+		
+		String path2 = "./layerData/";
+		if (compare2ID == -1) {
+			path2 += "default/";
+		}
+		else if (compare2ID < 0 || compare2ID > 9) {
+			return badRequest(); // TODO: add return errors if needed...
+		}
+		else {
+			path2 += folder + "/" + Integer.toString(compare2ID) + "/";
+		}
+		path2 += model + ".dss";
+		
+		// BLURF, crutching up for SOC layer being handled/stored kind of differently...
+
+		detailedLog("Going to heatmap files:");
+		detailedLog("  " + path1);
+		detailedLog("  " + path2);
+		
+		File file1 = new File(path1);
+		File file2 = new File(path2);
+		
+		if (type.equals("delta")) {
+			// for 'delta' type, both files must exist!
+			if (!file1.exists() || !file2.exists()) {
+				Logger.error("Wanted to open files for 'delta' heatmap but one of the files did not exist");
+				return badRequest(); // TODO: add return errors if needed...
+			}
+		}
+		else if (type.equals("file1")) {
+			if (!file1.exists()) {
+				Logger.error("Wanted to open file for 'file1' heatmap but that file did not exist");
+				return badRequest(); // TODO: add return errors if needed...
+			}
+		}
+		else if (type.equals("file2")) {
+			if (!file2.exists()) {
+				Logger.error("Wanted to open file for 'file2' heatmap but that file did not exist");
+				return badRequest(); // TODO: add return errors if needed...
+			}
+		}
+		else {
+			Logger.error("Error, unknown heatmap type: <" + type + ">");
+			return badRequest(); // TODO: add return errors if needed...
+		}
+
+		String outputPath = "/public/dynamicFiles/heat_max_" + model + "_" + Integer.toString(mHeatCount++) + ".png";
+		
+		// FIXME: not sure why play doesn't hand me back the expected directory path in production?
+		if (Play.isProd()) {
+			// FIXME: blugh, like this won't be totally fragile? :)
+//			outputPath = "/target/scala-2.10/classes" + outputPath;
+		}
+		outputPath = "." + outputPath;
+		
+		File outputFile = new File(outputPath);
+		ObjectNode sendBack = null;
+		
+		if (type.equals("delta")) { // TWO file heatmap
+			if (subtype.equals("equal")) {
+				sendBack = Analyzer_Heatmap.runEqualInterval(file1, file2, 
+							outputFile, 
+							10);
+			}
+			else {
+				sendBack = Analyzer_Heatmap.runQuantile(file1, file2, 
+							outputFile, 
+							10);
+			}
+		}
+		else
+		{
+			File fileToMap = file1;
+			
+			if (type.equals("file2")) { // ONE file absolute map
+				fileToMap = file2;
+			}
+			
+			if (subtype.equals("equal")) {
+				sendBack = Analyzer_Heatmap.runAbsolute(fileToMap, 
+								outputFile, 
+								10);
+			}
+			else {
+				sendBack = Analyzer_Heatmap.runAbsoluteQuantiled(fileToMap, 
+								outputFile, 
+								10);
+			}
+		}
+
+		if (sendBack != null) {
+			sendBack.put("heatFile", "/files/" + outputFile.getName());
+		}
 		return ok(sendBack);
 	}
 }

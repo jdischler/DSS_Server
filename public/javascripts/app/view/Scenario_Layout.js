@@ -4,12 +4,15 @@
 
 var DSS_DefaultScenarioSetup = {
 	Active: true, 
-	SelectionName: 'Double Click to Set Custom Name', 
-	TransformText: 'Double Click to Set Crop',
+	SelectionName: null,//'Double Click to Set Custom Name', 
+	TransformText: null,//'Double Click to Set Crop',
 	ManagementText: '',
 	Transform: { LandUse: 1, Options: undefined },
 	Query: {}
 };
+
+var DSS_EmptySelectionName = 'Double Click to Name Selection', 
+	DSS_EmptyTransformText = 'Click to Set Crop';
 
 //------------------------------------------------------------------------------
 var ClearScenarioGridStore = Ext.create('Ext.data.Store', {
@@ -207,7 +210,7 @@ Ext.define('MyApp.view.Scenario_Layout', {
 	},
 	
 	listeners: {
-		celldblclick: function(me, td, cellIndex, record, tr, rowIndex, e, eOpts) {
+		cellclick: function(me, td, cellIndex, record, tr, rowIndex, e, eOpts) {
 			
 		/*	if (cellIndex == 3) {
 				record.set('Active', !record.get('Active')); // Toggle active field
@@ -251,6 +254,15 @@ Ext.define('MyApp.view.Scenario_Layout', {
 				xtype: 'textfield',
 				allowBlank: false
 			},
+			renderer : function(value, meta, record) {
+				if (value) {
+        			meta.style = "color: #000";
+        			return value;
+    			} else {
+        			meta.style = "color: RGBA(0,0,0,0.3)";
+        			return DSS_EmptySelectionName;
+    			}
+    		},
 			tdCls: 'dss-grey-scenario-grid'
 		},
 		{
@@ -260,6 +272,10 @@ Ext.define('MyApp.view.Scenario_Layout', {
 			resizable: false,
 			tdCls: 'dss-grey-scenario-grid',
 			renderer: function(value, meta, record) {
+				if (!value) {
+					meta.style = 'color: red';
+					return DSS_EmptyTransformText;
+				}
 				meta.tdAttr = 'data-qtip="' + record.get("ManagementText") + '"';
 				return value;
 			}
@@ -465,13 +481,14 @@ Ext.define('MyApp.view.Scenario_Layout', {
     //--------------------------------------------------------------------------
     submitModel: function(queryJson) {
     	
+    	var me = this;
 //		console.log(queryJson);
 		var button = Ext.getCmp('DSS_runModelButton');
 		
 		// NOTE: these strings MUST be synchronized with the server, or else the server will
 		//	not know which models to run. FIXME: should maybe set this up in a more robust fashion?? How?
 		
-		var requestCount = this.DSS_modelTypes.length;
+		var requestCount = me.DSS_modelTypes.length;
 		var successCount = 0;
 		
 		Ext.getCmp('DSS_ReportDetail').setWaitFields();
@@ -479,9 +496,9 @@ Ext.define('MyApp.view.Scenario_Layout', {
 		// Disable the save button until all models complete...
 		Ext.getCmp('DSS_ScenarioSaveButton').setDisabled(true);
 
-		for (var i = 0; i < this.DSS_modelTypes.length; i++) {
+		for (var i = 0; i < me.DSS_modelTypes.length; i++) {
 			var request = queryJson;
-			request.modelType = this.DSS_modelTypes[i];
+			request.modelType = me.DSS_modelTypes[i];
 			
 			var obj = Ext.Ajax.request({
 				url: location.href + 'modelCluster',
@@ -510,7 +527,7 @@ Ext.define('MyApp.view.Scenario_Layout', {
 						button.setDisabled(false);
 						
 						// Only enable save button if all models succeed?
-						if (successCount >= modelTypes.length) {
+						if (successCount >= me.DSS_modelTypes.length) {
 							Ext.getCmp('DSS_ScenarioSaveButton').setDisabled(false);
 						}
 					}
@@ -521,7 +538,8 @@ Ext.define('MyApp.view.Scenario_Layout', {
 					if (requestCount <=0) {
 						button.setIcon('app/images/go_icon.png');
 						button.setDisabled(false);
-						alert("Model run failed, request timed out?");
+						alert("Model run failed for: '" + request.modelType 
+								+ "', request timed out?");
 					}
 				}
 			});

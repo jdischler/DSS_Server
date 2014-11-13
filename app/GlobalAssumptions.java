@@ -9,6 +9,15 @@ import com.fasterxml.jackson.databind.node.*;
 //------------------------------------------------------------------------------
 public class GlobalAssumptions
 {
+	//--------------------------------------------------------------------------
+	private static final boolean DETAILED_DEBUG_LOGGING = false;
+	private static final void detailedLog(String detailedMessage) {
+		
+		if (DETAILED_DEBUG_LOGGING) {
+			Logger.debug(detailedMessage);
+		}
+	}
+	
 	// Looks like this in memory:
 	//	economic: { CategoryName: "someName", CategoryIcon: "someIcon",
 	//						{ p_corn: { displayName: "someName", defaultValue: "someValue"},
@@ -253,7 +262,7 @@ public class GlobalAssumptions
 			throw new Exception();
 		}
 		mClientSentAssumptions = (ObjectNode)res;
-		Logger.info(res.toString());
+		detailedLog(res.toString());
 	}
 	
 	//--------------------------------------------------------------------------

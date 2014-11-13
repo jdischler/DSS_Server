@@ -18,6 +18,15 @@ import java.lang.reflect.Array;
 //------------------------------------------------------------------------------
 public class Model_SoilCarbon
 {
+	//--------------------------------------------------------------------------
+	private static final boolean DETAILED_DEBUG_LOGGING = false;
+	private static final void detailedLog(String detailedMessage) {
+		
+		if (DETAILED_DEBUG_LOGGING) {
+			Logger.debug(detailedMessage);
+		}
+	}
+
 	// Raw Soil Carbon Change Factor (RSCCF) 
 	static final float RSCCF_Corn_Grass = 0.63f; // Continuous Corn to Grass
 	static final float RSCCF_Corn_Alfalfa = 0.37f; // Continuous Corn to Alfalfa
@@ -37,10 +46,7 @@ long timeStart = System.currentTimeMillis();
 		float [][] soilCarbonData = new float[height][width];
 Logger.info("  > Allocated memory for SOC");
 
-		// Defining variables based on the selected layer
-		// Mask
 		Layer_Integer cdl = (Layer_Integer)Layer_Base.getLayer("cdl_2012"); 
-		//Logger.debug(" CDL from erver = " + cdl );
 		int Grass_Mask = cdl.convertStringsToMask("grass");
 		int Corn_Mask = cdl.convertStringsToMask("corn");
 		int Soy_Mask = cdl.convertStringsToMask("soy");
@@ -60,8 +66,7 @@ Logger.info("  > Allocated memory for SOC");
 		
 		// Get user changeable yield scaling values from the client...
 		//----------------------------------------------------------------------
-		try 
-		{	
+		try {	
 			// values come in as straight multiplier
 			annualNoTillageModifier = 1 + (scenario.mAssumptions.getAssumptionFloat("soc_nt_annuals") - 1) / 20;
 			annualCoverCropModifier = 1 + (scenario.mAssumptions.getAssumptionFloat("soc_cc_annuals") - 1) / 20;		
@@ -74,12 +79,12 @@ Logger.info("  > Allocated memory for SOC");
 			Logger.warn(e.toString());
 		}
 		
-		Logger.debug(" Agricultural no till from client = " + Float.toString(annualNoTillageModifier) );
-		Logger.debug(" Agricultural cover crop from client = " + Float.toString(annualCoverCropModifier) );
-		Logger.debug(" Agricultural Fertilizer from client = " + Float.toString(annualFertilizerModifier) );
-		Logger.debug(" Perennial Fertilizer from client = " + Float.toString(perennialFertilizerModifier) );
-		Logger.debug(" Annual Fall Fertilizer from client = " + Float.toString(annualFallFertilizerModifier) );
-		Logger.debug(" Perennial Fall Fertilizer from client = " + Float.toString(perennialFallFertilizerModifier) );
+		detailedLog(" Agricultural no till from client = " + Float.toString(annualNoTillageModifier) );
+		detailedLog(" Agricultural cover crop from client = " + Float.toString(annualCoverCropModifier) );
+		detailedLog(" Agricultural Fertilizer from client = " + Float.toString(annualFertilizerModifier) );
+		detailedLog(" Perennial Fertilizer from client = " + Float.toString(perennialFertilizerModifier) );
+		detailedLog(" Annual Fall Fertilizer from client = " + Float.toString(annualFallFertilizerModifier) );
+		detailedLog(" Perennial Fall Fertilizer from client = " + Float.toString(perennialFallFertilizerModifier) );
 		
 		// No Till Multiplier
 		float NT_M = 1.0f;
@@ -100,8 +105,6 @@ Logger.info("  > Allocated memory for SOC");
 					int landCover_D = rotationD_Data[y][x];
 					int landCover_T = rotationT_Data[y][x];
 					
-					//if (landCover_D != landCover_T)
-					//{
 					// NoData
 					if (landCover_D == 0 || landCover_T == 0 || SOC[y][x] < 0.0f) 
 					{
@@ -111,7 +114,6 @@ Logger.info("  > Allocated memory for SOC");
 					else if (landCover_D != landCover_T) 
 					{
 						//factor = 0.0f;
-						
 						// ----- CORN to...
 						if ((landCover_D & Corn_Mask) > 0) {
 							if ((landCover_T & Grass_Mask) > 0) {
@@ -214,25 +216,17 @@ Logger.info("  > Allocated memory for SOC");
 							adjFactor = 1.2f;
 						}
 						
-						//if(factor > -1.0f && adjFactor > -1.0f)
-						//{
-							// Convert the change from 20 years to 1 year
-							//soilCarbonData[y][x] = SOC[y][x] + (SOC[y][x] * factor * adjFactor) / 20.0f;
-							//soilCarbonData[y][x] = SOC[y][x] * adjFactor + SOC[y][x] * factor * adjFactor;
-							
-							// Mg per Ha and convert to Mg per cell
-							soilCarbonData[y][x] = (SOC[y][x] * (1 + (factor * adjFactor) / 20.0f)) * 900.0f / 10000.0f;
-							// Convert from Mg to short tons
-							//soilCarbonData[y][x] = soilCarbonData[y][x] * 1.102f;
-							
-							// Change value using multiplier
-							soilCarbonData[y][x] *=  NT_M * CC_M * F_M;
-						//}
+						// Mg per Ha and convert to Mg per cell
+						soilCarbonData[y][x] = (SOC[y][x] * (1 + (factor * adjFactor) / 20.0f)) * 900.0f / 10000.0f;
+						
+						// Change value using practice multipliers
+						soilCarbonData[y][x] *=  NT_M * CC_M * F_M;
 					}
-					//}
 					// Default
-					else
-					{
+					else {
+						// Don't believe it makes any sense to modify default SOC based on practices...
+						// commenting that out...
+						/*
 						// Corn
 						if ((landCover_D & Corn_Mask) > 0) {
 							// Return tillage modififier if cell is Tilled
@@ -265,28 +259,15 @@ Logger.info("  > Allocated memory for SOC");
 										1.0f, 1.0f, // these values correspond to NO Fert multiplier and synthetic multiplier
 										perennialFallFertilizerModifier, perennialFertilizerModifier);
 						}
+						*/
+						// Mg per Ha and convert to Mg per cell
+						soilCarbonData[y][x] = SOC[y][x] * 900.0f / 10000.0f;
 						
-							// Mg per Ha and convert to Mg per cell
-							soilCarbonData[y][x] = SOC[y][x] * 900.0f / 10000.0f;
-							
-							// Change value using multiplier
-							soilCarbonData[y][x] *=  NT_M * CC_M * F_M;
+						// Change value using multiplier
+						//soilCarbonData[y][x] *=  NT_M * CC_M * F_M;
 					}
-					}
-						//else
-						//{
-						//	soilCarbonData[y][x] = -9999.0f;
-						//}
-						//if (adjFactor < 0 || factor < 0 || soilCarbonData[y][x] < SOC[y][x])
-						//{
-							//Logger.info(Float.toString(adjFactor));
-							//Logger.info(Float.toString(factor));
-							//Logger.info(Float.toString(soilCarbonData[y][x]) + " " + Float.toString(SOC[y][x]));
-						//}
-					//}
-				//}
-				else 
-				{
+				}
+				else {
 					soilCarbonData[y][x] = -9999.0f;
 				}
 			}

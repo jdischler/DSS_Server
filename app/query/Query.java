@@ -14,6 +14,15 @@ import com.fasterxml.jackson.databind.node.*;
 //------------------------------------------------------------------------------
 public class Query {
 	
+	//--------------------------------------------------------------------------
+	private static final boolean DETAILED_DEBUG_LOGGING = false;
+	private static final void detailedLog(String detailedMessage) {
+		
+		if (DETAILED_DEBUG_LOGGING) {
+			Logger.debug(detailedMessage);
+		}
+	}
+	
 	static int mCounter;
 	static int mWidth, mHeight; // FIXME: why static?
 
@@ -33,8 +42,8 @@ public class Query {
 		mWidth = tmp.getWidth();
 		mHeight = tmp.getHeight();
 		
-		Logger.debug("Called into query");
-		Logger.debug(requestBody.toString());
+		detailedLog("Called into query");
+		detailedLog(requestBody.toString());
 		
 		int ctr = mCounter++;
 		String partialPath = "/public/dynamicFiles/selection" + String.valueOf(ctr) + ".png";
@@ -44,7 +53,7 @@ public class Query {
 //			partialPath = "/target/scala-2.10/classes" + partialPath;
 		}
 		String urlPath = "/files/selection" + String.valueOf(ctr) + ".png";
-		Logger.debug("File write path: " + partialPath);
+		detailedLog("File write path: " + partialPath);
 		
 		// 8 bits per pixel, one channel (indexed), file path where the png is saved
 		// Since this is the file we are saving, it will be smaller than the actual
@@ -81,10 +90,10 @@ public class Query {
 		// Get query statistics (number of selected pixels)
 		int count = selection.countSelectedPixels();	
 
-		Logger.info("Query Statistics");
-		Logger.info("-----------------------");
-		Logger.info("Total selected pixels: " + Integer.toString(count));
-		Logger.info("Square km: " + Float.toString(count * 0.03f * 0.03f));
+		detailedLog("Query Statistics");
+		detailedLog("-----------------------");
+		detailedLog("Total selected pixels: " + Integer.toString(count));
+		detailedLog("Square km: " + Float.toString(count * 0.03f * 0.03f));
 
 		// Data to return to the client		
 		ObjectNode ret = JsonNodeFactory.instance.objectNode();

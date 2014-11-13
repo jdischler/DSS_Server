@@ -97,7 +97,7 @@ public class CustomComparison
 		}
 
 		// giving 5 minutes 		
-		long expireHours = 0 * 5 * 60 * 1000; // 0 hour -> minutes -> seconds -> milliseconds
+		long expireHours = 0 * 10 * 60 * 1000; // 0 hour -> minutes -> seconds -> milliseconds
 		long roughlyNow = System.currentTimeMillis();
 		for (Map.Entry<String, CustomComparison> entry : mCachedCustomComparison.entrySet()) {
 			Logger.warn("Have possibly stale comparison objects hanging around...");
@@ -150,8 +150,8 @@ public class CustomComparison
 		
 		Logger.info(" - releasing cache for comparison, cache string named <" + cacheStringID + ">");
 		CustomComparison cc = mCachedCustomComparison.remove(cacheStringID);
-		cc.mSelection1 = null;
-		cc.mSelection2 = null;
+//		cc.mSelection1 = null;
+//		cc.mSelection2 = null;
 	}
 }
 

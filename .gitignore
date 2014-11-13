@@ -38,3 +38,5 @@ dist
 conf/routes~
 
 *.db
+
+*.key~#

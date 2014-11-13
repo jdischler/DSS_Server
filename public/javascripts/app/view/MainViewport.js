@@ -265,27 +265,6 @@ Ext.define('MyApp.view.MainViewport', {
 	//--------------------------------------------------------------------------
 	addMapLayers: function(map) {
 	
-		//-- CDL -----------------------------------------------
-		/*var wmsCDL = new OpenLayers.Layer.WMS('cdl_2012', 
-			this.getGeoserverURLs(DSS_RasterPath),
-			this.getLayerSettings(map, 'Raster:CDL_2012'),
-			this.getWMS_Settings(false, 0.5)
-		);*/
-		
-		//-- Rivers ----------------------------------------------
-		/*var wmsRivers = new OpenLayers.Layer.WMS("Rivers", 
-			this.getGeoserverURLs(DSS_VectorPath),
-			this.getLayerSettings(map, 'Vector:Rivers-B'),
-			this.getWMS_Settings(false, 1)
-		);*/
-
-		//-- Slope ----------------------------------------------
-		/*var wmsSlope = new OpenLayers.Layer.WMS("Slope", 
-			this.getGeoserverURLs(DSS_RasterPath),
-			this.getLayerSettings(map, 'Raster:Slope-b'),
-			this.getWMS_Settings(false, 0.5)
-		);*/
-
 		//-- Watersheds ----------------------------------------------
 		var wmsWatershed = new OpenLayers.Layer.WMS("Watersheds", 
 			this.getGeoserverURLs(DSS_VectorPath),
@@ -300,34 +279,14 @@ Ext.define('MyApp.view.MainViewport', {
 			this.getWMS_Settings(false, 1)
 		);
 		
-		//-- LCC ----------------------------------------------
-		/*var wmsLCC = new OpenLayers.Layer.WMS("lcc", 
-			this.getGeoserverURLs(DSS_RasterPath),
-			this.getLayerSettings(map, 'Raster:LCC'),
-			this.getWMS_Settings(false, 0.5)
-		);*/
-		
-		//-- LCS ----------------------------------------------
-		/*var wmsLCS = new OpenLayers.Layer.WMS("lcs",
-			this.getGeoserverURLs(DSS_RasterPath),
-			this.getLayerSettings(map, 'Raster:LCS'),
-			this.getWMS_Settings(false, 0.5)
-		);*/
-		
 		map.addLayers([
-			//wmsCDL,
-			//wmsSlope,
-			//wmsRivers,
 			wmsWatershed,
 			wmsAg_Lands,
-			//wmsLCC,
-			//wmsLCS
 			]);
 		
 		var lpCDL = Ext.create('MyApp.view.LayerPanel_Indexed', {
 			title: 'Landcover',
 			DSS_Description: 'Match land by landcover, example: select rowcrops such as corn or soybeans',
-			//DSS_Layer: wmsCDL,
 			minHeight: 90,
 			maxHeight: 400,
 			DSS_QueryTable: 'cdl_2012',
@@ -338,7 +297,6 @@ Ext.define('MyApp.view.MainViewport', {
 		var lpSlope = Ext.create('MyApp.view.LayerPanel_Continuous', {
 			title: 'Slope',
 			DSS_Description: 'Match land by range of slope, example: select land on steep slopes',
-			//DSS_Layer: wmsSlope,
 			DSS_LayerUnit: '%',//'\xb0',
 			DSS_LayerRangeMin: 0,
 			DSS_LayerRangeMax: 45.5,
@@ -353,7 +311,6 @@ Ext.define('MyApp.view.MainViewport', {
 			DSS_Description: 'Match land by distance to water, example: select land close to streams',
 			DSS_ShortTitle: 'Stream',
 			DSS_AutoSwapTitles: false,
-			//DSS_Layer: wmsRivers,
 			DSS_LayerUnit: 'ft',
 			DSS_LayerRangeMin: 0,
 			DSS_LayerRangeMax: 17220,
@@ -379,15 +336,15 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 
-		var lpAg_Lands = Ext.create('MyApp.view.LayerPanel_Watershed', {
+		var lpAg_Lands = null;/*Ext.create('MyApp.view.LayerPanel_Watershed', {
 			title: 'Dane County Ag Lands',
 			DSS_Description: 'Match land by Dane County agricultural land, example: select specific parcels',
 			DSS_Layer: wmsAg_Lands,
 			DSS_QueryTable: 'ag_lands',
 			collapsed: true
-		});
+		});*/
 
-		var lpCRP_Land = Ext.create('MyApp.view.LayerPanel_PickOne', {
+		var lpCRP_Land = null;/*Ext.create('MyApp.view.LayerPanel_PickOne', {
 			title: 'CRP Land',
 			DSS_ShortTitle: 'CRP Land',
 			DSS_QueryTable: 'crp',
@@ -405,14 +362,13 @@ Ext.define('MyApp.view.MainViewport', {
 				inputValue: 0,
 			}],
 			collapsed: true
-		});
+		});*/
 		
 		var lpLCC = Ext.create('MyApp.view.LayerPanel_Indexed', {
 			title: 'Land Capability Class',
 			DSS_Description: 'Match land by capability, example: select poor quality crop land',
 			DSS_ShortTitle: 'LCC',
 			DSS_AutoSwapTitles: true,
-			//DSS_Layer: wmsLCC,
 			minHeight: 90,
 			maxHeight: 400,
 			DSS_QueryTable: 'lcc',
@@ -424,7 +380,6 @@ Ext.define('MyApp.view.MainViewport', {
 			DSS_Description: 'Match land by capability subclass, example: select soils that are prone to saturation',
 			DSS_ShortTitle: 'LCS',
 			DSS_AutoSwapTitles: true,
-			//DSS_Layer: wmsLCS,
 			minHeight: 90,
 			maxHeight: 400,
 			DSS_QueryTable: 'lcs',
@@ -436,7 +391,6 @@ Ext.define('MyApp.view.MainViewport', {
 			DSS_Description: 'Match public lands, example: select lands that are adjacent to public lands',
 			DSS_ShortTitle: 'Public Land',
 			DSS_AutoSwapTitles: false,
-		//	DSS_Layer: wmsRivers,//fix
 			DSS_LayerUnit: 'mi',
 			DSS_LayerRangeMin: 0,
 			DSS_LayerRangeMax: 9,
@@ -459,7 +413,6 @@ Ext.define('MyApp.view.MainViewport', {
 			DSS_Description: 'Match land by dairy density, example: select lands with a high density of dairy farms',
 			DSS_ShortTitle: 'Per mi&#178;',
 			DSS_AutoSwapTitles: false,
-		//	DSS_Layer: wmsRivers,//fix
 			DSS_LayerUnit: '',
 			DSS_LayerRangeMin: 0,
 			DSS_LayerRangeMax: 8,
@@ -486,8 +439,8 @@ Ext.define('MyApp.view.MainViewport', {
 		dssLeftPanel.add(lpRiver);
 		dssLeftPanel.add(lpSlope);
 		dssLeftPanel.add(lpWatershed);
-		dssLeftPanel.add(lpAg_Lands);
-		dssLeftPanel.add(lpCRP_Land);
+		if (lpAg_Lands) dssLeftPanel.add(lpAg_Lands);
+		if (lpCRP_Land) dssLeftPanel.add(lpCRP_Land);
 		dssLeftPanel.add(lpLCC);
 		dssLeftPanel.add(lpLCS);
 		dssLeftPanel.add(lpPublicLand);
@@ -502,8 +455,8 @@ Ext.define('MyApp.view.MainViewport', {
 		DSS_globalQueryableLayers.push(lpLCC);
 		DSS_globalQueryableLayers.push(lpLCS);
 		DSS_globalQueryableLayers.push(lpWatershed);
-		DSS_globalQueryableLayers.push(lpAg_Lands);
-		DSS_globalQueryableLayers.push(lpCRP_Land);
+		if (lpAg_Lands) DSS_globalQueryableLayers.push(lpAg_Lands);
+		if (lpCRP_Land) DSS_globalQueryableLayers.push(lpCRP_Land);
 		DSS_globalQueryableLayers.push(lpPublicLand);
 		DSS_globalQueryableLayers.push(lpDairy);
 		DSS_globalQueryableLayers.push(lpGrid);
@@ -514,8 +467,8 @@ Ext.define('MyApp.view.MainViewport', {
 		DSS_globalCollapsibleLayers.push(lpLCC);
 		DSS_globalCollapsibleLayers.push(lpLCS);
 		DSS_globalCollapsibleLayers.push(lpWatershed);
-		DSS_globalCollapsibleLayers.push(lpAg_Lands);
-		DSS_globalCollapsibleLayers.push(lpCRP_Land);
+		if (lpAg_Lands) DSS_globalCollapsibleLayers.push(lpAg_Lands);
+		if (lpCRP_Land) DSS_globalCollapsibleLayers.push(lpCRP_Land);
 		DSS_globalCollapsibleLayers.push(lpPublicLand);
 		DSS_globalCollapsibleLayers.push(lpDairy);
 		DSS_globalCollapsibleLayers.push(lpGrid);

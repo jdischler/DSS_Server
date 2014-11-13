@@ -15,6 +15,7 @@ public class Layer_Float extends Layer_Base
 	protected boolean mbInitedMinMaxCache;
 	protected float	mMin, mMax;
 	protected float[][] mFloatData;
+	protected int mCountNoDataCells;
 	
 	//--------------------------------------------------------------------------
 	public Layer_Float(String name) {
@@ -28,6 +29,7 @@ public class Layer_Float extends Layer_Base
 		super(name, temporary);
 
 		mbInitedMinMaxCache = false;
+		mCountNoDataCells = 0;
 	}
 	
 	// Min / Max
@@ -89,6 +91,9 @@ public class Layer_Float extends Layer_Base
 				mMin = value;
 			}
 		}
+		else {
+			mCountNoDataCells++;
+		}
 	}
 	
 	//--------------------------------------------------------------------------
@@ -112,6 +117,8 @@ public class Layer_Float extends Layer_Base
 		
 		Logger.info("  Value range is: " + Float.toString(mMin) + 
 						" to " + Float.toString(mMax));
+		Logger.info("  Num Cells with NO_DATA: " + Integer.toString(mCountNoDataCells));
+		Logger.info("  % Cells with NO_DATA: %" + Float.toString(mCountNoDataCells / (float)(mHeight * mWidth) * 100.0f));
 	}
 	
 	//--------------------------------------------------------------------------
@@ -135,7 +142,7 @@ public class Layer_Float extends Layer_Base
 	//--------------------------------------------------------------------------
 	protected Selection query(JsonNode queryNode, Selection selection) {
 
-		Logger.info("Running continuous query");
+		detailedLog("Running continuous query");
 
 		String lessTest = queryNode.get("lessThanTest").textValue();
 		String gtrTest = queryNode.get("greaterThanTest").textValue();
@@ -162,8 +169,8 @@ public class Layer_Float extends Layer_Base
 			}
 		}
 		
-		Logger.info("Min value:" + Float.toString(minVal));
-		Logger.info("Max value:" + Float.toString(maxVal));
+		detailedLog("Min value:" + Float.toString(minVal));
+		detailedLog("Max value:" + Float.toString(maxVal));
 		int x,y;
 		
 		// Blugh, I count 8 permutations that we care about. These are split out this way
@@ -173,7 +180,7 @@ public class Layer_Float extends Layer_Base
 		if (isGreaterThan) {
 			if (isLessThan) {
 				// >  <
-				Logger.info("> <");
+				detailedLog("> <");
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
 						selection.mRasterData[y][x] &= 
@@ -184,7 +191,7 @@ public class Layer_Float extends Layer_Base
 			}
 			else if (isLessThanEqual) {
 				// >  <=
-				Logger.info("> <=");
+				detailedLog("> <=");
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
 						selection.mRasterData[y][x] &= 
@@ -195,7 +202,7 @@ public class Layer_Float extends Layer_Base
 			}
 			else
 			{ // >
-				Logger.info(">");
+				detailedLog(">");
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
 						selection.mRasterData[y][x] &= 
@@ -208,7 +215,7 @@ public class Layer_Float extends Layer_Base
 		else if (isGreaterThanEqual) {
 			if (isLessThan) {
 				// >= <
-				Logger.info(">= <");
+				detailedLog(">= <");
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
 						selection.mRasterData[y][x] &= 
@@ -219,7 +226,7 @@ public class Layer_Float extends Layer_Base
 			}
 			else if (isLessThanEqual) {
 				// >=  <=
-				Logger.info(">= <=");
+				detailedLog(">= <=");
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
 						selection.mRasterData[y][x] &= 
@@ -230,7 +237,7 @@ public class Layer_Float extends Layer_Base
 			}
 			else
 			{ // >=
-				Logger.info(">=");
+				detailedLog(">=");
 				for (y = 0; y < mHeight; y++) {
 					for (x = 0; x < mWidth; x++) {
 						selection.mRasterData[y][x] &= 
@@ -242,7 +249,7 @@ public class Layer_Float extends Layer_Base
 		}
 		else if (isLessThan) {
 			// <
-			Logger.info("<");
+			detailedLog("<");
 			for (y = 0; y < mHeight; y++) {
 				for (x = 0; x < mWidth; x++) {
 					selection.mRasterData[y][x] &= 
@@ -253,7 +260,7 @@ public class Layer_Float extends Layer_Base
 		}
 		else if (isLessThanEqual) {
 			// <=
-			Logger.info("<=");
+			detailedLog("<=");
 			for (y = 0; y < mHeight; y++) {
 				for (x = 0; x < mWidth; x++) {
 					selection.mRasterData[y][x] &= 
@@ -263,7 +270,7 @@ public class Layer_Float extends Layer_Base
 			}
 		}
 
-		Logger.info("Continuous query done!");
+		detailedLog("Continuous query done!");
 		return selection;
 	}
 }

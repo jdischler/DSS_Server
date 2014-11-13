@@ -327,7 +327,7 @@ public class Layer_Integer extends Layer_Base
 		ArrayNode arNode = (ArrayNode)matchValuesArray;
 		if (arNode != null) {
 			int count = arNode.size();
-			Logger.debug("Query Index Array count: " + Integer.toString(count));
+			detailedLog("Query Index Array count: " + Integer.toString(count));
 			StringBuffer debug = new StringBuffer();
 			debug.append("Query Indices: ");
 			for (int i = 0; i < count; i++) {
@@ -341,8 +341,8 @@ public class Layer_Integer extends Layer_Base
 				queryMask |= convertIndexToMask(val);
 			}
 			
-			Logger.debug(debug.toString());
-			Logger.info("Final Query Mask: " + Integer.toString(queryMask));
+			detailedLog(debug.toString());
+			detailedLog("Final Query Mask: " + Integer.toString(queryMask));
 			return queryMask;
 		}
 		
@@ -378,7 +378,7 @@ public class Layer_Integer extends Layer_Base
 		if (arNode != null) {
 			int count = arNode.size();
 			int array[] = new int [count];
-			Logger.debug("Query Index Array count: " + Integer.toString(count));
+			detailedLog("Query Index Array count: " + Integer.toString(count));
 			StringBuffer debug = new StringBuffer();
 			debug.append("Query Indices: ");
 			for (int i = 0; i < count; i++) {
@@ -392,7 +392,7 @@ public class Layer_Integer extends Layer_Base
 				array[i] = val;
 			}
 			
-			Logger.debug(debug.toString());
+			detailedLog(debug.toString());
 			return array;
 		}
 		
@@ -451,7 +451,7 @@ public class Layer_Integer extends Layer_Base
 	//--------------------------------------------------------------------------
 	protected Selection query(JsonNode queryNode, Selection selection) {
 
-		Logger.info("Running indexed query");
+		detailedLog("Running indexed query");
 		JsonNode queryValues = queryNode.get("matchValues");
 
 		if (mLayerDataFormat == EType.ERaw) {

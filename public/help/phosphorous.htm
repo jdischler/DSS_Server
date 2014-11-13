@@ -4,10 +4,18 @@
     <title>Phosphorous Model</title>
   </head>
   <body>
-We implemented phosphorous model that was developed by Soranno in decision support tool. See below paper for more details.
+The phosphorous loading model estimates the amount of phosphorous loaded into surface water each year from a focal location. 
+Phosphorous loss estimates for each pixel under the four cropping systems are generated in advance using the EPIC agroecosystem model (Zhang et al. 2010). 
+In these precomputed simulations, corn and soybean production uses conventional tillage and optimal amounts of synthetic fertilizer, while alfalfa and grassland simulations assume no tillage and optimal amounts of fertilizer. 
+Precomputed estimates of P loss are further modified with an exponential decay function (Soranno et al., 1996) that decreases P loss estimates based on the distance of a location from the nearest stream and the type of land use at a given location. 
+Uncertainty of phosphorous loading estimates depends on uncertainty in the many assumptions and parameter estimates in the EPIC agroecosystem model. 
+Validations studies have shown that EPIC simulations capture 59% to 87% of the variation in observed phosphorous losses from fields. 
+Uncertainty also arises from errors in the assumptions and coefficients incorporated into the exponential decay function. 
+The sum of these uncertainties is not known.
 <br><br>
-Soranno, P. A., Hubler, S. L., Carpenter, S. R., & Lathrop, R. C. (1996). Phosphorus loads to surface waters: a simple model to account for spatial pattern of land use. Ecological Applications, 6(3), 865-878.
+Zhang, X., Izaurralde, R. C., Manowitz, D., West, T. O., Post, W. M., Thomson, A. M., ... & Williams, J. R. (2010). An integrative modeling framework to evaluate the productivity and sustainability of biofuel crop production systems. GCB Bioenergy, 2(5), 258-277.
 <br><br>
+Soranno, P. A., Hubler, S. L., Carpenter, S. R., & Lathrop, R. C. (1996). Phosphorus loads to surface waters: a simple model to account for spatial pattern of land use. Ecological Applications, 6(3), 865-878.<br><br>
 <a href="http://www.esajournals.org/doi/abs/10.2307/2269490">Link</a> 
   </body>
 </html>

@@ -4,7 +4,17 @@
     <title>Soil Loss Model</title>
   </head>
   <body>
-We implemented soil loss model that were implemented by Khanal for WI in decision support tool. See below paper for more details.
+The Revised Universal Soil Loss Equation (RUSLE) is used to estimate annual soil loss for each focal location. 
+This model uses factors such as annual rainfall, runoff erosivity, soil erodibility, slope length, slope steepness, land use and management, and conservation practices to estimate average annual soil loss in tons per year. 
+Rainfall data comes from the PRISM geodatabase and land cover data comes from the Cropland Data Layer. 
+Slope steepness and slope length estimates are based on a digital elevation model. 
+Soil erodibility information comes from the USDA SSURGO soil geodatabase. 
+The accuracy of this estimate depends on the accuracy of the input layers and management specifications. 
+Previous studies have shown that RUSLE describes approximately 75% of the variation in average annual soil loss across sites (Risse et al. 1993). 
+The implementation of RUSLE used here is described in Khanal et al. (2013). implemented soil loss model that were implemented by Khanal for WI in decision support tool. 
+See below paper for more details.
+<br><br>
+Risse, L. M., Nearing, M. A., Laflen, J. M., & Nicks, A. D. (1993). Error assessment in the universal soil loss equation. Soil Science Society of America Journal, 57(3), 825-833.
 <br><br>
 Khanal, S., Anex, R. P., Anderson, C. J., Herzmann, D. E., & Jha, M. K. (2013). Implications of biofuel policy-driven land cover change for rainfall erosivity and soil erosion in the United States. GCB Bioenergy, 5(6), 713-722.
 <br><br>

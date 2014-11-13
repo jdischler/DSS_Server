@@ -50,7 +50,7 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_UnitLabel: '$Million/Yr',
 					DSS_Label: 'Net Income',
 					DSS_GraphTitle: 'Net Income',
-					DSS_InfoHTML: 'help/yield_ethanol_net_energy_net_income.htm',
+					DSS_InfoHTML: 'help/yield_and_net_income.htm',
 					DSS_DetailReportContainer: me
 				},{
 					itemId: 'result_ethanol',
@@ -78,7 +78,7 @@ Ext.define('MyApp.view.Report_Detail', {
 						DSS_ResultsPostUnits: ''
 					}],
 					DSS_GraphTitle: 'Biofuel Production',
-					DSS_InfoHTML: 'help/yield_ethanol_net_energy_net_income.htm',
+					DSS_InfoHTML: 'help/yield_and_biofuel.htm',
 					DSS_DetailReportContainer: me
 				},{
 					itemId: 'result_net_energy',
@@ -100,7 +100,7 @@ Ext.define('MyApp.view.Report_Detail', {
 						DSS_ResultsPostUnits: ''
 					}],
 					DSS_GraphTitle: 'Net Energy',
-					DSS_InfoHTML: 'help/yield_ethanol_net_energy_net_income.htm',
+					DSS_InfoHTML: 'help/yield_and_net_energy.htm',
 					DSS_DetailReportContainer: me
 				},{
 					itemId: 'result_phosphorus_epic',

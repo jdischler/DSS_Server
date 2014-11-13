@@ -336,15 +336,15 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 
-		var lpAg_Lands = null;/*Ext.create('MyApp.view.LayerPanel_Watershed', {
+		var lpAg_Lands = Ext.create('MyApp.view.LayerPanel_Watershed', {
 			title: 'Dane County Ag Lands',
 			DSS_Description: 'Match land by Dane County agricultural land, example: select specific parcels',
 			DSS_Layer: wmsAg_Lands,
 			DSS_QueryTable: 'ag_lands',
 			collapsed: true
-		});*/
+		});
 
-		var lpCRP_Land = null;/*Ext.create('MyApp.view.LayerPanel_PickOne', {
+		var lpCRP_Land = Ext.create('MyApp.view.LayerPanel_PickOne', {
 			title: 'CRP Land',
 			DSS_ShortTitle: 'CRP Land',
 			DSS_QueryTable: 'crp',
@@ -362,7 +362,7 @@ Ext.define('MyApp.view.MainViewport', {
 				inputValue: 0,
 			}],
 			collapsed: true
-		});*/
+		});
 		
 		var lpLCC = Ext.create('MyApp.view.LayerPanel_Indexed', {
 			title: 'Land Capability Class',

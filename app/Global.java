@@ -21,7 +21,7 @@ public class Global extends GlobalSettings
 	
 	// CRP data and Dane country ag lands. The client will ask for this and disable options
 	//	that will not work anwyay because the server didn't load this data...
-	private static final boolean USE_RESTRICTED_DATA = false;
+	private static final boolean USE_RESTRICTED_DATA = true;
 	
 	//--------------------------------------------------------------------------
 	@Override

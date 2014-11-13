@@ -666,10 +666,10 @@ Ext.define('MyApp.view.MainViewport', {
 					},
 
 					DSS_SetTitle: function(queryName, collapsed) {
-						this.DSS_NamedQuery = queryName;
-						if (queryName == 'Double Click to Set Custom Name') {
-							queryName = 'Unnamed Transform';
+						if (!queryName) {
+							queryName = 'Untitled';
 						}
+						this.DSS_NamedQuery = queryName;
 						queryName = ' - "' + queryName + '"'; 
 						if (collapsed) {
 							this.setTitle('Step 1: Select Land to Transform / Scenario Tools' + queryName);

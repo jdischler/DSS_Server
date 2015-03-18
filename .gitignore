@@ -38,5 +38,5 @@ dist
 conf/routes~
 
 *.db
-
+*.zip
 *.key~#

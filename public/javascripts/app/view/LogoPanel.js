@@ -5,6 +5,10 @@ Ext.define('MyApp.view.LogoPanel', {
     extend: 'Ext.toolbar.Toolbar',//panel.Panel',
     alias: 'widget.logo_panel',
 
+    requires: [
+    	'MyApp.view.Dev_Popup'
+    ],
+    
 	id: 'DSS_LogoPanel',
 	frame: false,
 	layout: 'absolute',
@@ -40,10 +44,10 @@ Ext.define('MyApp.view.LogoPanel', {
 				xtype: 'button',
 				x: 350,
 				y: 16,
-				width: 200,
+				width: 190,
 				border: 1,
 				scale: 'large',
-				text: 'SmartScape DSS Help',
+				text: 'SmartScape&#8482 Help', // tm = &#8482;
 				aURL: 'http://youtu.be/XxZvzqFZTU8',
 				handler: function(self) {
 					javascript:window.open(self.aURL,'_blank');return false;
@@ -51,9 +55,9 @@ Ext.define('MyApp.view.LogoPanel', {
 			},
 			{
 				xtype: 'button',
-				x: 560,
+				x: 550,
 				y: 16,
-				width: 200,
+				width: 190,
 				border: 1,
 				text: 'Gratton Lab',
 				aURL: 'http://gratton.entomology.wisc.edu',
@@ -64,15 +68,28 @@ Ext.define('MyApp.view.LogoPanel', {
 			},
 			{
 				xtype: 'button',
-				x: 770,
+				x: 750,
 				y: 16,
-				width: 200,
+				width: 190,
 				border: 1,
 				scale: 'large',
 				text: 'WEI Homepage',
 				aURL: 'https://energy.wisc.edu',
 				handler: function(self) {
 					javascript:window.open(self.aURL,'_blank');return false;
+				}
+			},
+			{
+				xtype: 'button',
+				x: 950,
+				y: 16,
+				width: 190,
+				border: 1,
+				scale: 'large',
+				text: 'Developer Links',
+				handler: function(self) {
+					Ext.create('MyApp.view.Dev_Popup').show();
+//					javascript:window.open(self.aURL,'_blank');return false;
 				}
 			}]
         });

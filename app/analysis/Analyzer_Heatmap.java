@@ -449,6 +449,13 @@ public class Analyzer_Heatmap {
 			}
 		}
 
+		int realPaletteEntries = numPaletteEntries;
+		
+		// if we happened to have less final bins that the ideal colors, we'll just reduce the color count...
+		if (indexRemapperTracker < realPaletteEntries) {
+			realPaletteEntries = indexRemapperTracker;
+		}
+		
 		Logger.info(" ...Generating IDX array");
 
 		byte[][] idx = new byte[newHeight][newWidth];
@@ -462,11 +469,11 @@ public class Analyzer_Heatmap {
 					if (index > binCount - 1) index = binCount - 1;
 					int palIndex = bins[index];
 					if (palIndex < 0) palIndex = 0;
-					else if (palIndex > numPaletteEntries - 1) palIndex = numPaletteEntries - 1; 
+					else if (palIndex > realPaletteEntries - 1) palIndex = realPaletteEntries - 1; 
 					idx[y][x] = (byte)(palIndex);
 				}
 				else {
-					idx[y][x] = numPaletteEntries; // last color is transparent color
+					idx[y][x] = (byte)realPaletteEntries; // last color is transparent color
 				}
 			}
 		}
@@ -476,8 +483,8 @@ public class Analyzer_Heatmap {
 		Png png = new Png(newWidth, newHeight, 8, 1, outputFile.getPath());
 	
 		ObjectNode sendBack = JsonNodeFactory.instance.objectNode();
-		sendBack = copyQuantizedValuesForClient(min, max, bins, binCount, numPaletteEntries, sendBack);
-		sendBack = createPalette(png, numPaletteEntries, minMax, sendBack);
+		sendBack = copyQuantizedValuesForClient(min, max, bins, binCount, realPaletteEntries, sendBack);
+		sendBack = createPalette(png, realPaletteEntries, minMax, sendBack);
 	
 		png.mPngWriter.writeRowsByte(idx);
 		png.mPngWriter.end();

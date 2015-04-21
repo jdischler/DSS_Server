@@ -5,9 +5,12 @@ import util.*;
 import java.util.*;
 import java.io.*;
 import java.net.*;
+import java.math.BigInteger;
+
 
 import play.*;
 import play.mvc.*;
+import play.mvc.Http.Context;
 import play.Logger;
 import play.cache.*;
 
@@ -23,6 +26,14 @@ import org.apache.commons.io.filefilter.*;
 //import org.codehaus.jackson.*;
 //import org.codehaus.jackson.node.*;
 import javax.xml.bind.DatatypeConverter;
+
+
+import java.security.SecureRandom;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
+import com.avaje.ebean.Ebean;
+
 
 //------------------------------------------------------------------------------
 public class Application extends Controller 
@@ -50,17 +61,60 @@ public class Application extends Controller
 		return config.getString("application.name");
     }
     
+    // returns NULL if no valid string key exists
+	//--------------------------------------------------------------------------
+    private static String safeGetString(JsonNode request, String key) {
+    
+    	String result = null;
+    	if (request != null && key != null) {
+    		JsonNode node = request.get(key);
+    		if (node != null) {
+    			result = node.textValue();
+    		}
+    	}
+
+		return result;
+    }
+    
+    // returns NULL if no valid string key exists
+	//--------------------------------------------------------------------------
+    private static Boolean safeGetBoolean(JsonNode request, String key) {
+    
+    	Boolean result = null;
+    	if (request != null && key != null) {
+    		JsonNode node = request.get(key);
+    		if (node != null) {
+    			result = node.booleanValue();
+    		}
+    	}
+
+		return result;
+    }
+    
 	//--------------------------------------------------------------------------
 	public static Result index() 
 	{
+		// Prevent lingering sessions. Though since this is here, the client doesn't check for existing sessions
+		//	so the login/logout button may not be in the correct state if this were removed.
+		session().clear();
+		
 		return ok(index.render());
 	}
 	
 	//--------------------------------------------------------------------------
 	public static Result query() throws Exception 
 	{
+		// NOTE: user can legally be null if they have not registered/logged-in
+		ClientUser user = null;
+		String userEmail = Context.current().session().get("email");
+		if (userEmail != null) {
+			user = ClientUser.find.where()
+					.eq("email", userEmail)
+					.findUnique();
+		}
+
 		Query query = new Query();
-		JsonNode result = query.selection(request().body().asJson());
+		JsonNode result = query.selection(request().body().asJson(), user);
 		return ok(result);
 	}
 
@@ -144,12 +198,12 @@ public class Application extends Controller
 
 		Logger.info(request.toString());
 		// e.g., 'Vector:Watersheds-C'
-		String layerName = request.get("layer").textValue();
+		String layerName = safeGetString(request, "layer");
 		int x = request.get("x").intValue(); // 585
 		int y = request.get("y").intValue(); // 273
 		int width = request.get("width").intValue();
 		int height = request.get("height").intValue();
-		String bbox = request.get("bbox").textValue();
+		String bbox = safeGetString(request, "bbox");
 
 		BufferedReader rd = null;
 		OutputStreamWriter wr = null;
@@ -225,6 +279,14 @@ public class Application extends Controller
 	//----------------------------------------------------------------------
 	public static Result setUpScenario() throws Exception
 	{
+		ClientUser user = null;
+		String userEmail = Context.current().session().get("email");
+		if (userEmail != null) {
+			user = ClientUser.find.where()
+					.eq("email", userEmail)
+					.findUnique();
+		}
+
 		// NOTE: sanity check...
 		// Derp, probably needs to be in a process that runs every now and then...
 		//	Just to validate that all the code in place is sufficient to not be leaking memory..
@@ -238,7 +300,7 @@ public class Application extends Controller
 		JsonNode request = request().body().asJson();
 
 		// TODO: validate that this can't contain anything that could be used as an attack?
-		String clientID = request.get("clientID").textValue();
+		String clientID = safeGetString(request, "clientID");
 //		String folder = "client_" + clientID;
 		int modelRequestCount = request.get("modelRequestCount").asInt();
 		
@@ -250,7 +312,8 @@ public class Application extends Controller
 		
 		String folder = "client_" + clientID + "/" + Integer.toString(saveID);
 		
-		Scenario scenario = new Scenario();
+		// NOTE: user can be null
+		Scenario scenario = new Scenario(user);
 		scenario.setAssumptions(request);
 		scenario.getTransformedRotation(request);
 		scenario.mOutputDir = folder;
@@ -273,14 +336,14 @@ public class Application extends Controller
 
 		JsonNode request = request().body().asJson();
 		
-		String scenarioID = request.get("scenarioID").textValue();
+		String scenarioID = safeGetString(request, "scenarioID");
 		Scenario scenario = Scenario.getCachedScenario(scenarioID);
 		
 		if (scenario == null) {
 			return badRequest();
 		}
 		
-		String modelType = request.get("modelType").textValue();
+		String modelType = safeGetString(request, "modelType");
 		List<ModelResult> results = null;
 		
 		if (modelType.equals("yield")) {
@@ -335,7 +398,7 @@ public class Application extends Controller
 				ModelResult res = results.get(i);
 				detailedLog("Procesing results for " + res.mName);
 				
-				String clientID = request.get("clientID").textValue();
+				String clientID = safeGetString(request, "clientID");
 				String clientFolder = "client_" + clientID + "/";
 				int compare1ID = request.get("compare1ID").asInt(); // -1 is default
 				String runFolder = Integer.toString(compare1ID) + "/";
@@ -390,7 +453,7 @@ public class Application extends Controller
 		JsonNode request = request().body().asJson();
 
 		// TODO: validate that this can't contain anything that could be used as an attack?
-		String clientID = request.get("clientID").textValue();
+		String clientID = safeGetString(request, "clientID");
 		String folder = "client_" + clientID;
 
 		int compare1ID = request.get("compare1ID").asInt(); // -1 is default
@@ -485,14 +548,14 @@ public class Application extends Controller
 
 		JsonNode request = request().body().asJson();
 		
-		String compareID = request.get("customCompareID").textValue();
+		String compareID = safeGetString(request, "customCompareID");
 		CustomComparison comparison = CustomComparison.getCachedComparison(compareID);
 		
 		if (comparison == null) {
 			return badRequest(); // TODO: return error if needed...
 		}
 		
-		String file = request.get("file").textValue();
+		String file = safeGetString(request, "file");
 
 		// SendBack to Client
 		ObjectNode sendBack  = JsonNodeFactory.instance.objectNode();
@@ -528,7 +591,7 @@ public class Application extends Controller
 		// model can be: (TODO: verify list)
 		//	habitat_index, soc, nitrogen, phosphorus, pest, pollinator(s?), net_energy,
 		//		net_income, ethanol, nitrous_oxide
-		String model = request.get("model").textValue();
+		String model = safeGetString(request, "model");
 
 		if (model == null) {
 			Logger.warn("Tried to find a model data file but none was passed. Aborting heatmap.");
@@ -539,11 +602,11 @@ public class Application extends Controller
 		//	delta - shows change between file1 and file2
 		//	file1 - shows file1 as an absolute map
 		//	file2 - shows file2 as an absolute map		
-		String type = request.get("type").textValue();
+		String type = safeGetString(request, "type");
 		// subtype can be:
 		//	equal - equal interval map
 		//	quantile - quantiled...
-		String subtype = request.get("subtype").textValue();
+		String subtype = safeGetString(request, "subtype");
 
 		if (type == null) {
 			Logger.warn("Tried to find a heatmap 'type' key but didn't. Assuming 'delta'");
@@ -662,5 +725,441 @@ public class Application extends Controller
 		}
 		return ok(sendBack);
 	}
+	
+	
+	
+	
+	//--------------------------------------------------------------------------
+	//
+	// Authentication Shtuffs
+	//
+	//--------------------------------------------------------------------------
+	public static String hashPassword(String pwd) {
+	  
+		MessageDigest md;
+		
+		try {
+			md = MessageDigest.getInstance("SHA-256");
+		} catch (NoSuchAlgorithmException ex) {
+			System.out.println(ex.getMessage());
+			return null;
+		}
+		
+		md.update(pwd.getBytes());
+		byte[] hashPass = md.digest();
+		
+		return toHex(hashPass);
+	}
+	  
+	//--------------------------------------------------------------------------
+	public static String toHex(byte[] array)
+	{
+		BigInteger bi = new BigInteger(1, array);
+		String hex = bi.toString(16);
+		int paddingLength = (array.length * 2) - hex.length();
+		if (paddingLength > 0) {
+			return String.format("%0" + paddingLength + "d", 0) + hex;
+		}
+		else {
+			return hex;
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	// LOGIN
+	//--------------------------------------------------------------------------
+	public static Result login() throws Exception
+	{
+		JsonNode request = request().body().asJson();
+		String email = safeGetString(request, "user");
+		String password = safeGetString(request, "pwd");
+
+		if (email == null || password == null) {
+			return badRequest("Your request is not able to be processed at this time");
+		}
+
+		ClientUser user = ClientUser.find
+			  .where()
+			  .eq("email", email)
+			  .findUnique();
+			  
+		if (user == null) {
+			session().clear();
+			return badRequest("Invalid user or password");
+		}
+
+		// We won't have a salt if the users are added via the YAML script,
+		//	so don't allow them to log in. Instead, they will have to use the forgot email option. :/
+		if (user.passwordSalt == null || user.passwordSalt.length() <= 0) {
+			return badRequest("You will need to use the forgotten email option to log in.");
+		}
+		
+		String encryptedPwd = hashPassword(user.passwordSalt + password);
+		Logger.info("user's salt = " + user.passwordSalt);
+		Logger.info("encryptedPwd = " + encryptedPwd);
+		if(!encryptedPwd.equals(user.password)) {
+			session().clear();
+			return badRequest("Invalid user or password");
+		}
+		
+		session().clear();
+		Logger.info("set new session info...");
+		session("email", email);
+		SessionId sid = new SessionId(email);
+		session("uuid", sid.session_id.toString());
+		
+		ObjectNode sendBack = JsonNodeFactory.instance.objectNode();
+		
+		// Get all restricted layers
+		sendBack.put("restrictedLayers", Layer_Base.getAccessRestrictedLayers());
+		// Then also get the list of ones this user could access...
+		sendBack.put("unrestrictedLayers", Layer_Base.getAccessibleRestrictedLayers(user.accessFlags));
+		// Should client show the admin button? A client will still have to be authenticated and
+		//	have admin rights for the admin box to be populated with anything useful....
+		sendBack.put("showExtra", user.admin);
+		
+		return ok(sendBack);
+	}
+	
+	//--------------------------------------------------------------------------
+	// INITIAL REGISTRATION
+	//--------------------------------------------------------------------------
+	public static Result beginRegistration() throws Exception
+	{
+		JsonNode request = request().body().asJson();
+		String email = safeGetString(request, "user");
+		String password = safeGetString(request, "pwd");
+		String organization = safeGetString(request, "organization");
+
+		if (email == null || password == null) {
+			return badRequest("Your request is not able to be processed at this time");
+		}
+		
+		if (organization == null) {
+			organization = "";
+		}
+		
+		ClientUser user = ClientUser.find
+			  .where()
+			  .eq("email", email)
+			  .findUnique();
+			  
+		if (user != null) {
+			session().clear();
+			return badRequest("User already exists, please use the retrieve password option instead");
+		}
+
+		PendingRegistration pending = PendingRegistration.find
+			  .where()
+			  .eq("email", email)
+			  .findUnique();
+			  
+		if (pending != null) {
+			session().clear();
+			return badRequest("A pending registration is already in progress, please follow the link in the email sent to your email address. Note that spam filters may have moved this mail to a spam folder!");
+		}
+
+		// 2) generate random salt
+		Logger.info("writing entry to pending registration table...");
+		SecureRandom random = new SecureRandom();
+		byte[] salt = new byte[24];
+		random.nextBytes(salt);
+		String saltValue = toHex(salt);
+		// 3) prepend and hash password
+		String securedPassword = hashPassword(saltValue + password);
+		// 4) create unique validation code
+		SecureRandom randomVc = new SecureRandom();
+		byte[] vCode = new byte[24];
+		randomVc.nextBytes(vCode);
+		String validationCode = Application.toHex(vCode);
+		// 5) place submission in temporary queue
+		PendingRegistration pendingReg = new PendingRegistration(email, securedPassword, organization, validationCode, saltValue);
+		// 6) send confirmation email with validation link and redirect to 'confirmation sent' page
+		SendEmail.createValidation(email, validationCode);
+		
+		return ok();
+		// TODO: 8) setup check timestamps in temporary queue to remove "old" registration submissions (expire stale pendingRegistrations)
+		// TODO: 9) guard against any vulnerabilities present in form submission?
+	}
+	
+	//--------------------------------------------------------------------------
+	public static Result validateRegistration(String validationCode) {
+	
+		final long HOUR = 3600*1000; // in milli-seconds.
+		Date dateTime = new Date();
+		
+		long newDate = dateTime.getTime() - 1 * HOUR;
+		Timestamp compTime = new Timestamp(newDate);
+		
+		PendingRegistration pr = PendingRegistration.find
+			.where()
+			.eq("validation_code", validationCode)
+			.gt("create_time", compTime)
+			.findUnique();
+		if (pr != null) {
+			ClientUser existingUser = ClientUser.find.where()
+				.eq("email", pr.email)
+				.findUnique();
+			if (existingUser != null) {
+				existingUser.password = pr.password;
+				existingUser.passwordSalt = pr.password_salt;
+				Ebean.save(existingUser);
+			} 
+			else {
+				ClientUser user = new ClientUser(pr.email, pr.organization, pr.password, pr.password_salt);
+				Ebean.save(user);
+			}
+			Ebean.delete(pr);
+			return redirect(routes.Application.index());
+		} 
+		else {
+			// TODO: proper return...
+			return badRequest();
+		}
+	}
+
+	//--------------------------------------------------------------------------
+	// PASSWORD RESET
+	//--------------------------------------------------------------------------
+	public static Result requestReset() {
+	
+		JsonNode request = request().body().asJson();
+		String email = safeGetString(request, "user");
+
+		if (email != null) {
+			ClientUser userForPWReset = ClientUser.find.where()
+				.eq("email", email)
+				.findUnique();
+				
+			if (userForPWReset != null) {
+		        // 2) create unique validation code
+		        SecureRandom randomVc = new SecureRandom();
+		        byte[] vCode = new byte[24];
+		        randomVc.nextBytes(vCode);
+				String validationCode = Application.toHex(vCode);
+				
+				// 3) write vcode to db
+	    		Logger.info("writing entry to pending registration table for a new password...");
+	    		PendingRegistration pendingReg = new PendingRegistration(userForPWReset.email, userForPWReset.password, userForPWReset.organization, validationCode, userForPWReset.passwordSalt);
+		    	
+		        // 4) send confirmation email with validation link and redirect to 'confirmation sent' page
+		        SendEmail.createPasswordReset(userForPWReset.email, validationCode);
+		        return ok();
+			}
+		}
+		
+		return badRequest("Your request is not able to be processed at this time");
+	}
+	
+	//--------------------------------------------------------------------------
+	public static Result tryFinishReset() {
+	
+		JsonNode request = request().body().asJson();
+		
+		String email = safeGetString(request, "user");
+		String password = safeGetString(request, "pwd");
+		String vCode = safeGetString(request, "code");
+	
+		if (email == null || password == null || vCode == null) {
+			return badRequest("Your request is not able to be processed at this time");
+		}
+
+		PendingRegistration registration = PendingRegistration.find.where()
+	    			.eq("validation_code", vCode)
+	    			.findUnique();
+	    
+	    if (registration != null) {
+			String userEmail = registration.email;
+			
+			// Small extra anti-spoof verification
+			if (email.equals(userEmail)) {
+				ClientUser user = ClientUser.find.where()
+						.eq("email", userEmail)
+						.findUnique();
+						
+				if (user != null) {
+					// 2) generate random salt
+					SecureRandom random = new SecureRandom();
+					byte[] salt = new byte[24];
+					random.nextBytes(salt);
+					String saltValue = toHex(salt);
+					
+					// 3) prepend and hash password
+					String securedPassword = hashPassword(saltValue + password);
+					
+					// 5) place submission in db
+					user.password = securedPassword;
+					user.passwordSalt = saltValue; 
+					Ebean.save(user);
+					Ebean.delete(registration);
+					session().clear();
+			        SendEmail.createPasswordChangeConfirmation(userEmail);
+					
+					return ok("Reset complete, please trying logging in");
+				}
+			}
+		}
+		
+		return badRequest("Your request is not able to be processed at this time");
+	}
+	
+	//--------------------------------------------------------------------------
+	public static Result logout() {
+	
+		ObjectNode sendBack = JsonNodeFactory.instance.objectNode();
+		
+		sendBack.put("restrictedLayers", Layer_Base.getAccessRestrictedLayers());
+		
+		session().clear();
+		return ok(sendBack);
+	}
+
+	//--------------------------------------------------------------------------
+    // dbTable is expected to come from the server like this:
+    //
+    //	dbTable. 					-- entire packaged result from the server
+    //		.definition[].			-- an array of bit flags that correspond to access switches
+    //			.label 				-- name of the switch
+    //		.data[].				-- an array of data elements, one for each registered user
+    //			.email				-- email address of the given user
+    //			.organization		-- optional organization name
+    //			.admin				-- is admin?
+    //				.flags[]		-- array of bit switches, size of this should match the size of the definition[] above
+    //			
+    //--------------------------------------------------------------------------
+	public static Result getAccess() {
+	
+		ClientUser user = null;
+		String userEmail = Context.current().session().get("email");
+		if (userEmail != null) {
+			user = ClientUser.find.where()
+					.eq("email", userEmail)
+					.findUnique();
+		}
+
+		if (user == null || user.admin == false) {
+			return badRequest();
+		}
+		
+		List<ClientUser> userList = ClientUser.find
+			.findList();
+
+		ObjectNode sendBack = JsonNodeFactory.instance.objectNode();
+		
+		ArrayNode definition = JsonNodeFactory.instance.arrayNode();
+		// go through our enums and add the name of them to the definition...
+		for (ClientUser.ACCESS e : ClientUser.ACCESS.values()) {
+			definition.add(e.name());
+		}
+		
+		ArrayNode data = JsonNodeFactory.instance.arrayNode();
+		
+		for(ClientUser cu : userList){
+			ObjectNode aUser = JsonNodeFactory.instance.objectNode();
+			aUser.put("email", cu.email);
+			aUser.put("organization", cu.organization);
+			aUser.put("admin", cu.admin);
+
+			// Extract all the encoded bit switches associated with the enums
+			ArrayNode flags = JsonNodeFactory.instance.arrayNode();
+			for (ClientUser.ACCESS e : ClientUser.ACCESS.values()) {
+				flags.add(((cu.accessFlags & e.value) > 0) ? true : false);
+			}
+			aUser.put("flags", flags);
+			data.add(aUser);
+		}
+
+		sendBack.put("definition", definition);
+		sendBack.put("data", data);
+		
+		return ok(sendBack);
+	}
+
+    //--------------------------------------------------------------------------
+	public static Result changeAccess() {
+	
+		ClientUser user = null;
+		String userEmail = Context.current().session().get("email");
+		if (userEmail != null) {
+			user = ClientUser.find.where()
+					.eq("email", userEmail)
+					.findUnique();
+		}
+
+		if (user == null || user.admin == false) {
+			return badRequest();
+		}
+		
+		JsonNode request = request().body().asJson();
+		
+		if (!request.isArray()) {
+			return badRequest();
+		}
+		
+		for (int i = 0; i < request.size(); i++) {
+			JsonNode change = request.get(i);
+			if (change.isObject()) {
+				String email = safeGetString(change, "email");
+				if (email != null) {
+					user = ClientUser.find.where()
+						.eq("email", userEmail)
+						.findUnique();
+					if (user != null) {
+						boolean changed = false;
+						int accessFlags = 0;
+						
+						Iterator<Map.Entry<String,JsonNode>> itr = change.fields();
+						
+						while (itr.hasNext()) {
+							Map.Entry<String,JsonNode> entry = itr.next();
+							String key = entry.getKey();
+							JsonNode val = entry.getValue();
+							
+							if (key == null) continue;
+							switch(key) {
+								case "admin": {
+									Boolean admin = safeGetBoolean(change, "admin");
+									if (admin != null && admin != user.admin) {
+										changed = true;
+										user.admin = admin;
+									}
+								}
+								break;
+								
+								case "email":
+								case "organization":
+									// don't allow change, so skip these...
+									break;
+									
+								default: {
+									// we assume we are one of the enums, so work those next...
+									if (val.isBoolean()) {
+										ClientUser.ACCESS e = ClientUser.ACCESS.getEnumForString(key);
+										if (e != null && val.booleanValue() == true) {
+											accessFlags |= e.value;
+										}
+									}
+								}
+							}
+						}
+						
+						if (accessFlags != user.accessFlags) {
+							changed = true;
+							user.accessFlags = accessFlags;
+							Logger.debug("Access flags have changed!");
+						}
+						if (changed) {
+							Logger.debug("Saving one user change for: " + email);
+							Ebean.save(user);
+						}
+					}
+				}
+			}
+		}
+		
+		return ok();
+	}
+	
 }
+
 

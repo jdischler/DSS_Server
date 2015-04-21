@@ -23,19 +23,19 @@ Ext.define('MyApp.view.Dev_Popup', {
 				xtype: 'label',
 				x: 20,
 				y: 40,
-				width: 240,
-				html: '<a href="/app/file/DSS_Setup.odt" download="DSS_Setup.odt">&#8226 Developer Setup (Open Document, 50 KB)</a>'
+				width: 280,
+				html: '<a href="/app/file/DSS_Setup.pdf" download="DSS_Setup.pdf">&#8226 Developer Setup Documentation (PDF, 283 KB)</a>'
 			},{
 				xtype: 'label',
 				x: 20,
 				y: 20,
-				width: 240,
+				width: 280,
 				html: '<a href="https://github.com/jdischler/DSS_Server">&#8226 SmartScape&#8482 DSS Source Code on GitHub</a>'
 			},{
 				xtype: 'label',
 				x: 20,
 				y: 60,
-				width: 240,
+				width: 280,
 				html: '<a href="/app/file/DSS_LayerData.zip" download="DSS_LayerData.zip">&#8226 Layer Data (Compressed Zip, 257 MB)</a>'
 			}]
         });

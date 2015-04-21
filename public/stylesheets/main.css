@@ -192,7 +192,7 @@
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c4dae3', endColorstr='#93bac6',GradientType=0 );
 }
 
-.x-btn-default-toolbar-large {
+.x-btn-default-large {
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
   -ms-border-radius: 10px;
@@ -201,12 +201,23 @@
   padding: 3px 3px 3px 3px;
   border-width: 1px;
   border-style: solid;
-  border-color: #c7d7ea;
+  border-color: #c0d0e2;
+  background-image: none;
   background-color: rgba(100,128,128,.07);
 }
 
-.x-btn-default-toolbar-large .x-btn-inner {
-  font-size: 18px;
+.x-btn-default-large-over {
+    border-color: #b0ccf2;
+    background-image: none;
+    background-color: #e4f3ff;
+    background-image: -webkit-gradient(linear, 50% 0, 50% 100%, color-stop(0%, #e4f3ff), color-stop(48%, #d9edff), color-stop(52%, #c2d8f2), color-stop(100%, #c6dcf6));
+    background-image: -webkit-linear-gradient(top, #e4f3ff, #d9edff 48%, #c2d8f2 52%, #c6dcf6);
+    background-image: -moz-linear-gradient(top, #e4f3ff, #d9edff 48%, #c2d8f2 52%, #c6dcf6);
+    background-image: -o-linear-gradient(top, #e4f3ff, #d9edff 48%, #c2d8f2 52%, #c6dcf6);
+    background-image: linear-gradient(top, #e4f3ff, #d9edff 48%, #c2d8f2 52%, #c6dcf6)
+}
+.x-btn-default-large .x-btn-inner {
+  font-size: 15px;
   color: white;
   text-shadow: 0 1px 2px #000;
 }

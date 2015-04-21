@@ -16,6 +16,18 @@ POST	/getHeatmap				controllers.Application.getHeatmap()
 POST	/initComparison			controllers.Application.initComparison()
 POST	/runComparison			controllers.Application.runComparison()
 
+# authentication shtuffs
+POST	/login					controllers.Application.login()
+POST	/register				controllers.Application.beginRegistration()
+GET     /validate				controllers.Application.validateRegistration(validationID: String)
+POST	/requestReset			controllers.Application.requestReset()
+POST	/tryReset				controllers.Application.tryFinishReset()
+POST	/logout					controllers.Application.logout()
+
+# Admin stuffs
+POST	/get_access				controllers.Application.getAccess()
+POST	/change_access			controllers.Application.changeAccess()
+
 # Map static resources from the /public folder to the /assets URL path
 GET		/files/:file			controllers.FileService.getFile(file: String)
 GET		/app/file/*file			controllers.Assets.at(path="/public/file", file)

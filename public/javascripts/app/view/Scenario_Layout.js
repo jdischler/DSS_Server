@@ -57,8 +57,8 @@ Ext.define('MyApp.view.Scenario_Layout', {
 	
     id: 'DSS_ScenarioSummary',
     height: 250,
-    minHeight: 250,
-    maxHeight: 250,
+  	resizable: {minHeight:150, maxHeight: 362},
+	resizeHandles: 'n',
     width: 300,
 	dock: 'bottom',
     

@@ -336,15 +336,16 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 
-		var lpAg_Lands = null;/*Ext.create('MyApp.view.LayerPanel_Watershed', {
+		var lpAg_Lands = Ext.create('MyApp.view.LayerPanel_Watershed', {
 			title: 'Dane County Ag Lands',
 			DSS_Description: 'Match land by Dane County agricultural land, example: select specific parcels',
 			DSS_Layer: wmsAg_Lands,
+			DSS_AccessLocked: true, // easy to hack this on the client but the server still requires authentication so... 
 			DSS_QueryTable: 'ag_lands',
 			collapsed: true
-		});*/
+		});
 
-		var lpCRP_Land = null;/*Ext.create('MyApp.view.LayerPanel_PickOne', {
+		var lpCRP_Land = Ext.create('MyApp.view.LayerPanel_PickOne', {
 			title: 'CRP Land',
 			DSS_ShortTitle: 'CRP Land',
 			DSS_QueryTable: 'crp',
@@ -352,6 +353,7 @@ Ext.define('MyApp.view.MainViewport', {
 			DSS_Label: '',
 			DSS_UniqueRadioGroupName: 'isCRP',
 			DSS_RadioColums: 2,
+			DSS_AccessLocked: true, // easy to hack this on the client but the server still requires authentication so... 
 			// Array of radio button options. Can use most radio button properties in here...
 			DSS_RadioOptions: [{
 				boxLabel: 'Is CRP',
@@ -362,7 +364,7 @@ Ext.define('MyApp.view.MainViewport', {
 				inputValue: 0,
 			}],
 			collapsed: true
-		});*/
+		});
 		
 		var lpLCC = Ext.create('MyApp.view.LayerPanel_Indexed', {
 			title: 'Land Capability Class',
@@ -619,20 +621,18 @@ Ext.define('MyApp.view.MainViewport', {
 						}]
 					}],
 					tools: [{
-						type: 'down',
+						type: 'up',
 						tooltip: 'Show/Hide Logo and Meta',
 						handler: function() {
 							var panel = Ext.getCmp('DSS_LogoPanel');
 							if (this.type == 'up') {
-								panel.setSize(undefined, 0);
+								panel.hide();
 								this.setType('down');
 							}
 							else {
-								panel.setSize(undefined, DSS_LogoPanelHeight);
+								panel.show();
 								this.setType('up');
 							}
-							panel = Ext.getCmp('DSS_ScenarioSummary');
-							panel.setSize(undefined,250);//doComponentLayout();
 						}
 					}]
 				}],

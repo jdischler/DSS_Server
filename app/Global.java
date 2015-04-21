@@ -2,9 +2,17 @@ package util;
 
 import play.*;
 import java.util.*;
+import java.util.concurrent.*;
 import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
+
+import com.avaje.ebean.Ebean;
+import play.db.ebean.*;
+import play.data.format.*;
+import play.data.validation.*;
+import play.libs.*;
+
 
 import com.fasterxml.jackson.core.*;
 
@@ -19,20 +27,34 @@ public class Global extends GlobalSettings
 	// mostly for DEV, production servers should always recompute this data to be safe...
 	private static final boolean FORCE_COMPUTE_DEFAULT_DATA = false;
 	
-	// CRP data and Dane country ag lands. The client will ask for this and disable options
-	//	that will not work anwyay because the server didn't load this data...
-	private static final boolean USE_RESTRICTED_DATA = false;
-	
+	ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
+	ScheduledFuture scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(
+		new Runnable() { public void run() {
+					cleanUpOldResults(); }}
+			, 0, 12, TimeUnit.HOURS);// initialDelay, period, units);
+
+	//--------------------------------------------------------------------------
+	private void cleanUpOldResults() {
+		// Process
+		// 1: for each "client_*" folder
+		// 2: get subfolder (0-9) list for the client_* folder
+		// 3: check date on this folder and delete it if it's older than 12-ish hours old?
+	}
+
 	//--------------------------------------------------------------------------
 	@Override
 	public void onStart(play.Application app) 
 	{
 		systemReport(app, "Application has started");
-		
-		UserDB.prepareDatabase();
-		
-//		SendEmail.to("jdischler.72@gmail.com");
-		
+	
+		// Add the yaml defined starting users if there are no current users in the db
+		List<ClientUser> userList = ClientUser.find
+			.findList();
+		if (userList.size() <= 0) {
+			Map<String,List<Object>> all = (Map<String,List<Object>>)Yaml.load("initial-data.yml");
+			Ebean.save(all.get("users"));
+		}
+
 		// Create all of the assumptions the server knows about, these will be fed to clients
 		GlobalAssumptions.initAssumptions();
 		
@@ -150,18 +172,14 @@ public class Global extends GlobalSettings
 			layer = new Layer_Float("soy_p"); layer.init();
 			layer = new Layer_Float("grass_p"); layer.init();
 			
-			// NOTE:  The CRP data is very sensitive, apparently...The Dane County land, less so...
-			//			but without a way to authenticate users and prevent certain people from accessing
-			//			this restricted-ish data, it's going to just be disabled...
-			if (USE_RESTRICTED_DATA) {
-				Logger.warn("Server is loading restricted data, clients connecting to this server will have access to query it!");
-				// Ag_Lands
-				layer = new Layer_Integer("ag_lands", Layer_Integer.EType.ERaw); layer.init();
-				// CRP
-				layer = new Layer_Integer("crp", Layer_Integer.EType.ERaw); // don't do fancy shift/match tricks...there is only two values possible here...
-				((Layer_Integer)layer).setNoDataConversion(0);// work around a data issue - conversion -9999 to zeros
-				layer.init();
-			}
+			// Ag_Lands - RESTRICTED
+			layer = new Layer_Integer("ag_lands", Layer_Integer.EType.ERaw); layer.init();
+			layer.setAccessRestrictions(ClientUser.getMaskForAccessOptions(ClientUser.ACCESS.AG_LANDS));
+			// CRP - RESTRICTED
+			layer = new Layer_Integer("crp", Layer_Integer.EType.ERaw); // don't do fancy shift/match tricks...there are only two values possible here...
+			((Layer_Integer)layer).setNoDataConversion(0);// work around a data issue - conversion -9999 to zeros
+			layer.init();
+			layer.setAccessRestrictions(ClientUser.getMaskForAccessOptions(ClientUser.ACCESS.CRP));
 
 			// NOTE: am putting low-priority (rarely used) data layers here so that
 			//	we can have them skip loading in DEVELOPMENT mode. Ie, faster loads
@@ -233,7 +251,7 @@ public class Global extends GlobalSettings
 			int width = layer.getWidth();
 			int height = layer.getHeight();
 			
-			Scenario scenario = new Scenario();
+			Scenario scenario = new Scenario(null); // user can be null
 			scenario.mNewRotation = layer.getIntData();
 			scenario.mSelection = new Selection(width, height);
 			scenario.mAssumptions = new GlobalAssumptions();
@@ -254,9 +272,6 @@ public class Global extends GlobalSettings
 			
 			results = new Model_SoilCarbon().run(scenario);
 			QueuedWriter.queueResults(results);
-			
-			//results = new Model_WaterQuality().run(scenario);
-			//QueuedWriter.queueResults(results);
 			
 			results = new Model_P_LossEpic().run(scenario);
 			QueuedWriter.queueResults(results);

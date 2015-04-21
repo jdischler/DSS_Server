@@ -1,0 +1,28 @@
+# Users
+
+users:
+
+    - !!util.ClientUser
+        email:        jdischler.72@gmail.com
+        organization: WID
+        admin:        true
+        password:     secret
+    
+    - !!util.ClientUser
+        email:        flypod2@gmail.com
+        organization: WEI
+        admin:        true
+        password:     secret
+
+    - !!util.ClientUser
+        email:        tmeeha@gmail.com
+        organization: 
+        admin:        true
+        password:     secret
+
+    - !!util.ClientUser
+        email:        amin.tayyebi@gmail.com
+        organization:
+        admin:        true
+        password:     secret
+

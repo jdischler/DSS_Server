@@ -23,6 +23,7 @@ Ext.define('MyApp.view.LayerPanel_Common', {
     },
     hideCollapseTool: true,
     hidden: true,
+    DSS_AccessLocked: false, // easily hackable on a client but doesn't do much because the server still requires authentication to do anything useful
     
 	//--------------------------------------------------------------------------    
 	listeners: {

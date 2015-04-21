@@ -31,9 +31,11 @@ public class Scenario
 	public String mOutputDir;
 	private JsonNode mConfiguration;
 	public int[][] mNewRotation; // copy of Rotation layer, but selection transformed
+	public ClientUser mOptionalUser = null; // yup, can be null
 	
 	//--------------------------------------------------------------------------
-	public Scenario() {
+	public Scenario(ClientUser user) {
+		mOptionalUser = user; // ca be null
 	}
 
 	//--------------------------------------------------------------------------
@@ -319,7 +321,7 @@ public class Scenario
 				}
 				
 				try {
-					currentSelection = query.execute(transformElement);
+					currentSelection = query.execute(transformElement, mOptionalUser);
 				} catch (Exception e) {
 					Logger.info(e.toString());
 				}

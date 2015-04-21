@@ -91,41 +91,14 @@ Ext.define('MyApp.view.AddCriteriaPopup', {
             	xtype: 'panel',
             	hidden: true,
             	collapsed: false
-            }/*,{
-				xtype: 'add_criteria',
-				title: 'Landcover'
-			},{
-				xtype: 'add_criteria',
-				title: 'Slope'
-			},{
-				xtype: 'add_criteria',
-				title: 'Distance to Stream'
-			},{
-				xtype: 'add_criteria',
-				title: 'Watershed'
-			},{
-				xtype: 'add_criteria',
-				title: 'Land Capability Class'
-			},{
-				xtype: 'add_criteria',
-				title: 'Land Capability Subclass'
-			},{
-				xtype: 'add_criteria',
-				title: 'Distance to Public Land'
-			},{
-				xtype: 'add_criteria',
-				title: 'Density of Dairies'
-			},{
-				xtype: 'add_criteria',
-				title: 'Subset of Land'
-			}*/]
+            }]
         });
 
         me.callParent(arguments);
         
 		for (var i = 0; i < DSS_globalQueryableLayers.length; i++) {
     		var layer = DSS_globalQueryableLayers[i];
-    		if (layer.isHidden()) {
+    		if (layer.isHidden() && !layer.DSS_AccessLocked) { // easily hacked on the client but the server will ignore access locked layers if authenticated used does not have access rights
     			me.add({xtype: 'add_criteria', title: layer.title, DSS_AssociatedLayer: layer, 
     				DSS_Description: layer.DSS_Description});
     		}

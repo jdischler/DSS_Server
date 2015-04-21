@@ -41,6 +41,9 @@ public abstract class Layer_Base
 	// FIXME: refactoring base class so no need for a procedural flag...
 	protected boolean mbIsProcedural;
 	
+	// MASK values from ClientUser.ACCESS...
+	protected int mAccessRestrictions = 0;
+	
 	// Return the Layer_Base object when asked for it by name
 	//--------------------------------------------------------------------------
 	public static Layer_Base getLayer(String name) {
@@ -72,6 +75,34 @@ public abstract class Layer_Base
 
 		Logger.info(" ... A call was made to clear all Layers!");
 		mLayers.clear();
+	}
+	
+	// returns an array of restricted layer names...
+	//--------------------------------------------------------------------------
+	public static ArrayNode getAccessRestrictedLayers() {
+	
+		ArrayNode list = JsonNodeFactory.instance.arrayNode();
+		for (Layer_Base layer : mLayers.values()) {
+			if (layer.mAccessRestrictions > 0) {
+				list.add(layer.mName);
+			}
+		}
+		
+		return list;
+	}
+	
+	// returns an array of access restricted layer names the given user can actually access...
+	//--------------------------------------------------------------------------
+	public static ArrayNode getAccessibleRestrictedLayers(int accessFlags) {
+	
+		ArrayNode list = JsonNodeFactory.instance.arrayNode();
+		for (Layer_Base layer : mLayers.values()) {
+			if (layer.mAccessRestrictions > 0 && (layer.mAccessRestrictions & accessFlags) > 0) {
+				list.add(layer.mName);
+			}
+		}
+		
+		return list;
 	}
 	
 	//--------------------------------------------------------------------------
@@ -127,6 +158,22 @@ public abstract class Layer_Base
 	//--------------------------------------------------------------------------
 	public float[][] getFloatData() {
 		return null;
+	}
+
+	// NOTE: this is only for Query/Selection access restrictions.
+	//--------------------------------------------------------------------------
+	public void setAccessRestrictions(int restrictionMask) {
+		this.mAccessRestrictions = restrictionMask;
+	}
+	
+	// NOTE: this is only for Query/Selection access restrictions.
+	//--------------------------------------------------------------------------
+	public boolean allowAccessFor(int clientUserAccessMask) {
+		if (this.mAccessRestrictions == 0) {
+			return true;
+		}
+		
+		return ((this.mAccessRestrictions & clientUserAccessMask) > 0);
 	}
 	
 	//--------------------------------------------------------------------------
@@ -274,12 +321,18 @@ public abstract class Layer_Base
 		return ret;
 	}
 			
+	// NOTE: that clientUser can be null
 	//--------------------------------------------------------------------------
-	public static void execQuery(JsonNode layerList, Selection selection) {
+	public static void execQuery(JsonNode layerList, Selection selection, ClientUser user) {
 
 		String cdlTest = "cdl_2012";
-		
-		if (layerList.isArray()) {
+
+		int userAccessRights = 0;
+		if (user != null) {
+			userAccessRights = user.accessFlags;
+		}
+
+		if (layerList != null && layerList.isArray()) {
 	
 			boolean queriedCDL = false;
 			ArrayNode arNode = (ArrayNode)layerList;
@@ -291,10 +344,15 @@ public abstract class Layer_Base
 				if (arElem != null && layerName != null) {
 					Layer_Base layer = Layer_Base.getLayer(layerName.textValue());
 					if (layer != null) {
-						if (cdlTest.equalsIgnoreCase(layerName.textValue())) {
-							queriedCDL = true;
+						if (layer.allowAccessFor(userAccessRights)) {
+							if (cdlTest.equalsIgnoreCase(layerName.textValue())) {
+								queriedCDL = true;
+							}
+							layer.query(arElem, selection);
 						}
-						layer.query(arElem, selection);
+						else {
+							Logger.error("Query Access Violation detected!");
+						}
 					}
 				}
 			}

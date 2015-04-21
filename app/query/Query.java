@@ -27,7 +27,7 @@ public class Query {
 	static int mWidth, mHeight; // FIXME: why static?
 
 	//------------------------------------------------------------------------------
-	public JsonNode selection(JsonNode requestBody) throws Exception
+	public JsonNode selection(JsonNode requestBody, ClientUser user) throws Exception
 	{
 		// selection color
 		int red = 255;
@@ -79,7 +79,7 @@ public class Query {
 		png.setTransparentArray(alpha);
 
 		// Set up to run the query...allocate memory...
-		Selection selection = execute(requestBody);
+		Selection selection = execute(requestBody, user);
 		
 		byte[][] temp = Downsampler.generateSelection(selection.mRasterData, 
 								selection.getWidth(), selection.getHeight(),
@@ -105,8 +105,9 @@ public class Query {
 		return ret;
 	}
 	
+	//NOTE: user can be null
 	//--------------------------------------------------------------------------
-	public Selection execute(JsonNode requestBody) throws Exception {
+	public Selection execute(JsonNode requestBody, ClientUser user) throws Exception {
 		
 		// FIXME: can't base size off of a hardcoded layer? The expectation is that
 		// all layers are of the same size....
@@ -118,7 +119,7 @@ public class Query {
 
 		// Actually run the query...
 		JsonNode layerList = requestBody.get("queryLayers");
-		Layer_Base.execQuery(layerList, selection);
+		Layer_Base.execQuery(layerList, selection, user);
 		return selection;
 	}
 	

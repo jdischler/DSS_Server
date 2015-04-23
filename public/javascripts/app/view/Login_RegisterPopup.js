@@ -123,7 +123,8 @@ Ext.define('MyApp.view.Login_RegisterPopup', {
 			timeout: 10 * 60 * 1000, // minutes * seconds * (i.e. converted to) milliseconds
 			
 			success: function(response, opts) {
-				me.setDisabled(false);				
+				me.setDisabled(false);
+				Ext.MessageBox.alert('Registration Process', 'Please check your email account used for registration for information on how to complete the registration process.');
 			},
 			
 			failure: function(response, opts) {

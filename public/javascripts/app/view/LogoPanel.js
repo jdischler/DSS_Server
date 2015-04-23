@@ -119,7 +119,7 @@ Ext.define('MyApp.view.LogoPanel', {
 							me.tryLogout(me, button);
 						}
 						else {
-							var login = Ext.create('MyApp.view.Login_Popup');
+							var login = Ext.create('MyApp.view.Login_Popup', {DSS_user: ""});
 							login.DSS_LoginButton = button;
 							login.show();
 						}

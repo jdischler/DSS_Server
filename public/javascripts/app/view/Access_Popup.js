@@ -87,7 +87,8 @@ Ext.define('MyApp.view.Access_Popup', {
 			text: 'IsAdmin?',
 			width: 90,
 			sortable: true,
-			dataIndex: 'admin'
+			dataIndex: 'admin',
+			disabled: true // NOTE: enabling this won't allow admin rights changes - the server code to allow this change is disabled!
 		}];
 	
 		// ...but then add as many switches as needed...
@@ -172,11 +173,20 @@ Ext.define('MyApp.view.Access_Panel', {
  //   store: usersStore,
     
 	tbar: [{
-		xtype: 'button', text: 'Save changes',
+		xtype: 'button', 
+		text: 'Save changes',
 		icon: 'app/images/save_icon.png',
 		scale: 'medium',
 		handler: function(btn) {
 			btn.up().up().submitChanges(btn);
+		}
+	},{
+		xtype: 'button', 
+		text: 'Cancel',
+		icon: 'app/images/revert_icon.png',
+		scale: 'medium',
+		handler: function(btn) {
+			btn.up().up().up().close();
 		}
 	}],
 

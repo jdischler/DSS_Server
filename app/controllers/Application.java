@@ -932,6 +932,16 @@ public class Application extends Controller
 				.findUnique();
 				
 			if (userForPWReset != null) {
+					PendingRegistration pending = PendingRegistration.find
+					  .where()
+					  .eq("email", email)
+					  .findUnique();
+					  
+				if (pending != null) {
+					session().clear();
+					return badRequest("A pending registration is already in progress, please follow the link in the email sent to your email address. Note that spam filters may have moved this mail to a spam folder!");
+				}
+
 		        // 2) create unique validation code
 		        SecureRandom randomVc = new SecureRandom();
 		        byte[] vCode = new byte[24];
@@ -1066,94 +1076,118 @@ public class Application extends Controller
 				flags.add(((cu.accessFlags & e.value) > 0) ? true : false);
 			}
 			aUser.put("flags", flags);
+			Logger.debug("Sending this stuffs for a user: " + aUser.toString());
 			data.add(aUser);
 		}
 
 		sendBack.put("definition", definition);
 		sendBack.put("data", data);
 		
+		Logger.debug("GetAccess is sending back: " + sendBack.toString());
 		return ok(sendBack);
 	}
 
     //--------------------------------------------------------------------------
 	public static Result changeAccess() {
 	
-		ClientUser user = null;
+		ClientUser changeUser = null;
 		String userEmail = Context.current().session().get("email");
 		if (userEmail != null) {
-			user = ClientUser.find.where()
+			changeUser = ClientUser.find.where()
 					.eq("email", userEmail)
 					.findUnique();
 		}
 
-		if (user == null || user.admin == false) {
+		if (changeUser == null || changeUser.admin == false) {
+			Logger.error("Change Access: No user or not an admin for user: " + userEmail); 
 			return badRequest();
 		}
 		
 		JsonNode request = request().body().asJson();
 		
 		if (!request.isArray()) {
+			Logger.error("Change Access: expected an Array: " + userEmail); 
 			return badRequest();
 		}
 		
 		for (int i = 0; i < request.size(); i++) {
 			JsonNode change = request.get(i);
-			if (change.isObject()) {
-				String email = safeGetString(change, "email");
-				if (email != null) {
-					user = ClientUser.find.where()
-						.eq("email", userEmail)
-						.findUnique();
-					if (user != null) {
-						boolean changed = false;
-						int accessFlags = 0;
+			if (change.isObject() == false) {
+				Logger.error("Change Access: array element was not an object:" + 
+					change.toString());
+				continue;
+			}
+			String email = safeGetString(change, "email");
+			if (email == null) {
+				Logger.error("Change Access: update for user email is <null>");
+				continue;
+			}
+			ClientUser user = ClientUser.find.where()
+				.eq("email", email)
+				.findUnique();
+			if (user == null) {
+				Logger.error("Change Access: updating for user <" + email + 
+					"> but they don't exist?");
+				continue;
+			}
+			boolean changed = false;
+			int accessFlags = 0;
+			
+			Iterator<Map.Entry<String,JsonNode>> itr = change.fields();
+			
+			while (itr.hasNext()) {
+				Map.Entry<String,JsonNode> entry = itr.next();
+				String key = entry.getKey();
+				JsonNode val = entry.getValue();
+				
+				if (key == null) continue;
+				switch(key) {
+					case "admin": {
+						Boolean admin = safeGetBoolean(change, "admin");
+						// FIXME: don't have a good robust solution for the possibility
+						//	of an admin turning around and making everyone (including themselves)
+						//	NOT an admin. So disabling this feature for now...
+						/*if (admin != null && admin != user.admin) {
+							changed = true;
+							user.admin = admin;
+						}
+						*/
+						Logger.error("ChangeAccess: client tried to change admin rights");
+					}
+					break;
+					
+					case "email":
+					case "organization":
+						// don't allow change, so skip these...
+						break;
 						
-						Iterator<Map.Entry<String,JsonNode>> itr = change.fields();
-						
-						while (itr.hasNext()) {
-							Map.Entry<String,JsonNode> entry = itr.next();
-							String key = entry.getKey();
-							JsonNode val = entry.getValue();
-							
-							if (key == null) continue;
-							switch(key) {
-								case "admin": {
-									Boolean admin = safeGetBoolean(change, "admin");
-									if (admin != null && admin != user.admin) {
-										changed = true;
-										user.admin = admin;
-									}
-								}
-								break;
-								
-								case "email":
-								case "organization":
-									// don't allow change, so skip these...
-									break;
-									
-								default: {
-									// we assume we are one of the enums, so work those next...
-									if (val.isBoolean()) {
-										ClientUser.ACCESS e = ClientUser.ACCESS.getEnumForString(key);
-										if (e != null && val.booleanValue() == true) {
-											accessFlags |= e.value;
-										}
-									}
+					default: {
+						// we assume we are one of the enums, so work those next...
+						if (val.isBoolean()) {
+							ClientUser.ACCESS e = ClientUser.ACCESS.getEnumForString(key);
+							if (e != null) {
+								if (val.booleanValue() == true) {
+									accessFlags |= e.value;
+									Logger.debug("Says that flag <" + e.name() + "> should be ON");
+								} else {
+									Logger.debug("Says that flag <" + e.name() + "> should be OFF");
 								}
 							}
 						}
-						
-						if (accessFlags != user.accessFlags) {
-							changed = true;
-							user.accessFlags = accessFlags;
-							Logger.debug("Access flags have changed!");
-						}
-						if (changed) {
-							Logger.debug("Saving one user change for: " + email);
-							Ebean.save(user);
-						}
 					}
 				}
+			}
+			if (accessFlags != user.accessFlags) {
+				changed = true;
+				user.accessFlags = accessFlags;
+				Logger.debug("Change Access: access flags have changed!");
+			}
+			if (changed) {
+				Logger.debug("Change Access: Saving one user change for: " + email);
+				Ebean.save(user);
+			}
+			else {
+				Logger.debug("Change Access: Hmm, should(?) have a change but didn't for: " + email);
 			}
 		}
 		

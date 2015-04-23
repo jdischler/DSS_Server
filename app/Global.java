@@ -24,22 +24,46 @@ public class Global extends GlobalSettings
 	private static final boolean LOAD_ALL_LAYERS_FOR_DEV = true;
 	private static final boolean LOAD_DEFAULT_DATA = true;
 	
-	// mostly for DEV, production servers should always recompute this data to be safe...
+	// mostly for DEV, production servers are set up to always recompute this data to be safe...
 	private static final boolean FORCE_COMPUTE_DEFAULT_DATA = false;
 	
+	// Timed services to do server maintenance
 	ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
 	ScheduledFuture scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(
-		new Runnable() { public void run() {
-					cleanUpOldResults(); }}
-			, 0, 12, TimeUnit.HOURS);// initialDelay, period, units);
+		new Runnable() { 
+			public void run() {
+				cleanUpPendingRegistrations(1); 
+			}
+		}, 5, 30, TimeUnit.MINUTES);// initialDelay, period, units);
 
 	//--------------------------------------------------------------------------
-	private void cleanUpOldResults() {
+	private void cleanUpPendingRegistrations(int shelfLife) { // time in hours
+		
+		Logger.debug("Scheduled Executor Service -> cleanUpPendingRegistrations");
+		Date date = new Date();
+		long expirationDateMS = date.getTime() - shelfLife * 30 * /*60 * */1000; // hour
+		Date expDate = new Date(expirationDateMS);
+
+		List<PendingRegistration> prList = PendingRegistration.find.where().
+			lt("create_time", expDate).
+				findList();
+		
+		if (prList.size() > 0) {
+			Logger.info("+----------------------------------------------+");
+			Logger.info(" Pending Registrations: Deleting expired ones");
+			for(PendingRegistration pr : prList) {
+				Logger.info(" > deleting one for: " + pr.email);
+				Ebean.delete(pr);
+			}
+			Logger.info("+----------------------------------------------+");
+		}
+	}
+			
+	// TODO: computed layerData (model runs) cleanup process if needed?		
 		// Process
 		// 1: for each "client_*" folder
 		// 2: get subfolder (0-9) list for the client_* folder
 		// 3: check date on this folder and delete it if it's older than 12-ish hours old?
-	}
 
 	//--------------------------------------------------------------------------
 	@Override

@@ -30,6 +30,7 @@ Ext.define('MyApp.view.Login_RegisterPopup', {
 				labelAlign: 'right',
 				emptyText: 'user',
 				vtype: 'email',
+				value: me.DSS_user, // value from login popup if they typed one
 				validateBlank: true,
 				allowBlank: false
 			},{
@@ -89,10 +90,11 @@ Ext.define('MyApp.view.Login_RegisterPopup', {
     //--------------------------------------------------------------------------
     tryRegister: function() {
     
-		var user = this.getComponent('DSS_RegisterUser').getValue();
-		var organization = this.getComponent('DSS_Organization').getValue();
-		var pwd1 = this.getComponent('DSS_RegisterPWD1').getValue();
-		var pwd2 = this.getComponent('DSS_RegisterPWD1').getValue();
+    	var me = this;
+		var user = me.getComponent('DSS_RegisterUser').getValue();
+		var organization = me.getComponent('DSS_Organization').getValue();
+		var pwd1 = me.getComponent('DSS_RegisterPWD1').getValue();
+		var pwd2 = me.getComponent('DSS_RegisterPWD1').getValue();
     	
 		// TODO: better email validation...for now, length of 6 because 'a@b.co' is the shortest legal email address
 		if (!user || user.length < 6) {
@@ -113,6 +115,7 @@ Ext.define('MyApp.view.Login_RegisterPopup', {
 			organization: organization,
 			pwd: pwd1
 		};
+		me.setDisabled(true);
 		
 		var obj = Ext.Ajax.request({
 			url: location.href + 'register',
@@ -120,10 +123,11 @@ Ext.define('MyApp.view.Login_RegisterPopup', {
 			timeout: 10 * 60 * 1000, // minutes * seconds * (i.e. converted to) milliseconds
 			
 			success: function(response, opts) {
-				
+				me.setDisabled(false);				
 			},
 			
 			failure: function(response, opts) {
+				me.setDisabled(false);				
 				Ext.MessageBox.alert('Registration Error', response.responseText);
 			}
 		});

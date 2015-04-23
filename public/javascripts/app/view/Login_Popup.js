@@ -35,6 +35,7 @@ Ext.define('MyApp.view.Login_Popup', {
 				labelAlign: 'right',
 				emptyText: 'user',
 				vtype: 'email',
+				value: me.DSS_user, // value from login popup if they typed one
 				validateBlank: true,
 				allowBlank: false
 			},{
@@ -71,7 +72,8 @@ Ext.define('MyApp.view.Login_Popup', {
 					text: "Forgot your password? Click here to start the process of getting a new password"
 				},
 				handler: function() {
-					Ext.create('MyApp.view.Login_ForgotPopup').show();
+					var user = me.getComponent('DSS_LoginUser').getValue();
+					Ext.create('MyApp.view.Login_ForgotPopup', {DSS_user: user}).show();
 					me.close();
 				}
 			},{
@@ -84,7 +86,8 @@ Ext.define('MyApp.view.Login_Popup', {
 					text: "Want access to restricted features? Consider registering to begin the process of accessing those features"
 				},
 				handler: function() {
-					Ext.create('MyApp.view.Login_RegisterPopup').show();
+					var user = me.getComponent('DSS_LoginUser').getValue();
+					Ext.create('MyApp.view.Login_RegisterPopup', {DSS_user: user}).show();
 					me.close();
 				}
 			}]
@@ -114,6 +117,7 @@ Ext.define('MyApp.view.Login_Popup', {
 			user: user,
 			pwd: pwd
 		};
+		me.setDisabled(true);				
 		
 		var obj = Ext.Ajax.request({
 			url: location.href + 'login',
@@ -121,6 +125,7 @@ Ext.define('MyApp.view.Login_Popup', {
 			timeout: 10 * 60 * 1000, // minutes * seconds * (i.e. converted to) milliseconds
 			
 			success: function(response, opts) {
+				me.setDisabled(false);				
 			
 				var obj= JSON.parse(response.responseText);
 
@@ -158,6 +163,7 @@ Ext.define('MyApp.view.Login_Popup', {
 			},
 			
 			failure: function(response, opts) {
+				me.setDisabled(false);				
 				Ext.MessageBox.alert('Login Error', response.responseText);
 			}
 		});

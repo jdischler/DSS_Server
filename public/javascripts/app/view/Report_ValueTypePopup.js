@@ -110,6 +110,7 @@ Ext.define('MyApp.view.Report_ValueTypePopup', {
 					labelAlign: 'left',
 					labelStyle: 'color:#777;',
 					items: [{
+						id: 'DSS_ActualOutputRadio',
 						boxLabel: 'Actual',
 						name: 'valueStyle',
 						checked: true,

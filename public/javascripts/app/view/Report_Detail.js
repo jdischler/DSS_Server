@@ -1,4 +1,13 @@
 
+function copyToClipboard(str) {
+	var aux = document.createElement("textarea");
+	aux.value = str;
+	document.body.appendChild(aux);
+	aux.select();
+	document.execCommand("copy");
+	document.body.removeChild(aux);
+}
+
 //------------------------------------------------------------------------------
 Ext.define('MyApp.view.Report_Detail', {
     extend: 'Ext.panel.Panel',
@@ -9,8 +18,14 @@ Ext.define('MyApp.view.Report_Detail', {
     width: 500,
  //   layout: 'vbox',
     title: 'Simulation Detail',
-	icon: 'app/images/magnify_icon.png',
+//	icon: 'app/images/magnify_icon.png',
 
+    /*tools: [{
+    	type: 'print',
+    	callback: function() {
+    		Ext.Msg.alert('Yes')
+    	}
+    }],*/
     requires : [
     	'MyApp.view.Report_ValueTypePopup',
 		'MyApp.view.Report_DetailHeader',
@@ -18,7 +33,21 @@ Ext.define('MyApp.view.Report_Detail', {
 		'MyApp.view.Report_GraphPopUp',
         'MyApp.view.Report_HeatmapLegendPopUp'
     ],
+    DSS_cachedResults: false,
+    DSS_compareMode: 'landscape', // or 'selection'
     
+    //--------------------------------------------------------------------------    
+	listeners: {
+		afterrender: function(c) {
+			c.header.insert(1,{xtype: 'button', text: 'Copy', width: 44, height: 22, handler: function(b,e) {
+				e.preventDefault();
+				var res = Ext.getCmp('DSS_ReportDetail').grabResults();
+				copyToClipboard(res.csv);
+				Ext.Msg.alert('Results as CSV (Copied to Clipboard)', res.html);
+			}})
+		}
+	},
+			    
     //--------------------------------------------------------------------------
     initComponent: function() {
         var me = this;
@@ -55,6 +84,7 @@ Ext.define('MyApp.view.Report_Detail', {
 				},{
 					itemId: 'result_ethanol',
 					xtype: 'report_detail_item',
+					style: 'background-color: #e1effe',
 					DSS_FieldString: 'ethanol',
 					DSS_UnitLabel: 'Gal/Yr',
 					//DSS_UnitLabel: 'Gl/Yr',
@@ -105,6 +135,7 @@ Ext.define('MyApp.view.Report_Detail', {
 				},{
 					itemId: 'result_phosphorus_epic',
 					xtype: 'report_detail_item',
+					style: 'background-color: #e1effe',
 					DSS_FieldString: 'p_loss_epic',
 					//DSS_UnitLabel: 'Kg/Yr',
 					//DSS_UnitLabel: 'ton/Yr',
@@ -145,6 +176,7 @@ Ext.define('MyApp.view.Report_Detail', {
 				},{
 					itemId: 'result_soc',
 					xtype: 'report_detail_item',
+					style: 'background-color: #e1effe',
 					DSS_FieldString: 'soc',
 					DSS_Label: 'Soil Carbon Sequest.',
 					//DSS_UnitLabel: 'Mg/Yr',
@@ -193,6 +225,7 @@ Ext.define('MyApp.view.Report_Detail', {
 				},{
 					itemId: 'result_pollinators',
 					xtype: 'report_detail_item',
+					style: 'background-color: #e1effe',
 					DSS_FieldString: 'pollinator',
 					DSS_UnitLabelDelta: '0 to 1',
 					DSS_UnitLabelFile: '0 to 1',
@@ -213,6 +246,7 @@ Ext.define('MyApp.view.Report_Detail', {
 				},{
 					itemId: 'result_habitat_index',
 					xtype: 'report_detail_item',
+					style: 'background-color: #e1effe',
 					DSS_FieldString: 'habitat_index',
 					DSS_UnitLabelDelta: '0 to 1',
 					DSS_UnitLabelFile: '0 to 1',
@@ -233,14 +267,16 @@ Ext.define('MyApp.view.Report_Detail', {
     //--------------------------------------------------------------------------
 	clearFields: function() {
 		
+		var me = this;
 		Ext.getCmp('DSS_SpiderGraphPanel').clearSpiderData(0);// set all fields to zero
 
 		// cycle through all of the detail elements and clear them out...
-		var c = this.getComponent('results_container');
+		var c = me.getComponent('results_container');
 		for (var idx = 0; idx < c.items.getCount(); idx++) {
 			var comp = c.items.getAt(idx);
 			comp.clearFields();
 		}
+		me.DSS_cachedResults = false;
 	},
 	
     //--------------------------------------------------------------------------
@@ -274,6 +310,39 @@ Ext.define('MyApp.view.Report_Detail', {
 	},
 	
     //--------------------------------------------------------------------------
+	grabResults: function() {
+
+		var me = this;
+		var dat = "<div><b>Model,", csv = '"Model","';
+		
+		if (Ext.getCmp('DSS_ActualOutputRadio').checked) {
+			dat += "Actual Values"
+			csv += "Actual Values"
+		}
+		else {
+			dat += "% Values"			
+			csv += "% Values"
+		}
+		if (me.DSS_compareMode == "landscape") {
+			csv += ' (Entire Landscape)"\r\n'		
+			dat += ' (Entire Landscape)</b></div>'
+		}
+		else {
+			csv += ' (Only Modified Landscape)"\r\n'
+			dat += ' (Only Modified Landscape)</b></div>'
+		}
+		var c = this.getComponent('results_container');
+		for (var idx = 0; idx < c.items.getCount(); idx++) {
+			var comp = c.items.getAt(idx);
+			if (comp.xtype != "report_detail_item") continue;
+			dat += '<div>' + comp.DSS_Label + ',' + comp.getValue().replace(/,/g, '') + '</div>';
+			csv += '"' + comp.DSS_Label + '",' + comp.getValue().replace(/,/g, '') + '\r\n';
+		};
+		
+		return {html:dat, csv: csv};
+	},
+	
+    //--------------------------------------------------------------------------
 	setWaitFields: function() {
 		
 		this.clearFields();
@@ -290,8 +359,11 @@ Ext.define('MyApp.view.Report_Detail', {
     //--------------------------------------------------------------------------
 	setComparisonType: function(newType) {
 		
-		// FIXME: TODO
-		// Need to switch existing field values, etc here!!!!!
+		var me = this;
+		if (me.DSS_cachedResults) {
+			me.DSS_compareMode = newType;
+			me.setData();
+		}
 	},
 	
 	// valid comparison types: 'none', 'area', or 'income'
@@ -336,7 +408,12 @@ Ext.define('MyApp.view.Report_Detail', {
 	},
 	
     //--------------------------------------------------------------------------
-	// OBJ Data comes in with this format
+	// OBJ can be NULL in the case of using already cached results and specifically when switching
+	//	between already cached landscape vs. selection comparisons
+	//
+	// OBJ Data comes in with this format (when coming from the server vs. an internal redisplay call for
+	//		comparison mode switches0
+	//
 	// obj.*model_name*	// where model name is something like 'habitat_index', 'soc', 'nitrogen', etc.
 	//		.file1		// right now, Default, but could be any model run when arbitrary model compares are supported
 	//			.sum
@@ -349,14 +426,21 @@ Ext.define('MyApp.view.Report_Detail', {
 	//			.min
 	//			.max
     //--------------------------------------------------------------------------
-        setData: function(obj)
-    {
-		var c = this.getComponent('results_container');
+	setData: function(obj) {
+		var me = this;
+		var c = me.getComponent('results_container');
+		
+		if (!obj) {
+			obj = me.DSS_cachedResults; 
+		}
+		else {
+			if (!me.DSS_cachedResults) me.DSS_cachedResults = {};
+			// merge the results onto a single object for convenience
+			me.DSS_cachedResults = Ext.applyIf(me.DSS_cachedResults, obj);
+		}
 		
 		if (obj.habitat_index) {
-			var base = obj.habitat_index.selection;
-//			var base = obj.habitat_index.landscape;
-//			Calculate average habitat index per cell
+			var base = obj.habitat_index[me.DSS_compareMode]; // either selection or landscape
 			var val1 = base.file1.sum / base.file1.count;
 			var val2 = base.file2.sum / base.file2.count;
 			var totalVal = val2 - val1;
@@ -364,7 +448,7 @@ Ext.define('MyApp.view.Report_Detail', {
 		}
 		
 		if (obj.soc) {
-			var base = obj.soc.selection;
+			var base = obj.soc[me.DSS_compareMode]; // either selection or landscape
 //			var base = obj.soc.landscape;
 			// Convert from Mg per Ha to Mg per cell (...*900/10000)
 			//var val1 = base.file1.sum * 0.09;
@@ -385,7 +469,7 @@ Ext.define('MyApp.view.Report_Detail', {
 		}	
 
 		if (obj.net_income) {
-			var base = obj.net_income.selection;
+			var base = obj.net_income[me.DSS_compareMode]; // either selection or landscape
 //			var base = obj.net_income.landscape;
 		// Convert from $ per Ha to million $ per cell (...*900/(10000*1000*1000))
 			//var val1 = base.file1.sum * 0.09 / 1000000;
@@ -398,7 +482,7 @@ Ext.define('MyApp.view.Report_Detail', {
 		}	
 
 		if (obj.net_energy) {
-			var base = obj.net_energy.selection;
+			var base = obj.net_energy[me.DSS_compareMode]; // either selection or landscape
 //			var base = obj.net_energy.landscape;
 			// Convert from MJ per Ha to TJ per cell (...*900/(10000*1000*1000*2.4710))
 			//var val1 = base.file1.sum * 0.09 / 1000000;
@@ -413,23 +497,8 @@ Ext.define('MyApp.view.Report_Detail', {
 			c.getComponent('result_net_energy').setData(val1, val2, totalVal, base);
 		}	
 
-		/*if (obj.phosphorus) {
-			var base = obj.phosphorus.selection;
-//			var base = obj.phosphorus.landscape;
-			// Units are Mg per Ha
-			//var val1 = base.file1.sum / base.file1.count;
-			//var val2 = base.file2.sum / base.file2.count;
-			// Kg
-			//var val1 = base.file1.sum;
-			//var val2 = base.file2.sum;
-			// Convert Mg to Short tons then to lb
-			var val1 = base.file1.sum * 1.102 * 2000;
-			var val2 = base.file2.sum * 1.102 * 2000;
-			var totalVal = val2 - val1;
-			c.getComponent('result_phosphorus').setData(val1, val2, totalVal, base);
-		}*/
 		if (obj.p_loss_epic) {
-			var base = obj.p_loss_epic.selection;
+			var base = obj.p_loss_epic[me.DSS_compareMode]; // either selection or landscape
 //			var base = obj.P_Loss_EPIC.landscape;
 			// Kg
 			//var val1 = base.file1.sum;
@@ -445,19 +514,9 @@ Ext.define('MyApp.view.Report_Detail', {
 			var totalVal = val2 - val1;
 			c.getComponent('result_phosphorus_epic').setData(val1, val2, totalVal, base, true);
 		}	
-		/*if (obj.water_quality) {
-			var base = obj.water_quality.selection;
-//			var base = obj.water_quality.landscape;
-			var val1 = base.file1.sum;
-			var val2 = base.file2.sum;
-			// Convert Mg to Short tons per per Year
-			val1 = val1 * 1.102;
-			val2 = val2 * 1.102;
-			var totalVal = (val2 - val1);
-			c.getComponent('result_water_quality').setData(val1, val2, totalVal, base);
-		}*/
+		
 		if (obj.soil_loss) {
-			var base = obj.soil_loss.selection;
+			var base = obj.soil_loss[me.DSS_compareMode]; // either selection or landscape
 //			var base = obj.water_quality.landscape;
 			//Tonns per cell
 			//var val1 = base.file1.sum / base.file1.count;
@@ -473,7 +532,7 @@ Ext.define('MyApp.view.Report_Detail', {
 		}	
     	
     	if (obj.ethanol) {
-    		var base = obj.ethanol.selection;
+    		var base = obj.ethanol[me.DSS_compareMode]; // either selection or landscape
 //			var base = obj.ethanol.landscape;
 			// Convert from L per Ha to Giga L per cell (...*900/(10000*1000*1000))
 			//var val1 = base.file1.sum * 0.09 / 1000000;
@@ -489,9 +548,7 @@ Ext.define('MyApp.view.Report_Detail', {
 		}
 		
     	if (obj.pest) {
-    		var base = obj.pest.selection;
-//			var base = obj.pest.landscape;
-//			Calculate average index using entire landscape
+    		var base = obj.pest[me.DSS_compareMode]; // either selection or landscape
 			var val1 = base.file1.sum / base.file1.count;
 			var val2 = base.file2.sum / base.file2.count;
 			var totalVal = val2 - val1;
@@ -499,10 +556,8 @@ Ext.define('MyApp.view.Report_Detail', {
 		}	
     	
     	if (obj.pollinator) {
-    		var base = obj.pollinator.selection; 
-//			var base = obj.pollinator.landscape;
-    		var max = base.range.max;
-//			Calculate average index using entire landscape
+    		var base = obj.pollinator[me.DSS_compareMode]; // either selection or landscape 
+    		var max = obj.pollinator.landscape.range.max;
 			var val1 = base.file1.sum / (base.file1.count * max);
 			var val2 = base.file2.sum / (base.file2.count * max);
 			var totalVal = val2 - val1;
@@ -510,7 +565,7 @@ Ext.define('MyApp.view.Report_Detail', {
 		}	
 
     	if (obj.nitrous_oxide) {
-    		var base = obj.nitrous_oxide.selection;
+    		var base = obj.nitrous_oxide[me.DSS_compareMode]; // either selection or landscape
 			//var base = obj.nitrous_oxide.landscape;
 			// Convert from Kg per Ha to Mg per cell (...*900/(10000*1000))
 			//var val1 = base.file1.sum * 0.09 / 1000;

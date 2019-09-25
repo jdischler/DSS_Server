@@ -170,7 +170,7 @@ Ext.define('MyApp.view.TransformPopup', {
     	else {
     		this.DSS_Transform = null;
     	}
-    	console.log(this.DSS_Transform);
+//    	console.log(this.DSS_Transform);
     	this.doClose()
     },
     

@@ -43,7 +43,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
             {
 			    itemId: 'DSS_ValueField',  
 			    xtype: 'textfield',
-			    x: 5,
+			    x: 15,
 			    y: 5,
 			    width: 260,
 			    fieldLabel: me.DSS_Label,
@@ -56,7 +56,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			},{
 				xtype: 'label',
 				itemId: 'DSS_UnitsLabel',
-				x: 272,
+				x: 282,
 				y: 9,
 				text: me.DSS_UnitLabelDelta ? me.DSS_UnitLabelDelta : me.DSS_UnitLabel,
 				style: {
@@ -65,7 +65,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			},{
 			    itemId: 'calculator_button',
 			    xtype: 'button',
-			    x: 335,
+			    x: 350,
 			    y: 3,
 			    width: 30,
 			    disabled: !me.DSS_calculators,
@@ -89,7 +89,8 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			},{
 			    itemId: 'graph_button',
 			    xtype: 'button',
-			    x: 370,
+			    x: 385,
+			    hidden: true,
 			    y: 3,
 			    width: 30,
 			    padding: '3 0 3 6',
@@ -105,7 +106,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
 			},{
 			    itemId: 'heat_delta_button',
 			    xtype: 'button',
-			    x: 405,
+			    x: 385,
 			    y: 3,
 			    width: 30,
 			    enableToggle: true,
@@ -182,6 +183,12 @@ Ext.define('MyApp.view.Report_DetailElement', {
 		var legendObject = Ext.getCmp('DSS_heatmap_legend');
 		
 		legendObject.setKeys(this.DSS_GraphTitle, serverData);
+	},
+	
+    //--------------------------------------------------------------------------
+	getValue: function() {
+		var me = this;
+		return me.down("#DSS_ValueField").getValue();
 	},
 	
     //--------------------------------------------------------------------------
@@ -370,8 +377,6 @@ Ext.define('MyApp.view.Report_DetailElement', {
     	
 		var me = this;
 		var button = this.getComponent('heat_delta_button');
-		
-		console.log('Doing a try create heatmap layer');
 		
 		// waits a small amount of time...then checks to see if they image could load...
 		Ext.defer(function() {

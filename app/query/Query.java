@@ -34,7 +34,7 @@ public class Query {
 		int green = 0;
 		int blue = 96;
 		int x, y;
-		int resampleFactor = 5;
+		int resampleFactor = 2;//5;
 		
 		// FIXME: can't base size off of a hardcoded layer? The expectation is that
 		//	all layers are of the same size....

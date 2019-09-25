@@ -106,9 +106,7 @@ public class QueuedWriter implements Runnable {
 		while (true) {
 			
 			if (!doesWriteQueueHaveFiles()) {
-				// FIXME: TODO: Enabling this log info suggests that this wait really does nothing?
-				
-				//Logger.info("Writer queue has no results, waiting......");
+				detailedLog("QueuedWriter queue has no results, waiting......");
 				try {
 					wait(90000);
 				}

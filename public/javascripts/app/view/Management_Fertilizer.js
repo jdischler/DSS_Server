@@ -112,7 +112,7 @@ Ext.define('MyApp.view.Management_Fertilizer', {
 		
 		var fertType = this.getComponent('DSS_FertType');
 		var value = fertType.getValue()['Type'];
-		console.log(value);
+//		console.log(value);
 		
 		if (value == 0) {
 			obj.text += 'None';

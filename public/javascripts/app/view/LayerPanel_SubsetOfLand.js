@@ -66,7 +66,9 @@ Ext.define('MyApp.view.LayerPanel_SubsetOfLand', {
 				step: 5,
 				value: 50,
 				minValue: 1,
-				maxValue: 99
+				maxValue: 99,
+				enableKeyEvents: true,
+				listeners: DSS_NumberFieldListener
 			},{
 				xtype: 'label',
 				x: me.DSS_FractionPosition_X + 55 + 45,
@@ -119,6 +121,7 @@ Ext.define('MyApp.view.LayerPanel_SubsetOfLand', {
 
 		var queryLayer = { 
 			name: 'proceduralFraction',
+			type: 'fractionalLand',
 			fraction: this.getComponent('DSS_FractionOfLand').getValue(),
 			gridCellSize: scale,
 			seed: this.DSS_Seed
@@ -130,8 +133,9 @@ Ext.define('MyApp.view.LayerPanel_SubsetOfLand', {
     //--------------------------------------------------------------------------
     setSelectionCriteria: function(jsonQuery) {
 
+    	var me = this;
     	if (!jsonQuery || !jsonQuery.queryLayers) {
-			this.header.getComponent('DSS_ShouldQuery').toggle(false);
+			me.header.getComponent('DSS_ShouldQuery').toggle(false);
     		return;
     	}
     	
@@ -140,17 +144,20 @@ Ext.define('MyApp.view.LayerPanel_SubsetOfLand', {
 			var queryElement = jsonQuery.queryLayers[i];
 			
 			// in query?
-			if (queryElement && queryElement.name == this.DSS_QueryTable) {
+			if (queryElement && queryElement.name == me.DSS_QueryTable) {
+				me.getComponent('DSS_FractionOfLand').setValue(queryElement.fraction);
+				var combo = me.getComponent('DSS_CellScales');
+				combo.setValue(queryElement.gridCellSize);
 				// yup
-				this.show();
-				this.header.getComponent('DSS_ShouldQuery').toggle(true);
+				me.show();
+				me.header.getComponent('DSS_ShouldQuery').toggle(true);
 				return;
         	}
         }
 				
 		// Nope, mark as not queried
-		this.hide();
-		this.header.getComponent('DSS_ShouldQuery').toggle(false);
+		me.hide();
+		me.header.getComponent('DSS_ShouldQuery').toggle(false);
     }
 	
 });

@@ -32,7 +32,6 @@ public class Model_NitrousOxideEmissions
 		int width = scenario.getWidth(), height = scenario.getHeight();
 		
 Logger.info(">>> Computing Nitrous Oxide Index");
-long timeStart = System.currentTimeMillis();
 		
 		float [][] nitrousOxideData = new float[height][width];
 Logger.info("  > Allocated memory for N2O");
@@ -46,10 +45,7 @@ Logger.info("  > Allocated memory for N2O");
 		int TotalMask = Grass_Mask | Corn_Mask | Soy_Mask | Alfalfa_Mask;
 		
 		// Input layers
-		float texture[][] = Layer_Base.getLayer("Texture").getFloatData();
-		float OM_SOC[][] = Layer_Base.getLayer("OM_SOC").getFloatData();
-		float drainage[][] = Layer_Base.getLayer("Drainage").getFloatData();
-		float pH[][] = Layer_Base.getLayer("PH").getFloatData();
+		float n2o_composite[][] = Layer_Base.getLayer("n2o_composite").getFloatData();
 		
 		// Multipliers from client variables
 		float annualTillageModifier = 1.0f; //
@@ -101,8 +97,7 @@ Logger.info("  > Allocated memory for N2O");
 				// Only process pixels for the landcover types we care about. Skip any cell that would
 				//	have a no-data value as any part of the computation
 				if ((landCover & TotalMask) > 0 &&
-					texture[y][x] > -9999.0f && OM_SOC[y][x] > -9999.0f &&
-					drainage[y][x] > -9999.0f && pH[y][x] > -9999.0f)
+					n2o_composite[y][x] > -9999.0f)
 				{
 					fertRate = 0.0f;
 					
@@ -147,11 +142,12 @@ Logger.info("  > Allocated memory for N2O");
 					}
 					
 					// Calculate Nitrous Oxide Emissions in Kg per Ha and then convert to Mg per cell per year
-					nitrousOxideData[y][x] = ((float)(Math.exp(0.414f + 0.825f + fertRate * 0.005f + cropRotation +
-						texture[y][x] + OM_SOC[y][x] + drainage[y][x] + pH[y][x]))) * 900.0f * 0.0001f * 0.001f;
+					nitrousOxideData[y][x] = ((float)(Math.exp(fertRate * 0.005f + cropRotation +
+						n2o_composite[y][x]))) * 900.0f * 0.0001f * 0.001f;
 					
 					// Change value using multiplier
 					nitrousOxideData[y][x] *=  T_M * CC_M * F_M;
+					
 				}
 				else { // else not a landcover type we care about or one of the 4 input cells had no-data
 					nitrousOxideData[y][x] = -9999.0f;
@@ -163,10 +159,6 @@ Logger.info("  > Allocated memory for N2O");
 		List<ModelResult> results = new ArrayList<ModelResult>();
 		
 		results.add(new ModelResult("nitrous_oxide", scenario.mOutputDir, nitrousOxideData, width, height));
-
-long timeEnd = System.currentTimeMillis();
-float timeSec = (timeEnd - timeStart) / 1000.0f;
-Logger.debug(">>> Model Nitrous Oxide - timing: " + Float.toString(timeSec));
 
 		return results;
 	}

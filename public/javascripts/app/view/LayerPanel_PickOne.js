@@ -33,7 +33,9 @@ Ext.define('MyApp.view.LayerPanel_PickOne', {
 				allowBlank: false,
 				columns: this.DSS_RadioColumns,
 				border: false,
-				items: this.DSS_RadioOptions
+				items: this.DSS_RadioOptions,
+				enableKeyEvents: true,
+				listeners: DSS_NumberFieldListener
 			}]
         });
 

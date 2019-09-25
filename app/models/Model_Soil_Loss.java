@@ -38,7 +38,6 @@ public class Model_Soil_Loss extends Model_Base
 	public List<ModelResult> run(Scenario scenario) 
 	{
 Logger.info(">>> Computing Soil_Loss Model");
-long timeStart = System.currentTimeMillis();
 		
 		// Spatial Layers
 		int[][] rotationData = scenario.mNewRotation;
@@ -157,10 +156,6 @@ Logger.info("  > Allocated memory for Soil_Loss");
 		
 		results.add(new ModelResult("soil_loss", scenario.mOutputDir, Soil_Loss_Data, width, height));
 		
-long timeEnd = System.currentTimeMillis();
-float timeSec = (timeEnd - timeStart) / 1000.0f;
-Logger.debug(">>> Model_Soil_Loss is finished - timing: " + Float.toString(timeSec));
-
 		return results;
 	}
 }

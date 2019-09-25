@@ -57,12 +57,14 @@ Ext.define('MyApp.view.LayerPanel_Common', {
 								c.tryEnableClickSelection();
 								c.show();
 								c.expand();
+								DSS_RefilterDelayed();
 							}
 							else {
 								self.setText('Add');
 								c.tryDisableClickSelection();
 //								c.collapse();
 								c.hide();
+								DSS_RefilterDelayed();
 							}
 						}
 					}

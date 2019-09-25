@@ -13,6 +13,7 @@ import play.mvc.*;
 import play.mvc.Http.Context;
 import play.Logger;
 import play.cache.*;
+import play.libs.F.*;
 
 import views.html.*;
 
@@ -20,12 +21,14 @@ import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.*;
 
+import fileHandling.ScenarioLogger;
+
 import org.apache.commons.io.FileUtils; 
 import org.apache.commons.io.filefilter.*; 
 
 //import org.codehaus.jackson.*;
 //import org.codehaus.jackson.node.*;
-import javax.xml.bind.DatatypeConverter;
+//import javax.xml.bind.DatatypeConverter;
 
 
 import java.security.SecureRandom;
@@ -325,12 +328,13 @@ public class Application extends Controller
 		
 		QueuedWriter.queueResults(new ScenarioSetupResult(folder, scenario.mNewRotation,
 			scenario.mSelection.mRasterData, scenario.mSelection.mWidth, scenario.mSelection.mHeight));
+		ScenarioLogger.queueResults(scenario);
 
 		return ok(sendback);
 	}
 	
 	//----------------------------------------------------------------------
-	public static Result runModelCluster() throws Exception 
+	public static Promise<Result> runModelCluster() throws Exception 
 	{
 		Logger.info("----- Model Cluster Process Started ----");
 
@@ -339,111 +343,131 @@ public class Application extends Controller
 		String scenarioID = safeGetString(request, "scenarioID");
 		Scenario scenario = Scenario.getCachedScenario(scenarioID);
 		
-		if (scenario == null) {
-			return badRequest();
-		}
-		
 		String modelType = safeGetString(request, "modelType");
-		List<ModelResult> results = null;
-		
-		if (modelType.equals("yield")) {
-			Model_EthanolNetEnergyIncome model = new Model_EthanolNetEnergyIncome();
-			results = model.run(scenario);
-		}
-		else if (modelType.equals("epic_phosphorus")) {
-			Model_P_LossEpic model = new Model_P_LossEpic();
-			results = model.run(scenario);
-		}
-/*		// Model not used from client
-		else if (modelType.equals("water_quality")) {
-			Model_WaterQuality wq = new Model_WaterQuality();
-			results = wq.run(scenario);
-		}
-*/
-		else if (modelType.equals("soc")) {
-			Model_SoilCarbon model = new Model_SoilCarbon();
-			results = model.run(scenario);
-		}
-		else if (modelType.equals("pest_pol")) {
-			Model_PollinatorPestSuppression model = new Model_PollinatorPestSuppression();
-			results = model.run(scenario);
-		}
-		else if (modelType.equals("nitrous")) {
-			Model_NitrousOxideEmissions model = new Model_NitrousOxideEmissions();
-			results = model.run(scenario);
-		}
-		else if (modelType.equals("soil_loss")) {
-			Model_Soil_Loss model = new Model_Soil_Loss();
-			results = model.run(scenario);
-		}
-		else if (modelType.equals("habitat_index")) { // Bird habitat
-			Model_HabitatIndex model = new Model_HabitatIndex();
-			results = model.run(scenario);
-		}
-		else {
-			Logger.error(" Bad model type in runModelCluster: " + modelType);
-			return badRequest();
-		}
-		
-		// SendBack to Client
-		ObjectNode sendBack  = JsonNodeFactory.instance.objectNode();
-		
-		if (results != null) {
-			Analyzer_HistogramNew histogram = new Analyzer_HistogramNew();
 			
-			// Try to do an in-memory compare of (usually) default...
-			//	if layer is not in memory, try doin a file-based compare
-			for (int i = 0; i < results.size(); i++) {
-				
-				ModelResult res = results.get(i);
-				detailedLog("Procesing results for " + res.mName);
-				
-				String clientID = safeGetString(request, "clientID");
-				String clientFolder = "client_" + clientID + "/";
-				int compare1ID = request.get("compare1ID").asInt(); // -1 is default
-				String runFolder = Integer.toString(compare1ID) + "/";
+		//----------------------------------------------------------
+		class PromiseData implements Function0<Result> {
+			private String scenarioID;
+			private Scenario scenario;
+			private String modelType;
 			
-				String path1 = "";
-				// Asking to compare against DEFAULT?
-				if (compare1ID == -1) {
-					path1 = "default/" + res.mName;
-					
-					// See if the layer is in memory (it usually will be unless the server was started
-					//	with the DEFAULTS NOT loaded...)
-					Layer_Base layer = Layer_Base.getLayer(path1);
-					if (layer != null) {
-						// other layer is in memory so compare with that.
-						float[][] data1 = layer.getFloatData();
-						if (data1 == null) {
-							Logger.error("could not get layer in runModelCluster");
-						}
-						else {
-							sendBack.put(res.mName, 
-								histogram.run(res.mWidth, res.mHeight, data1, scenario.mSelection,
-												res.mRasterData, scenario.mSelection));
-						}
-						continue; // process next result...
-					}
+			PromiseData(String scenarioID, Scenario scenario, String modelType) {
+				this.scenarioID = scenarioID;
+				this.scenario	= scenario;
+				this.modelType	= modelType;
+			}
+			public Result apply() {
+		
+				if (scenario == null) {
+					return ok();
+				}
+				List<ModelResult> results = null;
+				
+				if (modelType.equals("yield")) {
+					Model_EthanolNetEnergyIncome model = new Model_EthanolNetEnergyIncome();
+					results = model.run(scenario);
+				}
+				else if (modelType.equals("epic_phosphorus")) {
+					Model_P_LossEpic model = new Model_P_LossEpic();
+					results = model.run(scenario);
+				}
+				else if (modelType.equals("soc")) {
+					Model_SoilCarbon model = new Model_SoilCarbon();
+					results = model.run(scenario);
+				}
+				else if (modelType.equals("pest_pol")) {
+					Model_PollinatorPestSuppression model = new Model_PollinatorPestSuppression();
+					results = model.run(scenario);
+				}
+				else if (modelType.equals("nitrous")) {
+					Model_NitrousOxideEmissions model = new Model_NitrousOxideEmissions();
+					results = model.run(scenario);
+				}
+				else if (modelType.equals("soil_loss")) {
+					Model_Soil_Loss model = new Model_Soil_Loss();
+					results = model.run(scenario);
+				}
+				else if (modelType.equals("habitat_index")) { // Bird habitat
+					Model_HabitatIndex model = new Model_HabitatIndex();
+					results = model.run(scenario);
 				}
 				else {
-					path1 = clientFolder + runFolder + res.mName;
+					Logger.error(" Bad model type in runModelCluster: " + modelType);
+					return ok();
 				}
 				
-				// Compare to file was not in memory, set up the real path and we'll try to load it for
-				//	comparison (which is slower...booo)
-				path1 = "./layerData/" + path1 + ".dss";
-				sendBack.put(res.mName, 
-						histogram.run(new File(path1), scenario.mSelection,
-										res.mWidth, res.mHeight, res.mRasterData, scenario.mSelection));
+				// SendBack to Client
+				ObjectNode sendBack  = JsonNodeFactory.instance.objectNode();
+				
+				if (results != null) {
+					Analyzer_HistogramNew histogram = new Analyzer_HistogramNew();
+					
+					// Try to do an in-memory compare of (usually) default...
+					//	if layer is not in memory, try doin a file-based compare
+					for (int i = 0; i < results.size(); i++) {
+						
+						ModelResult res = results.get(i);
+						detailedLog("Procesing results for " + res.mName);
+						
+						String clientID = safeGetString(request, "clientID");
+						String clientFolder = "client_" + clientID + "/";
+						int compare1ID = request.get("compare1ID").asInt(); // -1 is default
+						String runFolder = Integer.toString(compare1ID) + "/";
+					
+						String path1 = "";
+						// Asking to compare against DEFAULT?
+						if (compare1ID == -1) {
+							path1 = "default/" + res.mName;
+							
+							// See if the layer is in memory (it usually will be unless the server was started
+							//	with the DEFAULTS NOT loaded...)
+							Layer_Base layer = Layer_Base.getLayer(path1);
+							if (layer != null) {
+								// other layer is in memory so compare with that.
+								float[][] data1 = layer.getFloatData();
+								if (data1 == null) {
+									Logger.error("could not get layer in runModelCluster");
+								}
+								else {
+									sendBack.put(res.mName, 
+										histogram.run(res.mWidth, res.mHeight, data1, scenario.mSelection,
+														res.mRasterData, scenario.mSelection));
+								}
+								continue; // process next result...
+							}
+						}
+						else {
+							path1 = clientFolder + runFolder + res.mName;
+						}
+						
+						// Compare to file was not in memory, set up the real path and we'll try to load it for
+						//	comparison (which is slower...booo)
+						path1 = "./layerData/" + path1 + ".dss";
+						sendBack.put(res.mName, 
+								histogram.run(new File(path1), scenario.mSelection,
+												res.mWidth, res.mHeight, res.mRasterData, scenario.mSelection));
+					}
+					// decrement ref count and remove it for real if not needed...
+					Scenario.releaseCachedScenario(scenarioID);
+				}
+				detailedLog("Done processing list of results, queuing results for file writer");
+				QueuedWriter.queueResults(results);
+		
+				detailedLog(sendBack.toString());
+				return ok(sendBack);
 			}
-			// decrement ref count and remove it for real if not needed...
-			Scenario.releaseCachedScenario(scenarioID);
 		}
-		detailedLog("Done processing list of results, queuing results for file writer");
-		QueuedWriter.queueResults(results);
-
-		detailedLog(sendBack.toString());
-		return ok(sendBack);
+		
+		PromiseData pd = new PromiseData(scenarioID, scenario, modelType);
+		Promise<Result> promiseOfResult = Promise.promise(pd);
+	    promiseOfResult.map(
+	    	new Function<Result, Result>() {
+	    		public Result apply(Result r) {
+	    			return r;
+	    		}
+	    	}
+		);
+		return promiseOfResult;
 	}
  
 	//----------------------------------------------------------------------
@@ -692,12 +716,12 @@ public class Application extends Controller
 			if (subtype.equals("equal")) {
 				sendBack = Analyzer_Heatmap.runEqualInterval(file1, file2, 
 							outputFile, 
-							10);
+							4);
 			}
 			else {
 				sendBack = Analyzer_Heatmap.runQuantile(file1, file2, 
 							outputFile, 
-							10);
+							4);
 			}
 		}
 		else
@@ -711,12 +735,12 @@ public class Application extends Controller
 			if (subtype.equals("equal")) {
 				sendBack = Analyzer_Heatmap.runAbsolute(fileToMap, 
 								outputFile, 
-								10);
+								4);
 			}
 			else {
 				sendBack = Analyzer_Heatmap.runAbsoluteQuantiled(fileToMap, 
 								outputFile, 
-								10);
+								4);
 			}
 		}
 

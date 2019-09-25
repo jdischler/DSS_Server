@@ -46,6 +46,7 @@ Ext.define('MyApp.view.LegendElement', {
 						c.el.on('click', function () {
 							var comp = c.up().getComponent('DSS_queryCheck');
 							comp.setValue(!comp.getValue());
+							DSS_RefilterDelayed();
 						});
 					}
 				}
@@ -62,7 +63,10 @@ Ext.define('MyApp.view.LegendElement', {
 				x: 145,
 				y: -1,
 				fieldLabel: 'Label',
-				hideLabel: true
+				hideLabel: true,
+				handler: function() {
+					DSS_RefilterDelayed();
+				}
 			}]
         });
 

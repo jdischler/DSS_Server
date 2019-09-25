@@ -7,8 +7,8 @@ Ext.define('MyApp.view.LayerPanel_Google', {
 		'MyApp.view.LayerPanel_CurrentSelection',
     ],
 
-    title: 'Map Options',
-	icon: 'app/images/active_block_icon.png',
+    title: 'Map Options & Selection Statistics',
+//	icon: 'app/images/active_block_icon.png',
     hideCollapseTool: true,
 	hidden: false,
 	
@@ -37,38 +37,43 @@ Ext.define('MyApp.view.LayerPanel_Google', {
             	height: 25,
             	items: [{
 					xtype: 'label',
-					x: 38,
+					x: 35,
 					y: -4,
 					html: '<p style="text-align:right">Base Map:</p>',
-					width: 70
-				},		
-				{
+					width: 95
+				},{
 					xtype: 'radiofield',
-					x: 128,
+					x: 150,
 					y: 5,
 					name: 'google',
-					boxLabel: 'Google Hybrid',
-					checked: true,
-					value: true,
-					DSS_LayerValue:	this.DSS_LayerHybrid,
+					boxLabel: 'Simple',
 					handler: function(checkbox, checked) {
-						// Uh, why reversed value check?
-						if (!checked) {
-							globalMap.setBaseLayer(this.DSS_LayerValue);
+						if (checked) {
+							globalMap.setBaseLayer(me.DSS_LayerSimpleRoads);
 						}
 					}
-				},
-				{
+				},{
 					xtype: 'radiofield',
-					x: 245,
+					x: 225,
 					y: 5,
 					name: 'google',
-					boxLabel: 'Google Satellite',
-					DSS_LayerValue: this.DSS_LayerSatellite,
+					boxLabel: 'Terrain',
+					checked: true,
+					value: true,
 					handler: function(checkbox, checked) {
-						// Uh, why reversed value check?
-						if (!checked) {
-							globalMap.setBaseLayer(this.DSS_LayerValue);
+						if (checked) {
+							globalMap.setBaseLayer(me.DSS_LayerTerrain);
+						}
+					}
+				},{
+					xtype: 'radiofield',
+					x: 302,
+					y: 5,
+					name: 'google',
+					boxLabel: 'Satellite',
+					handler: function(checkbox, checked) {
+						if (checked) {
+							globalMap.setBaseLayer(me.DSS_LayerSatellite);
 						}
 					}
 				}]

@@ -67,7 +67,7 @@ Ext.define('MyApp.view.Scenario_Layout', {
 		stripeRows: true
 	},
     bodyStyle: {'background-color': '#fafcff'},
-	icon: 'app/images/magnify_icon.png',
+//	icon: 'app/images/magnify_icon.png',
 	
     store: ClearScenarioGridStore,
     enableColumnHide: false,
@@ -509,8 +509,6 @@ Ext.define('MyApp.view.Scenario_Layout', {
 					
 					try {
 						var obj= JSON.parse(response.responseText);
-//						console.log("success: ");
-//						console.log(obj);
 						Ext.getCmp('DSS_ReportDetail').setData(obj);
 					}
 					catch(err) {

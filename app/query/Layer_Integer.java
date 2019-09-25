@@ -327,22 +327,13 @@ public class Layer_Integer extends Layer_Base
 		ArrayNode arNode = (ArrayNode)matchValuesArray;
 		if (arNode != null) {
 			int count = arNode.size();
-			detailedLog("Query Index Array count: " + Integer.toString(count));
-			StringBuffer debug = new StringBuffer();
-			debug.append("Query Indices: ");
 			for (int i = 0; i < count; i++) {
 				JsonNode node = arNode.get(i);
 				
 				int val = node.intValue(); // FIXME: default value?
-				debug.append(Integer.toString(val));
-				if (i < count - 1) {
-					debug.append(", ");
-				}
 				queryMask |= convertIndexToMask(val);
 			}
 			
-			detailedLog(debug.toString());
-			detailedLog("Final Query Mask: " + Integer.toString(queryMask));
 			return queryMask;
 		}
 		
@@ -364,7 +355,6 @@ public class Layer_Integer extends Layer_Base
 				int val = node.intValue(); // FIXME: default value?
 				set.add(val);
 			}
-			Logger.info(set.toString());
 			return set;
 		}
 		
@@ -378,21 +368,12 @@ public class Layer_Integer extends Layer_Base
 		if (arNode != null) {
 			int count = arNode.size();
 			int array[] = new int [count];
-			detailedLog("Query Index Array count: " + Integer.toString(count));
-			StringBuffer debug = new StringBuffer();
-			debug.append("Query Indices: ");
 			for (int i = 0; i < count; i++) {
 				JsonNode node = arNode.get(i);
-				
 				int val = node.intValue(); // FIXME: default value?
-				debug.append(Integer.toString(val));
-				if (i < count - 1) {
-					debug.append(", ");
-				}
 				array[i] = val;
 			}
 			
-			detailedLog(debug.toString());
 			return array;
 		}
 		

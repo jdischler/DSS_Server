@@ -2,25 +2,35 @@
 <html lang="en">
   <head>
     <title>Crop Yield Model + Biofuel Production Model</title>
+<style>
+    body { 
+    	font-family: Arial, Helvetica, sans-serif;
+    	background-color: #f7f7f7;
+    	color: #234;
+	}
+</style>
   </head>
   <body>
-	<h1>
+<h4>
+   About the Models
+</h4>
+<h2>
 		Biofuel Production Model
-	</h1>
+	</h2>
 	The biofuel production models are simple accounting models that predict the amount of liquid biofuel generated from the crop yield at focal locations. 
 	For corn, grass, and alfalfa, the biofuel predicted is ethanol (gallons per year). 
 	For soybean, the biofuel predicted is biodiesel (gallons per year). 
 	The inputs to the model include yield from the crop yield model, and conversion ratios from Farrel et al. (2006; ethanol) or Hill et al. (2006; biodiesel) that describe the volume of liquid fuel (gallons) that can be attained from a mass (ton) of feedtock. 
-	The accuracy of this estimate depends first on the accuracy of the crop model (described above) and the accuracy of the conversion ratios, which are industry averages or modeled estimates.
+	The accuracy of this estimate depends first on the accuracy of the crop model (described below) and the accuracy of the conversion ratios, which are industry averages or modeled estimates.
 	<br><br>
 	Farrell, A. E., Plevin, R. J., Turner, B. T., Jones, A. D., O'Hare, M., & Kammen, D. M. (2006). Ethanol can contribute to energy and environmental goals. Science, 311(5760), 506-508.
 	<br><br>
 	Hill, J., Nelson, E., Tilman, D., Polasky, S., & Tiffany, D. (2006). Environmental, economic, and energetic costs and benefits of biodiesel and ethanol biofuels. Proceedings of the National Academy of Sciences, 103(30), 11206-11210.
 	<br><br>
 	<a href="http://www.sciencemag.org/content/311/5760/506.short">Link</a> 
-  	<h1>
+  	<h2>
   		Crop Yield Model
-  	</h1>
+  	</h2>
 	The crop yield models are statistical models that predict typical crop yields (bushels or short tons at standard reporting moisture levels per year) for focal locations based on local soil and topographic characteristics. 
 	The inputs to the models are slope, soil depth, percent silt and cation-exchange capacity. 
 	Slope estimates are based on a digital elevation model. Soil depth, percent silt, and cation exchange capacity estimates come from the USDA SSURGO soil geodatabase. 

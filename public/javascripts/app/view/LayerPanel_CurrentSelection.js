@@ -129,8 +129,6 @@ Ext.define('MyApp.view.LayerPanel_CurrentSelection', {
     //--------------------------------------------------------------------------
 	setNumSelectedPixels: function(pixelCount, totalPixels) {
 		
-		console.log(pixelCount);
-		
 		var areaLabel = this.getComponent('DSS_selectionArea');
 		var areaPerc = this.getComponent('DSS_selectionPerc');
 		

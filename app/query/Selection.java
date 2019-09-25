@@ -23,12 +23,9 @@ public class Selection
 		mHeight = height;
 		mWidth = width;
 		mRasterData = new byte[mHeight][mWidth];
-		int x, y;
 		// ...and initialize everything to 1 to prep for & (and) logic
-		for (y = 0; y < mHeight; y++) {
-			for (x = 0; x < mWidth; x++) {
-				mRasterData[y][x] = 1;
-			}
+		for (byte[] row: mRasterData) {
+			Arrays.fill(row, (byte)1);
 		}
 		isValid = true;
 	}

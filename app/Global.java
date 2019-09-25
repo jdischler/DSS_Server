@@ -12,16 +12,17 @@ import play.db.ebean.*;
 import play.data.format.*;
 import play.data.validation.*;
 import play.libs.*;
-
+import util.Scenario;
 
 import com.fasterxml.jackson.core.*;
+
+import fileHandling.ScenarioLogger;
+
+//import models.Layer_Integer;
 
 //------------------------------------------------------------------------------
 public class Global extends GlobalSettings
 {
-	// If the play server is started in DEV mode, should we skip loading certain layers
-	//	to get a faster server startup time and use less memory?
-	private static final boolean LOAD_ALL_LAYERS_FOR_DEV = true;
 	private static final boolean LOAD_DEFAULT_DATA = true;
 	
 	// mostly for DEV, production servers are set up to always recompute this data to be safe...
@@ -81,7 +82,7 @@ public class Global extends GlobalSettings
 
 		// Create all of the assumptions the server knows about, these will be fed to clients
 		GlobalAssumptions.initAssumptions();
-		
+		Scenario.initTracking();
 		
 		// create any computed layers (currently don't have any in here?)
 		computeLayers();
@@ -91,6 +92,7 @@ public class Global extends GlobalSettings
 		ApplyManagementOptions.now(); // Takes in-memory CDL and adds management options to it...
 		
 		QueuedWriter.beginWatchWriteQueue();
+		ScenarioLogger.beginWatchWriteQueue();
 		conditionalCreateDefaultModelOutputs();		
 		cacheModelDefaults();
 		
@@ -160,14 +162,10 @@ public class Global extends GlobalSettings
 	//--------------------------------------------------------------------------
 	private void cacheLayers() 
 	{
+		PerformanceTimer timer = new PerformanceTimer();
 		Layer_Base layer;
 		try {
-			if (Play.isProd() || LOAD_ALL_LAYERS_FOR_DEV == true) {
-				Logger.info(" ... Server is going to load all layers ... ");
-			}
-			else {
-				Logger.info(" ... Server only loading a subset of layers ... ");
-			}
+			Logger.info(" ... Server starting layer load ... ");
 			
 			// Queryable layers...though some of these are also used by model computations..
 			layer = new Layer_ProceduralFraction(); layer.init();// really has no data...init may not also be needed?
@@ -175,17 +173,23 @@ public class Global extends GlobalSettings
 			layer = new Layer_Float("slope"); layer.init();
 			layer = new Layer_Float("rivers"); layer.init();
 			layer = new Layer_Integer("watersheds", Layer_Integer.EType.ERaw); layer.init();
-//			layer = new Layer_Integer("box_selection", Layer_Integer.EType.ERaw); layer.init();
+			layer = new Layer_Integer("lcc"); layer.init();
+			layer = new Layer_Integer("lcs"); layer.init();
+			layer = new Layer_Float("dairy"); layer.init();
+			layer = new Layer_Float("public_land"); layer.init();
 			
 			// Layers for model computation
 			layer = new Layer_Float("cec"); layer.init();
 			layer = new Layer_Float("depth"); layer.init();
 			layer = new Layer_Float("silt"); layer.init();
 			layer = new Layer_Float("soc"); layer.init();
-			layer = new Layer_Float("texture"); layer.init();
+			/*layer = new Layer_Float("texture"); layer.init();
 			layer = new Layer_Float("om_soc"); layer.init();
 			layer = new Layer_Float("drainage"); layer.init();
 			layer = new Layer_Float("ph"); layer.init();
+			*/
+			// The above were converted into a single composite lookup
+			layer = new Layer_Float("n2o_composite"); layer.init();
 			layer = new Layer_Float("ls"); layer.init();
 			layer = new Layer_Float("rainfall_erosivity"); layer.init();
 			layer = new Layer_Float("soil_erodibility"); layer.init();
@@ -197,35 +201,27 @@ public class Global extends GlobalSettings
 			layer = new Layer_Float("grass_p"); layer.init();
 			
 			// Ag_Lands - RESTRICTED
-			layer = new Layer_Integer("ag_lands", Layer_Integer.EType.ERaw); layer.init();
+		/*	layer = new Layer_Integer("ag_lands", Layer_Integer.EType.ERaw); layer.init();
 			layer.setAccessRestrictions(ClientUser.getMaskForAccessOptions(ClientUser.ACCESS.AG_LANDS));
 			// CRP - RESTRICTED
 			layer = new Layer_Integer("crp", Layer_Integer.EType.ERaw); // don't do fancy shift/match tricks...there are only two values possible here...
 			((Layer_Integer)layer).setNoDataConversion(0);// work around a data issue - conversion -9999 to zeros
 			layer.init();
 			layer.setAccessRestrictions(ClientUser.getMaskForAccessOptions(ClientUser.ACCESS.CRP));
-
-			// NOTE: am putting low-priority (rarely used) data layers here so that
-			//	we can have them skip loading in DEVELOPMENT mode. Ie, faster loads
-			//	and less memory usage...
-			if (Play.isProd() || LOAD_ALL_LAYERS_FOR_DEV == true) {
-				
-				// Queryable layers...
-				layer = new Layer_Integer("lcc"); layer.init();
-				layer = new Layer_Integer("lcs"); layer.init();
-				layer = new Layer_Float("dairy"); layer.init();
-				layer = new Layer_Float("public_land"); layer.init();
-			}
+*/
 		}
 		catch (Exception e) {
 			Logger.error(e.toString());
 		}
+		
+		Logger.debug(" -Time to cache all layers (s): " + timer.stringSeconds(2));
 	}
 	
 	//--------------------------------------------------------------------------
 	private void cacheModelDefaults() {
 		
 		if (LOAD_DEFAULT_DATA) {
+			PerformanceTimer timer = new PerformanceTimer();
 			Logger.info(" ... Server is going to load MODEL DEFAULT files ...");
 			Layer_Base layer;
 			try {
@@ -244,6 +240,7 @@ public class Global extends GlobalSettings
 			catch (Exception e) {
 				Logger.error(e.toString());
 			}
+			Logger.debug(" -Time to cache all model defaults (s): " + timer.stringSeconds(2));
 		}
 		else {
 			Logger.info(" ... The Server is skipping loading MODEL DEFAULT files ...");

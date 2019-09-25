@@ -14,7 +14,7 @@ Ext.define('MyApp.view.Report_MasterLayout', {
 	
 	dock: 'right',
 	title: 'Step 3: View Simulation Results / Comparison',//Simulation Results / Reports',
-	icon: 'app/images/magnify_icon.png',
+//	icon: 'app/images/magnify_icon.png',
 	width: 500,
 	autoScroll: true,
 	layout: {
@@ -22,7 +22,7 @@ Ext.define('MyApp.view.Report_MasterLayout', {
 		autoWidth: false,
 		type: 'accordion',
 		animate: false,
-		multi: true
+		multi: true,
 	},
 	collapseDirection: 'right',
 	collapsible: true,
@@ -39,7 +39,7 @@ Ext.define('MyApp.view.Report_MasterLayout', {
 			// NOTE: didn't like the expander tool appearing at the BOTTOM
 			//	of the rightmost collapsible panel. It is not very visible.
 			//	So, I move it from the last position to the first position...
-			var tool = c.reExpander.remove(c.reExpander.items.getAt(2), false);
+			var tool = c.reExpander.remove(c.reExpander.items.getAt(1), false);
 			c.reExpander.insert(0, tool);
 		},
 	},
@@ -60,10 +60,11 @@ Ext.define('MyApp.view.Report_MasterLayout', {
 				xtype: 'report_spider'
 			},
 			{
-				xtype: 'report_detail'
+				xtype: 'report_detail',
+				titleCollapse: false
 			},
 			{
-				xtype: 'report_generate_report'
+				xtype: 'report_generate_report',
 			}]
         });
         

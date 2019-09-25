@@ -7,7 +7,7 @@ Ext.define('MyApp.view.Report_GenerateReport', {
     height: 64,
     width: 300,
     title: 'Step 4: Store Results',
-	icon: 'app/images/new_icon.png',
+//	icon: 'app/images/new_icon.png',
 	//collapsed: true,
 	
     layout: 'absolute',
@@ -32,15 +32,6 @@ Ext.define('MyApp.view.Report_GenerateReport', {
 				handler: function(btn) {
 					me.askSaveResults(btn);
 				}
-			},{
-				xtype: 'button',
-				disabled: true,
-				hidden: true,
-				text: 'Print Results',
-				icon: 'app/images/print_small_icon.png',
-				x: 250,
-				y: 6,
-				height: 24,
 			}]
         });
 

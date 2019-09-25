@@ -9,8 +9,8 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 
     width: 400,
     height: 86,
-	DSS_unpressedText: 'Activate Click Selection Tool',
-	DSS_pressedText: 'Deactivate Selection Tool',
+	DSS_unpressedText: 'Start Choosing',
+	DSS_pressedText: 'Done Choosing',
    
     //--------------------------------------------------------------------------
     initComponent: function() {
@@ -36,7 +36,7 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 				height: 28,
 				width: 152,
 				tooltip: {
-					text: 'Click on a watershed to include it in your query'
+					text: 'Click on one or more watersheds to include it in your query'
 				},
 				enableToggle: true,
 				handler: function(button, evt) {
@@ -144,6 +144,7 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 		var queryLayer = { 
 			name: this.DSS_QueryTable,
 			type: 'indexed',
+			subType: 'vectorSelect',
 			matchValues: []
 		};
 		
@@ -155,6 +156,7 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
         if (!addedElement) {
         	return;
         }
+        queryLayer['selected'] = queryLayer.matchValues.length;
         return queryLayer;
     },
 
@@ -162,7 +164,6 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
     setSelectionCriteria: function(jsonQuery) {
 
     	if (!jsonQuery || !jsonQuery.queryLayers) {
-    		console.log('Saying to hide watershed!');
 			this.header.getComponent('DSS_ShouldQuery').toggle(false);
     		return;
     	}
@@ -185,14 +186,14 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 					
 					// FIXME: TODO: Need to somehow get the relevant feature vectors!!!??
 				}
+				DSS_RefilterDelayed();
 				return;
         	}
         }
 				
 		// Nope, mark as not queried
-//		console.log('Saying to hide watershed!');
-//		this.header.getComponent('DSS_ShouldQuery').toggle(false);
-//		this.hide();
+		this.hide();
+		this.header.getComponent('DSS_ShouldQuery').toggle(false);
     },
 
 	//--------------------------------------------------------------------------
@@ -282,6 +283,8 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 			var featureObj = this.DSS_selectionLayer.getFeatureBy('fid',feature.fid);
 			this.DSS_selectionLayer.removeFeatures(featureObj);
 		}
+		DSS_RefilterDelayed(750);
+		
 	},
 
 	//--------------------------------------------------------------------------
@@ -297,6 +300,7 @@ Ext.define('MyApp.view.LayerPanel_Watershed', {
 			this.DSS_watershedSelections.splice(pos,1);
 			var featureObj = this.DSS_selectionLayer.getFeatureBy('fid', feature.fid);
 			this.DSS_selectionLayer.removeFeatures(featureObj);
+			DSS_RefilterDelayed(750);
 		}
 	}
 		

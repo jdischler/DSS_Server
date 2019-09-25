@@ -64,7 +64,7 @@ Ext.define('MyApp.view.Management_Tillage', {
 		
 		var tillageType = this.getComponent('DSS_Tillage');
 		var value = tillageType.getValue()['Tillage'];
-		console.log(value);
+//		console.log(value);
 		
 		if (value == 0) {
 			obj.text += 'Conventional';

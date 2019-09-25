@@ -39,7 +39,7 @@ public class Model_EthanolNetEnergyIncome extends Model_Base
 		int width = scenario.getWidth(), height = scenario.getHeight();
 		
 Logger.info(">>> Computing Model Ethanol / Net Energy / Net Income");
-long timeStart = System.currentTimeMillis();
+		
 		// Precompute yield....
 		Model_CropYield cropYield = new Model_CropYield();
 		float[][] calculatedYield = cropYield.run(scenario);
@@ -197,8 +197,9 @@ Logger.info("  > Allocated memory for NetEnergy, NetIncom, Fuel");
 						ethanol = yield * CEO_S;
 						// MJ per Ha
 						netEnergy = (yield * 0.40f * CEO_S * EO_S) - (EI_SF + EI_SP * yield * CEO_S);
-						// Soy return $ per Ha
-						returnAmount = P_Per_Soy * yield;
+						// Soy return $ per Ha - NOTE: soy yield includes residuals which do not have the same value
+						//	as the soybeans. Back that contribution out of the yield so we only sell the higher value soybeans
+						returnAmount = P_Per_Soy * (yield / 2.5f);
 						// Net Income $ per Ha
 						netIncome = returnAmount  - PS_Cost;
 					}
@@ -234,11 +235,6 @@ Logger.info("  > Allocated memory for NetEnergy, NetIncom, Fuel");
 		results.add(new ModelResult("ethanol", scenario.mOutputDir, ethanolData, width, height));
 		results.add(new ModelResult("net_energy", scenario.mOutputDir, netEnergyData, width, height));
 		results.add(new ModelResult("net_income", scenario.mOutputDir, netIncomeData, width, height));
-
-long timeEnd = System.currentTimeMillis();
-float timeSec = (timeEnd - timeStart) / 1000.0f;
-Logger.info(">>> Model Ethanol / Net Energy / Net Income finished");
-Logger.debug(" Execution timing: " + Float.toString(timeSec));
 
 		return results;
 	}

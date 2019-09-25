@@ -41,7 +41,6 @@ public class Model_SoilCarbon
 		int width = scenario.getWidth(), height = scenario.getHeight();
 		
 Logger.info(">>> Computing Soil Carbon Index");
-long timeStart = System.currentTimeMillis();
 		
 		float [][] soilCarbonData = new float[height][width];
 Logger.info("  > Allocated memory for SOC");
@@ -276,10 +275,6 @@ Logger.info("  > Allocated memory for SOC");
 		List<ModelResult> results = new ArrayList<ModelResult>();
 		
 		results.add(new ModelResult("soc", scenario.mOutputDir, soilCarbonData, width, height));
-
-long timeEnd = System.currentTimeMillis();
-float timeSec = (timeEnd - timeStart) / 1000.0f;
-Logger.debug(">>> Model Soil Carbon is finished - timing: " + Float.toString(timeSec));
 
 		return results;
 	}

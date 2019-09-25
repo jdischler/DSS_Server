@@ -39,7 +39,6 @@ public class Model_PollinatorPestSuppression extends Model_Base
 		int width = scenario.getWidth(), height = scenario.getHeight();
 		
 Logger.info(">>> Computing Model Pest/ Pollinator");
-long timeStart = System.currentTimeMillis();
 		
 		// Mask
 		Layer_Integer cdl = (Layer_Integer)Layer_Base.getLayer("cdl_2012"); 
@@ -63,6 +62,8 @@ long timeStart = System.currentTimeMillis();
 		Moving_Z_Window zWin = new Moving_Z_Window(mWindowSizeInCells, rotationData, width, height);
 		Moving_Z_Window.Z_WindowPoint point = zWin.getPoint();
 
+		float max = (float)Math.pow(0.75f + 2.5f + 1.0f, 2.0f);
+		
 		boolean moreCells = true;
 		while (moreCells) {
 			
@@ -73,10 +74,11 @@ long timeStart = System.currentTimeMillis();
 				float proportionGrass = zWin.getProportionGrass();
 				
 				// Calculate visitation index and normalize value by max
-				float pollinatorIndex = (float)Math.pow(0.6617f + (2.98f * proportionForest) 
-																+ (1.83f * proportionGrass), 2.0f);
+				float pollinatorIndex = (float)Math.pow((proportionForest * proportionGrass) * 3.0f 
+							+ (2.5f * proportionForest) 
+							+ (proportionGrass), 2.0f);
 				
-				pollinatorData[point.mY][point.mX] = pollinatorIndex;
+				pollinatorData[point.mY][point.mX] = pollinatorIndex / max;
 				
 				// Crop type is zero for Ag, Crop type is 1 for grass
 				float cropType = 0.0f;
@@ -102,10 +104,6 @@ long timeStart = System.currentTimeMillis();
 		results.add(new ModelResult("pest", scenario.mOutputDir, pestData, width, height));
 		results.add(new ModelResult("pollinator", scenario.mOutputDir, pollinatorData, width, height));
 		
-long timeEnd = System.currentTimeMillis();
-float timeSec = (timeEnd - timeStart) / 1000.0f;
-Logger.debug(">>> Model_PollinatorPestSuppression_New is finished - timing: " + Float.toString(timeSec));
-
 		return results;
 	}	
 }

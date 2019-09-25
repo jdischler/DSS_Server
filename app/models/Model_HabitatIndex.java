@@ -27,7 +27,6 @@ public class Model_HabitatIndex extends Model_Base
 		int width = scenario.getWidth(), height = scenario.getHeight();
 		
 Logger.info(">>> Computing Model Habitat Index");
-long timeStart = System.currentTimeMillis();
 		
 		float [][] habitatData = new float[height][width];
 Logger.info("  > Allocated memory for Habitat Index");
@@ -74,10 +73,6 @@ Logger.info("  > Allocated memory for Habitat Index");
 		List<ModelResult> results = new ArrayList<ModelResult>();
 		results.add(new ModelResult("habitat_index", scenario.mOutputDir, habitatData, width, height));
 		
-long timeEnd = System.currentTimeMillis();
-float timeSec = (timeEnd - timeStart) / 1000.0f;
-Logger.debug(">>> Model_Habitat_Index is finished - timing: " + Float.toString(timeSec));
-
 		return results;
 	}	
 }

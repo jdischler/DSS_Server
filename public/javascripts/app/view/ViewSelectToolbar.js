@@ -4,6 +4,46 @@
 var DSS_DoExpandQueried = true;
 var DSS_ViewSelectToolbar = null;
 
+//--------------------------------------------------------------------------
+var filter_task = new Ext.util.DelayedTask(function(){
+	var query = DSS_ViewSelectToolbar.buildQuery();
+	if (query) {
+		DSS_ViewSelectToolbar.submitQuery(query);
+	}
+	else {
+		var selContainer = Ext.getCmp('DSS_CurrentSelectionLayer');
+		if (selContainer.DSS_Layer) {
+			selContainer.DSS_Layer.setVisibility(false);
+		}
+		selContainer.setHeight(0);
+	}
+});
+
+var DSS_Refilter = function() {
+	filter_task.delay(0);
+}
+var DSS_RefilterDelayed = function(msDelay) {
+	if (!msDelay) msDelay = 250;
+	filter_task.delay(msDelay);
+}
+
+var DSS_NumberFieldListener = {
+	keypress: function(self, evt) {
+		if (evt.getKey() == evt.ENTER) {
+			DSS_Refilter();
+		}
+		else {
+			DSS_RefilterDelayed(1200);
+		}
+	},
+	spinup: function() {
+		DSS_RefilterDelayed(1000);
+	},
+	spindown: function() {
+		DSS_RefilterDelayed(1000);
+	}
+}
+
 //------------------------------------------------------------------------------
 Ext.define('MyApp.view.ViewSelectToolbar', {
 		
@@ -156,8 +196,6 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
     	var me = this;
 		var button = Ext.getCmp('DSS_queryButton');
 		
-		console.log('Doing a try create selection layer');
-		
 		// waits a small amount of time...then checks to see if they image could load...
 		Ext.defer(function() {
 				
@@ -170,6 +208,8 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 				var bounds = new OpenLayers.Bounds(
 					-10062652.65061, 5278060.469521415,
 					-9878152.65061, 5415259.640662575
+				//		-9991929.51,5299587.26,-9929770.38, // subtract ?? 100 100 acres tiles from the top //ALSO ABOUT 100 100 acre tiles from the left
+				//		5356675.84    
 				);
 				var imgTest = new OpenLayers.Layer.Image(
 					'Selection',

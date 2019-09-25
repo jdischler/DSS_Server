@@ -549,12 +549,18 @@ public class Analyzer_Heatmap {
 	}
 
 	//--------------------------------------------------------------------------
-	private static ObjectNode createPalette(Png png, int numColors, MinMax minMax, ObjectNode sendBack) {
+	private static ObjectNode createPalette(Png png, Integer numColors, MinMax minMax, ObjectNode sendBack) {
 		
 		Logger.info("Creating palette");
 		PngChunkPLTE palette = null;
 		try {
-			palette = png.createPalette(numColors + 1); // extra one for the transparent color
+			/*if (numColors < 7 && (minMax.mMax <= 0.0f || minMax.mMin >= 0.0f)) {
+				// FIXME: this prevents a crash but doesn't correctly offset the 
+				Logger.debug("Number of colors is smaller than expected");
+				numColors = 7;
+			}*/
+		//	palette = png.createPalette(numColors + 1); // extra one for the transparent color
+			palette = png.createPalette(10); // fudged count to avoid array access issue
 		}
 		catch(Exception e) {
 			Logger.info(e.toString());
@@ -562,13 +568,45 @@ public class Analyzer_Heatmap {
 		Logger.info("Setting palette entries");
 		
 		if (minMax.mMax <= 0.0f) {		// entire value range negative?
-			palette.setEntry(0, 60, 0, 22); // dark magenta
-			palette.setEntry(1, 100, 8, 50); 
-			palette.setEntry(2, 170, 12, 88); // magenta
-			palette.setEntry(3, 240, 32, 116); 
-			palette.setEntry(4, 255, 136, 187); // pink
-			palette.setEntry(5, 255, 200, 220);
-			palette.setEntry(6, 255, 255, 255); // white
+			// TODO: fixme...
+			if (numColors == 2) {
+				palette.setEntry(0, 255, 200, 220);
+				palette.setEntry(1, 255, 255, 255); // white
+			}
+			else if (numColors == 3) {
+				palette.setEntry(0, 255, 136, 187); // pink
+				palette.setEntry(1, 255, 200, 220);
+				palette.setEntry(2, 255, 255, 255); // white
+			}
+			else if (numColors == 4) {
+				palette.setEntry(0, 240, 32, 116); 
+				palette.setEntry(1, 255, 136, 187); // pink
+				palette.setEntry(2, 255, 200, 220);
+				palette.setEntry(3, 255, 255, 255); // white
+			}
+			else if (numColors == 5) {
+				palette.setEntry(0, 170, 12, 88); // magenta
+				palette.setEntry(1, 240, 32, 116); 
+				palette.setEntry(2, 255, 136, 187); // pink
+				palette.setEntry(3, 255, 200, 220);
+				palette.setEntry(4, 255, 255, 255); // white
+			}
+			else if (numColors == 6) {
+				palette.setEntry(0, 100, 8, 50); 
+				palette.setEntry(1, 170, 12, 88); // magenta
+				palette.setEntry(2, 240, 32, 116); 
+				palette.setEntry(3, 255, 136, 187); // pink
+				palette.setEntry(4, 255, 200, 220);
+				palette.setEntry(5, 255, 255, 255); // white
+			} else {
+				palette.setEntry(0, 60, 0, 22); // dark magenta
+				palette.setEntry(1, 100, 8, 50); 
+				palette.setEntry(2, 170, 12, 88); // magenta
+				palette.setEntry(3, 240, 32, 116); 
+				palette.setEntry(4, 255, 136, 187); // pink
+				palette.setEntry(5, 255, 200, 220);
+				palette.setEntry(6, 255, 255, 255); // white
+			}
 		}
 		else if (minMax.mMin >= 0.0f) {	// entire value range positive?
 			palette.setEntry(0, 255, 255, 255); // white

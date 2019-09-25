@@ -47,6 +47,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 					else {
 						me.setText('>=');
 					}
+					DSS_RefilterDelayed();
 				}
 			},{
 				xtype: 'numberfield',
@@ -59,7 +60,9 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 				decimalPrecision: 1,
 				step: me.DSS_ValueStep,
 				value: me.DSS_ValueDefaultGreater,
-				minValue: 0
+				minValue: 0,
+				enableKeyEvents: true,
+				listeners: DSS_NumberFieldListener
 			},{
 				xtype: 'button',
 				x: 164,
@@ -71,6 +74,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 				},
 				handler: function(me,evt) {
 					me.up().getComponent('DSS_GreaterThanValue').setValue('');
+					DSS_RefilterDelayed();					
 				}
 			},{
 				xtype: 'label',
@@ -92,6 +96,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 					var temp = gtrValue.getValue();
 					gtrValue.setValue(lessValue.getValue());
 					lessValue.setValue(temp);
+					DSS_RefilterDelayed();					
 				}
 			},{
 				xtype: 'button',
@@ -110,6 +115,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 					else {
 						me.setText('<=');
 					}
+					DSS_RefilterDelayed();					
 				}
 			},{
 				xtype: 'numberfield',
@@ -122,7 +128,9 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 				decimalPrecision: 1,
 				step: me.DSS_ValueStep,
 				value: me.DSS_ValueDefaultLess,
-				minValue: 0
+				minValue: 0,
+				enableKeyEvents: true,
+				listeners: DSS_NumberFieldListener
 			},{
 				xtype: 'button',
 				x: 343,
@@ -134,6 +142,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 				},
 				handler: function(me,evt) {
 					me.up().getComponent('DSS_LessThanValue').setValue('');
+					DSS_RefilterDelayed();					
 				}
 			},{
 				xtype: 'label',
@@ -216,7 +225,6 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 					
 					// Check to see if we need to convert units from the server....
 					if (typeof this.DSS_MetricToEnglish === 'function') {
-						console.log('Have function to convert server metric units to english...');
 						obj.layerMin = this.DSS_MetricToEnglish(obj.layerMin);
 						obj.layerMax = this.DSS_MetricToEnglish(obj.layerMax);
 					}
@@ -252,7 +260,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
     	
 		var queryLayer = { 
 			name: this.DSS_QueryTable,
-			type: 'continuous'
+			type: 'continuous',
 		};
 		
 		var gtrTest = this.getComponent('DSS_GreaterThanTest');
@@ -267,7 +275,6 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 		
 		// Check to see if we need to convert units for the server.....
 		if (typeof this.DSS_EnglishToMetric === 'function') {
-			console.log('Have function to convert English units to metric for the server...');
 			queryLayer.lessThanValue = this.DSS_EnglishToMetric(queryLayer.lessThanValue);
 			queryLayer.greaterThanValue = this.DSS_EnglishToMetric(queryLayer.greaterThanValue);
 		}
@@ -314,6 +321,8 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 				gtrTestComp.setText(queryElement.greaterThanTest);
 				lessValueComp.setValue(lessValue);
 				gtrValueComp.setValue(gtrValue);
+				DSS_RefilterDelayed();
+				
 				return;
 			}
 		}
@@ -337,6 +346,7 @@ Ext.define('MyApp.view.LayerPanel_Continuous', {
 		gtrTest.setText(this.DSS_DefaultGreaterThanTest);
 		lessValue.setValue(this.DSS_ValueDefaultLess);
 		gtrValue.setValue(this.DSS_ValueDefaultGreater);
+		DSS_RefilterDelayed();
     }
     
 });

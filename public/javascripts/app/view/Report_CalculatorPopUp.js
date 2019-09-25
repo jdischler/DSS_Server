@@ -6,7 +6,7 @@ Ext.define('MyApp.view.Report_CalculatorPopUp', {
 //    height: 120,
     width: 450,
     title: 'My Window',
-	icon: 'app/images/calculator_16.png',
+//	icon: 'app/images/calculator_16.png',
     layout: 'vbox',
     constrainHeader: true, // keep the header from being dragged out of the app body...otherwise may not be able to close it!
     maximizable: false,

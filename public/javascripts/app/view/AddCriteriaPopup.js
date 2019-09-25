@@ -7,7 +7,7 @@ Ext.define('MyApp.view.AddCriteriaPopup', {
     	'MyApp.view.AddCriteriaWidget'
     ],
     
-    height: 382,
+    height: 320,
 //    height: 600,
     width: 330,
 	layout: {

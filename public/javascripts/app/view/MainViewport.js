@@ -3,7 +3,7 @@
 var globalMap;
 var DSS_ImgFormat = 'image/png';
 var DSS_bufferSize = 2; // how many non-visible tiles on either side of visible area to cache?
-var DSS_resizeMethod = 'null';//null; // can be: null, "resize", or Ómap-resizeÓ
+var DSS_resizeMethod = 'null';//null; // can be: null, "resize", or ï¿½map-resizeï¿½
 
 // The pgis123 variants are all mapped to pgis at the server level. From the client POV,
 //	they appear as different URLs which allows the client to make multiple simultaneous
@@ -47,11 +47,13 @@ Ext.define('MyApp.view.MainViewport', {
         'MyApp.view.Report_MasterLayout'
 	],
 	
-	//autoScroll: true,
 	layout: {
 		type: 'fit'
 	},
 	id: 'DSS_MainViewport',
+	
+	minWidth: 800,
+	autoScroll: true,
 	
 	listeners: {
 		// Some controls need the layout to be done before being wired in...
@@ -155,8 +157,8 @@ Ext.define('MyApp.view.MainViewport', {
 	addControlsNeedingLayout: function() {
 		
 //		globalMap.zoomToMaxExtent();
-		globalMap.zoomTo(1);
-		globalMap.pan(1,1); // FIXME: lame workaround for google map zoom level not starting out correctly?
+		globalMap.zoomTo(9);
+//		globalMap.pan(1,1); // FIXME: lame workaround for google map zoom level not starting out correctly?
 	},
 	
 	//--------------------------------------------------------------------------
@@ -167,7 +169,8 @@ Ext.define('MyApp.view.MainViewport', {
 			dragPanOptions: {
 				enableKinetic: true,
 				kineticInterval: 500
-			}
+			},
+			zoomWheelEnabled: true
 		}));
 		
 		map.addControl(new OpenLayers.Control.Zoom());
@@ -238,28 +241,49 @@ Ext.define('MyApp.view.MainViewport', {
 	
 	//--------------------------------------------------------------------------
 	addGoogleLayers: function(map) {
-		
-		var googTerrain = new OpenLayers.Layer.Google(
+		 
+		var googSimple = new OpenLayers.Layer.Bing({
+		    name: "My Bing Aerial Layer",
+		    type: "Aerial",
+		    key: "Au_ohpV01b_LnpbMExJmpmUnamgty20v7Cpl1GvNmwzZPOezhtzegaNM0MNaSPoa",
+		});
+		var googTerrain = new OpenLayers.Layer.Bing({
+		    name: "My Bing Aerial Layer",
+		    type: "Road",
+		    key: "Au_ohpV01b_LnpbMExJmpmUnamgty20v7Cpl1GvNmwzZPOezhtzegaNM0MNaSPoa",
+		});
+		var googHybrid = new OpenLayers.Layer.Bing({
+		    name: "My Bing Aerial Layer",
+		    type: "AerialWithLabels",
+		    key: "Au_ohpV01b_LnpbMExJmpmUnamgty20v7Cpl1GvNmwzZPOezhtzegaNM0MNaSPoa",
+		});/*
 			"Google Terrain",
 			{
 				type: google.maps.MapTypeId.TERRAIN, minZoomLevel: 9, maxZoomLevel: 15
 			});
-		var googHybrid = new OpenLayers.Layer.Google(
+		var googHybrid = new OpenLayers.Layer.OSM(
 			"Google Hybrid",
 			{
 				type: google.maps.MapTypeId.HYBRID, minZoomLevel: 9, maxZoomLevel: 15
 			});
-		
-		map.addLayers([googTerrain,googHybrid]);
+		var googSimple = new OpenLayers.Layer.OSM(
+			"Google Simple",
+			{
+				type: google.maps.MapTypeId.ROADMAP, minZoomLevel: 9, maxZoomLevel: 15
+			});
+			*/
+		map.addLayers([googTerrain,googHybrid,googSimple]);
 		
 		var lpGoog = Ext.create('MyApp.view.LayerPanel_Google', {
-			DSS_LayerSatellite: googTerrain,
-			DSS_LayerHybrid: googHybrid,
+			DSS_LayerSatellite: googHybrid,
+			DSS_LayerTerrain: googTerrain,
+			DSS_LayerSimpleRoads: googSimple,
 			dock: 'bottom'
 		});
 		
 		var dssLeftPanel = Ext.getCmp('DSS_LeftPanel');
 		dssLeftPanel.up().addDocked(lpGoog);
+
 	},
 	
 	//--------------------------------------------------------------------------
@@ -336,7 +360,7 @@ Ext.define('MyApp.view.MainViewport', {
 			collapsed: true
 		});
 
-		var lpAg_Lands = Ext.create('MyApp.view.LayerPanel_Watershed', {
+/*		var lpAg_Lands = Ext.create('MyApp.view.LayerPanel_Watershed', {
 			title: 'Dane County Ag Lands',
 			DSS_Description: 'Match land by Dane County agricultural land, example: select specific parcels',
 			DSS_Layer: wmsAg_Lands,
@@ -365,7 +389,7 @@ Ext.define('MyApp.view.MainViewport', {
 			}],
 			collapsed: true
 		});
-		
+*/		
 		var lpLCC = Ext.create('MyApp.view.LayerPanel_Indexed', {
 			title: 'Land Capability Class',
 			DSS_Description: 'Match land by capability, example: select poor quality crop land',
@@ -429,7 +453,7 @@ Ext.define('MyApp.view.MainViewport', {
 			DSS_Description: 'Match land by percentage, example: select a random subset of land to simulate less-than-100% practice adoption rates',
 			DSS_shortTitle: 'Subset',
 //			DSS_Layer: DSS_GridLayer,
-			DSS_QueryTable: 'box_selection',
+			DSS_QueryTable: 'proceduralFraction',
 			collapsed: true
 		});
 		
@@ -441,8 +465,8 @@ Ext.define('MyApp.view.MainViewport', {
 		dssLeftPanel.add(lpRiver);
 		dssLeftPanel.add(lpSlope);
 		dssLeftPanel.add(lpWatershed);
-		if (lpAg_Lands) dssLeftPanel.add(lpAg_Lands);
-		if (lpCRP_Land) dssLeftPanel.add(lpCRP_Land);
+//		if (lpAg_Lands) dssLeftPanel.add(lpAg_Lands);
+//		if (lpCRP_Land) dssLeftPanel.add(lpCRP_Land);
 		dssLeftPanel.add(lpLCC);
 		dssLeftPanel.add(lpLCS);
 		dssLeftPanel.add(lpPublicLand);
@@ -457,8 +481,8 @@ Ext.define('MyApp.view.MainViewport', {
 		DSS_globalQueryableLayers.push(lpLCC);
 		DSS_globalQueryableLayers.push(lpLCS);
 		DSS_globalQueryableLayers.push(lpWatershed);
-		if (lpAg_Lands) DSS_globalQueryableLayers.push(lpAg_Lands);
-		if (lpCRP_Land) DSS_globalQueryableLayers.push(lpCRP_Land);
+//		if (lpAg_Lands) DSS_globalQueryableLayers.push(lpAg_Lands);
+//		if (lpCRP_Land) DSS_globalQueryableLayers.push(lpCRP_Land);
 		DSS_globalQueryableLayers.push(lpPublicLand);
 		DSS_globalQueryableLayers.push(lpDairy);
 		DSS_globalQueryableLayers.push(lpGrid);
@@ -469,8 +493,8 @@ Ext.define('MyApp.view.MainViewport', {
 		DSS_globalCollapsibleLayers.push(lpLCC);
 		DSS_globalCollapsibleLayers.push(lpLCS);
 		DSS_globalCollapsibleLayers.push(lpWatershed);
-		if (lpAg_Lands) DSS_globalCollapsibleLayers.push(lpAg_Lands);
-		if (lpCRP_Land) DSS_globalCollapsibleLayers.push(lpCRP_Land);
+//		if (lpAg_Lands) DSS_globalCollapsibleLayers.push(lpAg_Lands);
+//		if (lpCRP_Land) DSS_globalCollapsibleLayers.push(lpCRP_Land);
 		DSS_globalCollapsibleLayers.push(lpPublicLand);
 		DSS_globalCollapsibleLayers.push(lpDairy);
 		DSS_globalCollapsibleLayers.push(lpGrid);
@@ -577,7 +601,7 @@ Ext.define('MyApp.view.MainViewport', {
 					xtype: 'gx_mappanel',
 					id: 'DSS_map_panel',
 					title: 'Landscape Map',
-					icon: 'app/images/globe_icon.png',
+					//icon: 'app/images/globe_icon.png',
 					map: map,
 					border: 0,
 					center: '12,51',
@@ -651,7 +675,7 @@ Ext.define('MyApp.view.MainViewport', {
 						style: {
 							'background-color': '#95b0db !important'
 						},
-						icon: 'app/images/magnify_icon.png',
+						//icon: 'app/images/magnify_icon.png',
 					},
 					manageHeight: false,
 					title: 'Step 1: Select Land to Transform',

@@ -2,7 +2,7 @@
 //------------------------------------------------------------------------------
 Ext.define('MyApp.view.LogoPanel', {
 		
-    extend: 'Ext.toolbar.Toolbar',//panel.Panel',
+    extend: 'Ext.container.Container',//panel.Panel',
     alias: 'widget.logo_panel',
 
     requires: [
@@ -16,130 +16,70 @@ Ext.define('MyApp.view.LogoPanel', {
 	layout: {
 		type: 'hbox',//'absolute',
 		pack: 'start',
-		align: 'stretch'
+		align: 'middle'
 	},
 	header: false,
 	dock: 'top',
 	collapsible: true,
 	animCollapse: false,
 	collapsed: false,
-	height: DSS_LogoPanelHeight,
+//	height: DSS_LogoPanelHeight,
  	overflowY: 'hidden',
+ 	style: 'background-color: #d3e1f1',
 	
     //--------------------------------------------------------------------------
     initComponent: function() {
-    	
         var me = this;
         
         Ext.applyIf(me, {
         	items: [{
         		xtype: 'container',
-        		flex: 1,
-        		layout: 'absolute',
-				items: [{
-					xtype: 'image',
-					width: 399,
-					x: 0,
-					y: 0,
-					src: 'app/images/dss_logo.png',
-					autoEl: {
-						tag: 'a',
-						href: 'http://www.glbrc.org',
-						onclick: "javascript:window.open(this.href,'_blank');return false;"	
-					}
-				},
-				{
-					xtype: 'button',
-					x: 350,
-					y: 16,
-					width: 150,
-					border: 1,
-					scale: 'large',
-					text: 'SmartScape&#8482 Help', // tm = &#8482;
-					aURL: 'http://youtu.be/XxZvzqFZTU8',
-					handler: function(self) {
-						javascript:window.open(self.aURL,'_blank');return false;
-					}
-				},
-				{
-					xtype: 'button',
-					x: 510,
-					y: 16,
-					width: 100,
-					border: 1,
-					text: 'Gratton Lab',
-					aURL: 'http://gratton.entomology.wisc.edu',
-					scale: 'large',
-					handler: function(self) {
-						javascript:window.open(self.aURL,'_blank');return false;
-					}
-				},
-				{
-					xtype: 'button',
-					x: 620,
-					y: 16,
-					width: 120,
-					border: 1,
-					scale: 'large',
-					text: 'WEI Homepage',
-					aURL: 'https://energy.wisc.edu',
-					handler: function(self) {
-						javascript:window.open(self.aURL,'_blank');return false;
-					}
-				},
-				{
-					xtype: 'button',
-					x: 750,
-					y: 16,
-					width: 130,
-					border: 1,
-					scale: 'large',
-					text: 'Developer Links',
-					handler: function(self) {
-						Ext.create('MyApp.view.Dev_Popup').show();
-					}
-				}]
+				margins: '0 2 0 0',
+				width: 220,
+				height: 51,
+				html: '<a href="http://www.glbrc.org"><img id="ddd" src="app/images/dss_logo.png" style="width:220px"></a>',
+				listeners: {
+					afterrender: function(self) {
+						Ext.defer(function() {
+							self.updateLayout();
+						}, 100);
+						
+					}	
+				}
+				
 			},{
-				id: 'DSS_LogoExtraContainer',
+				xtype: 'button',
+				margins: 'auto 2',
+				border: 1,
+				scale: 'large',
+				text: 'SmartScape&#8482 Help', // tm = &#8482;
+				aURL: 'http://youtu.be/XxZvzqFZTU8',
+				handler: function(self) {
+					javascript:window.open(self.aURL,'_blank');return false;
+				}
+			},{
+				xtype: 'button',
+				margins: 'auto 2',
+				border: 1,
+				text: 'Gratton Lab',
+				aURL: 'http://gratton.entomology.wisc.edu',
+				scale: 'large',
+				handler: function(self) {
+					javascript:window.open(self.aURL,'_blank');return false;
+				}
+			},{
+				xtype: 'button',
+				margins: 'auto 2',
+				border: 1,
+				scale: 'large',
+				text: 'WEI Homepage',
+				aURL: 'https://energy.wisc.edu',
+				handler: function(self) {
+					javascript:window.open(self.aURL,'_blank');return false;
+				}
+			},{
 				xtype: 'container',
-				width: 80,
-				layout: 'absolute',
-				items: [{
-					id: 'DSS_LoginButton',
-					xtype: 'button',
-					x: 0,
-					y: 16,
-					width: 70,
-					border: 1,
-					scale: 'large',
-					text: 'Login',
-					DSS_LoggedIn: false,
-					handler: function(button) {
-						if (button.DSS_LoggedIn) {
-							me.tryLogout(me, button);
-						}
-						else {
-							var login = Ext.create('MyApp.view.Login_Popup', {DSS_user: ""});
-							login.DSS_LoginButton = button;
-							login.show();
-						}
-					}
-				},
-				{
-					id: 'DSS_ExtraButton',
-					xtype: 'button',
-					x: 80,
-					y: 16,
-					width: 70,
-					border: 1,
-					scale: 'large',
-					DSS_LoggedIn: false,
-					text: 'Admin',
-					hidden: true,
-					handler: function(button) {
-						Ext.create('MyApp.view.Access_Popup').show();
-					}
-				}]
+				flex: 1,
 			}]
         });
         
@@ -174,43 +114,12 @@ Ext.define('MyApp.view.LogoPanel', {
 				}
 				button.setText('Login');
 				button.DSS_LoggedIn = false;
-				me.hideExtra();
 			},
 			
 			failure: function(response, opts) {
 				Ext.MessageBox.alert('Logout Error', response.responseText);
 			}
 		});
-	},
+	}
 	
-    //--------------------------------------------------------------------------
-	showExtra: function() {
-	
-		var x = Ext.getCmp('DSS_LogoExtraContainer');
-		x.animate({
-			dynamic: true,
-			to: {
-				width: 160
-			},
-			listeners: {
-				afteranimate: function() {
-					Ext.getCmp('DSS_ExtraButton').show();
-				}
-			}
-		});
-	},
-
-    //--------------------------------------------------------------------------
-    hideExtra: function() {
-    
-		var x = Ext.getCmp('DSS_LogoExtraContainer');
-		Ext.getCmp('DSS_ExtraButton').hide();
-		x.animate({
-			dynamic: true,
-			to: {
-				width: 80
-			},
-		});
-
-    }
 });

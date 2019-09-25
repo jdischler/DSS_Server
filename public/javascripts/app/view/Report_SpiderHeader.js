@@ -4,6 +4,7 @@ Ext.define('MyApp.view.Report_SpiderHeader', {
     extend: 'Ext.container.Container',
     alias: 'widget.report_spider_header',
 
+    hidden: true,
     width: 500,
 	layout: 'vbox',
 	style: {

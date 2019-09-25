@@ -30,7 +30,6 @@ public class Model_P_LossEpic extends Model_Base
 	public List<ModelResult> run(Scenario scenario) 
 	{
 Logger.info(">>> Computing P_Loss_EPIC Model");
-long timeStart = System.currentTimeMillis();
 
 		//----------------------------------------------------------------------
 		// Get Client Multipliers
@@ -169,10 +168,6 @@ Logger.info("  > Allocated memory for P_Loss_EPIC");
 		
 		results.add(new ModelResult("p_loss_epic", scenario.mOutputDir, PhosphorusData, width, height));
 		
-long timeEnd = System.currentTimeMillis();
-float timeSec = (timeEnd - timeStart) / 1000.0f;
-Logger.debug(">>> P_Loss_EPIC Model is finished - timing: " + Float.toString(timeSec));
-
 		return results;
 	}
 }

@@ -247,6 +247,7 @@ Ext.define('MyApp.view.LayerPanel_Indexed', {
 						}
 					}
 				}
+				DSS_RefilterDelayed();
 				return;
         	}
         }

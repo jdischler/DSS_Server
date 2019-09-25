@@ -64,7 +64,7 @@ Ext.define('MyApp.view.Management_CoverCrop', {
 		
 		var tillageType = this.getComponent('DSS_CoverCrop');
 		var value = tillageType.getValue()['CoverCrop'];
-		console.log(value);
+//		console.log(value);
 		
 		if (value == 0) {
 			obj.text += 'Yes';

@@ -4,7 +4,7 @@ Ext.define('MyApp.view.Info_PopUp_HTML', {
     height: 480,
     width: 640,
     title: 'Temp',
-	icon: 'app/images/magnify_icon.png',
+//	icon: 'app/images/magnify_icon.png',
     layout: 'fit',
     
     initComponent: function() {

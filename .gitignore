@@ -39,3 +39,5 @@ conf/routes~
 *.db
 *.zip
 *.key~#
+/.target/
+scenarioLog/results.csv

@@ -3,16 +3,80 @@ package util;
 import play.*;
 import java.util.*;
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.*;
 
+import util.Layer_Integer;
+
 //------------------------------------------------------------------------------
 public class Scenario 
 {
 	//--------------------------------------------------------------------------
-	private static final boolean DETAILED_DEBUG_LOGGING = true;
+	// scenario tracking
+	// Add row defaults
+	private static List<String> mPosition;
+	private static List<String> mData;
+	private static Long mScenarioCounter = 1L;
+	
+	public static final void initTracking() {
+		
+		mPosition = new ArrayList<String>();
+		mData = new ArrayList<String>();
+		
+		mPosition.add("user"); 			mData.add("");
+		mPosition.add("scenario"); 		mData.add("");
+		mPosition.add("timestamp"); 	mData.add("");
+		mPosition.add("step"); 			mData.add("");
+		mPosition.add("cdl_2012"); 		mData.add("");
+		mPosition.add("lcc"); 			mData.add("");
+		mPosition.add("lcs"); 			mData.add("");
+		mPosition.add("slope >"); 		mData.add("");
+		mPosition.add("slope <"); 		mData.add("");
+		mPosition.add("rivers >"); 		mData.add("");
+		mPosition.add("rivers <"); 		mData.add("");
+		mPosition.add("dairy >"); 		mData.add("");
+		mPosition.add("dairy <"); 		mData.add("");
+		mPosition.add("public_land >");	mData.add("");
+		mPosition.add("public_land <"); mData.add("");
+		mPosition.add("watersheds"); 	mData.add("");
+		mPosition.add("subset"); 		mData.add("");
+		mPosition.add("area_query");	mData.add("");
+		mPosition.add("area_trx");		mData.add("");
+		mPosition.add("to"); 			mData.add("");
+		mPosition.add("fertilized"); 	mData.add("");
+		mPosition.add("manure"); 		mData.add("");
+		mPosition.add("fall_manure"); 	mData.add("");
+		mPosition.add("tilled"); 		mData.add("");
+		mPosition.add("cover_crop"); 	mData.add("");
+		mPosition.add("countoured"); 	mData.add("");
+	}
+	
+	private static final void set(List<String> row, String key, String value) {
+		
+		Integer ct = mPosition.size();
+		Integer sz = row.size();
+		for (int idx = 0; idx < ct; idx++) {
+			if (idx >= sz) {
+				Logger.error("OOOOOOOOoooof");
+				break;
+			}
+			
+			if (key.equalsIgnoreCase(mPosition.get(idx))) {
+				row.set(idx, value);
+			}
+		}
+	}
+
+	// messy but makes the tracking add-on a little faster to slip in
+	public String mUserId; // 
+	public String mScenarioId;
+	
+	//--------------------------------------------------------------------------
+	private static final boolean DETAILED_DEBUG_LOGGING = false;
 	private static final void detailedLog(String detailedMessage) {
 		
 		if (DETAILED_DEBUG_LOGGING) {
@@ -27,7 +91,7 @@ public class Scenario
 	public int mRefCounts;
 	
 	public GlobalAssumptions mAssumptions;
-	public Selection mSelection; 
+	public Selection mSelection;
 	public String mOutputDir;
 	private JsonNode mConfiguration;
 	public int[][] mNewRotation; // copy of Rotation layer, but selection transformed
@@ -75,15 +139,16 @@ public class Scenario
 		}
 		
 		theScenario.mRefCounts = requestCount;
-		RandomString uniqueID = new RandomString();
 		int tryCount = 0;
 		while(tryCount < 1000) {
-			String scenarioCacheID = uniqueID.get(5) + 
-						clientID + 
-						((tryCount > 0) ? Integer.toString(tryCount) : "");
+			String scenarioCacheID = mScenarioCounter.toString();
+			mScenarioCounter++;			
+			theScenario.mScenarioId = scenarioCacheID;
+			scenarioCacheID = clientID + scenarioCacheID;
 			if (!mCachedScenarios.containsKey(scenarioCacheID)) {
 				mCachedScenarios.put(scenarioCacheID, theScenario);
 				theScenario.mCachedAtTime = System.currentTimeMillis();
+				theScenario.mUserId = clientID;
 				return scenarioCacheID;
 			}
 			tryCount++;
@@ -331,6 +396,7 @@ public class Scenario
 //				Logger.info("  Num pixels selected from query: " +
 //						Integer.toString(currentSelection.countSelectedPixels()));
 				
+				((ObjectNode)transformElement).put("area_query", pixelsSelectedFromQuery * 30.0f / 4046.856f);
 				if (oldSelection != null) {
 					// remove the old selection from the current/new selection
 					//	this prevents us from running a transform on land that is
@@ -342,6 +408,13 @@ public class Scenario
 					perc = actualPixelsSelectedFromQuery / (float)pixelsSelectedFromQuery;
 					detailedLog("  Pixels removed from selection: " +
 						Integer.toString(pixelsSelectedFromQuery - actualPixelsSelectedFromQuery));
+					
+					// export area in acres
+					((ObjectNode)transformElement).put("area_trx", actualPixelsSelectedFromQuery * 30.0f / 4046.856f);
+				}
+				else {
+					// export area in acres
+					((ObjectNode)transformElement).put("area_trx", pixelsSelectedFromQuery * 30.0f / 4046.856f);
 				}
 				
 				detailedLog("  Actual selection percentage: " + 
@@ -378,5 +451,161 @@ public class Scenario
 		
 		return rotationToTransform;
 	}
-}
 
+	//--------------------------------------------------------------------------
+	public static String logCSVHeader() {
+		return String.join(",", mPosition) + "\n";
+	}
+	//--------------------------------------------------------------------------
+	public String logCSV() {
+			
+		JsonNode transformQueries = mConfiguration.get("transforms");
+		if (transformQueries == null || !transformQueries.isArray()) {
+			return "bad config";
+		}
+		
+		Layer_Integer cdl = (Layer_Integer)Layer_Base.getLayer("cdl_2012");
+		if (cdl == null) return "bad config";
+		
+		Selection currentSelection = null, oldSelection = null;
+		ArrayNode transformArray = (ArrayNode)transformQueries;
+		StringBuilder str = new StringBuilder();
+		
+		DateTimeFormatter FOMATTER = DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm");
+		LocalDateTime localDateTime = LocalDateTime.now();
+		String ts = FOMATTER.format(localDateTime);
+		
+		int count = transformArray.size();
+		for (Integer i = 0; i < count; i++) {
+			// copy the default (no data) set
+			List<String> row = new ArrayList<String>(mData);
+			set(row, "user", mUserId);
+			set(row, "scenario", mScenarioId);
+			set(row, "timestamp", ts);
+			set(row, "step", i.toString());
+			
+			JsonNode transformElement = transformArray.get(i);
+			if (transformElement == null || !transformElement.isObject()) {
+				continue;
+			}
+			
+			JsonNode query = transformElement.get("queryLayers");			
+			//str.append("Query:" + query.toString() + "\n");
+			
+			JsonNode transformConfig = transformElement.get("config");
+			if (transformConfig == null || !transformConfig.isObject()) {
+				continue;
+			}
+			
+			ObjectNode transformConfigObj = (ObjectNode)transformConfig;
+			
+			try {
+				Integer newLandUse = Json.safeGetInteger(transformConfig, "LandUse");
+				String tmp = "";
+				if (newLandUse == 1) tmp = "corn";
+				else if (newLandUse == 6) tmp = "grass";
+				else if (newLandUse == 16) tmp = "soy";
+				else if (newLandUse == 17) tmp = "alfalfa";
+				
+				set(row, "to", tmp);
+				set(row, "area_query", Json.safeGetOptionalFloat(transformElement, "area_query", -1.0f).toString());
+				set(row, "area_trx", Json.safeGetOptionalFloat(transformElement, "area_trx", -1.0f).toString());
+				
+				if (query != null && query.isArray()) {
+					
+					ArrayNode arNode = (ArrayNode)query;
+					int ct = arNode.size();
+					for (int ii = 0; ii < ct; ii++) {
+						JsonNode arElem = arNode.get(ii);
+
+						String type = Json.safeGetString(arElem, "type");
+						String subType = Json.safeGetOptionalString(arElem, "subType", null);
+						String name = Json.safeGetString(arElem, "name"); // layer name
+						
+						if (subType != null && subType.equalsIgnoreCase("vectorSelect")) {
+							set(row, "watersheds", arElem.get("selected").asText());
+						}
+						else if (type.equalsIgnoreCase("fractionalLand")) {
+							set(row, "subset", arElem.get("fraction").asText());
+						}
+						else if (type.equalsIgnoreCase("continuous")) {
+							Float lessThan = Json.safeGetOptionalFloat(arElem, "lessThanValue", null);
+							Float gtrThan = Json.safeGetOptionalFloat(arElem, "greaterThanValue", null);
+							if (lessThan != null) {
+								set(row, name + " <", lessThan.toString());
+							}
+							if (gtrThan != null) {
+								set(row, name + " >", gtrThan.toString());
+							}
+						}
+						else if (type.equalsIgnoreCase("indexed")) {
+							ArrayNode matchVals = (ArrayNode)arElem.get("matchValues");
+							if (matchVals == null) continue;
+							String strVal = "";
+							for (int idx = 0; idx < matchVals.size(); idx++) {
+								if (idx > 0) strVal += ":";
+								Integer index = matchVals.get(idx).intValue();
+								if (name.equalsIgnoreCase("cdl_2012")) {
+									if (index == 1) strVal += "corn";
+									else if (index == 6) strVal += "grass";
+									else if (index == 16) strVal += "soy";
+									else if (index == 17) strVal += "alfalfa";
+								}
+								else if (name.equalsIgnoreCase("lcc")) {
+									strVal += index;
+									/*if (index == 1) strVal += "crop_I";
+									else if (index == 2) strVal += "crop_II";
+									else if (index == 3) strVal += "crop_III";
+									else if (index == 4) strVal += "crop_IV";
+									else if (index == 5) strVal += "marg_I";
+									else if (index == 6) strVal += "marg_II";
+									else if (index == 7) strVal += "marg_III";
+									else if (index == 8) strVal += "marg_IV";*/
+								}
+								else if (name.equalsIgnoreCase("lcs")) {
+									if (index == 1) strVal += "erosion_prone";
+									else if (index == 2) strVal += "saturated_soils";
+									else if (index == 3) strVal += "poor_texture";
+								}
+							}
+							set(row, name, strVal);
+						}
+					}
+				}
+				
+				JsonNode managementOptions = transformConfigObj.get("Options");
+				if (managementOptions != null && managementOptions.isObject()) {
+					JsonNode fertNode = managementOptions.get("Fertilizer");
+					if (fertNode != null && fertNode.isObject()) { 
+						ObjectNode fertOpts = (ObjectNode)fertNode;
+						set(row, "fertilized", Json.safeGetOptionalBoolean(fertOpts, "Fertilizer", false).toString());
+						set(row, "manure", Json.safeGetOptionalBoolean(fertOpts, "FertilizerManure", false).toString());
+						set(row, "fall_manure", Json.safeGetOptionalBoolean(fertOpts, "FertilizerFallSpread", false).toString());
+					}
+					JsonNode tillNode = managementOptions.get("Tillage");
+					if (tillNode != null && tillNode.isObject()) {
+						ObjectNode tillOpts = (ObjectNode)tillNode;
+						set(row, "tilled", Json.safeGetOptionalBoolean(tillOpts, "Tillage", false).toString());;
+					}
+					JsonNode ccnode = managementOptions.get("CoverCrop");
+					if (ccnode != null && ccnode.isObject()) {
+						ObjectNode ccOpts = (ObjectNode)ccnode;
+						set(row, "cover_crop", Json.safeGetOptionalBoolean(ccOpts, "CoverCrop", false).toString());;
+					}
+					JsonNode cnode = managementOptions.get("Contour");
+					if (cnode != null && cnode.isObject()) {
+						ObjectNode contOpts = (ObjectNode)cnode;
+						set(row, "countoured", Json.safeGetOptionalBoolean(contOpts, "Contour", false).toString());;
+					}
+				}
+			}
+			catch(Exception e) {
+				Logger.error(e.toString());
+			}
+			
+			str.append(String.join(",", row) + "\n");
+		}
+		
+		return str.toString();
+	}
+}

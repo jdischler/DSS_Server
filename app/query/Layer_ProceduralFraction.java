@@ -42,35 +42,25 @@ public class Layer_ProceduralFraction extends Layer_Base
 			gridCellSize: 900, // 900 meters x 900 meters
 			seed: this.DSS_Seed
 */		
-		Logger.info("Running Procedural Fraction Query");
 		
 		// Get fraction
 		float fraction = 0.5f;
 		JsonNode queryFraction = queryNode.get("fraction");
-		if (queryFraction == null) {
-			Logger.info(" ! fraction jsonNode not found, using default fraction value");
-		}
-		else {
+		if (queryFraction != null) {
 			fraction = queryFraction.numberValue().floatValue() / 100.0f;
 		}
 		
 		// Get seed
 		int seed = 0;
 		JsonNode querySeed = queryNode.get("seed");
-		if (querySeed == null) {
-			Logger.info(" ! fraction seed jsonNode not found, using default seed value");
-		}
-		else {
+		if (querySeed != null) {
 			seed = querySeed.numberValue().intValue();
 		}
 
 		// Get Cell Size for procedural grid...
 		int gridSize = 30; // 30 raster cells wide...
 		JsonNode queryCellSize = queryNode.get("gridCellSize");
-		if (queryCellSize == null) {
-			Logger.info(" ! fraction cell size jsonNode not found, using default cell size value");
-		}
-		else {
+		if (queryCellSize != null) {
 			gridSize = queryCellSize.numberValue().intValue();
 			if (gridSize < 1) gridSize = 1;
 			if (gridSize > 100) gridSize = 100;

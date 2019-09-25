@@ -35,12 +35,11 @@ public class Global extends GlobalSettings
 			public void run() {
 				cleanUpPendingRegistrations(1); 
 			}
-		}, 5, 30, TimeUnit.MINUTES);// initialDelay, period, units);
+		}, 10, 30, TimeUnit.MINUTES);// initialDelay, period, units);
 
 	//--------------------------------------------------------------------------
 	private void cleanUpPendingRegistrations(int shelfLife) { // time in hours
 		
-		Logger.debug("Scheduled Executor Service -> cleanUpPendingRegistrations");
 		Date date = new Date();
 		long expirationDateMS = date.getTime() - shelfLife * 30 * /*60 * */1000; // hour
 		Date expDate = new Date(expirationDateMS);

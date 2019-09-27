@@ -38,6 +38,8 @@ public class ScenarioLogger implements Runnable {
 	
 	private static final boolean mbWriteLandscape = false; // thinking this is mostly for debugging at this point?
 	
+	private static Integer mFileID = 1;
+	
 	//--------------------------------------------------------------------------
 	public final static void beginWatchWriteQueue() {
 	
@@ -75,9 +77,20 @@ public class ScenarioLogger implements Runnable {
 			}
 		}
 		
+		// Try to create a new file
+		while (true) {
+			File writeFile = new File("./scenarioLog/results" + mFileID + ".csv");
+			if (writeFile.exists()) {
+				mFileID++;
+			}
+			else {
+				break;
+			}
+		}
+		
 		// start a new log
 		try ( BufferedWriter writer = new BufferedWriter(
-		        new FileWriter("./scenarioLog/results.csv", false)  //Set FALSE to overwrite (create new)
+		        new FileWriter("./scenarioLog/results" + mFileID + ".csv", false)  //Set FALSE to overwrite (create new)
 		    )) { 
 
 			writer.write(Scenario.logCSVHeader());
@@ -122,7 +135,7 @@ public class ScenarioLogger implements Runnable {
 				detailedLog("ScenarioLogger queue working, waiting......");				
 				String out = setup.logCSV();
 				try ( BufferedWriter writer = new BufferedWriter(
-                        new FileWriter("./scenarioLog/results.csv", true)  //Set true for append mode
+                        new FileWriter("./scenarioLog/results" + mFileID + ".csv", true)  //Set true for append mode
                     )) { 
 					writer.write(out);
 				}

@@ -40,4 +40,4 @@ conf/routes~
 *.zip
 *.key~#
 /.target/
-scenarioLog/results.csv
+/scenarioLog/

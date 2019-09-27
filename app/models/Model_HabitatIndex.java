@@ -46,16 +46,20 @@ Logger.info("  > Allocated memory for Habitat Index");
 		int TotalMask = mAgMask | mGrassMask;
 		
 		// --- Model specific code starts here
-		Moving_Z_Window zWin = new Moving_Z_Window(mWindowSizeInCells, rotationData, width, height);
+		// N Window seems to be slightly more efficient than the Z window.
+		//	Possibly because it steps up and down which means the leading edge being updated is horizontal 
+		//	...thus the memory along that edge is contiguous??
+		Moving_Window win = new Moving_N_Window(mWindowSizeInCells, rotationData, width, height);
+		Moving_Window.WindowPoint point;
 		
 		boolean moreCells = true;
 		while (moreCells) {
-			Moving_Z_Window.Z_WindowPoint point = zWin.getPoint();
+			point = win.getPoint();
 			
 			// If proportions are zero, don't try to get them because we'd divide by zero in doing that.
-			if ((rotationData[point.mY][point.mX] & TotalMask) > 0 && zWin.canGetProportions()) {
-				float proportionAg = zWin.getProportionAg();
-				float proportionGrass = zWin.getProportionGrass();
+			if ((rotationData[point.mY][point.mX] & TotalMask) > 0 && win.canGetProportions()) {
+				float proportionAg = win.getProportionAg();
+				float proportionGrass = win.getProportionGrass();
 				
 				// Habitat Index
 				float lambda = -4.47f + (2.95f * proportionAg) + (5.17f * proportionGrass); 
@@ -67,7 +71,7 @@ Logger.info("  > Allocated memory for Habitat Index");
 				habitatData[point.mY][point.mX] = -9999.0f; // NO DATA
 			}
 			
-			moreCells = zWin.advance();
+			moreCells = win.advance();
 		}		
 		
 		List<ModelResult> results = new ArrayList<ModelResult>();

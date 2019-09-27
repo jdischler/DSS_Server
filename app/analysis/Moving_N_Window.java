@@ -28,132 +28,19 @@ while (!moreCells) {
 */
 
 //------------------------------------------------------------------------------
-public final class Moving_N_Window
+public final class Moving_N_Window extends Moving_Window
 {
-	// small helper class.....
-	public final class N_WindowPoint
-	{
-		public int mX, mY;
-		
-		public N_WindowPoint(int x, int y) {
-			mX = x;
-			mY = y;
-		}
-	}
-	
-	//
-	private int[][] mRasterData;
-	private int mRasterWidth, mRasterHeight;
-	private int mHalfWindowSize; // half the size, in cells
-	
-	// Define working variables
-	private int mbInitialized; // first call to 
-	private int mUpLeft_X, mUpLeft_Y;
-	private int mLowRight_X, mLowRight_Y;
-	
-	private int mTotal; // total data cells in window. NoData cells are NOT counted
-	
-	private int mCountAg, mAgMask;
-	private int mCountForest, mForestMask;
-	private int mCountGrass, mGrassMask;
-	
-	private int mAt_X, mAt_Y;
 	private boolean mbMovingUp; // set when the window should be moving UP
 	private boolean mbShouldAdvance_X; // set when the next move should be a RIGHT movement
-	private N_WindowPoint mPoint;
 	
 	// Define moving N window - it assumes starting at (x,y) = (0,0) - but that could be changed if needed
 	//--------------------------------------------------------------------------
 	public Moving_N_Window(int win_sz, int [][] rasterData, int raster_w, int raster_h) {
 		
-		mRasterData = rasterData;
-		mRasterWidth = raster_w;
-		mRasterHeight = raster_h;
-		mHalfWindowSize = win_sz / 2;
-		
-		mAt_X = 0;
-		mAt_Y = 0;
+		super(win_sz, rasterData, raster_w, raster_h);
+
 		mbMovingUp = false; // window moves down first...
 		mbShouldAdvance_X = false; // only gets set once per line once an edge is hit
-		
-		mAgMask = 1 + 2 + 4 + 8 + 16 + 32 + 64 + 512; // 1, 2, 3, 4, 5, 6, 7, 10
-		mForestMask = 1024; // 11
-		mGrassMask = 128 + 256; // 8 and 9
-	
-		mPoint = new N_WindowPoint(mAt_X, mAt_Y);
-		
-		calcWindowBounds();
-		initCounts();
-	}
-	
-	//--------------------------------------------------------------------------
-	private void calcWindowBounds() {
-		
-		updateBoundsMoving_X();
-		updateBoundsMoving_Y();
-	}
-	
-	//--------------------------------------------------------------------------
-	private final void updateBoundsMoving_X() {
-		
-		mUpLeft_X = mAt_X - mHalfWindowSize;
-		mLowRight_X = mAt_X + mHalfWindowSize;
-		
-		if (mUpLeft_X < 0) {
-			mUpLeft_X = 0;
-		}
-		if (mLowRight_X > mRasterWidth - 1) {
-			mLowRight_X = mRasterWidth - 1;
-		}
-	}
-
-	//--------------------------------------------------------------------------
-	private final void updateBoundsMoving_Y() {
-		
-		mUpLeft_Y = mAt_Y - mHalfWindowSize;
-		mLowRight_Y = mAt_Y + mHalfWindowSize;
-		
-		if (mUpLeft_Y < 0) {
-			mUpLeft_Y = 0;
-		}
-		if (mLowRight_Y > mRasterHeight - 1) {
-			mLowRight_Y = mRasterHeight - 1;
-		}
-	}
-	
-	// Called internally off the constructor
-	//--------------------------------------------------------------------------
-	private void initCounts() {
-		
-		mTotal = 0;	
-		
-		for (int y = mUpLeft_Y; y <= mLowRight_Y; y++) {
-			for (int x = mUpLeft_X; x <= mLowRight_X; x++) {
-				int cellValue = mRasterData[y][x]; 
-				if (cellValue != 0) {
-					mTotal++;
-					
-					// Calculate count of land cover in the given moving window
-					if ((cellValue & mAgMask) > 0) {
-						mCountAg++;	
-					}
-					else if ((cellValue & mGrassMask) > 0) {
-						mCountGrass++;
-					}
-					else if ((cellValue & mForestMask) > 0) {
-						mCountForest++;
-					}
-				}
-			}
-		}
-	}
-	
-	//--------------------------------------------------------------------------
-	public final N_WindowPoint getPoint() {
-		
-		mPoint.mX = mAt_X;
-		mPoint.mY = mAt_Y;
-		return mPoint;
 	}
 	
 	// Each call to run advances one cell in the direction the Z-win is moving in...
@@ -310,21 +197,6 @@ public final class Moving_N_Window
 		}
 		
 		return true;
-	}
-	
-	//--------------------------------------------------------------------------
-	public final float getProportionAg() {
-		return (float)mCountAg / mTotal;
-	}
-	
-	//--------------------------------------------------------------------------
-	public final float getProportionForest() {
-		return (float)mCountForest / mTotal;
-	}
-
-	//--------------------------------------------------------------------------
-	public final float getProportionGrass() {
-		return (float)mCountGrass / mTotal;
-	}
+	}	
 }
 

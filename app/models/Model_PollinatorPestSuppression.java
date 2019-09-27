@@ -58,20 +58,23 @@ Logger.info(">>> Computing Model Pest/ Pollinator");
 		// full raster save process...
 		float [][] pestData = new float[height][width];
 		float [][] pollinatorData = new float[height][width];
-		
-		Moving_Z_Window zWin = new Moving_Z_Window(mWindowSizeInCells, rotationData, width, height);
-		Moving_Z_Window.Z_WindowPoint point = zWin.getPoint();
+
+		// N Window seems to be slightly more efficient than the Z window.
+		//	Possibly because it steps up and down which means the leading edge being updated is horizontal 
+		//	...thus the memory along that edge is contiguous??
+		Moving_Window win = new Moving_N_Window(mWindowSizeInCells, rotationData, width, height);
+		Moving_Window.WindowPoint point;
 
 		float max = (float)Math.pow(0.75f + 2.5f + 1.0f, 2.0f);
 		
 		boolean moreCells = true;
 		while (moreCells) {
 			
-			point = zWin.getPoint();
-			if ((rotationData[point.mY][point.mX] & TotalMask) > 0 && zWin.canGetProportions()) {
+			point = win.getPoint();
+			if ((rotationData[point.mY][point.mX] & TotalMask) > 0 && win.canGetProportions()) {
 				
-				float proportionForest = zWin.getProportionForest();
-				float proportionGrass = zWin.getProportionGrass();
+				float proportionForest = win.getProportionForest();
+				float proportionGrass = win.getProportionGrass();
 				
 				// Calculate visitation index and normalize value by max
 				float pollinatorIndex = (float)Math.pow((proportionForest * proportionGrass) * 3.0f 
@@ -97,7 +100,7 @@ Logger.info(">>> Computing Model Pest/ Pollinator");
 			}
 
 			
-			moreCells = zWin.advance();
+			moreCells = win.advance();
 		}	
 	
 		List<ModelResult> results = new ArrayList<ModelResult>();

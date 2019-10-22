@@ -7,7 +7,7 @@ Ext.define('MyApp.view.LayerPanel_CurrentSelection', {
     // Unique ID for this layer, thus there should only be one of these ever?
     id: 'DSS_CurrentSelectionLayer',
     
-    DSS_desiredHeight: 60,
+    DSS_desiredHeight: 56,
 	height: 0,
 
     layout: 'absolute',
@@ -28,14 +28,14 @@ Ext.define('MyApp.view.LayerPanel_CurrentSelection', {
         		itemId: 'DSS_selectionArea',
         		text: '',
         		x: 25,
-        		y: 18
+        		y: 15
         	},
         	{
         		xtype: 'label',
         		itemId: 'DSS_selectionPerc',
         		text: '',
         		x: 230,
-        		y: 18
+        		y: 15
         	},{
         		xtype: 'button',
 				itemId: 'DSS_showSelectionButon',
@@ -43,7 +43,7 @@ Ext.define('MyApp.view.LayerPanel_CurrentSelection', {
         		enableToggle: true,
         		pressed: true,
         		x: 45,
-        		y: 41,
+        		y: 38,
         		width: 90,
         		handler: function(self) {
 					var slider = me.getComponent('DSS_opacitySlider');
@@ -62,13 +62,14 @@ Ext.define('MyApp.view.LayerPanel_CurrentSelection', {
 				itemId: 'DSS_opacitySlider',
 				width: 210,
 				x: 133,
-				y: 30,
+				y: 27,
 				padding: 10,
 				value: 100,
 				minValue: 0,
 				maxValue: 100,
 				increment: 10,
 				fieldLabel: 'Selection Opacity',
+				labelAlign: 'right',
 				labelWidth: 105,
 				listeners: {
 					change: function(slider, newvalue) {

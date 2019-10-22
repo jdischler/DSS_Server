@@ -91,6 +91,9 @@ Ext.define('MyApp.view.MainViewport', {
 		};
 		
 		globalMap = new OpenLayers.Map('map', options)
+		globalMap.isValidZoomLevel = function(zoomLevel) {
+	        return ((zoomLevel != null) && (zoomLevel >= 8) && (zoomLevel <= 13));
+		}
 		var map = globalMap;
 
 		this.doApplyIf(me, map);

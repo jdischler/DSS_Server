@@ -34,17 +34,17 @@ Ext.define('MyApp.view.LayerPanel_Google', {
             items: [{
             	xtype: 'container',
             	layout: 'absolute',
-            	height: 25,
+            	height: 18,
             	items: [{
 					xtype: 'label',
 					x: 35,
-					y: -4,
+					y: -6,
 					html: '<p style="text-align:right">Base Map:</p>',
 					width: 95
 				},{
 					xtype: 'radiofield',
 					x: 150,
-					y: 5,
+					y: 3,
 					name: 'google',
 					boxLabel: 'Simple',
 					handler: function(checkbox, checked) {
@@ -55,7 +55,7 @@ Ext.define('MyApp.view.LayerPanel_Google', {
 				},{
 					xtype: 'radiofield',
 					x: 225,
-					y: 5,
+					y: 3,
 					name: 'google',
 					boxLabel: 'Terrain',
 					checked: true,
@@ -68,7 +68,7 @@ Ext.define('MyApp.view.LayerPanel_Google', {
 				},{
 					xtype: 'radiofield',
 					x: 302,
-					y: 5,
+					y: 3,
 					name: 'google',
 					boxLabel: 'Satellite',
 					handler: function(checkbox, checked) {

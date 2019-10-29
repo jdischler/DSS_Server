@@ -22,7 +22,7 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 
 		Ext.define('Spider_Model', {
 			extend: 'Ext.data.Model',
-			fields: ['Current', 'Scenario', 'Bin', 'Match', 'IntermCurrent', 'IntermScenario']
+			fields: ['Baseline', 'Scenario', 'Bin', 'Match', 'IntermCurrent', 'IntermScenario']
 		});
 	
         me.graphDetailStore = Ext.create('Ext.data.Store', {
@@ -31,10 +31,10 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 				{Bin: 'Net Income', Match: 'net_income'}, 
 				{Bin: 'Gross Biofuel', Match: 'ethanol'}, 
 				{Bin: 'Net Energy', Match: 'net_energy'},
-				{Bin: 'Phosphorus', Match: 'P_Loss_EPIC'},
-				{Bin: 'Soil Loss', Match: 'soil_loss'}, 
 				{Bin: 'Soil Carbon', Match: 'soc'}, 
-				{Bin: 'Nitrous Oxide', Match: 'nitrous_oxide'},
+				{Bin: 'Soil Retention', Match: 'soil_loss'}, 
+				{Bin: 'Phosphorus Retention', Match: 'P_Loss_EPIC'},
+				{Bin: 'N₂O Mitigation', Match: 'nitrous_oxide'},
 				{Bin: 'Pollinators', Match: 'pollinator'}, 
 				{Bin: 'Biocontrol', Match: 'pest'}, 
 				{Bin: 'Bird Habitat', Match: 'habitat_index'}]
@@ -110,7 +110,7 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 		}
 		
     	if (rec) {
-			rec.set("Current", result1);
+			rec.set("Baseline", result1);
 			rec.set("Scenario", result2);
 			rec.commit();
     	}
@@ -176,7 +176,7 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 			result1 = intermediate1 / max * 100;
 			result2 = intermediate2 / max * 100;
   			
-			rec.set('Current', result1);
+			rec.set('Baseline', result1);
 			rec.set('Scenario', result2);
 			
 			rec.commit();
@@ -191,14 +191,14 @@ Ext.define('MyApp.view.Report_SpiderGraph', {
 		for (var idx = 0; idx < this.graphDetailStore.count(); idx++)
 		{
 			var rec = this.graphDetailStore.getAt(idx);
-			rec.set("Current", defaultValue);
+			rec.set("Baseline", defaultValue);
 			rec.set("Scenario", defaultValue);
 			rec.commit();
 		}
 		for (var idx = 0; idx < this.graphCombinedStore.count(); idx++)
 		{
 			var rec = this.graphCombinedStore.getAt(idx);
-			rec.set("Current", defaultValue);
+			rec.set("Baseline", defaultValue);
 			rec.set("Scenario", defaultValue);
 			rec.set('IntermCurrent', 0);
 			rec.set('IntermScenario', 0);

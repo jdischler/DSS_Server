@@ -16,7 +16,7 @@ Ext.define('MyApp.view.Report_GraphPopUp', {
 
 		Ext.define('Habitat_Index', {
 			extend: 'Ext.data.Model',
-			fields: ['Current', 'Scenario', 'Delta', 'Bin']
+			fields: ['Baseline', 'Scenario', 'Delta', 'Bin']
 		});
 	
         this.graphstore = Ext.create('Ext.data.Store', {
@@ -40,7 +40,7 @@ Ext.define('MyApp.view.Report_GraphPopUp', {
 					title: 'km\xb2', // square kilometers
 					type: 'Numeric',
 					position: 'left',
-					fields: ['Current', 'Scenario']
+					fields: ['Baseline', 'Scenario']
 				}/*,{
 					title: 'km\xb2', // square kilometers
 					type: 'Numeric',
@@ -56,7 +56,7 @@ Ext.define('MyApp.view.Report_GraphPopUp', {
 				series: [{
 					type: 'line',
 					xField: 'Bin',
-					yField: 'Current',
+					yField: 'Baseline',
 					smooth: 3,
 					tips: {
 						trackMouse: true,
@@ -64,7 +64,7 @@ Ext.define('MyApp.view.Report_GraphPopUp', {
 						height: 40,
 						renderer: function(store, item) {
 							var areaUnits = ' km\xb2'; // km2
-							var freq = 'Area: ' + store.get('Current').toFixed(2) + areaUnits;
+							var freq = 'Area: ' + store.get('Baseline').toFixed(2) + areaUnits;
 							var bin = 'Value: ' + store.get('Bin').toFixed(3);
 
 							this.setTitle(freq + '<br />' + bin);
@@ -129,7 +129,7 @@ Ext.define('MyApp.view.Report_GraphPopUp', {
 			var cr = data1[i] * 900 / 1000000;
 			var sc = data2[i] * 900 / 1000000;
 			
-			array.push({ 	Current: cr, 
+			array.push({ 	Baseline: cr, 
 							Scenario: sc,
 							Delta: sc - cr,
 							Bin: (max-min)/(data1.length) * i + min });

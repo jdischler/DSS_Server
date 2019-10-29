@@ -135,7 +135,7 @@ Ext.define('MyApp.view.Report_ValueTypePopup', {
 						boxLabel: '$',
 						name: 'valueStyle',
 						padding: '0 0 -5 0',
-						disabled: true,
+						hidden: true,
 						handler: function(radio, checked) {
 							if (checked) {
 								Ext.getCmp('DSS_ReportDetail').setValueStyle('$');
@@ -154,6 +154,7 @@ Ext.define('MyApp.view.Report_ValueTypePopup', {
 					columns: 1,
 					labelStyle: 'color:#777;',
 					items: [{
+						id: 'DSS_DeltaOutputRadio',
 						boxLabel: 'Change',
 						name: 'dataStyle',
 						checked: true,
@@ -167,7 +168,8 @@ Ext.define('MyApp.view.Report_ValueTypePopup', {
 							}
 						}
 					},{
-						boxLabel: 'Current',
+						boxLabel: 'Baseline',
+						id: 'DSS_BaselineOutputRadio',
 						name: 'dataStyle',
 						padding: '0 0 -5 0',
 						handler: function(radio, checked) {
@@ -175,7 +177,7 @@ Ext.define('MyApp.view.Report_ValueTypePopup', {
 								Ext.getCmp('DSS_ReportDetail').setDataStyle('file1');
 								Ext.getCmp('DSS_ValueStyleRadioGroup').setDisabled(true);
 								Ext.getCmp('DSS_valueTypeDisplay').setDisabled(true);
-								Ext.getCmp('DSS_dataTypeDisplay').setText('Current');
+								Ext.getCmp('DSS_dataTypeDisplay').setText('Baseline');
 							}
 						}
 					},{

@@ -3,6 +3,7 @@
 
 var DSS_DoExpandQueried = true;
 var DSS_ViewSelectToolbar = null;
+var DSS_plusButtonToggle = null;
 
 //--------------------------------------------------------------------------
 var filter_task = new Ext.util.DelayedTask(function(){
@@ -75,6 +76,7 @@ Ext.define('MyApp.view.ViewSelectToolbar', {
 				},
 				border: 1,
 				handler: function(button) {
+					DSS_plusButtonToggle = button;
 					button.setIcon('app/images/24_drop_icon.png');
 					button.up().tryShowCriteriaLayers(button);
 				}

@@ -31,7 +31,7 @@ Ext.define('MyApp.view.Report_SpiderGraphObject', {
 	series: [{
 		type: 'dss_radar',
 		xField: 'Bin',
-		yField: 'Current',
+		yField: 'Baseline',
 		startDegrees: -90,
 		showInLegend: true,
 		showMarkers: true,
@@ -41,11 +41,13 @@ Ext.define('MyApp.view.Report_SpiderGraphObject', {
 			opacity: 0.75
 		},
 		tips: {
-			trackMouse: true,
-			width: 120,
-			height: 50,
+			//trackMouse: true,
+			anchor: 'left',
+			anchorOffset: 11,
+			width: 180,
+			height: 20,
 			renderer: function(store, item) {
-				this.setTitle(store.get('Bin') + ': ' + store.get('Current'));
+				this.setTitle(store.get('Bin') + ': ' + Ext.util.Format.number(store.get('Baseline'), '0.0#'));
 			}
 		},
 		style: {
@@ -67,15 +69,17 @@ Ext.define('MyApp.view.Report_SpiderGraphObject', {
 			opacity: 0.75
 		},
 		tips: {
-			trackMouse: true,
-			width: 150,
-			height: 40,
+//			trackMouse: true,
+			anchor: 'left',
+			anchorOffset: -11,
+			width: 180,
+			height: 20,
 			renderer: function(store, item) {
-				this.setTitle(store.get('Bin') + ': ' + store.get('Scenario'));
+				this.setTitle(store.get('Bin') + ': ' + Ext.util.Format.number(store.get('Scenario'), '0.0#'));
 			}
 		},
 		style: {
-			'stroke-width': 2,
+			'stroke-width': 1,
 			'fill-opacity': 0.1,
 			'stroke-opacity': 1
 		}

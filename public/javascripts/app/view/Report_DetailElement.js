@@ -19,9 +19,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
     
     width: 500,
     height: 28,
-	layout: {
-        type: 'absolute'
-    },
+	layout: 'absolute',
 	
     //--------------------------------------------------------------------------
     initComponent: function() {
@@ -39,8 +37,7 @@ Ext.define('MyApp.view.Report_DetailElement', {
         }
         
         Ext.applyIf(me, {
-            items: [
-            {
+        	items: [{
 			    itemId: 'DSS_ValueField',  
 			    xtype: 'textfield',
 			    x: 15,

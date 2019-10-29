@@ -76,6 +76,7 @@ Ext.define('MyApp.view.AddCriteriaPopup', {
 			//	Ext.getCmp('DSS_ScenarioSummary').hide();
 			}
     		button.up().up().close();
+    		DSS_plusButtonToggle.setIcon('app/images/add_icon.png');
     	}
     },{
     	xtype: 'tbspacer',

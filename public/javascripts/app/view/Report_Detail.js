@@ -16,16 +16,8 @@ Ext.define('MyApp.view.Report_Detail', {
     id: "DSS_ReportDetail",
     
     width: 500,
- //   layout: 'vbox',
     title: 'Simulation Detail',
-//	icon: 'app/images/magnify_icon.png',
 
-    /*tools: [{
-    	type: 'print',
-    	callback: function() {
-    		Ext.Msg.alert('Yes')
-    	}
-    }],*/
     requires : [
     	'MyApp.view.Report_ValueTypePopup',
 		'MyApp.view.Report_DetailHeader',
@@ -43,7 +35,7 @@ Ext.define('MyApp.view.Report_Detail', {
 				e.preventDefault();
 				var res = Ext.getCmp('DSS_ReportDetail').grabResults();
 				copyToClipboard(res.csv);
-				Ext.Msg.alert('Results as CSV (Copied to Clipboard)', res.html);
+				Ext.Msg.alert('Results as CSV (Copied to Clipboard)', res.html).setWidth(480);
 			}})
 		}
 	},
@@ -66,28 +58,24 @@ Ext.define('MyApp.view.Report_Detail', {
 				xtype: 'container', 
 				itemId: 'results_container',
 				padding: '0 0 3 0', // just really need to pad bottom to maintain spacing there
-				layout: { 
-					type: 'vbox'
+				defaults: {
+					xtype: 'report_detail_item',
+					DSS_DetailReportContainer: me
 				},
 				items: [{
 					xtype: 'report_value_popup'
-				},
-				{
+				},{
 					itemId: 'result_net_income',
-					xtype: 'report_detail_item',
 					DSS_FieldString: 'net_income',
 					DSS_UnitLabel: '$Million/Yr',
 					DSS_Label: 'Net Income',
 					DSS_GraphTitle: 'Net Income',
 					DSS_InfoHTML: 'help/yield_and_net_income.htm',
-					DSS_DetailReportContainer: me
 				},{
 					itemId: 'result_ethanol',
-					xtype: 'report_detail_item',
 					style: 'background-color: #e1effe',
 					DSS_FieldString: 'ethanol',
 					DSS_UnitLabel: 'Gal/Yr',
-					//DSS_UnitLabel: 'Gl/Yr',
 					DSS_Label: 'Gross Biofuel',
 					DSS_calculators: [{
 						DSS_HiddenConversion: true,
@@ -109,12 +97,9 @@ Ext.define('MyApp.view.Report_Detail', {
 					}],
 					DSS_GraphTitle: 'Biofuel Production',
 					DSS_InfoHTML: 'help/yield_and_biofuel.htm',
-					DSS_DetailReportContainer: me
 				},{
 					itemId: 'result_net_energy',
-					xtype: 'report_detail_item',
 					DSS_FieldString: 'net_energy',
-					//DSS_UnitLabel: 'TJ/Yr',
 					DSS_UnitLabel: 'MBtu/Yr',
 					DSS_Label: 'Net Energy',
 					DSS_calculators: [{
@@ -131,14 +116,10 @@ Ext.define('MyApp.view.Report_Detail', {
 					}],
 					DSS_GraphTitle: 'Net Energy',
 					DSS_InfoHTML: 'help/yield_and_net_energy.htm',
-					DSS_DetailReportContainer: me
 				},{
 					itemId: 'result_phosphorus_epic',
-					xtype: 'report_detail_item',
 					style: 'background-color: #e1effe',
 					DSS_FieldString: 'p_loss_epic',
-					//DSS_UnitLabel: 'Kg/Yr',
-					//DSS_UnitLabel: 'ton/Yr',
 					DSS_UnitLabel: 'lb/Yr',
 					DSS_Label: 'Phosphorus Loading',
 					DSS_calculators: [{
@@ -161,25 +142,19 @@ Ext.define('MyApp.view.Report_Detail', {
 					}],
 					DSS_GraphTitle: 'Epic Phosphorus Loading',
 					DSS_InfoHTML: 'help/phosphorous.htm',
-					DSS_DetailReportContainer: me
 				},{
 					itemId: 'result_soil_loss',
-					xtype: 'report_detail_item',
 					DSS_FieldString: 'soil_loss',
-					//DSS_UnitLabel: 'Mg/Yr',
 					DSS_UnitLabel: 'ton/Yr',
 					DSS_Label: 'Soil Loss',
 					DSS_calculators: [ton_to_megagram],
 					DSS_GraphTitle: 'Soil Loss',
 					DSS_InfoHTML: 'help/soil_loss.htm',
-					DSS_DetailReportContainer: me
 				},{
 					itemId: 'result_soc',
-					xtype: 'report_detail_item',
 					style: 'background-color: #e1effe',
 					DSS_FieldString: 'soc',
 					DSS_Label: 'Soil Carbon Sequest.',
-					//DSS_UnitLabel: 'Mg/Yr',
 					DSS_UnitLabel: 'ton/Yr',
 					DSS_calculators: [ton_to_megagram,
 					{
@@ -197,12 +172,9 @@ Ext.define('MyApp.view.Report_Detail', {
 					}],
 					DSS_GraphTitle: 'Soil Carbon Sequestration',
 					DSS_InfoHTML: 'help/soil_carbon.htm',
-					DSS_DetailReportContainer: me
 				},{
 					itemId: 'result_nitrous_oxide',
-					xtype: 'report_detail_item',
 					DSS_FieldString: 'nitrous_oxide',
-					//DSS_UnitLabel: 'Mg/Yr',
 					DSS_UnitLabel: 'ton/Yr',
 					DSS_Label: 'Nitrous Oxide',
 					DSS_calculators: [ton_to_megagram,
@@ -221,10 +193,8 @@ Ext.define('MyApp.view.Report_Detail', {
 					}],
 					DSS_GraphTitle: 'Nitrous Oxide Emissions',
 					DSS_InfoHTML: 'help/nitrous_oxide_emission.htm',
-					DSS_DetailReportContainer: me
 				},{
 					itemId: 'result_pollinators',
-					xtype: 'report_detail_item',
 					style: 'background-color: #e1effe',
 					DSS_FieldString: 'pollinator',
 					DSS_UnitLabelDelta: '0 to 1',
@@ -232,20 +202,16 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_Label: 'Pollinator Index',
 					DSS_GraphTitle: 'Pollinator Index',
 					DSS_InfoHTML: 'help/pollinator.htm',
-					DSS_DetailReportContainer: me
 				},{
 					itemId: 'result_pest',
-					xtype: 'report_detail_item',
 					DSS_FieldString: 'pest',
 					DSS_UnitLabelDelta: '0 to 1',
 					DSS_UnitLabelFile: '0 to 1',
 					DSS_Label: 'Biocontrol Index',
 					DSS_GraphTitle: 'Biocontrol / Pest Supression Index',
 					DSS_InfoHTML: 'help/pest_suppression.htm',
-					DSS_DetailReportContainer: me
 				},{
 					itemId: 'result_habitat_index',
-					xtype: 'report_detail_item',
 					style: 'background-color: #e1effe',
 					DSS_FieldString: 'habitat_index',
 					DSS_UnitLabelDelta: '0 to 1',
@@ -253,7 +219,6 @@ Ext.define('MyApp.view.Report_Detail', {
 					DSS_Label: 'Bird Habitat Index',
 					DSS_GraphTitle: 'Bird Habitat Index',
 					DSS_InfoHTML: 'help/biodiversity.htm',
-					DSS_DetailReportContainer: me
 				}]
 			}]
         });
@@ -313,23 +278,36 @@ Ext.define('MyApp.view.Report_Detail', {
 	grabResults: function() {
 
 		var me = this;
-		var dat = "<div><b>Model,", csv = '"Model","';
+		var dat = "<div><b>Model, Values (", csv = '"Model","Value (';
 		
-		if (Ext.getCmp('DSS_ActualOutputRadio').checked) {
-			dat += "Actual Values"
-			csv += "Actual Values"
+		if (Ext.getCmp('DSS_ActualOutputRadio').checked || !Ext.getCmp('DSS_DeltaOutputRadio').checked) {
+			dat += "Actual "
+			csv += "Actual "
 		}
 		else {
-			dat += "% Values"			
-			csv += "% Values"
+			dat += "% "			
+			csv += "% "
 		}
+		if (Ext.getCmp('DSS_DeltaOutputRadio').checked) {
+			dat += 'Change, ';
+			csv += 'Change, '
+		}
+		else if (Ext.getCmp('DSS_BaselineOutputRadio').checked) {
+			dat += "Baseline, ";
+			csv += "Baseline, ";
+		}
+		else {
+			dat += "Scenario, ";
+			csv += "Scenario, ";
+		}
+
 		if (me.DSS_compareMode == "landscape") {
-			csv += ' (Entire Landscape)"\r\n'		
-			dat += ' (Entire Landscape)</b></div>'
+			csv += 'Entire Landscape)"\r\n'		
+			dat += 'Entire Landscape)</b></div>'
 		}
 		else {
-			csv += ' (Only Modified Landscape)"\r\n'
-			dat += ' (Only Modified Landscape)</b></div>'
+			csv += 'Only Modified Landscape)"\r\n'
+			dat += 'Only Modified Landscape)</b></div>'
 		}
 		var c = this.getComponent('results_container');
 		for (var idx = 0; idx < c.items.getCount(); idx++) {
